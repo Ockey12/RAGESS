@@ -70,8 +70,6 @@
 			isa = PBXGroup;
 			children = (
 				AC20242B2BC151070007E156 /* RAGESS */,
-				AC20243D2BC151090007E156 /* RAGESSTests */,
-				AC2024472BC151090007E156 /* RAGESSUITests */,
 				AC20242A2BC151070007E156 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -104,20 +102,6 @@
 				AC2024332BC151090007E156 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
-			sourceTree = "<group>";
-		};
-		AC20243D2BC151090007E156 /* RAGESSTests */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = RAGESSTests;
-			sourceTree = "<group>";
-		};
-		AC2024472BC151090007E156 /* RAGESSUITests */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = RAGESSUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

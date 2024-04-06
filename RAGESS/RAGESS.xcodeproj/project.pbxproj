@@ -69,7 +69,7 @@
 		AC2024202BC151070007E156 = {
 			isa = PBXGroup;
 			children = (
-				AC20242B2BC151070007E156 /* RAGESS */,
+				AC20242B2BC151070007E156 /* macOS */,
 				AC20242A2BC151070007E156 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -84,7 +84,7 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		AC20242B2BC151070007E156 /* RAGESS */ = {
+		AC20242B2BC151070007E156 /* macOS */ = {
 			isa = PBXGroup;
 			children = (
 				AC20242C2BC151070007E156 /* RAGESSApp.swift */,
@@ -93,7 +93,7 @@
 				AC2024352BC151090007E156 /* RAGESS.entitlements */,
 				AC2024322BC151090007E156 /* Preview Content */,
 			);
-			path = RAGESS;
+			path = macOS;
 			sourceTree = "<group>";
 		};
 		AC2024322BC151090007E156 /* Preview Content */ = {

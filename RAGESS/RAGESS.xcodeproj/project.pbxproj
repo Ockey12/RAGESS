@@ -39,6 +39,7 @@
 		AC2024352BC151090007E156 /* RAGESS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = RAGESS.entitlements; sourceTree = "<group>"; };
 		AC20243A2BC151090007E156 /* RAGESSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RAGESSTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC2024442BC151090007E156 /* RAGESSUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RAGESSUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AC2024582BC154430007E156 /* RAGESS */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = RAGESS; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -69,6 +70,7 @@
 		AC2024202BC151070007E156 = {
 			isa = PBXGroup;
 			children = (
+				AC2024582BC154430007E156 /* RAGESS */,
 				AC20242B2BC151070007E156 /* macOS */,
 				AC20242A2BC151070007E156 /* Products */,
 			);

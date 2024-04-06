@@ -11,8 +11,6 @@
 		AC20242F2BC151070007E156 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC20242E2BC151070007E156 /* ContentView.swift */; };
 		AC2024312BC151090007E156 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AC2024302BC151090007E156 /* Assets.xcassets */; };
 		AC2024342BC151090007E156 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AC2024332BC151090007E156 /* Preview Assets.xcassets */; };
-		AC2024492BC151090007E156 /* RAGESSUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC2024482BC151090007E156 /* RAGESSUITests.swift */; };
-		AC20244B2BC151090007E156 /* RAGESSUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC20244A2BC151090007E156 /* RAGESSUITestsLaunchTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -41,8 +39,6 @@
 		AC2024352BC151090007E156 /* RAGESS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = RAGESS.entitlements; sourceTree = "<group>"; };
 		AC20243A2BC151090007E156 /* RAGESSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RAGESSTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC2024442BC151090007E156 /* RAGESSUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RAGESSUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		AC2024482BC151090007E156 /* RAGESSUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAGESSUITests.swift; sourceTree = "<group>"; };
-		AC20244A2BC151090007E156 /* RAGESSUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAGESSUITestsLaunchTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -120,8 +116,6 @@
 		AC2024472BC151090007E156 /* RAGESSUITests */ = {
 			isa = PBXGroup;
 			children = (
-				AC2024482BC151090007E156 /* RAGESSUITests.swift */,
-				AC20244A2BC151090007E156 /* RAGESSUITestsLaunchTests.swift */,
 			);
 			path = RAGESSUITests;
 			sourceTree = "<group>";
@@ -272,8 +266,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AC2024492BC151090007E156 /* RAGESSUITests.swift in Sources */,
-				AC20244B2BC151090007E156 /* RAGESSUITestsLaunchTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

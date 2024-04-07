@@ -10,7 +10,7 @@ import SwiftUI
 public struct GreetingView: View
 {
     public init() {
-        
+
     }
     public var body: some View {
         Text("Hello, RAGESS!")

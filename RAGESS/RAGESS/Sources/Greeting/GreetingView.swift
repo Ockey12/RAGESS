@@ -16,6 +16,7 @@ public struct GreetingView: View
     {
         Text("Hello, RAGESS!")
     }
+
 }
 
 #Preview {

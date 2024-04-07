@@ -6,12 +6,13 @@
 //
 
 import SwiftUI
+import Greeting
 
 @main
 struct RAGESSApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            GreetingView()
         }
     }
 }

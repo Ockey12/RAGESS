@@ -7,21 +7,17 @@ let package = Package(
     platforms: [.macOS(.v14)],
     products: [
         .library(
-            name: "RAGESS",
-            targets: ["ContentView"]),
+            name: "Greeting",
+            targets: ["Greeting"]),
     ],
     dependencies: [],
     targets: [
         .target(
-            name: "Client",
-            dependencies: []
-        ),
-        .target(
-            name: "ContentView",
+            name: "Greeting",
             dependencies: []
         ),
         .testTarget(
-            name: "ClientTests",
+            name: "Sample",
             dependencies: []
         )
     ]

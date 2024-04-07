@@ -9,5 +9,19 @@ the developer checks the file for changes, commits, and pushes again.
 If the file is not modified by SwiftFormat, the push is successful.
 
 1. Clone this project.
-2. Install [SwiftFormat](https://github.com/nicklockwood/SwiftFormat), if needed.
-3. In the root directory of this project, execute `./setup-hooks.sh`.
+1. Install [SwiftFormat](https://github.com/nicklockwood/SwiftFormat), if needed. For example, execute the following command.
+    ```
+    brew install swiftformat
+    ```
+1. Go to the root directory of this project. For example, execute the following command.
+    ```
+    cd RAGESS
+    ```
+1. Execute the following command to grant execute permission to [setup-hooks.sh](https://github.com/Ockey12/RAGESS/blob/main/setup-hooks.sh).
+    ```
+    chmod +x setup-hooks.sh
+    ```
+1. To generate `.git/hooks/pre-push`, execute the following command.
+    ```
+    ./setup-hooks.sh
+    ```

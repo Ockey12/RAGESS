@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# Execute SwiftFormat
+swiftformat .
+
+# Get the number of files modified by SwiftFormat
+CHANGED_FILES=$(git diff --name-only | wc -l)
+
+# If there are modified files, display a message and abort push
+if [ $CHANGED_FILES -gt 0 ]; then
+    echo "The following files have been changed by SwiftFormat :"
+    git diff --name-only
+    echo "Commit the changes and then push again."
+    exit 1
+fi
+
+# Allow push if no files have been modified
+exit 0

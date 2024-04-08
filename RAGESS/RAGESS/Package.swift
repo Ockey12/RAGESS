@@ -19,12 +19,17 @@ let package = Package(
         .package(
             url: "https://github.com/pointfreeco/swift-composable-architecture",
             .upToNextMinor(from: "1.9.2")
+        ),
+        .package(
+            url: "https://github.com/pointfreeco/swift-dependencies",
+            .upToNextMinor(from: "1.2.2")
         )
     ],
     targets: [
         .target(
             name: "LSPClient",
             dependencies: [
+                .product(name: "DependenciesMacros", package: "swift-dependencies"),
                 .product(name: "LSPBindings", package: "sourcekit-lsp")
             ]
         ),

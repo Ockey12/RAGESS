@@ -13,6 +13,10 @@ let package = Package(
     ],
     dependencies: [
         .package(
+            url: "https://github.com/apple/sourcekit-lsp",
+            branch: "release/5.10"
+        ),
+        .package(
             url: "https://github.com/pointfreeco/swift-composable-architecture",
             .upToNextMinor(from: "1.9.2")
         )

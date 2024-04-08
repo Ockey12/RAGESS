@@ -10,7 +10,7 @@
 		AC20242D2BC151070007E156 /* RAGESSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC20242C2BC151070007E156 /* RAGESSApp.swift */; };
 		AC2024312BC151090007E156 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AC2024302BC151090007E156 /* Assets.xcassets */; };
 		AC2024342BC151090007E156 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AC2024332BC151090007E156 /* Preview Assets.xcassets */; };
-		ACFA44AA2BC281880060D2AC /* Greeting in Frameworks */ = {isa = PBXBuildFile; productRef = ACFA44A92BC281880060D2AC /* Greeting */; };
+		AC279BB62BC445E00016F2B9 /* Greeting in Frameworks */ = {isa = PBXBuildFile; productRef = AC279BB52BC445E00016F2B9 /* Greeting */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -46,7 +46,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ACFA44AA2BC281880060D2AC /* Greeting in Frameworks */,
+				AC279BB62BC445E00016F2B9 /* Greeting in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -130,7 +130,7 @@
 			);
 			name = RAGESS;
 			packageProductDependencies = (
-				ACFA44A92BC281880060D2AC /* Greeting */,
+				AC279BB52BC445E00016F2B9 /* Greeting */,
 			);
 			productName = RAGESS;
 			productReference = AC2024292BC151070007E156 /* RAGESS.app */;
@@ -570,7 +570,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		ACFA44A92BC281880060D2AC /* Greeting */ = {
+		AC279BB52BC445E00016F2B9 /* Greeting */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Greeting;
 		};

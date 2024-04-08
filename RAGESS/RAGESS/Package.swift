@@ -7,8 +7,8 @@ let package = Package(
     platforms: [.macOS(.v14)],
     products: [
         .library(
-            name: "Greeting",
-            targets: ["Greeting"]
+            name: "LSPClient",
+            targets: ["LSPClient"]
         )
     ],
     dependencies: [
@@ -23,8 +23,10 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "Greeting",
-            dependencies: []
+            name: "LSPClient",
+            dependencies: [
+                .product(name: "LSPBindings", package: "sourcekit-lsp")
+            ]
         ),
         .testTarget(
             name: "Sample",

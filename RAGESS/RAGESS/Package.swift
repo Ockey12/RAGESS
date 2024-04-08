@@ -11,7 +11,12 @@ let package = Package(
             targets: ["Greeting"]
         )
     ],
-    dependencies: [],
+    dependencies: [
+        .package(
+            url: "https://github.com/pointfreeco/swift-composable-architecture",
+            .upToNextMinor(from: "1.9.2")
+        )
+    ],
     targets: [
         .target(
             name: "Greeting",

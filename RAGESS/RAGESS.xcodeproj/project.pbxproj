@@ -10,7 +10,7 @@
 		AC20242D2BC151070007E156 /* RAGESSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC20242C2BC151070007E156 /* RAGESSApp.swift */; };
 		AC2024312BC151090007E156 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AC2024302BC151090007E156 /* Assets.xcassets */; };
 		AC2024342BC151090007E156 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AC2024332BC151090007E156 /* Preview Assets.xcassets */; };
-		AC279BB82BC4498E0016F2B9 /* LSPClient in Frameworks */ = {isa = PBXBuildFile; productRef = AC279BB72BC4498E0016F2B9 /* LSPClient */; };
+		AC279BBA2BC44A780016F2B9 /* LSPClient in Frameworks */ = {isa = PBXBuildFile; productRef = AC279BB92BC44A780016F2B9 /* LSPClient */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -46,7 +46,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AC279BB82BC4498E0016F2B9 /* LSPClient in Frameworks */,
+				AC279BBA2BC44A780016F2B9 /* LSPClient in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -130,7 +130,7 @@
 			);
 			name = RAGESS;
 			packageProductDependencies = (
-				AC279BB72BC4498E0016F2B9 /* LSPClient */,
+				AC279BB92BC44A780016F2B9 /* LSPClient */,
 			);
 			productName = RAGESS;
 			productReference = AC2024292BC151070007E156 /* RAGESS.app */;
@@ -570,7 +570,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		AC279BB72BC4498E0016F2B9 /* LSPClient */ = {
+		AC279BB92BC44A780016F2B9 /* LSPClient */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = LSPClient;
 		};

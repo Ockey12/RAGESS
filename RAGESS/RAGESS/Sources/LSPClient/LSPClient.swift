@@ -5,8 +5,8 @@
 //  Created by ockey12 on 2024/04/09.
 //
 
-import Foundation
 import DependenciesMacros
+import Foundation
 import LanguageServerProtocol
 import LanguageServerProtocolJSONRPC
 
@@ -23,7 +23,8 @@ struct LSPClient {
     private let queue = DispatchQueue(label: "LSP-Request")
 
     mutating func sendInitializeRequest(
-        serverPath: String = "/Applications/Xcode-15.2.0.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/sourcekit-lsp",
+        serverPath: String =
+            "/Applications/Xcode-15.2.0.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/sourcekit-lsp",
         projectRootPathString: String
     ) {
         connection.start(receiveHandler: Client())
@@ -49,10 +50,10 @@ struct LSPClient {
 
         _ = connection.send(request, queue: queue) { result in
             switch result {
-            case .success(let response):
+            case let .success(response):
                 print("\nINITIALIZATION SUCCEEDED\n")
                 dump(response)
-            case .failure(let error):
+            case let .failure(error):
                 print("\nINITIALIZATION FAILED...\n")
                 print(error)
             }

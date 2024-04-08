@@ -11,12 +11,12 @@ final class Client: MessageHandler {
     func handle<Notification>(
         _: Notification,
         from: ObjectIdentifier
-    ) where Notification : NotificationType {}
+    ) where Notification: NotificationType {}
 
     func handle<Request>(
         _: Request,
         id: RequestID,
         from: ObjectIdentifier,
         reply: @escaping (LSPResult<Request.Response>) -> Void
-    ) where Request : RequestType {}
+    ) where Request: RequestType {}
 }

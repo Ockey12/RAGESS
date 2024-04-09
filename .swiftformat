@@ -13,7 +13,7 @@
 --hexgrouping none
 
 # Maximum length of a line
---maxwidth 100
+--maxwidth 200
 
 # Change unused arguments in the closure to underscores.
 --stripunusedargs closure-only

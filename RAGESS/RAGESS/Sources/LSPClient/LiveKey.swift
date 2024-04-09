@@ -30,9 +30,9 @@ extension LSPClient: DependencyKey {
             )
 
             #if DEBUG
-            print("Sending InitializedRequest")
-            dump(request)
-            print("")
+                print("Sending InitializedRequest")
+                dump(request)
+                print("")
             #endif
 
             let connection = JSONRPCConnection(
@@ -45,13 +45,13 @@ extension LSPClient: DependencyKey {
                 switch result {
                 case let .success(response):
                     #if DEBUG
-                    print("\nINITIALIZATION SUCCEEDED\n")
-                    dump(response)
+                        print("\nINITIALIZATION SUCCEEDED\n")
+                        dump(response)
                     #endif
-                case let  .failure(error):
+                case let .failure(error):
                     #if DEBUG
-                    print("\nINITIALIZATION FAILED...\n")
-                    print(error)
+                        print("\nINITIALIZATION FAILED...\n")
+                        print(error)
                     #endif
                 }
             }

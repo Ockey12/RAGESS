@@ -5,22 +5,28 @@
 //  Created by ockey12 on 2024/04/09.
 //
 
+import Dependencies
 import DependenciesMacros
 import Foundation
 import LanguageServerProtocol
 import LanguageServerProtocolJSONRPC
 
 @DependencyClient
-struct LSPClient {
-    private let clientToServer = Pipe()
-    private let serverToClient = Pipe()
-    private let serverProcess = Process()
+public struct LSPClient {
+    let clientToServer: Pipe
+    let serverToClient: Pipe
+    let serverProcess: Process
     private lazy var connection = JSONRPCConnection(
         protocol: .lspProtocol,
         inFD: .init(fileDescriptor: serverToClient.fileHandleForReading.fileDescriptor),
         outFD: .init(fileDescriptor: clientToServer.fileHandleForWriting.fileDescriptor)
     )
-    private let queue = DispatchQueue(label: "LSP-Request")
+    let queue: DispatchQueue
+
+    public var sendInitializeRequest: @Sendable (
+        _ serverPath: String,
+        _ projectRootPathString: String
+    ) async throws -> Void
 
     mutating func sendInitializeRequest(
         serverPath: String =

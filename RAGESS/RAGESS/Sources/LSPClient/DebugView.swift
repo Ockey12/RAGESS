@@ -37,10 +37,11 @@ public struct DebugReducer {
                 return .run { [
                     serverPath = state.serverPath,
                     projectRootPathString = state.rootPathString
-                ] send in
+                ] _ in
                     try await lspClient.sendInitializeRequest(
                         serverPath: serverPath,
-                        projectRootPathString: projectRootPathString)
+                        projectRootPathString: projectRootPathString
+                    )
                 }
 
             case .binding:

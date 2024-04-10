@@ -13,56 +13,18 @@ import LanguageServerProtocolJSONRPC
 
 @DependencyClient
 public struct LSPClient {
-    let clientToServer: Pipe
-    let serverToClient: Pipe
-    let serverProcess: Process
-    private lazy var connection = JSONRPCConnection(
+    static let clientToServer = Pipe()
+    static let serverToClient = Pipe()
+    static let serverProcess = Process()
+    static let connection = JSONRPCConnection(
         protocol: .lspProtocol,
-        inFD: .init(fileDescriptor: serverToClient.fileHandleForReading.fileDescriptor),
-        outFD: .init(fileDescriptor: clientToServer.fileHandleForWriting.fileDescriptor)
+        inFD: .init(fileDescriptor: Self.serverToClient.fileHandleForReading.fileDescriptor),
+        outFD: .init(fileDescriptor: Self.clientToServer.fileHandleForWriting.fileDescriptor)
     )
-    let queue: DispatchQueue
+    static let queue = DispatchQueue(label: "SourceKit-LSP")
 
     public var sendInitializeRequest: @Sendable (
         _ serverPath: String,
         _ projectRootPathString: String
     ) async throws -> Void
-
-    mutating func sendInitializeRequest(
-        serverPath: String =
-            "/Applications/Xcode-15.2.0.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/sourcekit-lsp",
-        projectRootPathString: String
-    ) {
-        connection.start(receiveHandler: Client())
-
-        serverProcess.launchPath = serverPath
-        serverProcess.standardInput = clientToServer
-        serverProcess.standardOutput = serverToClient
-//        serverProcess.terminationHandler = { _ in
-//            self?.connection.close()
-//        }
-        serverProcess.launch()
-
-        let rootURL = URL(fileURLWithPath: projectRootPathString)
-        let request = InitializeRequest(
-            rootURI: DocumentURI(string: rootURL.absoluteString),
-            capabilities: ClientCapabilities(),
-            workspaceFolders: nil
-        )
-
-        print("Sending InitializedRequest")
-        dump(request)
-        print("")
-
-        _ = connection.send(request, queue: queue) { result in
-            switch result {
-            case let .success(response):
-                print("\nINITIALIZATION SUCCEEDED\n")
-                dump(response)
-            case let .failure(error):
-                print("\nINITIALIZATION FAILED...\n")
-                print(error)
-            }
-        }
-    } // func sendInitializeRequest
 }

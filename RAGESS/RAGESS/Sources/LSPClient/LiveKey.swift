@@ -12,15 +12,11 @@ import LanguageServerProtocolJSONRPC
 
 extension LSPClient: DependencyKey {
     public static let liveValue: Self = .init(
-        clientToServer: Pipe(),
-        serverToClient: Pipe(),
-        serverProcess: Process(),
-        queue: DispatchQueue(label: "SourceKit-LSP"),
         sendInitializeRequest: { serverPath, projectRootPathString in
-            Self.liveValue.serverProcess.launchPath = serverPath
-            Self.liveValue.serverProcess.standardInput = Self.liveValue.clientToServer
-            Self.liveValue.serverProcess.standardOutput = Self.liveValue.serverToClient
-            Self.liveValue.serverProcess.launch()
+            serverProcess.launchPath = serverPath
+            serverProcess.standardInput = clientToServer
+            serverProcess.standardOutput = serverToClient
+            serverProcess.launch()
 
             let rootURL = URL(fileURLWithPath: projectRootPathString)
             let request = InitializeRequest(
@@ -35,13 +31,7 @@ extension LSPClient: DependencyKey {
                 print("")
             #endif
 
-            let connection = JSONRPCConnection(
-                protocol: .lspProtocol,
-                inFD: .init(fileDescriptor: Self.liveValue.serverToClient.fileHandleForReading.fileDescriptor),
-                outFD: .init(fileDescriptor: Self.liveValue.clientToServer.fileHandleForWriting.fileDescriptor)
-            )
-
-            _ = connection.send(request, queue: Self.liveValue.queue) { result in
+            _ = connection.send(request, queue: queue) { result in
                 switch result {
                 case let .success(response):
                     #if DEBUG

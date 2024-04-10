@@ -13,6 +13,8 @@ import LanguageServerProtocolJSONRPC
 extension LSPClient: DependencyKey {
     public static let liveValue: Self = .init(
         sendInitializeRequest: { serverPath, projectRootPathString in
+            connection.start(receiveHandler: Client())
+
             serverProcess.launchPath = serverPath
             serverProcess.standardInput = clientToServer
             serverProcess.standardOutput = serverToClient

@@ -29,6 +29,7 @@ let package = Package(
         .target(
             name: "LSPClient",
             dependencies: [
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "Dependencies", package: "swift-dependencies"),
                 .product(name: "DependenciesMacros", package: "swift-dependencies"),
                 .product(name: "LSPBindings", package: "sourcekit-lsp")

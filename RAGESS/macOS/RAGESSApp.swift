@@ -5,13 +5,19 @@
 //  Created by ockey12 on 2024/04/06.
 //
 
+import LSPClient
 import SwiftUI
 
 @main
 struct RAGESSApp: App {
     var body: some Scene {
         WindowGroup {
-            Text("Hello, RAGESS!")
+            DebugView(
+                store: .init(
+                    initialState: DebugReducer.State(rootPathString: ""),
+                    reducer: { DebugReducer() }
+                )
+            )
         }
     }
 }

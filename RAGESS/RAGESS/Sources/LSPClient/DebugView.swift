@@ -14,7 +14,7 @@ public struct DebugReducer {
 
     @ObservableState
     public struct State {
-        let serverPath = "/Applications/Xcode-15.2.0.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/sourcekit-lsp"
+        let serverPathString = "/Applications/Xcode-15.2.0.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/sourcekit-lsp"
         var rootPathString: String
         var filePathString: String
         var sourceCode: String
@@ -41,7 +41,7 @@ public struct DebugReducer {
             switch action {
             case .sendInitializeRequest:
                 return .run { [
-                    serverPath = state.serverPath,
+                    serverPath = state.serverPathString,
                     projectRootPathString = state.rootPathString
                 ] _ in
                     try await lspClient.sendInitializeRequest(

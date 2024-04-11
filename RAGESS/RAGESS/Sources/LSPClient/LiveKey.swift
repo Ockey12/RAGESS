@@ -68,6 +68,29 @@ extension LSPClient: DependencyKey {
             connection.send(notification)
             print("Sending DidOpen Notification")
             dump(notification)
+        },
+        sendDefinitionRequest: { filePathString, position in
+            let sourceFileURL = URL(fileURLWithPath: filePathString)
+            let request = DefinitionRequest(
+                textDocument: TextDocumentIdentifier(
+                    DocumentURI(sourceFileURL)
+                ),
+                position: position
+            )
+
+            print("Sending DefinitionRequest")
+            dump(request)
+
+            _ = connection.send(request, queue: queue) { result in
+                switch result {
+                case .success(let response):
+                    print("\nSuccessfully retrieved the definition location.\n")
+                    dump(response)
+                case .failure(let error):
+                    print("\nFailed to retrieve the definition location.\n")
+                    print(error)
+                }
+            }
         }
     )
 }

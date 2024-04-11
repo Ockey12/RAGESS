@@ -34,4 +34,9 @@ public struct LSPClient {
         _ filePathString: String,
         _ sourceCode: String
     ) async throws -> Void
+
+    public var sendDefinitionRequest: @Sendable (
+        _ filePathString: String,
+        _ position: Position
+    ) async throws -> Void
 }

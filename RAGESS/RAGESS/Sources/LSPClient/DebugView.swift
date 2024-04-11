@@ -37,9 +37,7 @@ public struct DebugReducer {
 
     public var body: some ReducerOf<Self> {
         BindingReducer()
-        Reduce {
-            state,
-            action in
+        Reduce { state, action in
             switch action {
             case .sendInitializeRequest:
                 return .run { [
@@ -51,12 +49,12 @@ public struct DebugReducer {
                         projectRootPathString: projectRootPathString
                     )
                 }
-                
+
             case .sendInitializedNotification:
                 return .run { _ in
                     try await lspClient.sendInitializedNotification()
                 }
-                
+
             case .sendDidOpenNotification:
                 return .run { [
                     filePathString = state.filePathString,

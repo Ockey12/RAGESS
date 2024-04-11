@@ -6,6 +6,7 @@
 //
 
 import ComposableArchitecture
+import LanguageServerProtocol
 import SwiftUI
 
 @Reducer
@@ -18,11 +19,21 @@ public struct DebugReducer {
         var rootPathString: String
         var filePathString: String
         var sourceCode: String
+        var line: Int
+        var column: Int
 
-        public init(rootPathString: String, filePathString: String, sourceCode: String) {
+        public init(
+            rootPathString: String,
+            filePathString: String,
+            sourceCode: String,
+            line: Int,
+            column: Int
+        ) {
             self.rootPathString = rootPathString
             self.filePathString = filePathString
             self.sourceCode = sourceCode
+            self.line = line
+            self.column = column
         }
     }
 
@@ -30,6 +41,7 @@ public struct DebugReducer {
         case sendInitializeRequest
         case sendInitializedNotification
         case sendDidOpenNotification
+        case sendDefinitionRequest
         case binding(BindingAction<State>)
     }
 
@@ -63,6 +75,19 @@ public struct DebugReducer {
                     try await lspClient.sendDidOpenNotification(
                         filePathString: filePathString,
                         sourceCode: sourceCode
+                    )
+                }
+
+            case .sendDefinitionRequest:
+                return .run { [
+                    filePathString = state.filePathString,
+                    line = state.line,
+                    column = state.column
+                ] _ in
+                    let position = Position(line: line, utf16index: column)
+                    try await lspClient.sendDefinitionRequest(
+                        filePathString: filePathString,
+                        position: position
                     )
                 }
 
@@ -106,6 +131,29 @@ public struct DebugView: View {
                 Text("DidOpen")
                     .font(.headline)
             }
+
+            Section {
+                HStack {
+                    Picker("Line", selection: $store.line) {
+                        ForEach(0 ... 100, id: \.self) { number in
+                            Text("\(number)")
+                        }
+                    }
+                    .frame(width: 100)
+                    Picker("utf16index", selection: $store.column) {
+                        ForEach(0 ... 100, id: \.self) { number in
+                            Text("\(number)")
+                        }
+                    }
+                    .frame(width: 130)
+                }
+                Button("Send Definition Request") {
+                    store.send(.sendDefinitionRequest)
+                }
+            } header: {
+                Text("Definition")
+                    .font(.headline)
+            }
         } // Form
         .padding()
         .frame(width: 800)
@@ -118,7 +166,9 @@ public struct DebugView: View {
             initialState: DebugReducer.State(
                 rootPathString: "",
                 filePathString: "",
-                sourceCode: ""
+                sourceCode: "",
+                line: 0,
+                column: 0
             ),
             reducer: {
                 DebugReducer()

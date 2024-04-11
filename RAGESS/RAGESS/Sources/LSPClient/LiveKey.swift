@@ -51,8 +51,8 @@ extension LSPClient: DependencyKey {
             let notification = InitializedNotification()
             connection.send(notification)
             #if DEBUG
-            print("Sending InitializedNotification")
-            dump(notification)
+                print("Sending InitializedNotification")
+                dump(notification)
             #endif
         }
     )

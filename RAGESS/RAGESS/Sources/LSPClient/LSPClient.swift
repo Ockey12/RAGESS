@@ -27,4 +27,6 @@ public struct LSPClient {
         _ serverPath: String,
         _ projectRootPathString: String
     ) async throws -> Void
+
+    public var sendInitializedNotification: @Sendable () async throws -> Void
 }

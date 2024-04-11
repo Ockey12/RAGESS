@@ -30,7 +30,6 @@ extension LSPClient: DependencyKey {
             #if DEBUG
                 print("Sending InitializedRequest")
                 dump(request)
-                print("")
             #endif
 
             _ = connection.send(request, queue: queue) { result in
@@ -47,6 +46,14 @@ extension LSPClient: DependencyKey {
                     #endif
                 }
             }
-        } // sendInitializeRequest
+        },
+        sendInitializedNotification: {
+            let notification = InitializedNotification()
+            connection.send(notification)
+            #if DEBUG
+                print("Sending InitializedNotification")
+                dump(notification)
+            #endif
+        }
     )
 }

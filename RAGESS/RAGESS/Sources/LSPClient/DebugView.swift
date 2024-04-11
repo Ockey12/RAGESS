@@ -24,6 +24,7 @@ public struct DebugReducer {
 
     public enum Action: BindableAction {
         case sendInitializeRequest
+        case sendInitializedNotification
         case binding(BindingAction<State>)
     }
 
@@ -42,6 +43,11 @@ public struct DebugReducer {
                         serverPath: serverPath,
                         projectRootPathString: projectRootPathString
                     )
+                }
+
+            case .sendInitializedNotification:
+                return .run { _ in
+                    try await lspClient.sendInitializedNotification()
                 }
 
             case .binding:
@@ -65,8 +71,12 @@ public struct DebugView: View {
                 Button("Send Initialize Request") {
                     store.send(.sendInitializeRequest)
                 }
+                Button("Send Initialized Notification") {
+                    store.send(.sendInitializedNotification)
+                }
             } header: {
                 Text("Initialization")
+                    .font(.headline)
             }
         } // Form
         .padding()

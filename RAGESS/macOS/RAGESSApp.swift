@@ -14,8 +14,14 @@ struct RAGESSApp: App {
         WindowGroup {
             DebugView(
                 store: .init(
-                    initialState: DebugReducer.State(rootPathString: ""),
-                    reducer: { DebugReducer() }
+                    initialState: DebugReducer.State(
+                        rootPathString: "",
+                        filePathString: "",
+                        sourceCode: ""
+                    ),
+                    reducer: {
+                        DebugReducer()
+                    }
                 )
             )
         }

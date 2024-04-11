@@ -16,15 +16,20 @@ public struct DebugReducer {
     public struct State {
         let serverPath = "/Applications/Xcode-15.2.0.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/sourcekit-lsp"
         var rootPathString: String
+        var filePathString: String
+        var sourceCode: String
 
-        public init(rootPathString: String) {
+        public init(rootPathString: String, filePathString: String, sourceCode: String) {
             self.rootPathString = rootPathString
+            self.filePathString = filePathString
+            self.sourceCode = sourceCode
         }
     }
 
     public enum Action: BindableAction {
         case sendInitializeRequest
         case sendInitializedNotification
+        case sendDidOpenNotification
         case binding(BindingAction<State>)
     }
 
@@ -32,7 +37,9 @@ public struct DebugReducer {
 
     public var body: some ReducerOf<Self> {
         BindingReducer()
-        Reduce { state, action in
+        Reduce {
+            state,
+            action in
             switch action {
             case .sendInitializeRequest:
                 return .run { [
@@ -44,10 +51,21 @@ public struct DebugReducer {
                         projectRootPathString: projectRootPathString
                     )
                 }
-
+                
             case .sendInitializedNotification:
                 return .run { _ in
                     try await lspClient.sendInitializedNotification()
+                }
+                
+            case .sendDidOpenNotification:
+                return .run { [
+                    filePathString = state.filePathString,
+                    sourceCode = state.sourceCode
+                ] _ in
+                    try await lspClient.sendDidOpenNotification(
+                        filePathString: filePathString,
+                        sourceCode: sourceCode
+                    )
                 }
 
             case .binding:
@@ -78,6 +96,18 @@ public struct DebugView: View {
                 Text("Initialization")
                     .font(.headline)
             }
+
+            Section {
+                TextField("File path", text: $store.filePathString)
+                TextEditor(text: $store.sourceCode)
+                    .frame(height: 300)
+                Button("Send DidOpen Notification") {
+                    store.send(.sendDidOpenNotification)
+                }
+            } header: {
+                Text("DidOpen")
+                    .font(.headline)
+            }
         } // Form
         .padding()
         .frame(width: 800)
@@ -87,8 +117,14 @@ public struct DebugView: View {
 #Preview {
     DebugView(
         store: .init(
-            initialState: DebugReducer.State(rootPathString: ""),
-            reducer: { DebugReducer() }
+            initialState: DebugReducer.State(
+                rootPathString: "",
+                filePathString: "",
+                sourceCode: ""
+            ),
+            reducer: {
+                DebugReducer()
+            }
         )
     )
 }

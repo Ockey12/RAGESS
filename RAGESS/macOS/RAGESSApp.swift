@@ -17,7 +17,9 @@ struct RAGESSApp: App {
                     initialState: DebugReducer.State(
                         rootPathString: "",
                         filePathString: "",
-                        sourceCode: ""
+                        sourceCode: "",
+                        row: 0,
+                        column: 0
                     ),
                     reducer: {
                         DebugReducer()

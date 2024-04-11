@@ -19,20 +19,20 @@ public struct DebugReducer {
         var rootPathString: String
         var filePathString: String
         var sourceCode: String
-        var row: Int
+        var line: Int
         var column: Int
 
         public init(
             rootPathString: String,
             filePathString: String,
             sourceCode: String,
-            row: Int,
+            line: Int,
             column: Int
         ) {
             self.rootPathString = rootPathString
             self.filePathString = filePathString
             self.sourceCode = sourceCode
-            self.row = row
+            self.line = line
             self.column = column
         }
     }
@@ -81,10 +81,10 @@ public struct DebugReducer {
             case .sendDefinitionRequest:
                 return .run { [
                     filePathString = state.filePathString,
-                    row = state.row,
+                    line = state.line,
                     column = state.column
                 ] _ in
-                    let position = Position(line: row, utf16index: column)
+                    let position = Position(line: line, utf16index: column)
                     try await lspClient.sendDefinitionRequest(
                         filePathString: filePathString,
                         position: position
@@ -134,7 +134,7 @@ public struct DebugView: View {
 
             Section {
                 HStack {
-                    Picker("Line", selection: $store.row) {
+                    Picker("Line", selection: $store.line) {
                         ForEach(0...100, id: \.self) { number in
                             Text("\(number)")
                         }
@@ -167,7 +167,7 @@ public struct DebugView: View {
                 rootPathString: "",
                 filePathString: "",
                 sourceCode: "",
-                row: 0,
+                line: 0,
                 column: 0
             ),
             reducer: {

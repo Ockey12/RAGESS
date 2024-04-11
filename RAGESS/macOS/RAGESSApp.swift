@@ -18,7 +18,7 @@ struct RAGESSApp: App {
                         rootPathString: "",
                         filePathString: "",
                         sourceCode: "",
-                        row: 0,
+                        line: 0,
                         column: 0
                     ),
                     reducer: {

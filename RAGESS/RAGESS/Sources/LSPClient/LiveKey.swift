@@ -30,7 +30,6 @@ extension LSPClient: DependencyKey {
             #if DEBUG
                 print("Sending InitializedRequest")
                 dump(request)
-                print("")
             #endif
 
             _ = connection.send(request, queue: queue) { result in

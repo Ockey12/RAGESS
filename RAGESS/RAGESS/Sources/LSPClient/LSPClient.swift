@@ -29,4 +29,9 @@ public struct LSPClient {
     ) async throws -> Void
 
     public var sendInitializedNotification: @Sendable () async throws -> Void
+
+    public var sendDidOpenNotification: @Sendable (
+        _ filePathString: String,
+        _ sourceCode: String
+    ) async throws -> Void
 }

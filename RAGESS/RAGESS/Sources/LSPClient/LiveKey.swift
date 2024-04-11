@@ -54,6 +54,20 @@ extension LSPClient: DependencyKey {
                 print("Sending InitializedNotification")
                 dump(notification)
             #endif
+        },
+        sendDidOpenNotification: { filePathString, sourceCode in
+            let sourceFileURL = URL(fileURLWithPath: filePathString)
+            let document = TextDocumentItem(
+                uri: DocumentURI(sourceFileURL),
+                language: .swift,
+                version: 1,
+                text: sourceCode
+            )
+
+            let notification = DidOpenTextDocumentNotification(textDocument: document)
+            connection.send(notification)
+            print("Sending DidOpen Notification")
+            dump(notification)
         }
     )
 }

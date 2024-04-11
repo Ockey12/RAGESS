@@ -67,8 +67,8 @@ extension LSPClient: DependencyKey {
             let notification = DidOpenTextDocumentNotification(textDocument: document)
             connection.send(notification)
             #if DEBUG
-            print("Sending DidOpen Notification")
-            dump(notification)
+                print("Sending DidOpen Notification")
+                dump(notification)
             #endif
         },
         sendDefinitionRequest: { filePathString, position in
@@ -81,21 +81,21 @@ extension LSPClient: DependencyKey {
             )
 
             #if DEBUG
-            print("Sending DefinitionRequest")
-            dump(request)
+                print("Sending DefinitionRequest")
+                dump(request)
             #endif
 
             _ = connection.send(request, queue: queue) { result in
                 switch result {
                 case let .success(response):
                     #if DEBUG
-                    print("\nSuccessfully retrieved the definition location.\n")
-                    dump(response)
+                        print("\nSuccessfully retrieved the definition location.\n")
+                        dump(response)
                     #endif
                 case let .failure(error):
                     #if DEBUG
-                    print("\nFailed to retrieve the definition location.\n")
-                    print(error)
+                        print("\nFailed to retrieve the definition location.\n")
+                        print(error)
                     #endif
                 }
             }

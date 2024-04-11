@@ -135,13 +135,13 @@ public struct DebugView: View {
             Section {
                 HStack {
                     Picker("Line", selection: $store.line) {
-                        ForEach(0...100, id: \.self) { number in
+                        ForEach(0 ... 100, id: \.self) { number in
                             Text("\(number)")
                         }
                     }
                     .frame(width: 100)
                     Picker("utf16index", selection: $store.column) {
-                        ForEach(0...100, id: \.self) { number in
+                        ForEach(0 ... 100, id: \.self) { number in
                             Text("\(number)")
                         }
                     }

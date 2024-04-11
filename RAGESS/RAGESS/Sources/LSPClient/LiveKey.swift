@@ -83,10 +83,10 @@ extension LSPClient: DependencyKey {
 
             _ = connection.send(request, queue: queue) { result in
                 switch result {
-                case .success(let response):
+                case let .success(response):
                     print("\nSuccessfully retrieved the definition location.\n")
                     dump(response)
-                case .failure(let error):
+                case let .failure(error):
                     print("\nFailed to retrieve the definition location.\n")
                     print(error)
                 }

@@ -35,7 +35,10 @@ public struct SourceCodeClientDebugger {
             switch action {
             case .subPathsButtonTapped:
                 return .run { [rootPathString = state.rootPathString] _ in
-                    try await sourceDirectoryClient.getSourceCode(rootDirectoryPath: rootPathString)
+                    try await sourceDirectoryClient.getSourceCode(
+                        rootDirectoryPath: rootPathString,
+                        ignoredDirectories: [".build", "DerivedData"]
+                    )
                 }
 
             case .binding:

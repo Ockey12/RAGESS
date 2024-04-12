@@ -35,6 +35,13 @@ let package = Package(
                 .product(name: "LSPBindings", package: "sourcekit-lsp")
             ]
         ),
+        .target(
+            name: "SourceCodeClient",
+            dependencies: [
+                .product(name: "Dependencies", package: "swift-dependencies"),
+                .product(name: "DependenciesMacros", package: "swift-dependencies"),
+            ]
+        ),
         .testTarget(
             name: "Sample",
             dependencies: []

@@ -14,7 +14,7 @@ struct RAGESSApp: App {
         WindowGroup {
             LSPClientDebugView(
                 store: .init(
-                    initialState: LSPClientDebugReducer.State(
+                    initialState: LSPClientDebugger.State(
                         rootPathString: "",
                         filePathString: "",
                         sourceCode: "",
@@ -22,7 +22,7 @@ struct RAGESSApp: App {
                         column: 0
                     ),
                     reducer: {
-                        LSPClientDebugReducer()
+                        LSPClientDebugger()
                     }
                 )
             )

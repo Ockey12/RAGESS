@@ -8,11 +8,10 @@
 import ComposableArchitecture
 import LanguageServerProtocol
 import LSPClient
-import SourceCodeClient
 import SwiftUI
 
 @Reducer
-public struct LSPClientDebugReducer {
+public struct LSPClientDebugger {
     public init() {}
 
     @ObservableState
@@ -101,9 +100,9 @@ public struct LSPClientDebugReducer {
 }
 
 public struct LSPClientDebugView: View {
-    @Bindable public var store: StoreOf<LSPClientDebugReducer>
+    @Bindable public var store: StoreOf<LSPClientDebugger>
 
-    public init(store: StoreOf<LSPClientDebugReducer>) {
+    public init(store: StoreOf<LSPClientDebugger>) {
         self.store = store
     }
 
@@ -165,7 +164,7 @@ public struct LSPClientDebugView: View {
 #Preview {
     LSPClientDebugView(
         store: .init(
-            initialState: LSPClientDebugReducer.State(
+            initialState: LSPClientDebugger.State(
                 rootPathString: "",
                 filePathString: "",
                 sourceCode: "",
@@ -173,7 +172,7 @@ public struct LSPClientDebugView: View {
                 column: 0
             ),
             reducer: {
-                LSPClientDebugReducer()
+                LSPClientDebugger()
             }
         )
     )

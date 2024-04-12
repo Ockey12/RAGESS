@@ -156,8 +156,6 @@ public struct LSPClientDebugView: View {
                     .font(.headline)
             }
         } // Form
-        .padding()
-        .frame(width: 800)
     } // body
 }
 

@@ -5,16 +5,16 @@
 //  Created by ockey12 on 2024/04/06.
 //
 
-import LSPClient
+import DebugView
 import SwiftUI
 
 @main
 struct RAGESSApp: App {
     var body: some Scene {
         WindowGroup {
-            DebugView(
+            LSPClientDebugView(
                 store: .init(
-                    initialState: DebugReducer.State(
+                    initialState: LSPClientDebugReducer.State(
                         rootPathString: "",
                         filePathString: "",
                         sourceCode: "",
@@ -22,7 +22,7 @@ struct RAGESSApp: App {
                         column: 0
                     ),
                     reducer: {
-                        DebugReducer()
+                        LSPClientDebugReducer()
                     }
                 )
             )

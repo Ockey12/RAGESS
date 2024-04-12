@@ -7,8 +7,8 @@ let package = Package(
     platforms: [.macOS(.v14)],
     products: [
         .library(
-            name: "LSPClient",
-            targets: ["LSPClient"]
+            name: "DebugView",
+            targets: ["DebugView"]
         )
     ],
     dependencies: [
@@ -26,6 +26,14 @@ let package = Package(
         )
     ],
     targets: [
+        .target(
+            name: "DebugView",
+            dependencies: [
+                "LSPClient",
+                "SourceCodeClient",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+            ]
+        ),
         .target(
             name: "LSPClient",
             dependencies: [

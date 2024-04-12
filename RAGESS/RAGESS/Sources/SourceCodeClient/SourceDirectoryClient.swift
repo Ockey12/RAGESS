@@ -37,8 +37,8 @@ extension SourceDirectoryClient: DependencyKey {
 
                 if isDirectory.boolValue,
                    ignoredDirectoriesSet.contains((filePath as NSString).lastPathComponent) {
-                        enumerator.skipDescendants()
-                        continue
+                    enumerator.skipDescendants()
+                    continue
                 } else if filePath.hasSuffix(".swift") {
                     filePaths.append(fullPath)
                 }

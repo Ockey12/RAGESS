@@ -47,7 +47,7 @@ let package = Package(
             name: "SourceCodeClient",
             dependencies: [
                 .product(name: "Dependencies", package: "swift-dependencies"),
-                .product(name: "DependenciesMacros", package: "swift-dependencies"),
+                .product(name: "DependenciesMacros", package: "swift-dependencies")
             ]
         ),
         .testTarget(

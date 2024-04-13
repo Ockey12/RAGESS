@@ -35,6 +35,10 @@ let package = Package(
             ]
         ),
         .target(
+            name: "DependenciesClient",
+            dependencies: []
+        ),
+        .target(
             name: "LSPClient",
             dependencies: [
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),

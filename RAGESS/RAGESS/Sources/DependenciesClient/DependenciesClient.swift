@@ -9,6 +9,4 @@ import Dependencies
 import DependenciesMacros
 
 @DependencyClient
-public struct DependenciesClient {
-    
-}
+public struct DependenciesClient {}

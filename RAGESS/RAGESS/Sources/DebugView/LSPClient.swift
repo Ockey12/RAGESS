@@ -1,5 +1,5 @@
 //
-//  DebugView.swift
+//  LSPClient.swift
 //
 //
 //  Created by ockey12 on 2024/04/11.
@@ -7,10 +7,11 @@
 
 import ComposableArchitecture
 import LanguageServerProtocol
+import LSPClient
 import SwiftUI
 
 @Reducer
-public struct DebugReducer {
+public struct LSPClientDebugger {
     public init() {}
 
     @ObservableState
@@ -98,10 +99,10 @@ public struct DebugReducer {
     }
 }
 
-public struct DebugView: View {
-    @Bindable public var store: StoreOf<DebugReducer>
+public struct LSPClientDebugView: View {
+    @Bindable public var store: StoreOf<LSPClientDebugger>
 
-    public init(store: StoreOf<DebugReducer>) {
+    public init(store: StoreOf<LSPClientDebugger>) {
         self.store = store
     }
 
@@ -155,15 +156,13 @@ public struct DebugView: View {
                     .font(.headline)
             }
         } // Form
-        .padding()
-        .frame(width: 800)
     } // body
 }
 
 #Preview {
-    DebugView(
+    LSPClientDebugView(
         store: .init(
-            initialState: DebugReducer.State(
+            initialState: LSPClientDebugger.State(
                 rootPathString: "",
                 filePathString: "",
                 sourceCode: "",
@@ -171,7 +170,7 @@ public struct DebugView: View {
                 column: 0
             ),
             reducer: {
-                DebugReducer()
+                LSPClientDebugger()
             }
         )
     )

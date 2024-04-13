@@ -27,7 +27,7 @@ public struct SourceCodeClientDebugger {
         case binding(BindingAction<State>)
     }
 
-    @Dependency(SourceDirectoryClient.self) var sourceDirectoryClient
+    @Dependency(SourceFileClient.self) var sourceFileClient
 
     public var body: some ReducerOf<Self> {
         BindingReducer()
@@ -35,7 +35,7 @@ public struct SourceCodeClientDebugger {
             switch action {
             case .subPathsButtonTapped:
                 return .run { [rootPathString = state.rootPathString] _ in
-                    try await sourceDirectoryClient.getSourceCode(
+                    try await _ = sourceFileClient.getSourceFiles(
                         rootDirectoryPath: rootPathString,
                         ignoredDirectories: [".build", "DerivedData"]
                     )

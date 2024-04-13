@@ -10,22 +10,22 @@ import DependenciesMacros
 import Foundation
 
 @DependencyClient
-public struct SourceDirectoryClient {
-    public var getSourceCode: @Sendable (
+public struct SourceFileClient {
+    public var getSourceFiles: @Sendable (
         _ rootDirectoryPath: String,
         _ ignoredDirectories: [String]
-    ) async throws -> Void
+    ) async throws -> [SourceFile]
 }
 
-extension SourceDirectoryClient: DependencyKey {
+extension SourceFileClient: DependencyKey {
     public static let liveValue: Self = {
-        @Sendable func getFilesPath(path: String, ignoredDirectories: [String]) -> [String] {
+        @Sendable func getFilesPath(path: String, ignoredDirectories: [String]) -> [SourceFile] {
             let fileManager = FileManager.default
             guard let enumerator = fileManager.enumerator(atPath: path) else {
                 return []
             }
 
-            var filePaths = [String]()
+            var sourceFiles = [SourceFile]()
             var isDirectory: ObjCBool = false
             let ignoredDirectoriesSet = Set(ignoredDirectories)
 
@@ -40,20 +40,23 @@ extension SourceDirectoryClient: DependencyKey {
                     enumerator.skipDescendants()
                     continue
                 } else if filePath.hasSuffix(".swift") {
-                    filePaths.append(fullPath)
+                    if let content = try? String(contentsOfFile: fullPath, encoding: .utf8) {
+                        sourceFiles.append(.init(path: fullPath, content: content))
+                    }
                 }
             }
 
-            return filePaths
+            return sourceFiles
         }
 
         return .init(
-            getSourceCode: { rootDirectoryPath, ignoredDirectories in
-                let paths = getFilesPath(
+            getSourceFiles: { rootDirectoryPath, ignoredDirectories in
+                let sourceFiles = getFilesPath(
                     path: rootDirectoryPath,
                     ignoredDirectories: ignoredDirectories
                 )
-                dump(paths)
+                dump(sourceFiles)
+                return sourceFiles
             }
         )
     }()

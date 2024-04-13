@@ -19,7 +19,7 @@ public struct SourceFileClient {
 
 extension SourceFileClient: DependencyKey {
     public static let liveValue: Self = {
-        @Sendable func getFilesPath(path: String, ignoredDirectories: [String]) -> [SourceFile] {
+        @Sendable func getFilesContent(path: String, ignoredDirectories: [String]) -> [SourceFile] {
             let fileManager = FileManager.default
             guard let enumerator = fileManager.enumerator(atPath: path) else {
                 return []
@@ -51,12 +51,40 @@ extension SourceFileClient: DependencyKey {
 
         return .init(
             getSourceFiles: { rootDirectoryPath, ignoredDirectories in
-                let sourceFiles = getFilesPath(
+                #if DEBUG
+                let startTime = CFAbsoluteTimeGetCurrent()
+                let sourceFiles = getFilesContent(
                     path: rootDirectoryPath,
                     ignoredDirectories: ignoredDirectories
                 )
-                dump(sourceFiles)
+                let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
+
+                var numberOfLines = 0
+                for sourceFile in sourceFiles {
+                    print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
+                    print(sourceFile.path)
+                    print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
+                    let lines = sourceFile.content.components(separatedBy: "\n")
+                    numberOfLines += lines.count
+                    for line in lines {
+                        print(line)
+                    }
+                    print()
+                }
+
+                print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
+                print("NUMBER OF LINES: \(numberOfLines)")
+                print("TIME ELAPSED: \(timeElapsed)")
+                print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
+
                 return sourceFiles
+                #else
+                let sourceFiles = getFilesContent(
+                    path: rootDirectoryPath,
+                    ignoredDirectories: ignoredDirectories
+                )
+                return sourceFiles
+                #endif
             }
         )
     }()

@@ -35,6 +35,9 @@ let package = Package(
             ]
         ),
         .target(
+            name: "DeclarationType"
+        ),
+        .target(
             name: "DependenciesClient",
             dependencies: [
                 .product(name: "Dependencies", package: "swift-dependencies"),

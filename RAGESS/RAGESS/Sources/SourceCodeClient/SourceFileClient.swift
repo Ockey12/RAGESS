@@ -1,5 +1,5 @@
 //
-//  SourceDirectoryClient.swift
+//  SourceFileClient.swift
 //
 //
 //  Created by ockey12 on 2024/04/12.
@@ -52,38 +52,38 @@ extension SourceFileClient: DependencyKey {
         return .init(
             getSourceFiles: { rootDirectoryPath, ignoredDirectories in
                 #if DEBUG
-                let startTime = CFAbsoluteTimeGetCurrent()
-                let sourceFiles = getFilesContent(
-                    path: rootDirectoryPath,
-                    ignoredDirectories: ignoredDirectories
-                )
-                let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
+                    let startTime = CFAbsoluteTimeGetCurrent()
+                    let sourceFiles = getFilesContent(
+                        path: rootDirectoryPath,
+                        ignoredDirectories: ignoredDirectories
+                    )
+                    let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
 
-                var numberOfLines = 0
-                for sourceFile in sourceFiles {
-                    print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
-                    print(sourceFile.path)
-                    print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
-                    let lines = sourceFile.content.components(separatedBy: "\n")
-                    numberOfLines += lines.count
-                    for line in lines {
-                        print(line)
+                    var numberOfLines = 0
+                    for sourceFile in sourceFiles {
+                        print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
+                        print(sourceFile.path)
+                        print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
+                        let lines = sourceFile.content.components(separatedBy: "\n")
+                        numberOfLines += lines.count
+                        for line in lines {
+                            print(line)
+                        }
+                        print()
                     }
-                    print()
-                }
 
-                print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
-                print("NUMBER OF LINES: \(numberOfLines)")
-                print("TIME ELAPSED: \(timeElapsed)")
-                print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
+                    print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
+                    print("NUMBER OF LINES: \(numberOfLines)")
+                    print("TIME ELAPSED: \(timeElapsed)")
+                    print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
 
-                return sourceFiles
+                    return sourceFiles
                 #else
-                let sourceFiles = getFilesContent(
-                    path: rootDirectoryPath,
-                    ignoredDirectories: ignoredDirectories
-                )
-                return sourceFiles
+                    let sourceFiles = getFilesContent(
+                        path: rootDirectoryPath,
+                        ignoredDirectories: ignoredDirectories
+                    )
+                    return sourceFiles
                 #endif
             }
         )

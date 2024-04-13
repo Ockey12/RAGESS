@@ -5,10 +5,13 @@
 //  Created by ockey12 on 2024/04/14.
 //
 
+import LanguageServerProtocol
+
 public struct DeclarationType: Hashable {
     let name: String
     let type: Type
     let fullPath: String
+    let declarationStartPosition: Position
     let sourceCode: String
 
     /// A set of types that the current type depends on.

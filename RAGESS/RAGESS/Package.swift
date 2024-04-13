@@ -17,6 +17,10 @@ let package = Package(
             branch: "release/5.10"
         ),
         .package(
+            url: "https://github.com/apple/swift-syntax.git",
+            .upToNextMinor(from: "510.0.1")
+        ),
+        .package(
             url: "https://github.com/pointfreeco/swift-composable-architecture",
             .upToNextMinor(from: "1.9.2")
         ),
@@ -35,7 +39,10 @@ let package = Package(
             ]
         ),
         .target(
-            name: "DeclarationType"
+            name: "DeclarationType",
+            dependencies: [
+                .product(name: "LSPBindings", package: "sourcekit-lsp")
+            ]
         ),
         .target(
             name: "DependenciesClient",

@@ -16,14 +16,20 @@ public struct SourceCodeClientDebugger {
     @ObservableState
     public struct State {
         var rootPathString: String
+        var sourceFiles: [SourceFile]
 
-        public init(rootPathString: String) {
+        public init(
+            rootPathString: String,
+            sourceFiles: [SourceFile]
+        ) {
             self.rootPathString = rootPathString
+            self.sourceFiles = sourceFiles
         }
     }
 
     public enum Action: BindableAction {
-        case subPathsButtonTapped
+        case getSourceFilesButtonTapped
+        case sourceFileResponse(Result<[SourceFile], Error>)
         case binding(BindingAction<State>)
     }
 
@@ -33,13 +39,21 @@ public struct SourceCodeClientDebugger {
         BindingReducer()
         Reduce { state, action in
             switch action {
-            case .subPathsButtonTapped:
-                return .run { [rootPathString = state.rootPathString] _ in
-                    try await _ = sourceFileClient.getSourceFiles(
-                        rootDirectoryPath: rootPathString,
-                        ignoredDirectories: [".build", "DerivedData"]
-                    )
+            case .getSourceFilesButtonTapped:
+                return .run { [rootPathString = state.rootPathString] send in
+                    await send(.sourceFileResponse(Result{
+                        try await sourceFileClient.getSourceFiles(
+                            rootDirectoryPath: rootPathString,
+                            ignoredDirectories: [".build", "DerivedData"])
+                    }))
                 }
+
+            case let .sourceFileResponse(.success(sourceFiles)):
+                state.sourceFiles = sourceFiles
+                return .none
+
+            case .sourceFileResponse(.failure):
+                return .none
 
             case .binding:
                 return .none
@@ -56,10 +70,27 @@ public struct SourceCodeClientDebugView: View {
     }
 
     public var body: some View {
-        Form {
-            TextField("Project root path", text: $store.rootPathString)
-            Button("Get Sub Paths") {
-                store.send(.subPathsButtonTapped)
+        VStack {
+            Form {
+                TextField("Project root path", text: $store.rootPathString)
+                Button("Get Source Files") {
+                    store.send(.getSourceFilesButtonTapped)
+                }
+            }
+
+            ScrollView {
+                ForEach(store.sourceFiles, id: \.path) { sourceFile in
+                    DisclosureGroup(sourceFile.path) {
+                        HStack {
+                            Text(sourceFile.content)
+                                .padding(.leading)
+                                .foregroundStyle(.white)
+                            Spacer()
+                        }
+                        .background(.black)
+                        .padding(.leading)
+                    }
+                }
             }
         }
     }

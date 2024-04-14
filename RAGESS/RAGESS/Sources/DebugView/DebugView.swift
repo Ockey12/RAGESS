@@ -30,7 +30,8 @@ public struct DebugView: View {
             SourceCodeClientDebugView(
                 store: .init(
                     initialState: SourceCodeClientDebugger.State(
-                        rootPathString: ""
+                        rootPathString: "",
+                        sourceFiles: []
                     ),
                     reducer: { SourceCodeClientDebugger() }
                 )

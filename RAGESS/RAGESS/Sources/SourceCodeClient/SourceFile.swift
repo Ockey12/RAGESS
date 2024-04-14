@@ -7,7 +7,10 @@
 
 import Foundation
 
-public struct SourceFile {
+public struct SourceFile: Identifiable {
+    public var id: String {
+        path
+    }
     public var path: String
     public var content: String
 }

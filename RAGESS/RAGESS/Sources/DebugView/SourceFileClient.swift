@@ -16,11 +16,11 @@ public struct SourceCodeClientDebugger {
     @ObservableState
     public struct State {
         var rootPathString: String
-        var sourceFiles: [SourceFile]
+        var sourceFiles: IdentifiedArrayOf<SourceFile>
 
         public init(
             rootPathString: String,
-            sourceFiles: [SourceFile]
+            sourceFiles: IdentifiedArrayOf<SourceFile>
         ) {
             self.rootPathString = rootPathString
             self.sourceFiles = sourceFiles
@@ -29,7 +29,8 @@ public struct SourceCodeClientDebugger {
 
     public enum Action: BindableAction {
         case getSourceFilesButtonTapped
-        case sourceFileResponse(Result<[SourceFile], Error>)
+        case sourceFileResponse(Result<IdentifiedArrayOf<SourceFile>, Error>)
+        case selectButtonTapped(SourceFile)
         case binding(BindingAction<State>)
     }
 
@@ -42,9 +43,11 @@ public struct SourceCodeClientDebugger {
             case .getSourceFilesButtonTapped:
                 return .run { [rootPathString = state.rootPathString] send in
                     await send(.sourceFileResponse(Result {
-                        try await sourceFileClient.getSourceFiles(
-                            rootDirectoryPath: rootPathString,
-                            ignoredDirectories: [".build", "DerivedData"]
+                        try await IdentifiedArray(
+                            uniqueElements: sourceFileClient.getSourceFiles(
+                                rootDirectoryPath: rootPathString,
+                                ignoredDirectories: [".build", "DerivedData"]
+                            )
                         )
                     }))
                 }
@@ -54,6 +57,9 @@ public struct SourceCodeClientDebugger {
                 return .none
 
             case .sourceFileResponse(.failure):
+                return .none
+
+            case .selectButtonTapped:
                 return .none
 
             case .binding:
@@ -82,13 +88,18 @@ public struct SourceCodeClientDebugView: View {
             ScrollView {
                 ForEach(store.sourceFiles, id: \.path) { sourceFile in
                     DisclosureGroup(sourceFile.path) {
-                        HStack {
-                            Text(sourceFile.content)
-                                .padding(.leading)
-                                .foregroundStyle(.white)
-                            Spacer()
+                        VStack(alignment: .leading) {
+                            Button("Select") {
+                                store.send(.selectButtonTapped(sourceFile))
+                            }
+                            HStack {
+                                Text(sourceFile.content)
+                                    .padding(.leading)
+                                    .foregroundStyle(.white)
+                                Spacer()
+                            }
+                            .background(.black)
                         }
-                        .background(.black)
                         .padding(.leading)
                     }
                 }

@@ -14,4 +14,9 @@ public struct SourceFile: Identifiable {
 
     public var path: String
     public var content: String
+
+    public init(path: String, content: String) {
+        self.path = path
+        self.content = content
+    }
 }

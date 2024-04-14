@@ -39,7 +39,7 @@ public struct LSPClient {
     public var sendInlayHintRequest: @Sendable (
         _ sourceFile: SourceFile,
         _ range: Range<Position>
-    ) -> Void
+    ) async throws -> Void
 
     public var sendDefinitionRequest: @Sendable (
         _ filePathString: String,

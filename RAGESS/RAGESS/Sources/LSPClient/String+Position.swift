@@ -8,7 +8,7 @@
 import Foundation
 import LanguageServerProtocol
 
-extension String {
+public extension String {
     var lengthInEditor: Int {
         let utf8View = utf8
         var length = 0
@@ -29,7 +29,7 @@ extension String {
     }
 
     var lastPosition: Position {
-        var lastLineIndex = components(separatedBy: "\n").count - 1
+        let lastLineIndex = components(separatedBy: "\n").count - 1
         let lastLine = components(separatedBy: "\n").last!
         let lastLineLength = lastLine.lengthInEditor
         return Position(line: lastLineIndex, utf16index: lastLineLength)

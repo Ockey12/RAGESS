@@ -64,12 +64,12 @@ public struct LSPClientDebugger {
                         projectRootPathString: projectRootPathString
                     )
                 }
-                
+
             case .sendInitializedNotification:
                 return .run { _ in
                     try await lspClient.sendInitializedNotification()
                 }
-                
+
             case .sendDidOpenNotification:
                 return .run { [
                     filePathString = state.filePathString,
@@ -80,7 +80,7 @@ public struct LSPClientDebugger {
                         sourceCode: sourceCode
                     )
                 }
-                
+
             case .inlayHintRequestTapped:
                 return .run { [
                     filePathString = state.filePathString,

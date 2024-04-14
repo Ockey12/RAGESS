@@ -12,7 +12,24 @@ import SwiftUI
 struct RAGESSApp: App {
     var body: some Scene {
         WindowGroup {
-            DebugView()
+            DebugView(
+                store: .init(
+                    initialState: DebugReducer.State(
+                        lspClient: .init(
+                            rootPathString: "",
+                            filePathString: "",
+                            sourceCode: "",
+                            line: 0,
+                            column: 0
+                        ),
+                        sourceCodeClient: .init(
+                            rootPathString: "",
+                            sourceFiles: []
+                        )
+                    ),
+                    reducer: { DebugReducer() }
+                )
+            )
         }
     }
 }

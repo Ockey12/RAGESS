@@ -10,6 +10,7 @@ import DependenciesMacros
 import Foundation
 import LanguageServerProtocol
 import LanguageServerProtocolJSONRPC
+import SourceCodeClient
 
 @DependencyClient
 public struct LSPClient {
@@ -33,6 +34,11 @@ public struct LSPClient {
     public var sendDidOpenNotification: @Sendable (
         _ filePathString: String,
         _ sourceCode: String
+    ) async throws -> Void
+
+    public var sendInlayHintRequest: @Sendable (
+        _ sourceFile: SourceFile,
+        _ range: Range<Position>
     ) async throws -> Void
 
     public var sendDefinitionRequest: @Sendable (

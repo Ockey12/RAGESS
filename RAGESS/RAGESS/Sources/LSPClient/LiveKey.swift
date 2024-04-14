@@ -71,6 +71,35 @@ extension LSPClient: DependencyKey {
                 dump(notification)
             #endif
         },
+        sendInlayHintRequest: { sourceFile, range in
+            let sourceFileURL = URL(fileURLWithPath: sourceFile.path)
+            let request = InlayHintRequest(
+                textDocument: TextDocumentIdentifier(
+                    DocumentURI(sourceFileURL)
+                ),
+                range: Position(line: 0, utf16index: 0) ..< sourceFile.content.lastPosition
+            )
+
+            #if DEBUG
+                print("Sending InlayHintRequest")
+                dump(request)
+            #endif
+
+            _ = connection.send(request, queue: queue) { result in
+                switch result {
+                case let .success(response):
+                    #if DEBUG
+                        print("\nSuccessfully retrieved the inlay hint.\n")
+                        dump(response)
+                    #endif
+                case let .failure(error):
+                    #if DEBUG
+                        print("\nFailed to retrieve the inlay hint.\n")
+                        print(error)
+                    #endif
+                }
+            }
+        },
         sendDefinitionRequest: { filePathString, position in
             let sourceFileURL = URL(fileURLWithPath: filePathString)
             let request = DefinitionRequest(

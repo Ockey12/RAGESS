@@ -8,6 +8,7 @@
 import ComposableArchitecture
 import LanguageServerProtocol
 import LSPClient
+import SourceCodeClient
 import SwiftUI
 
 @Reducer
@@ -42,6 +43,7 @@ public struct LSPClientDebugger {
         case sendInitializeRequest
         case sendInitializedNotification
         case sendDidOpenNotification
+        case inlayHintRequestTapped
         case sendDefinitionRequest
         case binding(BindingAction<State>)
     }
@@ -76,6 +78,17 @@ public struct LSPClientDebugger {
                     try await lspClient.sendDidOpenNotification(
                         filePathString: filePathString,
                         sourceCode: sourceCode
+                    )
+                }
+
+            case .inlayHintRequestTapped:
+                return .run { [
+                    filePathString = state.filePathString,
+                    sourceCode = state.sourceCode
+                ] _ in
+                    try await lspClient.sendInlayHintRequest(
+                        sourceFile: SourceFile(path: filePathString, content: sourceCode),
+                        range: Position(line: 0, utf16index: 0) ..< sourceCode.lastPosition
                     )
                 }
 
@@ -128,6 +141,9 @@ public struct LSPClientDebugView: View {
                 Button("Send DidOpen Notification") {
                     store.send(.sendDidOpenNotification)
                 }
+                Button("Send InlayHint Request") {
+                    store.send(.inlayHintRequestTapped)
+                }
             } header: {
                 Text("DidOpen")
                     .font(.headline)
@@ -155,6 +171,7 @@ public struct LSPClientDebugView: View {
                 Text("Definition")
                     .font(.headline)
             }
+            Spacer()
         } // Form
     } // body
 }

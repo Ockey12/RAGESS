@@ -10,7 +10,7 @@ import LanguageServerProtocol
 
 extension String {
     var lengthInEditor: Int {
-        let utf8View = self.utf8
+        let utf8View = utf8
         var length = 0
         var i = utf8View.startIndex
         while i < utf8View.endIndex {
@@ -29,8 +29,8 @@ extension String {
     }
 
     var lastPosition: Position {
-        var lastLineIndex = self.components(separatedBy: "\n").count - 1
-        let lastLine = self.components(separatedBy: "\n").last!
+        var lastLineIndex = components(separatedBy: "\n").count - 1
+        let lastLine = components(separatedBy: "\n").last!
         let lastLineLength = lastLine.lengthInEditor
         return Position(line: lastLineIndex, utf16index: lastLineLength)
     }

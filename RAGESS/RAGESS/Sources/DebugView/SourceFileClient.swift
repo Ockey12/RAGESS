@@ -41,10 +41,11 @@ public struct SourceCodeClientDebugger {
             switch action {
             case .getSourceFilesButtonTapped:
                 return .run { [rootPathString = state.rootPathString] send in
-                    await send(.sourceFileResponse(Result{
+                    await send(.sourceFileResponse(Result {
                         try await sourceFileClient.getSourceFiles(
                             rootDirectoryPath: rootPathString,
-                            ignoredDirectories: [".build", "DerivedData"])
+                            ignoredDirectories: [".build", "DerivedData"]
+                        )
                     }))
                 }
 

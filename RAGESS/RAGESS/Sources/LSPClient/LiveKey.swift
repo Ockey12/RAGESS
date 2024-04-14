@@ -81,8 +81,8 @@ extension LSPClient: DependencyKey {
             )
 
             #if DEBUG
-            print("Sending InlayHintRequest")
-            dump(request)
+                print("Sending InlayHintRequest")
+                dump(request)
             #endif
 
             _ = connection.send(request, queue: queue) { result in

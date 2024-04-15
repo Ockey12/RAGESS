@@ -60,21 +60,26 @@ public struct TypeAnnotationDebugView: View {
     }
 
     public var body: some View {
-        VStack {
-            Text("File Path\n\(store.sourceFile.path)")
-            Text(store.sourceFile.content)
-                .padding()
-                .foregroundStyle(.white)
-                .background(.black)
-                .padding(.leading)
-            Button("Set Type Annotations") {
-                store.send(.setTypeAnnotationsTapped)
+        ScrollView {
+            HStack {
+                VStack(alignment: .leading) {
+                    Text("File Path: \(store.sourceFile.path)")
+                    Text(store.sourceFile.content)
+                        .padding()
+                        .foregroundStyle(.white)
+                        .background(.black)
+                        .padding(.leading)
+                    Button("Set Type Annotations") {
+                        store.send(.setTypeAnnotationsTapped)
+                    }
+                    Text(store.typeAnnotatedCode)
+                        .padding()
+                        .foregroundStyle(.white)
+                        .background(.black)
+                        .padding(.leading)
+                }
+                Spacer()
             }
-            Text(store.typeAnnotatedCode)
-                .padding()
-                .foregroundStyle(.white)
-                .background(.black)
-                .padding(.leading)
         }
     }
 }

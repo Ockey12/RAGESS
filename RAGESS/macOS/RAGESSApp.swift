@@ -22,7 +22,7 @@ struct RAGESSApp: App {
                             line: 0,
                             column: 0
                         ),
-                        sourceCodeClient: .init(
+                        sourceFileClient: .init(
                             rootPathString: "",
                             sourceFiles: []
                         )

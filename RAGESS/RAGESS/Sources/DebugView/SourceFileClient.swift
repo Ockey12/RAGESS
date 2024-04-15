@@ -6,11 +6,11 @@
 //
 
 import ComposableArchitecture
-import SourceCodeClient
+import SourceFileClient
 import SwiftUI
 
 @Reducer
-public struct SourceCodeClientDebugger {
+public struct SourceFileClientDebugger {
     public init() {}
 
     @ObservableState
@@ -69,10 +69,10 @@ public struct SourceCodeClientDebugger {
     }
 }
 
-public struct SourceCodeClientDebugView: View {
-    @Bindable public var store: StoreOf<SourceCodeClientDebugger>
+public struct SourceFileClientDebugView: View {
+    @Bindable public var store: StoreOf<SourceFileClientDebugger>
 
-    public init(store: StoreOf<SourceCodeClientDebugger>) {
+    public init(store: StoreOf<SourceFileClientDebugger>) {
         self.store = store
     }
 

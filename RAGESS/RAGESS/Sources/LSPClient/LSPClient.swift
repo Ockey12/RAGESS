@@ -10,7 +10,7 @@ import DependenciesMacros
 import Foundation
 import LanguageServerProtocol
 import LanguageServerProtocolJSONRPC
-import SourceCodeClient
+import SourceFileClient
 
 @DependencyClient
 public struct LSPClient {

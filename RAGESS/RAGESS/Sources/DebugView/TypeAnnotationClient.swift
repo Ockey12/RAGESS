@@ -43,6 +43,7 @@ public struct TypeAnnotationDebugger {
                 }
 
             case let .setTypeAnnotationsResponse(.success(typeAnnotatedCode)):
+                state.typeAnnotatedCode = typeAnnotatedCode
                 return .none
 
             case let .setTypeAnnotationsResponse(.failure(error)):

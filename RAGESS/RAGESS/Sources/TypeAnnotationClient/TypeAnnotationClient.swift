@@ -31,7 +31,14 @@ extension TypeAnnotationClient: DependencyKey {
                     print("\nType Annotations")
                     dump(typeAnnotations)
                 #endif
-                return ""
+                var annotatedCode = sourceFile.content
+                for typeAnnotation in typeAnnotations {
+                    guard case let .string(additionalString) = typeAnnotation.label else {
+                        continue
+                    }
+                    annotatedCode.insert(additionalString, into: typeAnnotation.position)
+                }
+                return annotatedCode
             }
         )
     }()

@@ -6,9 +6,9 @@
 //
 
 import ComposableArchitecture
-import TypeAnnotationClient
 import SourceFileClient
 import SwiftUI
+import TypeAnnotationClient
 
 @Reducer
 public struct TypeAnnotationDebugger {

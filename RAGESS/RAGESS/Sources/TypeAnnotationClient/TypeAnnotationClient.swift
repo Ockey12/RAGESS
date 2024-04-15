@@ -25,9 +25,10 @@ extension TypeAnnotationClient: DependencyKey {
                 let lastPosition = sourceFile.content.lastPosition
                 let range = Position(line: 0, utf16index: 0) ..< lastPosition
                 let inlayHints = try await lspClient.sendInlayHintRequest(sourceFile: sourceFile, range: range)
-                let typeAnnotations = inlayHints.map { $0.kind == .type }
+                let typeAnnotations = inlayHints.filter { $0.kind == .type }
+                    .sorted { $0.position.utf16index > $1.position.utf16index}
                 #if DEBUG
-                    print("Type Annotations")
+                    print("\nType Annotations")
                     dump(typeAnnotations)
                 #endif
                 return ""

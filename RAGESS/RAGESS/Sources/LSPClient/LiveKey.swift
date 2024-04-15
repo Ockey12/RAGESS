@@ -84,20 +84,23 @@ extension LSPClient: DependencyKey {
                 print("Sending InlayHintRequest")
                 dump(request)
             #endif
-
-            var result: Result<[InlayHint], ResponseError> = .success([])
-            _ = connection.send(request, queue: queue) { response in
-                result = response
-            }
-
-            switch result {
-            case let .success(inlayHints):
+            do {
+                let inlayHints = try await withCheckedThrowingContinuation { continuation in
+                    _ = connection.send(request, queue: queue) { response in
+                        switch response {
+                        case let .success(inlayHints):
+                            continuation.resume(returning: inlayHints)
+                        case let .failure(error):
+                            continuation.resume(throwing: error)
+                        }
+                    }
+                }
                 #if DEBUG
                     print("\nSuccessfully retrieved the inlay hint.\n")
                     dump(inlayHints)
                 #endif
                 return inlayHints
-            case let .failure(error):
+            } catch {
                 #if DEBUG
                     print("\nFailed to retrieve the inlay hint.\n")
                     print(error)

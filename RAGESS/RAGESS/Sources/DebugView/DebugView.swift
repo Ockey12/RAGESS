@@ -16,19 +16,23 @@ public struct DebugReducer {
     public struct State {
         var lspClient: LSPClientDebugger.State
         var sourceFileClient: SourceFileClientDebugger.State
+        var typeAnnotationClient: TypeAnnotationDebugger.State
 
         public init(
             lspClient: LSPClientDebugger.State,
-            sourceFileClient: SourceFileClientDebugger.State
+            sourceFileClient: SourceFileClientDebugger.State,
+            typeAnnotationClient: TypeAnnotationDebugger.State
         ) {
             self.lspClient = lspClient
             self.sourceFileClient = sourceFileClient
+            self.typeAnnotationClient = typeAnnotationClient
         }
     }
 
     public enum Action {
         case lspClient(LSPClientDebugger.Action)
         case sourceFileClient(SourceFileClientDebugger.Action)
+        case typeAnnotationClient(TypeAnnotationDebugger.Action)
     }
 
     public var body: some ReducerOf<Self> {
@@ -37,6 +41,9 @@ public struct DebugReducer {
         }
         Scope(state: \.sourceFileClient, action: \.sourceFileClient) {
             SourceFileClientDebugger()
+        }
+        Scope(state: \.typeAnnotationClient, action: \.typeAnnotationClient) {
+            TypeAnnotationDebugger()
         }
         Reduce { state, action in
             switch action {
@@ -47,9 +54,15 @@ public struct DebugReducer {
                 state.lspClient.rootPathString = state.sourceFileClient.rootPathString
                 state.lspClient.filePathString = sourceFile.path
                 state.lspClient.sourceCode = sourceFile.content
+
+                state.typeAnnotationClient.sourceFile = sourceFile
+
                 return .none
 
             case .sourceFileClient:
+                return .none
+
+            case .typeAnnotationClient:
                 return .none
             }
         }
@@ -80,7 +93,16 @@ public struct DebugView: View {
                     action: \.lspClient
                 )
             )
-            .tabItem { Text("LSPclient") }
+            .tabItem { Text("LSPClient") }
+            .padding()
+
+            TypeAnnotationDebugView(
+                store: store.scope(
+                    state: \.typeAnnotationClient,
+                    action: \.typeAnnotationClient
+                )
+            )
+            .tabItem { Text("TypeAnnotationClient") }
             .padding()
         }
         .frame(width: 800)

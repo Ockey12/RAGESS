@@ -25,9 +25,15 @@ struct RAGESSApp: App {
                         sourceFileClient: .init(
                             rootPathString: "",
                             sourceFiles: []
+                        ),
+                        typeAnnotationClient: .init(
+                            sourceFile: .init(path: "", content: ""),
+                            typeAnnotatedCode: ""
                         )
                     ),
-                    reducer: { DebugReducer() }
+                    reducer: {
+                        DebugReducer()
+                    }
                 )
             )
         }

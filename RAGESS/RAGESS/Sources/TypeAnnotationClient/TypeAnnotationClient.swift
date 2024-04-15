@@ -13,7 +13,7 @@ import SourceFileClient
 
 @DependencyClient
 public struct TypeAnnotationClient {
-    public var setTypeAnnotation: @Sendable (_ sourceFile: SourceFile) async throws -> String
+    public var setTypeAnnotations: @Sendable (_ sourceFile: SourceFile) async throws -> String
 }
 
 extension TypeAnnotationClient: DependencyKey {
@@ -21,10 +21,15 @@ extension TypeAnnotationClient: DependencyKey {
         @Dependency(LSPClient.self) var lspClient
 
         return .init(
-            setTypeAnnotation: { sourceFile in
+            setTypeAnnotations: { sourceFile in
                 let lastPosition = sourceFile.content.lastPosition
                 let range = Position(line: 0, utf16index: 0) ..< lastPosition
                 let inlayHints = try await lspClient.sendInlayHintRequest(sourceFile: sourceFile, range: range)
+                let typeAnnotations = inlayHints.map { $0.kind == .type }
+                #if DEBUG
+                    print("Type Annotations")
+                    dump(typeAnnotations)
+                #endif
                 return ""
             }
         )

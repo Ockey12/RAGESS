@@ -35,6 +35,7 @@ let package = Package(
             dependencies: [
                 "LSPClient",
                 "SourceFileClient",
+                "TypeAnnotationClient",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ]
         ),

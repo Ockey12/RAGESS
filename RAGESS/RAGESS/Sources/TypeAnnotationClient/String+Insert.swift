@@ -10,12 +10,14 @@ import LanguageServerProtocol
 extension String {
     mutating func insert(_ additionalString: String, into position: Position) {
         var lines = components(separatedBy: "\n")
-        guard position.line >= 0, position.line < lines.count else {
+        guard position.line >= 0,
+              position.line < lines.count else {
             return
         }
 
         var line = lines[position.line]
-        guard position.utf16index >= 0, position.utf16index <= line.lengthInEditor else {
+        guard position.utf16index >= 0,
+              position.utf16index <= line.lengthInEditor else {
             return
         }
 

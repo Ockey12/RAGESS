@@ -29,6 +29,14 @@ final class String_InsertTests: XCTestCase {
         XCTAssertEqual(target, "This is a sentence.")
     }
 
+    func test_insertAtNegativeColumnIndex() {
+        var target = "This is an immutable string."
+        let additionalString = "ABC"
+        let position = Position(line: 0, utf16index: -1)
+        target.insert(additionalString, into: position)
+        XCTAssertEqual(target, "This is an immutable string.")
+    }
+
     func test_insertAtNegativeLineIndex() {
         var target = """
         This sentence is line 0.

@@ -11,6 +11,8 @@ import XCTest
 @testable import TypeAnnotationClient
 
 final class String_InsertTests: XCTestCase {
+    // Note that `Position` starts counting lines and characters from 0.
+
     func test_insert_at_beginning() {
         var target = "is a sentence."
         let additionalString = "This "

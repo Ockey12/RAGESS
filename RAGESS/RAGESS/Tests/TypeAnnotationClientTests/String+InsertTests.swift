@@ -13,7 +13,7 @@ import XCTest
 final class String_InsertTests: XCTestCase {
     // Note that `Position` starts counting lines and characters from 0.
 
-    func test_insert_at_beginning() {
+    func test_insertAtBeginning() {
         var target = "is a sentence."
         let additionalString = "This "
         let position = Position(line: 0, utf16index: 0)

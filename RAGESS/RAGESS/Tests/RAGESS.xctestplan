@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "0F088D0D-9DFF-4239-A91A-373E0B802D2E",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:RAGESS",
+        "identifier" : "TypeAnnotationClientTests",
+        "name" : "TypeAnnotationClientTests"
+      }
+    }
+  ],
+  "version" : 1
+}

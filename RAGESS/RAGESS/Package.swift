@@ -82,7 +82,8 @@ let package = Package(
         .testTarget(
             name: "TypeAnnotationClientTests",
             dependencies: [
-                "TypeAnnotationClient"
+                "TypeAnnotationClient",
+                .product(name: "LSPBindings", package: "sourcekit-lsp")
             ]
         )
     ]

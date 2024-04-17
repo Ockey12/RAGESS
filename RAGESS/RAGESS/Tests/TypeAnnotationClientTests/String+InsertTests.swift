@@ -18,4 +18,12 @@ final class String_InsertTests: XCTestCase {
         target.insert(additionalString, into: position)
         XCTAssertEqual(target, "This is a sentence.")
     }
+
+    func test_insertAtEndOfLine() {
+        var target = "This is a"
+        let additionalString = " sentence."
+        let position = Position(line: 0, utf16index: 9)
+        target.insert(additionalString, into: position)
+        XCTAssertEqual(target, "This is a sentence.")
+    }
 }

@@ -15,41 +15,54 @@ public struct DebugReducer {
     @ObservableState
     public struct State {
         var lspClient: LSPClientDebugger.State
-        var sourceCodeClient: SourceCodeClientDebugger.State
+        var sourceFileClient: SourceFileClientDebugger.State
+        var typeAnnotationClient: TypeAnnotationDebugger.State
 
         public init(
             lspClient: LSPClientDebugger.State,
-            sourceCodeClient: SourceCodeClientDebugger.State
+            sourceFileClient: SourceFileClientDebugger.State,
+            typeAnnotationClient: TypeAnnotationDebugger.State
         ) {
             self.lspClient = lspClient
-            self.sourceCodeClient = sourceCodeClient
+            self.sourceFileClient = sourceFileClient
+            self.typeAnnotationClient = typeAnnotationClient
         }
     }
 
     public enum Action {
         case lspClient(LSPClientDebugger.Action)
-        case sourceCodeClient(SourceCodeClientDebugger.Action)
+        case sourceFileClient(SourceFileClientDebugger.Action)
+        case typeAnnotationClient(TypeAnnotationDebugger.Action)
     }
 
     public var body: some ReducerOf<Self> {
         Scope(state: \.lspClient, action: \.lspClient) {
             LSPClientDebugger()
         }
-        Scope(state: \.sourceCodeClient, action: \.sourceCodeClient) {
-            SourceCodeClientDebugger()
+        Scope(state: \.sourceFileClient, action: \.sourceFileClient) {
+            SourceFileClientDebugger()
+        }
+        Scope(state: \.typeAnnotationClient, action: \.typeAnnotationClient) {
+            TypeAnnotationDebugger()
         }
         Reduce { state, action in
             switch action {
             case .lspClient:
                 return .none
 
-            case let .sourceCodeClient(.selectButtonTapped(sourceFile)):
-                state.lspClient.rootPathString = state.sourceCodeClient.rootPathString
+            case let .sourceFileClient(.selectButtonTapped(sourceFile)):
+                state.lspClient.rootPathString = state.sourceFileClient.rootPathString
                 state.lspClient.filePathString = sourceFile.path
                 state.lspClient.sourceCode = sourceFile.content
+
+                state.typeAnnotationClient.sourceFile = sourceFile
+
                 return .none
 
-            case .sourceCodeClient:
+            case .sourceFileClient:
+                return .none
+
+            case .typeAnnotationClient:
                 return .none
             }
         }
@@ -65,13 +78,13 @@ public struct DebugView: View {
 
     public var body: some View {
         TabView {
-            SourceCodeClientDebugView(
+            SourceFileClientDebugView(
                 store: store.scope(
-                    state: \.sourceCodeClient,
-                    action: \.sourceCodeClient
+                    state: \.sourceFileClient,
+                    action: \.sourceFileClient
                 )
             )
-            .tabItem { Text("SourceCodeClient") }
+            .tabItem { Text("SourceFileClient") }
             .padding()
 
             LSPClientDebugView(
@@ -80,7 +93,16 @@ public struct DebugView: View {
                     action: \.lspClient
                 )
             )
-            .tabItem { Text("LSPclient") }
+            .tabItem { Text("LSPClient") }
+            .padding()
+
+            TypeAnnotationDebugView(
+                store: store.scope(
+                    state: \.typeAnnotationClient,
+                    action: \.typeAnnotationClient
+                )
+            )
+            .tabItem { Text("TypeAnnotationClient") }
             .padding()
         }
         .frame(width: 800)

@@ -34,7 +34,8 @@ let package = Package(
             name: "DebugView",
             dependencies: [
                 "LSPClient",
-                "SourceCodeClient",
+                "SourceFileClient",
+                "TypeAnnotationClient",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ]
         ),
@@ -54,7 +55,7 @@ let package = Package(
         .target(
             name: "LSPClient",
             dependencies: [
-                "SourceCodeClient",
+                "SourceFileClient",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "Dependencies", package: "swift-dependencies"),
                 .product(name: "DependenciesMacros", package: "swift-dependencies"),
@@ -62,15 +63,28 @@ let package = Package(
             ]
         ),
         .target(
-            name: "SourceCodeClient",
+            name: "SourceFileClient",
             dependencies: [
                 .product(name: "Dependencies", package: "swift-dependencies"),
                 .product(name: "DependenciesMacros", package: "swift-dependencies")
             ]
         ),
+        .target(
+            name: "TypeAnnotationClient",
+            dependencies: [
+                "LSPClient",
+                "SourceFileClient",
+                .product(name: "Dependencies", package: "swift-dependencies"),
+                .product(name: "DependenciesMacros", package: "swift-dependencies"),
+                .product(name: "LSPBindings", package: "sourcekit-lsp")
+            ]
+        ),
         .testTarget(
-            name: "Sample",
-            dependencies: []
+            name: "TypeAnnotationClientTests",
+            dependencies: [
+                "TypeAnnotationClient",
+                .product(name: "LSPBindings", package: "sourcekit-lsp")
+            ]
         )
     ]
 )

@@ -8,7 +8,7 @@
 import ComposableArchitecture
 import LanguageServerProtocol
 import LSPClient
-import SourceCodeClient
+import SourceFileClient
 import SwiftUI
 
 @Reducer

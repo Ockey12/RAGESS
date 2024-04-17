@@ -84,20 +84,28 @@ extension LSPClient: DependencyKey {
                 print("Sending InlayHintRequest")
                 dump(request)
             #endif
-
-            _ = connection.send(request, queue: queue) { result in
-                switch result {
-                case let .success(response):
-                    #if DEBUG
-                        print("\nSuccessfully retrieved the inlay hint.\n")
-                        dump(response)
-                    #endif
-                case let .failure(error):
-                    #if DEBUG
-                        print("\nFailed to retrieve the inlay hint.\n")
-                        print(error)
-                    #endif
+            do {
+                let inlayHints = try await withCheckedThrowingContinuation { continuation in
+                    _ = connection.send(request, queue: queue) { response in
+                        switch response {
+                        case let .success(inlayHints):
+                            continuation.resume(returning: inlayHints)
+                        case let .failure(error):
+                            continuation.resume(throwing: error)
+                        }
+                    }
                 }
+                #if DEBUG
+                    print("\nSuccessfully retrieved the inlay hint.\n")
+                    dump(inlayHints)
+                #endif
+                return inlayHints
+            } catch {
+                #if DEBUG
+                    print("\nFailed to retrieve the inlay hint.\n")
+                    print(error)
+                #endif
+                throw error
             }
         },
         sendDefinitionRequest: { filePathString, position in

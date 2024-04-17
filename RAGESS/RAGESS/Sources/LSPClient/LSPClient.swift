@@ -10,7 +10,7 @@ import DependenciesMacros
 import Foundation
 import LanguageServerProtocol
 import LanguageServerProtocolJSONRPC
-import SourceCodeClient
+import SourceFileClient
 
 @DependencyClient
 public struct LSPClient {
@@ -39,7 +39,7 @@ public struct LSPClient {
     public var sendInlayHintRequest: @Sendable (
         _ sourceFile: SourceFile,
         _ range: Range<Position>
-    ) async throws -> Void
+    ) async throws -> [InlayHint]
 
     public var sendDefinitionRequest: @Sendable (
         _ filePathString: String,

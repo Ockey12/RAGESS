@@ -80,8 +80,10 @@ let package = Package(
             ]
         ),
         .testTarget(
-            name: "Sample",
-            dependencies: []
+            name: "TypeAnnotationClientTests",
+            dependencies: [
+                "TypeAnnotationClient"
+            ]
         )
     ]
 )

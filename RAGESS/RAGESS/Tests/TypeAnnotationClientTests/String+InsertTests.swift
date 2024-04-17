@@ -29,7 +29,7 @@ final class String_InsertTests: XCTestCase {
         XCTAssertEqual(target, "This is a sentence.")
     }
 
-    func test_insertAtNegativeLineNumber() {
+    func test_insertAtNegativeLineIndex() {
         var target = """
         This sentence is line 0.
         This sentence is line 1.
@@ -37,6 +37,25 @@ final class String_InsertTests: XCTestCase {
         """
         let additionalString = "This sentence is negative line."
         let position = Position(line: -1, utf16index: 0)
+        target.insert(additionalString, into: position)
+        XCTAssertEqual(
+            target,
+            """
+            This sentence is line 0.
+            This sentence is line 1.
+            This sentence is line 2.
+            """
+        )
+    }
+
+    func test_insertAtLargerLineIndex() {
+        var target = """
+        This sentence is line 0.
+        This sentence is line 1.
+        This sentence is line 2.
+        """
+        let additionalString = "This is a line index greater than the range."
+        let position = Position(line: 3, utf16index: 0)
         target.insert(additionalString, into: position)
         XCTAssertEqual(
             target,

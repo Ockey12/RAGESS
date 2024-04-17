@@ -82,4 +82,16 @@ final class String_InsertTests: XCTestCase {
             """
         )
     }
+
+    func test_insertIntoEndWithNewline() {
+        var target = "This sentence is line 0.\nThis sentence is line 1.\nThis sentence line 2.\n"
+        let additionalString = "is "
+        let position = Position(line: 2, utf16index: 14)
+        target.insert(additionalString, into: position)
+        XCTAssertEqual(
+            target,
+            "This sentence is line 0.\nThis sentence is line 1.\nThis sentence is line 2.\n"
+        )
+    }
 }
+

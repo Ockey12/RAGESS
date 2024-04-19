@@ -9,6 +9,6 @@ import XCTest
 
 @testable import LSPClient
 
-final class String_PositionTests: XCTestCase {
+final class LengthInEditorTests: XCTestCase {
     func test_emojiLength() {}
 }

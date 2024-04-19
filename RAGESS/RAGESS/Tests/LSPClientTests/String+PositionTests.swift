@@ -30,4 +30,15 @@ final class LastPositionTests: XCTestCase {
             Position(line: 0, utf16index: 5)
         )
     }
+
+    func test_multipleLines() {
+        XCTAssertEqual(
+            "Objective-C\nSwift".lastPosition,
+            Position(line: 1, utf16index: 5)
+        )
+        XCTAssertEqual(
+            "Objective-C\nSwift\n".lastPosition,
+            Position(line: 2, utf16index: 0)
+        )
+    }
 }

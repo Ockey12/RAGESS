@@ -80,6 +80,12 @@ let package = Package(
             ]
         ),
         .testTarget(
+            name: "LSPClientTests",
+            dependencies: [
+                "LSPClient"
+            ]
+        ),
+        .testTarget(
             name: "TypeAnnotationClientTests",
             dependencies: [
                 "TypeAnnotationClient",

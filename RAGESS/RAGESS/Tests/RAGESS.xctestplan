@@ -18,6 +18,13 @@
         "identifier" : "TypeAnnotationClientTests",
         "name" : "TypeAnnotationClientTests"
       }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:RAGESS",
+        "identifier" : "LSPClientTests",
+        "name" : "LSPClientTests"
+      }
     }
   ],
   "version" : 1

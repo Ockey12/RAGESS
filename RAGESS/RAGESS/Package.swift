@@ -80,6 +80,13 @@ let package = Package(
             ]
         ),
         .testTarget(
+            name: "LSPClientTests",
+            dependencies: [
+                "LSPClient",
+                .product(name: "LSPBindings", package: "sourcekit-lsp")
+            ]
+        ),
+        .testTarget(
             name: "TypeAnnotationClientTests",
             dependencies: [
                 "TypeAnnotationClient",

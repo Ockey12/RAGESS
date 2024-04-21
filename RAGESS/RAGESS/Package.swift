@@ -57,6 +57,12 @@ let package = Package(
             ]
         ),
         .target(
+            name: "KittenClient",
+            dependencies: [
+                .product(name: "SourceKittenFramework", package: "SourceKitten")
+            ]
+        ),
+        .target(
             name: "LSPClient",
             dependencies: [
                 "SourceFileClient",

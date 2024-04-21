@@ -27,6 +27,10 @@ let package = Package(
         .package(
             url: "https://github.com/pointfreeco/swift-dependencies",
             .upToNextMinor(from: "1.2.2")
+        ),
+        .package(
+            url: "https://github.com/jpsim/SourceKitten.git",
+            .upToNextMinor(from: "0.34.1")
         )
     ],
     targets: [

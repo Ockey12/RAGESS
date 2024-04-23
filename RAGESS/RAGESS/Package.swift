@@ -37,9 +37,9 @@ let package = Package(
         .target(
             name: "DebugView",
             dependencies: [
-                "KittenClient",
                 "LSPClient",
                 "SourceFileClient",
+                "SourceKitClient",
                 "TypeAnnotationClient",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ]
@@ -58,12 +58,6 @@ let package = Package(
             ]
         ),
         .target(
-            name: "KittenClient",
-            dependencies: [
-                .product(name: "SourceKittenFramework", package: "SourceKitten")
-            ]
-        ),
-        .target(
             name: "LSPClient",
             dependencies: [
                 "SourceFileClient",
@@ -78,6 +72,12 @@ let package = Package(
             dependencies: [
                 .product(name: "Dependencies", package: "swift-dependencies"),
                 .product(name: "DependenciesMacros", package: "swift-dependencies")
+            ]
+        ),
+        .target(
+            name: "SourceKitClient",
+            dependencies: [
+                .product(name: "SourceKittenFramework", package: "SourceKitten")
             ]
         ),
         .target(

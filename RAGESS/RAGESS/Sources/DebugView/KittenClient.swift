@@ -6,7 +6,7 @@
 //
 
 import ComposableArchitecture
-import KittenClient
+import SourceKitClient
 import SwiftUI
 
 @Reducer

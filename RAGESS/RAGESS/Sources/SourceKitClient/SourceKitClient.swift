@@ -24,7 +24,6 @@ extension SourceKitClient: DependencyKey {
             let byteCount = ByteCount(offset)
             let request = Request.cursorInfo(file: file, offset: byteCount, arguments: arguments)
             let response = try await request.asyncSend()
-//            dump(response)
 
             for (key, value) in response {
                 print("\(key): \(value)")

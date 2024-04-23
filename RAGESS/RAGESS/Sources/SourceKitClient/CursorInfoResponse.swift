@@ -8,16 +8,16 @@
 public struct CursorInfoResponse {
     public var name: String?
     public var kind: String?
-    public var length: Int?
+    public var length: String?
     public var declLang: String?
     public var typeName: String?
     public var annotatedDecl: String?
     public var fullyAnnotatedDecl: String?
     public var filePath: String?
     public var moduleName: String?
-    public var line: Int?
-    public var column: Int?
-    public var offset: Int?
+    public var line: String?
+    public var column: String?
+    public var offset: String?
     public var USR: String?
     public var typeUSR: String?
     public var containerTypeUSR: String?

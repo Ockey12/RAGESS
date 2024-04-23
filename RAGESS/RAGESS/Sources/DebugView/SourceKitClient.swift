@@ -21,6 +21,7 @@ public struct SourceKitClientDebugger {
         var symbolName: String = ""
         var countedString: String = ""
         var offset: Int = 0
+        var cursorInfoResponse = CursorInfoResponse()
 
         public init(filePath: String) {
             self.filePath = filePath
@@ -107,6 +108,46 @@ public struct SourceKitClientDebugger {
                 }
 
             case let .cursorInfoResponse(.success(response)):
+                for (key, value) in response {
+                    if let cursorInfoKey = CursorInfoResponseKeys(key: key) {
+                        switch cursorInfoKey {
+                        case .name:
+                            state.cursorInfoResponse.name = value as? String
+                        case .kind:
+                            state.cursorInfoResponse.kind = value as? String
+                        case .length:
+                            state.cursorInfoResponse.length = value as? String
+                        case .declLang:
+                            state.cursorInfoResponse.declLang = value as? String
+                        case .typeName:
+                            state.cursorInfoResponse.typeName = value as? String
+                        case .annotatedDecl:
+                            state.cursorInfoResponse.annotatedDecl = value as? String
+                        case .fullyAnnotatedDecl:
+                            state.cursorInfoResponse.fullyAnnotatedDecl = value as? String
+                        case .filePath:
+                            state.cursorInfoResponse.filePath = value as? String
+                        case .moduleName:
+                            state.cursorInfoResponse.moduleName = value as? String
+                        case .line:
+                            state.cursorInfoResponse.line = value as? String
+                        case .column:
+                            state.cursorInfoResponse.column = value as? String
+                        case .offset:
+                            state.cursorInfoResponse.offset = value as? String
+                        case .USR:
+                            state.cursorInfoResponse.USR = value as? String
+                        case .typeUSR:
+                            state.cursorInfoResponse.typeUSR = value as? String
+                        case .containerTypeUSR:
+                            state.cursorInfoResponse.containerTypeUSR = value as? String
+                        case .reusingASTContext:
+                            state.cursorInfoResponse.reusingASTContext = value as? String
+                        }
+                    } else {
+                        fatalError("Unexpected Response [\(key): \(value)]")
+                    }
+                }
                 return .none
 
             case let .cursorInfoResponse(.failure(error)):

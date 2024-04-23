@@ -102,6 +102,17 @@ let package = Package(
             ]
         ),
         .testTarget(
+            name: "SourceKitClientTests",
+            dependencies: [
+                "LSPClient",
+                "SourceKitClient",
+                .product(name: "Dependencies", package: "swift-dependencies"),
+                .product(name: "DependenciesMacros", package: "swift-dependencies"),
+                .product(name: "LSPBindings", package: "sourcekit-lsp"),
+                .product(name: "SourceKittenFramework", package: "SourceKitten")
+            ]
+        ),
+        .testTarget(
             name: "TypeAnnotationClientTests",
             dependencies: [
                 "TypeAnnotationClient",

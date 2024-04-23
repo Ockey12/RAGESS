@@ -170,7 +170,7 @@ public struct SourceKitClientDebugView: View {
                     Text("key.usr: ")
                     Text("key.typeusr: ")
                     Text("key.containertypeusr: ")
-
+                    Divider()
                     Text("key.reusingastcontext: ")
                 } header: {
                     Text("Request")

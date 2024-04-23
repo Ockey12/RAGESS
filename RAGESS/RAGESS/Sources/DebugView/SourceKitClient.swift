@@ -8,6 +8,7 @@
 import ComposableArchitecture
 import LSPClient
 import SourceKitClient
+import SourceKittenFramework
 import SwiftUI
 
 @Reducer
@@ -32,6 +33,7 @@ public struct SourceKitClientDebugger {
         case getTrailingOffsetTapped
         case offsetResponse(Result<Int, Error>)
         case cursorInfoTapped
+        case cursorInfoResponse(Result<[String : SourceKitRepresentable], Error>)
         case binding(BindingAction<State>)
     }
 
@@ -74,33 +76,42 @@ public struct SourceKitClientDebugger {
                 return .none
 
             case .cursorInfoTapped:
-                return .run { [path = state.filePath, offset = state.offset] _ in
-                    try await sourceKitClient.sendCursorInfoRequest(
-                        file: path,
-                        offset: offset,
-                        arguments: [
-                            "-vfsoverlay",
-                            "/Users/onaga/Library/Developer/Xcode/DerivedData/SourceKit-LSP-Analysis-Target-dyojgxcyuvpzjpggswsgjqrcrzqh/Index.noindex/Build/Intermediates.noindex/index-overlay.yaml",
-                            "-module-name",
-                            "AppFeature",
-                            "-Onone",
-                            "-enforce-exclusivity=checked",
-                            "/Users/onaga/SourceKit-LSP-Analysis-Target/Sources/AppFeature/Affected.swift",
-                            "/Users/onaga/SourceKit-LSP-Analysis-Target/Sources/AppFeature/Affecting.swift",
-                            "/Users/onaga/SourceKit-LSP-Analysis-Target/Sources/AppFeature/Caller.swift",
-                            "/Users/onaga/SourceKit-LSP-Analysis-Target/Sources/AppFeature/Case.swift",
-                            "/Users/onaga/SourceKit-LSP-Analysis-Target/Sources/AppFeature/ContentView.swift",
-                            "/Users/onaga/SourceKit-LSP-Analysis-Target/Sources/AppFeature/Sample.swift",
-                            "-DSWIFT_PACKAGE",
-                            "-DDEBUG",
-                            "-DXcode",
-                            "-sdk",
-                            "/Applications/Xcode-15.2.0.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.2.sdk",
-                            "-sdk",
-                            "/Applications/Xcode-15.2.0.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk"
-                        ]
-                    )
+                return .run { [path = state.filePath, offset = state.offset] send in
+                    await send(.cursorInfoResponse(Result {
+                        try await sourceKitClient.sendCursorInfoRequest(
+                            file: path,
+                            offset: offset,
+                            arguments: [
+                                "-vfsoverlay",
+                                "/Users/onaga/Library/Developer/Xcode/DerivedData/SourceKit-LSP-Analysis-Target-dyojgxcyuvpzjpggswsgjqrcrzqh/Index.noindex/Build/Intermediates.noindex/index-overlay.yaml",
+                                "-module-name",
+                                "AppFeature",
+                                "-Onone",
+                                "-enforce-exclusivity=checked",
+                                "/Users/onaga/SourceKit-LSP-Analysis-Target/Sources/AppFeature/Affected.swift",
+                                "/Users/onaga/SourceKit-LSP-Analysis-Target/Sources/AppFeature/Affecting.swift",
+                                "/Users/onaga/SourceKit-LSP-Analysis-Target/Sources/AppFeature/Caller.swift",
+                                "/Users/onaga/SourceKit-LSP-Analysis-Target/Sources/AppFeature/Case.swift",
+                                "/Users/onaga/SourceKit-LSP-Analysis-Target/Sources/AppFeature/ContentView.swift",
+                                "/Users/onaga/SourceKit-LSP-Analysis-Target/Sources/AppFeature/Sample.swift",
+                                "-DSWIFT_PACKAGE",
+                                "-DDEBUG",
+                                "-DXcode",
+                                "-sdk",
+                                "/Applications/Xcode-15.2.0.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.2.sdk",
+                                "-sdk",
+                                "/Applications/Xcode-15.2.0.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk"
+                            ]
+                        )
+                    }))
                 }
+
+            case let .cursorInfoResponse(.success(response)):
+                return .none
+
+            case let .cursorInfoResponse(.failure(error)):
+                print(error)
+                return .none
 
             case .binding:
                 return .none

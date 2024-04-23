@@ -11,16 +11,16 @@ import XCTest
 
 final class ByteOffsetTests: XCTestCase {
     let target = """
-        private struct Affected {
-            let affected: Affecting = Affecting()
-            let propertyCaller: Int = Affecting().property
-            let methodCaller: Int = Affecting().getValue()
+    private struct Affected {
+        let affected: Affecting = Affecting()
+        let propertyCaller: Int = Affecting().property
+        let methodCaller: Int = Affecting().getValue()
 
-            func get() {
-                let value: Int = affected.getValue()
-            }
+        func get() {
+            let value: Int = affected.getValue()
         }
-        """
+    }
+    """
     func test_endOfString() {
         do {
             let endOfStringPosition = target.lastPosition

@@ -10,7 +10,7 @@ import LanguageServerProtocol
 
 public extension String {
     var lengthInEditor: Int {
-        self.utf16.count
+        utf16.count
     }
 
     var lastPosition: Position {

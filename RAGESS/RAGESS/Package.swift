@@ -77,8 +77,10 @@ let package = Package(
         .target(
             name: "SourceKitClient",
             dependencies: [
+                "LSPClient",
                 .product(name: "Dependencies", package: "swift-dependencies"),
                 .product(name: "DependenciesMacros", package: "swift-dependencies"),
+                .product(name: "LSPBindings", package: "sourcekit-lsp"),
                 .product(name: "SourceKittenFramework", package: "SourceKitten")
             ]
         ),

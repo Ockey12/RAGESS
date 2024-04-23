@@ -19,7 +19,7 @@ public struct FileStructureDebugger {
         self.file = file
 
         do {
-            self.structure = try Structure(file: file)
+            structure = try Structure(file: file)
         } catch {
             throw JumpToDefinitionError.parseError(error)
         }

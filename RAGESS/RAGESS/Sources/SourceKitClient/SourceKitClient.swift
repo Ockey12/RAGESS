@@ -15,7 +15,7 @@ public struct SourceKitClient {
         _ file: String,
         _ offset: Int,
         _ arguments: [String]
-    ) async throws -> [String : SourceKitRepresentable]
+    ) async throws -> [String: SourceKitRepresentable]
 }
 
 extension SourceKitClient: DependencyKey {
@@ -26,9 +26,9 @@ extension SourceKitClient: DependencyKey {
             let response = try await request.asyncSend()
 
             #if DEBUG
-            for (key, value) in response {
-                print("\(key): \(value)")
-            }
+                for (key, value) in response {
+                    print("\(key): \(value)")
+                }
             #endif
 
             return response

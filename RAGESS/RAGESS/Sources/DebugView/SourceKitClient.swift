@@ -33,7 +33,7 @@ public struct SourceKitClientDebugger {
         case getTrailingOffsetTapped
         case offsetResponse(Result<Int, Error>)
         case cursorInfoTapped
-        case cursorInfoResponse(Result<[String : SourceKitRepresentable], Error>)
+        case cursorInfoResponse(Result<[String: SourceKitRepresentable], Error>)
         case binding(BindingAction<State>)
     }
 

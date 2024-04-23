@@ -109,8 +109,7 @@ public struct SourceKitClientDebugger {
 
             case let .cursorInfoResponse(.success(response)):
                 for (key, value) in response {
-                    if let cursorInfoKey = CursorInfoResponseKeys(key: key)
-                    {
+                    if let cursorInfoKey = CursorInfoResponseKeys(key: key) {
                         switch cursorInfoKey {
                         case .name:
                             state.cursorInfoResponse.name = value as? String

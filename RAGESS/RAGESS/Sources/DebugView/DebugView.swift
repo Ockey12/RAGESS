@@ -65,6 +65,7 @@ public struct DebugReducer {
                 state.typeAnnotationClient.sourceFile = sourceFile
 
                 state.kittenClient.filePath = sourceFile.path
+                state.kittenClient.countedString = sourceFile.content
 
                 return .none
 

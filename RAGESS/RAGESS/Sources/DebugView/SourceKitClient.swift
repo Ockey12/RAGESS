@@ -6,6 +6,7 @@
 //
 
 import ComposableArchitecture
+import LSPClient
 import SourceKitClient
 import SwiftUI
 
@@ -17,6 +18,8 @@ public struct SourceKitClientDebugger {
     public struct State {
         var filePath: String
         var symbolName: String = ""
+        var countedString: String = ""
+        var offset: Int = 0
 
         public init(filePath: String) {
             self.filePath = filePath
@@ -26,6 +29,8 @@ public struct SourceKitClientDebugger {
     public enum Action: BindableAction {
         case dumpSymbolTapped
         case initializeResponse(Result<FileStructureDebugger, Error>)
+        case getTrailingOffsetTapped
+        case offsetResponse(Result<Int, Error>)
         case cursorInfoTapped
         case binding(BindingAction<State>)
     }
@@ -51,11 +56,28 @@ public struct SourceKitClientDebugger {
                 print(error)
                 return .none
 
+            case .getTrailingOffsetTapped:
+
+                return .run { [string = state.countedString] send in
+                    let position = string.lastPosition
+                    await send(.offsetResponse(Result {
+                        try string.getByteOffset(position: position)
+                    }))
+                }
+
+            case let .offsetResponse(.success(offset)):
+                state.offset = offset
+                return .none
+
+            case let .offsetResponse(.failure(error)):
+                print(error)
+                return .none
+
             case .cursorInfoTapped:
-                return .run { _ in
+                return .run { [path = state.filePath, offset = state.offset] _ in
                     try await sourceKitClient.sendCursorInfoRequest(
-                        file: "/Users/onaga/SourceKit-LSP-Analysis-Target/Sources/AppFeature/Affected.swift",
-                        offset: 223,
+                        file: path,
+                        offset: offset,
                         arguments: [
                             "-vfsoverlay",
                             "/Users/onaga/Library/Developer/Xcode/DerivedData/SourceKit-LSP-Analysis-Target-dyojgxcyuvpzjpggswsgjqrcrzqh/Index.noindex/Build/Intermediates.noindex/index-overlay.yaml",
@@ -96,17 +118,30 @@ public struct SourceKitClientDebugView: View {
 
     public var body: some View {
         VStack {
-            Text(store.filePath)
+            Text("File Path: \(store.filePath)")
 
             Form {
                 TextField("Symbol Name", text: $store.symbolName)
                 Button("Dump Symbol") {
                     store.send(.dumpSymbolTapped)
                 }
-                Button("Cursor Info") {
-                    store.send(.cursorInfoTapped)
+                Section {
+                    TextEditor(text: $store.countedString)
+                        .frame(height: 300)
+                    Button("Get Trailing Offset") {
+                        store.send(.getTrailingOffsetTapped)
+                    }
+                    Text("Offset: \(store.offset)")
+                    Button("Cursor Info") {
+                        store.send(.cursorInfoTapped)
+                    }
+                } header: {
+                    Text("Request")
+                        .font(.headline)
                 }
             }
+
+            Spacer()
         }
     }
 }

@@ -73,7 +73,8 @@ public struct SourceKitClientDebugger {
                             "-DDEBUG",
                             "-DXcode",
                             "-sdk",
-//                            "/Applications/Xcode-15.2.0.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.2.sdk"
+                            "/Applications/Xcode-15.2.0.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.2.sdk",
+                            "-sdk",
                             "/Applications/Xcode-15.2.0.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk"
                         ]
                     )

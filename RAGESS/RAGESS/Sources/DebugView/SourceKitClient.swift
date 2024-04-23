@@ -26,8 +26,11 @@ public struct SourceKitClientDebugger {
     public enum Action: BindableAction {
         case dumpSymbolTapped
         case initializeResponse(Result<FileStructureDebugger, Error>)
+        case cursorInfoTapped
         case binding(BindingAction<State>)
     }
+
+    @Dependency(SourceKitClient.self) var sourceKitClient
 
     public var body: some ReducerOf<Self> {
         BindingReducer()
@@ -47,6 +50,34 @@ public struct SourceKitClientDebugger {
             case let .initializeResponse(.failure(error)):
                 print(error)
                 return .none
+
+            case .cursorInfoTapped:
+                return .run { _ in
+                    try await sourceKitClient.sendCursorInfoRequest(
+                        file: "/Users/onaga/SourceKit-LSP-Analysis-Target/Sources/AppFeature/Affected.swift",
+                        offset: 223,
+                        arguments: [
+                            "-vfsoverlay",
+                            "/Users/onaga/Library/Developer/Xcode/DerivedData/SourceKit-LSP-Analysis-Target-dyojgxcyuvpzjpggswsgjqrcrzqh/Index.noindex/Build/Intermediates.noindex/index-overlay.yaml",
+                            "-module-name",
+                            "AppFeature",
+                            "-Onone",
+                            "-enforce-exclusivity=checked",
+                            "/Users/onaga/SourceKit-LSP-Analysis-Target/Sources/AppFeature/Affected.swift",
+                            "/Users/onaga/SourceKit-LSP-Analysis-Target/Sources/AppFeature/Affecting.swift",
+                            "/Users/onaga/SourceKit-LSP-Analysis-Target/Sources/AppFeature/Caller.swift",
+                            "/Users/onaga/SourceKit-LSP-Analysis-Target/Sources/AppFeature/Case.swift",
+                            "/Users/onaga/SourceKit-LSP-Analysis-Target/Sources/AppFeature/ContentView.swift",
+                            "/Users/onaga/SourceKit-LSP-Analysis-Target/Sources/AppFeature/Sample.swift",
+                            "-DSWIFT_PACKAGE",
+                            "-DDEBUG",
+                            "-DXcode",
+                            "-sdk",
+//                            "/Applications/Xcode-15.2.0.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.2.sdk"
+                            "/Applications/Xcode-15.2.0.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk"
+                        ]
+                    )
+                }
 
             case .binding:
                 return .none
@@ -70,6 +101,9 @@ public struct SourceKitClientDebugView: View {
                 TextField("Symbol Name", text: $store.symbolName)
                 Button("Dump Symbol") {
                     store.send(.dumpSymbolTapped)
+                }
+                Button("Cursor Info") {
+                    store.send(.cursorInfoTapped)
                 }
             }
         }

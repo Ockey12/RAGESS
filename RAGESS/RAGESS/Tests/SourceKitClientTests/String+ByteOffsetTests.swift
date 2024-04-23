@@ -38,15 +38,6 @@ final class ByteOffsetTests: XCTestCase {
 
     func test_invalidNumberOfLines() {
         let target = "Swift"
-        do {
-            let invalidPosition = Position(line: 1, utf16index: 0)
-            _ = try target.getByteOffset(position: invalidPosition)
-            XCTFail("Expected ByteOffsetError.invalidNumberOfLines")
-        } catch let error as String.ByteOffsetError {
-            XCTAssertEqual(error.localizedDescription, "Invalid number of lines. [Line: 1]")
-        } catch {
-            XCTFail("Unexpected error: \(error)")
-        }
 
         do {
             let invalidPosition = Position(line: -1, utf16index: 0)
@@ -57,10 +48,30 @@ final class ByteOffsetTests: XCTestCase {
         } catch {
             XCTFail("Unexpected error: \(error)")
         }
+
+        do {
+            let invalidPosition = Position(line: 1, utf16index: 0)
+            _ = try target.getByteOffset(position: invalidPosition)
+            XCTFail("Expected ByteOffsetError.invalidNumberOfLines")
+        } catch let error as String.ByteOffsetError {
+            XCTAssertEqual(error.localizedDescription, "Invalid number of lines. [Line: 1]")
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
     }
 
     func test_invalidNumberOfColumns() {
         let target = "Swift"
+        do {
+            let invalidPosition = Position(line: 0, utf16index: -1)
+            _ = try target.getByteOffset(position: invalidPosition)
+            XCTFail("Expected ByteOffsetError.invalidNumberOfColumns")
+        } catch let error as String.ByteOffsetError {
+            XCTAssertEqual(error.localizedDescription, "Invalid number of columns. [Line: 0, Column: -1]")
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+
         do {
             let invalidPosition = Position(line: 0, utf16index: 6)
             _ = try target.getByteOffset(position: invalidPosition)

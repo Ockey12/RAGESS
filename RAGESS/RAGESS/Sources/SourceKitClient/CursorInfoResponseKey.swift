@@ -23,6 +23,45 @@ public enum CursorInfoResponseKeys {
     case containerTypeUSR
     case reusingASTContext
 
+    public init?(key: String) {
+        switch key {
+        case "key.name":
+            self = .name
+        case "key.kind":
+            self = .kind
+        case "key.length":
+            self = .length
+        case "key.decl_lang":
+            self = .declLang
+        case "key.typename":
+            self = .typeName
+        case "key.annotated_decl":
+            self = .annotatedDecl
+        case "key.fully_annotated_decl":
+            self = .fullyAnnotatedDecl
+        case "key.filepath":
+            self = .filePath
+        case "key.modulename":
+            self = .moduleName
+        case "key.line":
+            self = .line
+        case "key.column":
+            self = .column
+        case "key.offset":
+            self = .offset
+        case "key.usr":
+            self = .USR
+        case "key.typeusr":
+            self = .typeUSR
+        case "key.containertypeusr":
+            self = .containerTypeUSR
+        case "key.reusingastcontext":
+            self = .reusingASTContext
+        default:
+            return nil
+        }
+    }
+
     public var key: String {
         switch self {
         case .name:

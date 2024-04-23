@@ -109,14 +109,15 @@ public struct SourceKitClientDebugger {
 
             case let .cursorInfoResponse(.success(response)):
                 for (key, value) in response {
-                    if let cursorInfoKey = CursorInfoResponseKeys(key: key) {
+                    if let cursorInfoKey = CursorInfoResponseKeys(key: key)
+                    {
                         switch cursorInfoKey {
                         case .name:
                             state.cursorInfoResponse.name = value as? String
                         case .kind:
                             state.cursorInfoResponse.kind = value as? String
                         case .length:
-                            state.cursorInfoResponse.length = value as? String
+                            state.cursorInfoResponse.length = value as? Int64
                         case .declLang:
                             state.cursorInfoResponse.declLang = value as? String
                         case .typeName:
@@ -130,11 +131,11 @@ public struct SourceKitClientDebugger {
                         case .moduleName:
                             state.cursorInfoResponse.moduleName = value as? String
                         case .line:
-                            state.cursorInfoResponse.line = value as? String
+                            state.cursorInfoResponse.line = value as? Int64
                         case .column:
-                            state.cursorInfoResponse.column = value as? String
+                            state.cursorInfoResponse.column = value as? Int64
                         case .offset:
-                            state.cursorInfoResponse.offset = value as? String
+                            state.cursorInfoResponse.offset = value as? Int64
                         case .USR:
                             state.cursorInfoResponse.USR = value as? String
                         case .typeUSR:
@@ -142,7 +143,7 @@ public struct SourceKitClientDebugger {
                         case .containerTypeUSR:
                             state.cursorInfoResponse.containerTypeUSR = value as? String
                         case .reusingASTContext:
-                            state.cursorInfoResponse.reusingASTContext = value as? String
+                            state.cursorInfoResponse.reusingASTContext = value as? Bool
                         }
                     } else {
                         fatalError("Unexpected Response [\(key): \(value)]")
@@ -192,27 +193,97 @@ public struct SourceKitClientDebugView: View {
                     Button("Cursor Info") {
                         store.send(.cursorInfoTapped)
                     }
-                    Text("key.name: ")
-                    Text("key.kind: ")
-                    Text("key.length: ")
+                    HStack(alignment: .top) {
+                        Text("key.name:")
+                        Text(store.cursorInfoResponse.name ?? "")
+                        Spacer()
+                    }
+                    HStack(alignment: .top) {
+                        Text("key.kind:")
+                        Text(store.cursorInfoResponse.kind ?? "")
+                        Spacer()
+                    }
+                    HStack(alignment: .top) {
+                        Text("key.length:")
+                        if let length = store.cursorInfoResponse.length {
+                            Text("\(length)")
+                        }
+                        Spacer()
+                    }
                     Divider()
-                    Text("key.decl_lang: ")
+                    HStack(alignment: .top) {
+                        Text("key.decl_lang:")
+                        Text(store.cursorInfoResponse.declLang ?? "")
+                        Spacer()
+                    }
                     Divider()
-                    Text("key.typename:")
-                    Text("key.annotated_decl: ")
-                    Text("key.fully_annotated_decl: ")
+                    HStack(alignment: .top) {
+                        Text("key.typename:")
+                        Text(store.cursorInfoResponse.typeName ?? "")
+                        Spacer()
+                    }
+                    HStack(alignment: .top) {
+                        Text("key.annotated_decl:")
+                        Text(store.cursorInfoResponse.annotatedDecl ?? "")
+                        Spacer()
+                    }
+                    HStack(alignment: .top) {
+                        Text("key.fully_annotated_decl:")
+                        Text(store.cursorInfoResponse.fullyAnnotatedDecl ?? "")
+                        Spacer()
+                    }
                     Divider()
-                    Text("key.filepath: ")
-                    Text("key.modulename: ")
-                    Text("key.line: ")
-                    Text("key.column: ")
-                    Text("key.offset: ")
+                    HStack(alignment: .top) {
+                        Text("key.filepath:")
+                        Text(store.cursorInfoResponse.filePath ?? "")
+                        Spacer()
+                    }
+                    HStack(alignment: .top) {
+                        Text("key.modulename:")
+                        Text(store.cursorInfoResponse.moduleName ?? "")
+                        Spacer()
+                    }
+                    HStack(alignment: .top) {
+                        Text("key.line:")
+                        if let line = store.cursorInfoResponse.line {
+                            Text("\(line)")
+                        }
+                        Spacer()
+                    }
+                    HStack(alignment: .top) {
+                        Text("key.column:")
+                        if let column = store.cursorInfoResponse.column {
+                            Text("\(column)")
+                        }
+                        Spacer()
+                    }
+                    HStack(alignment: .top) {
+                        Text("key.offset:")
+                        Text("\(store.cursorInfoResponse.offset?.description ?? "")")
+                        Spacer()
+                    }
                     Divider()
-                    Text("key.usr: ")
-                    Text("key.typeusr: ")
-                    Text("key.containertypeusr: ")
+                    HStack(alignment: .top) {
+                        Text("key.usr:")
+                        Text(store.cursorInfoResponse.USR ?? "")
+                        Spacer()
+                    }
+                    HStack(alignment: .top) {
+                        Text("key.typeusr:")
+                        Text(store.cursorInfoResponse.typeUSR ?? "")
+                        Spacer()
+                    }
+                    HStack(alignment: .top) {
+                        Text("key.containertypeusr:")
+                        Text(store.cursorInfoResponse.containerTypeUSR ?? "")
+                        Spacer()
+                    }
                     Divider()
-                    Text("key.reusingastcontext: ")
+                    HStack(alignment: .top) {
+                        Text("key.reusingastcontext:")
+                        Text("\(store.cursorInfoResponse.reusingASTContext?.description ?? "")")
+                        Spacer()
+                    }
                 } header: {
                     Text("Request")
                         .font(.headline)

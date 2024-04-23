@@ -28,6 +28,7 @@ extension SourceKitClient: DependencyKey {
             #if DEBUG
                 for (key, value) in response {
                     print("\(key): \(value)")
+                    print("  \(type(of: value))")
                 }
             #endif
 

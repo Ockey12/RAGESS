@@ -48,4 +48,17 @@ final class ByteOffsetTests: XCTestCase {
             XCTFail("Unexpected error: \(error)")
         }
     }
+
+    func test_invalidNumberOfColumns() {
+        let target = "Swift"
+        do {
+            let invalidPosition = Position(line: 0, utf16index: 6)
+            let offset = try target.getByteOffset(position: invalidPosition)
+            XCTFail("Expected ByteOffsetError.invalidNumberOfColumns")
+        } catch let error as String.ByteOffsetError {
+            XCTAssertEqual(error.localizedDescription, "Invalid number of columns. [Line: 0, Column: 6]")
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
 }

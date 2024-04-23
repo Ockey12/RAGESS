@@ -42,7 +42,7 @@ final class ByteOffsetTests: XCTestCase {
             let invalidPosition = Position(line: 1, utf16index: 0)
             let offset = try target.getByteOffset(position: invalidPosition)
             XCTFail("Expected ByteOffsetError.invalidNumberOfLines")
-        }  catch let error as String.ByteOffsetError {
+        } catch let error as String.ByteOffsetError {
             XCTAssertEqual(error.localizedDescription, "Invalid number of lines. [Line: 1]")
         } catch {
             XCTFail("Unexpected error: \(error)")

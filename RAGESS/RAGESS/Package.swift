@@ -37,6 +37,7 @@ let package = Package(
         .target(
             name: "DebugView",
             dependencies: [
+                "KittenClient",
                 "LSPClient",
                 "SourceFileClient",
                 "TypeAnnotationClient",

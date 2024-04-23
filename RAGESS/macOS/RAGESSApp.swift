@@ -29,7 +29,8 @@ struct RAGESSApp: App {
                         typeAnnotationClient: .init(
                             sourceFile: .init(path: "", content: ""),
                             typeAnnotatedCode: ""
-                        )
+                        ),
+                        kittenClient: .init(filePath: "")
                     ),
                     reducer: {
                         DebugReducer()

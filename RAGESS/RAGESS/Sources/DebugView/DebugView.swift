@@ -17,15 +17,18 @@ public struct DebugReducer {
         var lspClient: LSPClientDebugger.State
         var sourceFileClient: SourceFileClientDebugger.State
         var typeAnnotationClient: TypeAnnotationDebugger.State
+        var kittenClient: KittenClientDebugger.State
 
         public init(
             lspClient: LSPClientDebugger.State,
             sourceFileClient: SourceFileClientDebugger.State,
-            typeAnnotationClient: TypeAnnotationDebugger.State
+            typeAnnotationClient: TypeAnnotationDebugger.State,
+            kittenClient: KittenClientDebugger.State
         ) {
             self.lspClient = lspClient
             self.sourceFileClient = sourceFileClient
             self.typeAnnotationClient = typeAnnotationClient
+            self.kittenClient = kittenClient
         }
     }
 
@@ -33,6 +36,7 @@ public struct DebugReducer {
         case lspClient(LSPClientDebugger.Action)
         case sourceFileClient(SourceFileClientDebugger.Action)
         case typeAnnotationClient(TypeAnnotationDebugger.Action)
+        case kittenClient(KittenClientDebugger.Action)
     }
 
     public var body: some ReducerOf<Self> {
@@ -44,6 +48,9 @@ public struct DebugReducer {
         }
         Scope(state: \.typeAnnotationClient, action: \.typeAnnotationClient) {
             TypeAnnotationDebugger()
+        }
+        Scope(state: \.kittenClient, action: \.kittenClient) {
+            KittenClientDebugger()
         }
         Reduce { state, action in
             switch action {
@@ -57,12 +64,17 @@ public struct DebugReducer {
 
                 state.typeAnnotationClient.sourceFile = sourceFile
 
+                state.kittenClient.filePath = sourceFile.path
+
                 return .none
 
             case .sourceFileClient:
                 return .none
 
             case .typeAnnotationClient:
+                return .none
+
+            case .kittenClient:
                 return .none
             }
         }
@@ -103,6 +115,15 @@ public struct DebugView: View {
                 )
             )
             .tabItem { Text("TypeAnnotationClient") }
+            .padding()
+
+            KittenClientDebugView(
+                store: store.scope(
+                    state: \.kittenClient,
+                    action: \.kittenClient
+                )
+            )
+            .tabItem { Text("KittenClient") }
             .padding()
         }
         .frame(width: 800)

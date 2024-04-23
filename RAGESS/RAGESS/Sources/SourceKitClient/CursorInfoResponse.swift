@@ -22,4 +22,6 @@ public struct CursorInfoResponse {
     public var typeUSR: String?
     public var containerTypeUSR: String?
     public var reusingASTContext: String?
+
+    public init() {}
 }

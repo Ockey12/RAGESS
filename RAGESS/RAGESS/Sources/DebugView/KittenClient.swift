@@ -25,7 +25,7 @@ public struct KittenClientDebugger {
 
     public enum Action: BindableAction {
         case dumpSymbolTapped
-        case initializeResponse(Result<JumpToDefinition, Error>)
+        case initializeResponse(Result<FileStructureDebugger, Error>)
         case binding(BindingAction<State>)
     }
 
@@ -36,12 +36,12 @@ public struct KittenClientDebugger {
             case .dumpSymbolTapped:
                 return .run { [filePath = state.filePath] send in
                     await send(.initializeResponse(Result {
-                        try JumpToDefinition(filePath: filePath)
+                        try FileStructureDebugger(filePath: filePath)
                     }))
                 }
 
             case let .initializeResponse(.success(jumpToDefinition)):
-                jumpToDefinition.findDefinition(symbolName: state.symbolName)
+                jumpToDefinition.printStructure()
                 return .none
 
             case let .initializeResponse(.failure(error)):

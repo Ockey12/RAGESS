@@ -40,7 +40,7 @@ final class ByteOffsetTests: XCTestCase {
         let target = "Swift"
         do {
             let invalidPosition = Position(line: 1, utf16index: 0)
-            let offset = try target.getByteOffset(position: invalidPosition)
+            _ = try target.getByteOffset(position: invalidPosition)
             XCTFail("Expected ByteOffsetError.invalidNumberOfLines")
         } catch let error as String.ByteOffsetError {
             XCTAssertEqual(error.localizedDescription, "Invalid number of lines. [Line: 1]")
@@ -53,7 +53,7 @@ final class ByteOffsetTests: XCTestCase {
         let target = "Swift"
         do {
             let invalidPosition = Position(line: 0, utf16index: 6)
-            let offset = try target.getByteOffset(position: invalidPosition)
+            _ = try target.getByteOffset(position: invalidPosition)
             XCTFail("Expected ByteOffsetError.invalidNumberOfColumns")
         } catch let error as String.ByteOffsetError {
             XCTAssertEqual(error.localizedDescription, "Invalid number of columns. [Line: 0, Column: 6]")

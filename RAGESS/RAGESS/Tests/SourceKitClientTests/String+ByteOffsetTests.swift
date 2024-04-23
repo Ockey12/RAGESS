@@ -20,7 +20,9 @@ final class ByteOffsetTests: XCTestCase {
             let value: Int = affected.getValue()
         }
     }
+
     """
+
     func test_endOfString() {
         do {
             let endOfStringPosition = target.lastPosition

@@ -23,7 +23,7 @@ public extension String {
         let column = position.utf16index
 
         guard column >= 0,
-              column < line.lengthInEditor else {
+              column <= line.lengthInEditor else {
             throw ByteOffsetError.invalidNumberOfColumns(line: row, column: column)
         }
 

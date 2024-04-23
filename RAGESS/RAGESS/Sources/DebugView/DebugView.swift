@@ -17,13 +17,13 @@ public struct DebugReducer {
         var lspClient: LSPClientDebugger.State
         var sourceFileClient: SourceFileClientDebugger.State
         var typeAnnotationClient: TypeAnnotationDebugger.State
-        var kittenClient: KittenClientDebugger.State
+        var kittenClient: SourceKitClientDebugger.State
 
         public init(
             lspClient: LSPClientDebugger.State,
             sourceFileClient: SourceFileClientDebugger.State,
             typeAnnotationClient: TypeAnnotationDebugger.State,
-            kittenClient: KittenClientDebugger.State
+            kittenClient: SourceKitClientDebugger.State
         ) {
             self.lspClient = lspClient
             self.sourceFileClient = sourceFileClient
@@ -36,7 +36,7 @@ public struct DebugReducer {
         case lspClient(LSPClientDebugger.Action)
         case sourceFileClient(SourceFileClientDebugger.Action)
         case typeAnnotationClient(TypeAnnotationDebugger.Action)
-        case kittenClient(KittenClientDebugger.Action)
+        case kittenClient(SourceKitClientDebugger.Action)
     }
 
     public var body: some ReducerOf<Self> {
@@ -50,7 +50,7 @@ public struct DebugReducer {
             TypeAnnotationDebugger()
         }
         Scope(state: \.kittenClient, action: \.kittenClient) {
-            KittenClientDebugger()
+            SourceKitClientDebugger()
         }
         Reduce { state, action in
             switch action {
@@ -117,13 +117,13 @@ public struct DebugView: View {
             .tabItem { Text("TypeAnnotationClient") }
             .padding()
 
-            KittenClientDebugView(
+            SourceKitClientDebugView(
                 store: store.scope(
                     state: \.kittenClient,
                     action: \.kittenClient
                 )
             )
-            .tabItem { Text("KittenClient") }
+            .tabItem { Text("SourceKitClient") }
             .padding()
         }
         .frame(width: 800)

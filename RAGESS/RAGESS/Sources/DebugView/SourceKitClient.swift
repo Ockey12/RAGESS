@@ -1,5 +1,5 @@
 //
-//  KittenClient.swift
+//  SourceKitClient.swift
 //
 //
 //  Created by ockey12 on 2024/04/21.
@@ -10,7 +10,7 @@ import SourceKitClient
 import SwiftUI
 
 @Reducer
-public struct KittenClientDebugger {
+public struct SourceKitClientDebugger {
     public init() {}
 
     @ObservableState
@@ -55,10 +55,10 @@ public struct KittenClientDebugger {
     }
 }
 
-public struct KittenClientDebugView: View {
-    @Bindable public var store: StoreOf<KittenClientDebugger>
+public struct SourceKitClientDebugView: View {
+    @Bindable public var store: StoreOf<SourceKitClientDebugger>
 
-    public init(store: StoreOf<KittenClientDebugger>) {
+    public init(store: StoreOf<SourceKitClientDebugger>) {
         self.store = store
     }
 

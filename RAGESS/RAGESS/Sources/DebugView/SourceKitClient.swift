@@ -132,9 +132,35 @@ public struct SourceKitClientDebugView: View {
                         store.send(.getTrailingOffsetTapped)
                     }
                     Text("Offset: \(store.offset)")
+                } header: {
+                    Text("Offset")
+                        .font(.headline)
+                }
+                Section {
                     Button("Cursor Info") {
                         store.send(.cursorInfoTapped)
                     }
+                    Text("key.name: ")
+                    Text("key.kind: ")
+                    Text("key.length: ")
+                    Divider()
+                    Text("key.decl_lang: ")
+                    Divider()
+                    Text("key.typename:")
+                    Text("key.annotated_decl: ")
+                    Text("key.fully_annotated_decl: ")
+                    Divider()
+                    Text("key.filepath: ")
+                    Text("key.modulename: ")
+                    Text("key.line: ")
+                    Text("key.column: ")
+                    Text("key.offset: ")
+                    Divider()
+                    Text("key.usr: ")
+                    Text("key.typeusr: ")
+                    Text("key.containertypeusr: ")
+
+                    Text("key.reusingastcontext: ")
                 } header: {
                     Text("Request")
                         .font(.headline)

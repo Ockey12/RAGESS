@@ -57,6 +57,10 @@ public struct DebugReducer {
             case .lspClient:
                 return .none
 
+            case let .sourceFileClient(.sourceFileResponse(.success(sourceFiles))):
+                state.kittenClient.allFilePathsInProject = sourceFiles.map { $0.path }
+                return .none
+
             case let .sourceFileClient(.selectButtonTapped(sourceFile)):
                 state.lspClient.rootPathString = state.sourceFileClient.rootPathString
                 state.lspClient.filePathString = sourceFile.path

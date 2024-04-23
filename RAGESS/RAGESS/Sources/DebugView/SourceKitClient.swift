@@ -22,6 +22,25 @@ public struct SourceKitClientDebugger {
         var countedString: String = ""
         var offset: Int = 0
         var cursorInfoResponse = CursorInfoResponse()
+        var allFilePathsInProject: [String] = []
+        var compilerArguments: [String] {
+            [
+                "-vfsoverlay",
+                "/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz/Index.noindex/Build/Intermediates.noindex/index-overlay.yaml",
+//                "-module-name",
+//                "AppFeature",
+                "-Onone",
+                "-enforce-exclusivity=checked",
+                "-DSWIFT_PACKAGE",
+                "-DDEBUG",
+                "-DXcode",
+                "-sdk",
+                "/Applications/Xcode-15.2.0.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.2.sdk",
+                "-sdk",
+                "/Applications/Xcode-15.2.0.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk"
+            ]
+            + allFilePathsInProject
+        }
 
         public init(filePath: String) {
             self.filePath = filePath
@@ -77,32 +96,12 @@ public struct SourceKitClientDebugger {
                 return .none
 
             case .cursorInfoTapped:
-                return .run { [path = state.filePath, offset = state.offset] send in
+                return .run { [path = state.filePath, offset = state.offset, arguments = state.compilerArguments] send in
                     await send(.cursorInfoResponse(Result {
                         try await sourceKitClient.sendCursorInfoRequest(
                             file: path,
                             offset: offset,
-                            arguments: [
-                                "-vfsoverlay",
-                                "/Users/onaga/Library/Developer/Xcode/DerivedData/SourceKit-LSP-Analysis-Target-dyojgxcyuvpzjpggswsgjqrcrzqh/Index.noindex/Build/Intermediates.noindex/index-overlay.yaml",
-                                "-module-name",
-                                "AppFeature",
-                                "-Onone",
-                                "-enforce-exclusivity=checked",
-                                "/Users/onaga/SourceKit-LSP-Analysis-Target/Sources/AppFeature/Affected.swift",
-                                "/Users/onaga/SourceKit-LSP-Analysis-Target/Sources/AppFeature/Affecting.swift",
-                                "/Users/onaga/SourceKit-LSP-Analysis-Target/Sources/AppFeature/Caller.swift",
-                                "/Users/onaga/SourceKit-LSP-Analysis-Target/Sources/AppFeature/Case.swift",
-                                "/Users/onaga/SourceKit-LSP-Analysis-Target/Sources/AppFeature/ContentView.swift",
-                                "/Users/onaga/SourceKit-LSP-Analysis-Target/Sources/AppFeature/Sample.swift",
-                                "-DSWIFT_PACKAGE",
-                                "-DDEBUG",
-                                "-DXcode",
-                                "-sdk",
-                                "/Applications/Xcode-15.2.0.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.2.sdk",
-                                "-sdk",
-                                "/Applications/Xcode-15.2.0.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk"
-                            ]
+                            arguments: arguments
                         )
                     }))
                 }
@@ -144,9 +143,10 @@ public struct SourceKitClientDebugger {
                         case .reusingASTContext:
                             state.cursorInfoResponse.reusingASTContext = value as? Bool
                         }
-                    } else {
-                        fatalError("Unexpected Response [\(key): \(value)]")
                     }
+//                    } else {
+//                        fatalError("Unexpected Response [\(key): \(value)]")
+//                    }
                 }
                 return .none
 

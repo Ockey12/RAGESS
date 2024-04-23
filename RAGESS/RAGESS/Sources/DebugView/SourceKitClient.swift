@@ -39,7 +39,7 @@ public struct SourceKitClientDebugger {
                 "-sdk",
                 "/Applications/Xcode-15.2.0.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk"
             ]
-            + allFilePathsInProject
+                + allFilePathsInProject
         }
 
         public init(filePath: String) {

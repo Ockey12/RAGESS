@@ -43,7 +43,7 @@ public struct SourceFileClientDebugger {
             case .getSourceFilesButtonTapped:
                 return .run { [rootPathString = state.rootPathString] send in
                     #if DEBUG
-                    let startTime = CFAbsoluteTimeGetCurrent()
+                        let startTime = CFAbsoluteTimeGetCurrent()
                     #endif
                     if let derivedDataPath = getDerivedDataPath(for: rootPathString) {
                         print("DerivedData path: \(derivedDataPath)")
@@ -51,10 +51,10 @@ public struct SourceFileClientDebugger {
                         print("Failed to get the DerivedData path.")
                     }
                     #if DEBUG
-                    let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
-                    print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
-                    print("TIME ELAPSED: \(timeElapsed)")
-                    print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
+                        let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
+                        print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
+                        print("TIME ELAPSED: \(timeElapsed)")
+                        print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
                     #endif
 
                     await send(.sourceFileResponse(Result {

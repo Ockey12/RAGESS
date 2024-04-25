@@ -42,6 +42,34 @@ public struct SourceFileClientDebugger {
             switch action {
             case .getSourceFilesButtonTapped:
                 return .run { [rootPathString = state.rootPathString] send in
+                    let fileManager = FileManager.default
+                    if fileManager.changeCurrentDirectoryPath(rootPathString) {
+                        let task = Process()
+                        task.launchPath = "/usr/bin/xcodebuild"
+                        task.arguments = ["-dry-run", "-showBuildSettings"]
+
+                        let pipe = Pipe()
+                        task.standardOutput = pipe
+
+                        task.launch()
+                        task.waitUntilExit()
+
+                        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+                        if let output = String(data: data, encoding: .utf8) {
+                            let lines = output.components(separatedBy: .newlines)
+                            for line in lines {
+                                if line.contains("PROJECT_TEMP_ROOT =") {
+                                    var derivedDataPath = line.replacingOccurrences(of: "PROJECT_TEMP_ROOT = ", with: "")
+                                    derivedDataPath = derivedDataPath.components(separatedBy: "/Build/")[0]
+                                    print("DerivedData path: \(derivedDataPath)")
+                                    break
+                                }
+                            }
+                        }
+                    } else {
+                        print("Failed to change the current directory to the project root.")
+                    }
+
                     await send(.sourceFileResponse(Result {
                         try await IdentifiedArray(
                             uniqueElements: sourceFileClient.getSourceFiles(

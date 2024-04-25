@@ -42,33 +42,20 @@ public struct SourceFileClientDebugger {
             switch action {
             case .getSourceFilesButtonTapped:
                 return .run { [rootPathString = state.rootPathString] send in
-                    let fileManager = FileManager.default
-                    if fileManager.changeCurrentDirectoryPath(rootPathString) {
-                        let task = Process()
-                        task.launchPath = "/usr/bin/xcodebuild"
-                        task.arguments = ["-dry-run", "-showBuildSettings"]
-
-                        let pipe = Pipe()
-                        task.standardOutput = pipe
-
-                        task.launch()
-                        task.waitUntilExit()
-
-                        let data = pipe.fileHandleForReading.readDataToEndOfFile()
-                        if let output = String(data: data, encoding: .utf8) {
-                            let lines = output.components(separatedBy: .newlines)
-                            for line in lines {
-                                if line.contains("PROJECT_TEMP_ROOT =") {
-                                    var derivedDataPath = line.replacingOccurrences(of: "PROJECT_TEMP_ROOT = ", with: "")
-                                    derivedDataPath = derivedDataPath.components(separatedBy: "/Build/")[0]
-                                    print("DerivedData path: \(derivedDataPath)")
-                                    break
-                                }
-                            }
-                        }
+                    #if DEBUG
+                    let startTime = CFAbsoluteTimeGetCurrent()
+                    #endif
+                    if let derivedDataPath = getDerivedDataPath(for: rootPathString) {
+                        print("DerivedData path: \(derivedDataPath)")
                     } else {
-                        print("Failed to change the current directory to the project root.")
+                        print("Failed to get the DerivedData path.")
                     }
+                    #if DEBUG
+                    let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
+                    print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
+                    print("TIME ELAPSED: \(timeElapsed)")
+                    print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
+                    #endif
 
                     await send(.sourceFileResponse(Result {
                         try await IdentifiedArray(
@@ -134,4 +121,31 @@ public struct SourceFileClientDebugView: View {
             }
         }
     }
+}
+
+func getDerivedDataPath(for projectRootPath: String) -> String? {
+    let task = Process()
+    task.launchPath = "/usr/bin/xcodebuild"
+    task.arguments = ["-project", projectRootPath, "-showBuildSettings"]
+
+    let pipe = Pipe()
+    task.standardOutput = pipe
+
+    task.launch()
+    task.waitUntilExit()
+
+    let data = pipe.fileHandleForReading.readDataToEndOfFile()
+    if let output = String(data: data, encoding: .utf8) {
+        let lines = output.components(separatedBy: .newlines)
+        for line in lines {
+            if line.contains("BUILD_DIR = ") {
+                var derivedDataPath = line.replacingOccurrences(of: "BUILD_DIR = ", with: "")
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+                derivedDataPath = derivedDataPath.components(separatedBy: "/Build/")[0]
+                return derivedDataPath
+            }
+        }
+    }
+
+    return nil
 }

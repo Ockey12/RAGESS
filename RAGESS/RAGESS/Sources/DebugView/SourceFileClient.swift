@@ -50,7 +50,7 @@ public struct SourceFileClientDebugger {
                     }))
                 }
 
-           case let .derivedDataPathResponse(.success(derivedDataPath)):
+            case let .derivedDataPathResponse(.success(derivedDataPath)):
                 print(".derivedDataPathResponse(.success(derivedDataPath)): \(derivedDataPath)")
                 let projectRootPath = NSString(string: state.xcodeprojPathString).deletingLastPathComponent
                 return .run { send in

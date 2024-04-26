@@ -16,9 +16,9 @@ public struct DerivedDataPathClient {
 
 extension DerivedDataPathClient: DependencyKey {
     public static let liveValue: Self = .init { xcodeprojPath in
-#if DEBUG
-        let startTime = CFAbsoluteTimeGetCurrent()
-#endif
+        #if DEBUG
+            let startTime = CFAbsoluteTimeGetCurrent()
+        #endif
         let task = Process()
         task.launchPath = "/usr/bin/xcodebuild"
         task.arguments = ["-project", xcodeprojPath, "-showBuildSettings"]
@@ -37,13 +37,13 @@ extension DerivedDataPathClient: DependencyKey {
                     var derivedDataPath = line.replacingOccurrences(of: "BUILD_DIR = ", with: "")
                         .trimmingCharacters(in: .whitespacesAndNewlines)
                     derivedDataPath = derivedDataPath.components(separatedBy: "/Build/")[0]
-#if DEBUG
-                    let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
-                    print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
-                    print("DERIVED DATA PATH: \(derivedDataPath)")
-                    print("TIME ELAPSED: \(timeElapsed)")
-                    print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
-#endif
+                    #if DEBUG
+                        let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
+                        print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
+                        print("DERIVED DATA PATH: \(derivedDataPath)")
+                        print("TIME ELAPSED: \(timeElapsed)")
+                        print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
+                    #endif
                     return derivedDataPath
                 }
             }

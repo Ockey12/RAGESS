@@ -196,11 +196,12 @@ public struct SourceKitClientDebugger {
                 return .none
 
             case .cursorInfoTapped:
-                return .run { [path = state.filePath, offset = state.offset, arguments = state.compilerArguments] send in
+                return .run { [path = state.filePath, offset = state.offset, allFilePathsInProject = state.allFilePathsInProject, arguments = state.compilerArguments] send in
                     await send(.cursorInfoResponse(Result {
                         try await sourceKitClient.sendCursorInfoRequest(
                             file: path,
                             offset: offset,
+                            sourceFilePaths: allFilePathsInProject,
                             arguments: arguments
                         )
                     }))

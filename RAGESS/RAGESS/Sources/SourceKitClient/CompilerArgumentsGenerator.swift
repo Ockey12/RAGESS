@@ -21,12 +21,12 @@ struct CompilerArgumentsGenerator {
             "-Onone",
             "-enforce-exclusivity=checked"
         ]
-        + sourceFilePaths
-        + [
-            "-DSWIFT_PACKAGE",
-            "-DDEBUG"
-        ]
-        + getModuleMapPaths(derivedDataPath: derivedDataPath)
+            + sourceFilePaths
+            + [
+                "-DSWIFT_PACKAGE",
+                "-DDEBUG"
+            ]
+            + getModuleMapPaths(derivedDataPath: derivedDataPath)
     }
 
     func getModuleMapPaths(derivedDataPath: String) -> [String] {

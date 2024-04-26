@@ -23,16 +23,16 @@ extension SourceKitClient: DependencyKey {
     public static let liveValue: Self = .init(
         sendCursorInfoRequest: { file, offset, sourceFilePaths, arguments in
             #if DEBUG
-            let compilerArgumentsGenerator = CompilerArgumentsGenerator(
-                derivedDataPath: "/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz",
-                moduleName: "DebugView",
-                sourceFilePaths: sourceFilePaths
-            )
-            print("Compiler Arguments")
-            for argument in compilerArgumentsGenerator.arguments {
-                print(argument)
-            }
-            print("")
+                let compilerArgumentsGenerator = CompilerArgumentsGenerator(
+                    derivedDataPath: "/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz",
+                    moduleName: "DebugView",
+                    sourceFilePaths: sourceFilePaths
+                )
+                print("Compiler Arguments")
+                for argument in compilerArgumentsGenerator.arguments {
+                    print(argument)
+                }
+                print("")
             #endif
 
             let byteCount = ByteCount(offset)

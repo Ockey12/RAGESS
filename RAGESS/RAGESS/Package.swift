@@ -37,6 +37,7 @@ let package = Package(
         .target(
             name: "DebugView",
             dependencies: [
+                "DerivedDataPathClient",
                 "LSPClient",
                 "SourceFileClient",
                 "SourceKitClient",

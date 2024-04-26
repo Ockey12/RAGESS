@@ -6,6 +6,7 @@
 //
 
 import ComposableArchitecture
+import DerivedDataPathClient
 import SourceFileClient
 import SwiftUI
 
@@ -15,25 +16,27 @@ public struct SourceFileClientDebugger {
 
     @ObservableState
     public struct State {
-        var rootPathString: String
+        var xcodeprojPathString: String
         var sourceFiles: IdentifiedArrayOf<SourceFile>
 
         public init(
-            rootPathString: String,
+            xcodeprojPathString: String,
             sourceFiles: IdentifiedArrayOf<SourceFile>
         ) {
-            self.rootPathString = rootPathString
+            self.xcodeprojPathString = xcodeprojPathString
             self.sourceFiles = sourceFiles
         }
     }
 
     public enum Action: BindableAction {
         case getSourceFilesButtonTapped
+        case derivedDataPathResponse(Result<String, Error>)
         case sourceFileResponse(Result<IdentifiedArrayOf<SourceFile>, Error>)
         case selectButtonTapped(SourceFile)
         case binding(BindingAction<State>)
     }
 
+    @Dependency(DerivedDataPathClient.self) var derivedDataPathClient
     @Dependency(SourceFileClient.self) var sourceFileClient
 
     public var body: some ReducerOf<Self> {
@@ -41,31 +44,28 @@ public struct SourceFileClientDebugger {
         Reduce { state, action in
             switch action {
             case .getSourceFilesButtonTapped:
-                return .run { [rootPathString = state.rootPathString] send in
-                    #if DEBUG
-                        let startTime = CFAbsoluteTimeGetCurrent()
-                    #endif
-                    if let derivedDataPath = getDerivedDataPath(for: rootPathString) {
-                        print("DerivedData path: \(derivedDataPath)")
-                    } else {
-                        print("Failed to get the DerivedData path.")
-                    }
-                    #if DEBUG
-                        let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
-                        print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
-                        print("TIME ELAPSED: \(timeElapsed)")
-                        print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
-                    #endif
+                return .run { [xcodeprojPathString = state.xcodeprojPathString] send in
+                    await send(.derivedDataPathResponse(Result {
+                        try await derivedDataPathClient.getPath(xcodeprojPath: xcodeprojPathString)
+                    }))
+                }
 
+           case let .derivedDataPathResponse(.success(derivedDataPath)):
+                print(".derivedDataPathResponse(.success(derivedDataPath)): \(derivedDataPath)")
+                let projectRootPath = NSString(string: state.xcodeprojPathString).deletingLastPathComponent
+                return .run { send in
                     await send(.sourceFileResponse(Result {
                         try await IdentifiedArray(
                             uniqueElements: sourceFileClient.getSourceFiles(
-                                rootDirectoryPath: rootPathString,
+                                rootDirectoryPath: projectRootPath,
                                 ignoredDirectories: [".build", "DerivedData"]
                             )
                         )
                     }))
                 }
+
+            case .derivedDataPathResponse(.failure):
+                return .none
 
             case let .sourceFileResponse(.success(sourceFiles)):
                 state.sourceFiles = sourceFiles
@@ -94,7 +94,7 @@ public struct SourceFileClientDebugView: View {
     public var body: some View {
         VStack {
             Form {
-                TextField("Project root path", text: $store.rootPathString)
+                TextField("Project root path", text: $store.xcodeprojPathString)
                 Button("Get Source Files") {
                     store.send(.getSourceFilesButtonTapped)
                 }
@@ -121,31 +121,4 @@ public struct SourceFileClientDebugView: View {
             }
         }
     }
-}
-
-func getDerivedDataPath(for projectRootPath: String) -> String? {
-    let task = Process()
-    task.launchPath = "/usr/bin/xcodebuild"
-    task.arguments = ["-project", projectRootPath, "-showBuildSettings"]
-
-    let pipe = Pipe()
-    task.standardOutput = pipe
-
-    task.launch()
-    task.waitUntilExit()
-
-    let data = pipe.fileHandleForReading.readDataToEndOfFile()
-    if let output = String(data: data, encoding: .utf8) {
-        let lines = output.components(separatedBy: .newlines)
-        for line in lines {
-            if line.contains("BUILD_DIR = ") {
-                var derivedDataPath = line.replacingOccurrences(of: "BUILD_DIR = ", with: "")
-                    .trimmingCharacters(in: .whitespacesAndNewlines)
-                derivedDataPath = derivedDataPath.components(separatedBy: "/Build/")[0]
-                return derivedDataPath
-            }
-        }
-    }
-
-    return nil
 }

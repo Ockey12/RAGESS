@@ -11,7 +11,7 @@ import Foundation
 
 @DependencyClient
 public struct DerivedDataPathClient {
-    public var getPath: @Sendable (_ xcodeprojPath: String) async -> String?
+    public var getPath: @Sendable (_ xcodeprojPath: String) async throws -> String
 }
 
 extension DerivedDataPathClient: DependencyKey {
@@ -49,6 +49,10 @@ extension DerivedDataPathClient: DependencyKey {
             }
         }
 
-        return nil
+        throw DerivedDataPathError.pathNotFound
     }
+}
+
+enum DerivedDataPathError: Error {
+    case pathNotFound
 }

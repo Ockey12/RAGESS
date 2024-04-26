@@ -58,6 +58,10 @@ let package = Package(
             ]
         ),
         .target(
+            name: "DerivedDataPathClient",
+            dependencies: []
+        ),
+        .target(
             name: "LSPClient",
             dependencies: [
                 "SourceFileClient",

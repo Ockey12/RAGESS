@@ -59,7 +59,10 @@ let package = Package(
         ),
         .target(
             name: "DerivedDataPathClient",
-            dependencies: []
+            dependencies: [
+                .product(name: "Dependencies", package: "swift-dependencies"),
+                .product(name: "DependenciesMacros", package: "swift-dependencies")
+            ]
         ),
         .target(
             name: "LSPClient",

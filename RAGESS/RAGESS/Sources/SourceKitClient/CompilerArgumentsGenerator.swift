@@ -27,34 +27,34 @@ struct CompilerArgumentsGenerator {
                 "-DDEBUG"
             ]
             + getModuleMapPaths(derivedDataPath: derivedDataPath)
-        + [
-            "-DXcode",
-            "-sdk",
-            // TODO: Make ↓ dynamically generated
-            "/Applications/Xcode-15.2.0.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk",
-            "-target",
-            "arm64-apple-macos14.0",
-            "-g",
-            "-module-cache-path",
-            moduleCachePath,
-            "-Xfrontend",
-            "-serialize-debugging-options",
-            "-enable-testing",
-            "-swift-version",
-            "5",
-            "-I",
-            debugPath,
-            "-I",
-            // TODO: Make ↓ dynamically generated
-            "/Applications/Xcode-15.2.0.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
-            "-F",
-            packageFrameworksPath,
-            "-F",
-            debugPath,
-            "-F",
-            // TODO: Make ↓ dynamically generated
-            "/Applications/Xcode-15.2.0.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
-        ]
+            + [
+                "-DXcode",
+                "-sdk",
+                // TODO: Make ↓ dynamically generated
+                "/Applications/Xcode-15.2.0.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk",
+                "-target",
+                "arm64-apple-macos14.0",
+                "-g",
+                "-module-cache-path",
+                moduleCachePath,
+                "-Xfrontend",
+                "-serialize-debugging-options",
+                "-enable-testing",
+                "-swift-version",
+                "5",
+                "-I",
+                debugPath,
+                "-I",
+                // TODO: Make ↓ dynamically generated
+                "/Applications/Xcode-15.2.0.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+                "-F",
+                packageFrameworksPath,
+                "-F",
+                debugPath,
+                "-F",
+                // TODO: Make ↓ dynamically generated
+                "/Applications/Xcode-15.2.0.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks"
+            ]
     }
 
     var moduleCachePath: String {

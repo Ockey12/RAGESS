@@ -13,7 +13,7 @@ struct CompilerArgumentsGenerator {
     let sourceFilePaths: [String]
 
     var arguments: [String] {
-        [
+        let path = [
             "-vfsoverlay",
             derivedDataPath + "/Index.noindex/Build/Intermediates.noindex/index-overlay.yaml",
             "-module-name",
@@ -56,10 +56,50 @@ struct CompilerArgumentsGenerator {
                 "/Applications/Xcode-15.2.0.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks"
             ]
         + getExecutableMacroPaths(derivedDataPath: derivedDataPath)
+
+        return path
+                + [
+                    "-Xfrontend",
+                    "-experimental-allow-module-with-compiler-errors",
+                    "-Xfrontend",
+                    "-empty-abi-descriptor",
+                    "-Xcc",
+                    "-fretain-comments-from-system-headers",
+                    "-Xcc",
+                    "-Xclang",
+                    "-Xcc",
+                    "-detailed-preprocessing-record",
+                    "-Xcc",
+                    "-Xclang",
+                    "-Xcc",
+                    "-fmodule-format=raw",
+                    "-Xcc",
+                    "-ferror-limit=10",
+                    "-Xcc",
+                    "-Xclang",
+                    "-Xcc",
+                    "-fallow-pch-with-compiler-errors",
+                    "-Xcc",
+                    "-Xclang",
+                    "-Xcc",
+                    "-fallow-pcm-with-compiler-errors",
+                    "-Xcc",
+                    "-Wno-non-modular-include-in-framework-module",
+                    "-Xcc",
+                    "-Wno-incomplete-umbrella",
+                    "-Xcc",
+                    "-fmodules-validate-system-headers",
+                    "-Xfrontend",
+                    "-package-name",
+                    "-Xfrontend",
+                    "ragess",
+                    "-Xcc",
+                    overridesHmapPath
+                ]
     }
 
     var moduleCachePath: String {
-        var path = NSString(string: derivedDataPath).deletingPathExtension
+        let path = NSString(string: derivedDataPath).deletingLastPathComponent
         return path + "/ModuleCache.noindex"
     }
 
@@ -69,6 +109,13 @@ struct CompilerArgumentsGenerator {
 
     var packageFrameworksPath: String {
         derivedDataPath + "/Index.noindex/Build/Products/Debug/PackageFrameworks"
+    }
+
+    var overridesHmapPath: String {
+        derivedDataPath
+        + "/Index.noindex/Build/Intermediates.noindex/RAGESS.build/Debug/"
+        + moduleName
+        + ".build/swift-overrides.hmap"
     }
 
     func getModuleMapPaths(derivedDataPath: String) -> [String] {

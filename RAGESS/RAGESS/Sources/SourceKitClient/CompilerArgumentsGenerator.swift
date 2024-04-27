@@ -55,6 +55,7 @@ struct CompilerArgumentsGenerator {
                 // TODO: Make ↓ dynamically generated
                 "/Applications/Xcode-15.2.0.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks"
             ]
+        + getExecutableMacroPaths(derivedDataPath: derivedDataPath)
     }
 
     var moduleCachePath: String {
@@ -89,5 +90,49 @@ struct CompilerArgumentsGenerator {
         }
 
         return moduleMapPaths
+    }
+
+    func getExecutableMacroPaths(derivedDataPath: String) -> [String] {
+        let fileManager = FileManager.default
+        let directoryPath = derivedDataPath + "/Index.noindex/Build/Products/Debug/"
+        let url = URL(fileURLWithPath: directoryPath)
+
+        guard let enumerator = fileManager.enumerator(at: url, includingPropertiesForKeys: nil) else {
+            return []
+        }
+
+        var macroPaths: [String] = []
+
+        while let fileURL = enumerator.nextObject() as? URL {
+            let path = fileURL.path
+
+            guard let attributes = try? fileManager.attributesOfItem(atPath: path) else {
+                continue
+            }
+
+            let fileType = attributes[.type] as? FileAttributeType
+            let filePermissions = attributes[.posixPermissions] as? Int
+
+            if fileType == .typeRegular,
+               isExecutable(filePermissions) {
+                let fileName = fileURL.lastPathComponent
+                macroPaths.append("-Xfrontend")
+                macroPaths.append("-load-plugin-executable")
+                macroPaths.append("-Xfrontend")
+                macroPaths.append("\(directoryPath)\(fileName)#\(fileName)")
+
+            }
+        }
+
+        return macroPaths
+
+        func isExecutable(_ permissions: Int?) -> Bool {
+            guard let permissions = permissions else {
+                return false
+            }
+
+            let executableMask = 0o111
+            return permissions & executableMask != 0
+        }
     }
 }

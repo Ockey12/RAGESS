@@ -62,7 +62,7 @@ public struct DebugReducer {
                 return .none
 
             case let .sourceFileClient(.selectButtonTapped(sourceFile)):
-                state.lspClient.rootPathString = state.sourceFileClient.xcodeprojPathString
+                state.lspClient.rootPathString = state.sourceFileClient.rootPath
                 state.lspClient.filePathString = sourceFile.path
                 state.lspClient.sourceCode = sourceFile.content
 

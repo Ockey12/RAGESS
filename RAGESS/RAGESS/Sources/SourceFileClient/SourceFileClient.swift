@@ -26,6 +26,7 @@ extension SourceFileClient: DependencyKey {
 
             var subDirectories: [Directory] = []
             var files: [SourceFile] = []
+            var xcodeprojPaths: [String] = []
             var descriptionJSONString: String?
             let ignoredDirectoriesSet = Set(ignoredDirectories)
             var isDirectory: ObjCBool = false
@@ -42,6 +43,9 @@ extension SourceFileClient: DependencyKey {
 
                 if isDirectory.boolValue {
                     let directoryName = NSString(string: fullPath).lastPathComponent
+                    if directoryName.hasSuffix(".xcodeproj") {
+                        xcodeprojPaths.append(fullPath)
+                    }
                     guard !ignoredDirectoriesSet.contains(directoryName) else {
                         continue
                     }
@@ -70,6 +74,7 @@ extension SourceFileClient: DependencyKey {
                 path: rootPath,
                 subDirectories: subDirectories,
                 files: files,
+                xcodeprojPaths: xcodeprojPaths,
                 descriptionJSONString: descriptionJSONString
             )
         }
@@ -85,6 +90,12 @@ extension SourceFileClient: DependencyKey {
                     let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
 
                     var numberOfLines = printDirectoryContents(directory)
+
+                    print("")
+                    for path in directory.allXcodeprojPathsUnderDirectory {
+                        print(path)
+                    }
+                    print("")
 
                     print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
                     print("NUMBER OF LINES: \(numberOfLines)")

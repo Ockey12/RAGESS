@@ -17,22 +17,26 @@ public struct SourceFileClientDebugger {
 
     @ObservableState
     public struct State {
-        var xcodeprojPathString: String
+        var rootPath: String
         var directory: Directory
+        var buildSettings: [String: String]
+        var isLoading: Bool = false
 
         public init(
             xcodeprojPathString: String,
-            directory: Directory
+            directory: Directory,
+            buildSettings: [String: String]
         ) {
-            self.xcodeprojPathString = xcodeprojPathString
+            self.rootPath = xcodeprojPathString
             self.directory = directory
+            self.buildSettings = buildSettings
         }
     }
 
     public enum Action: BindableAction {
         case getSourceFilesButtonTapped
-        case buildSettingsResponse(Result<[String: String], Error>)
         case sourceFileResponse(Result<Directory, Error>)
+        case buildSettingsResponse(Result<[String: String], Error>)
         case selectButtonTapped(SourceFile)
         case binding(BindingAction<State>)
     }
@@ -45,32 +49,38 @@ public struct SourceFileClientDebugger {
         Reduce { state, action in
             switch action {
             case .getSourceFilesButtonTapped:
-                return .run { [xcodeprojPathString = state.xcodeprojPathString] send in
-                    await send(.buildSettingsResponse(Result {
-                        try await buildSettingsClient.getSettings(xcodeprojPath: xcodeprojPathString)
-                    }))
-                }
-
-            case let .buildSettingsResponse(.success(derivedDataPath)):
-                let projectRootPath = NSString(string: state.xcodeprojPathString).deletingLastPathComponent
-                print(projectRootPath)
-                return .run { send in
+                state.isLoading = true
+                return .run { [rootPath = state.rootPath] send in
                     await send(.sourceFileResponse(Result {
                         try await sourceFileClient.getXcodeObjects(
-                            rootDirectoryPath: projectRootPath,
+                            rootDirectoryPath: rootPath,
                             ignoredDirectories: [".build", "DerivedData"]
                         )
                     }))
                 }
 
-            case .buildSettingsResponse(.failure):
-                return .none
-
             case let .sourceFileResponse(.success(directory)):
                 state.directory = directory
-                return .none
+                return .run { [paths = state.directory.allXcodeprojPathsUnderDirectory] send in
+                    for path in paths {
+                        await send(.buildSettingsResponse(Result {
+                            try await buildSettingsClient.getSettings(xcodeprojPath: path)
+                        }))
+                    }
+                }
 
             case .sourceFileResponse(.failure):
+                state.isLoading = false
+                return .none
+
+            case let .buildSettingsResponse(.success(buildSettings)):
+                state.isLoading = false
+                state.buildSettings = buildSettings
+                dump(state.buildSettings)
+                return .none
+
+            case .buildSettingsResponse(.failure):
+                state.isLoading = false
                 return .none
 
             case .selectButtonTapped:
@@ -91,16 +101,22 @@ public struct SourceFileClientDebugView: View {
     }
 
     public var body: some View {
-        VStack {
-            Form {
-                TextField("Project root path", text: $store.xcodeprojPathString)
-                Button("Get Source Files") {
-                    store.send(.getSourceFilesButtonTapped)
+        ZStack {
+            VStack {
+                Form {
+                    TextField("Project root path", text: $store.rootPath)
+                    Button("Get Source Files") {
+                        store.send(.getSourceFilesButtonTapped)
+                    }
+                }
+
+                ScrollView {
+                    DirectoryCell(directory: store.directory)
                 }
             }
 
-            ScrollView {
-                DirectoryCell(directory: store.directory)
+            if store.isLoading {
+                ProgressView()
             }
         }
     }

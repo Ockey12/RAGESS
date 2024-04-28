@@ -31,13 +31,13 @@ public struct SourceFileClientDebugger {
 
     public enum Action: BindableAction {
         case getSourceFilesButtonTapped
-        case derivedDataPathResponse(Result<String, Error>)
+        case buildSettingsResponse(Result<[String: String], Error>)
         case sourceFileResponse(Result<Directory, Error>)
         case selectButtonTapped(SourceFile)
         case binding(BindingAction<State>)
     }
 
-    @Dependency(BuildSettingsClient.self) var derivedDataPathClient
+    @Dependency(BuildSettingsClient.self) var buildSettingsClient
     @Dependency(SourceFileClient.self) var sourceFileClient
 
     public var body: some ReducerOf<Self> {
@@ -46,12 +46,12 @@ public struct SourceFileClientDebugger {
             switch action {
             case .getSourceFilesButtonTapped:
                 return .run { [xcodeprojPathString = state.xcodeprojPathString] send in
-                    await send(.derivedDataPathResponse(Result {
-                        try await derivedDataPathClient.getPath(xcodeprojPath: xcodeprojPathString)
+                    await send(.buildSettingsResponse(Result {
+                        try await buildSettingsClient.getSettings(xcodeprojPath: xcodeprojPathString)
                     }))
                 }
 
-            case let .derivedDataPathResponse(.success(derivedDataPath)):
+            case let .buildSettingsResponse(.success(derivedDataPath)):
                 let projectRootPath = NSString(string: state.xcodeprojPathString).deletingLastPathComponent
                 print(projectRootPath)
                 return .run { send in
@@ -63,7 +63,7 @@ public struct SourceFileClientDebugger {
                     }))
                 }
 
-            case .derivedDataPathResponse(.failure):
+            case .buildSettingsResponse(.failure):
                 return .none
 
             case let .sourceFileResponse(.success(directory)):

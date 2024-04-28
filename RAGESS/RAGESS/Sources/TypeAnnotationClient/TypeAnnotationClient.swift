@@ -10,6 +10,7 @@ import DependenciesMacros
 import LanguageServerProtocol
 import LSPClient
 import SourceFileClient
+import XcodeObject
 
 @DependencyClient
 public struct TypeAnnotationClient {

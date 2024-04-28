@@ -9,6 +9,7 @@ import ComposableArchitecture
 import SourceFileClient
 import SwiftUI
 import TypeAnnotationClient
+import XcodeObject
 
 @Reducer
 public struct TypeAnnotationDebugger {

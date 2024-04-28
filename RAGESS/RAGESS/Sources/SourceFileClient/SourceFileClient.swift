@@ -8,6 +8,7 @@
 import Dependencies
 import DependenciesMacros
 import Foundation
+import XcodeObject
 
 @DependencyClient
 public struct SourceFileClient {

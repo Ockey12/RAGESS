@@ -42,6 +42,7 @@ let package = Package(
                 "SourceFileClient",
                 "SourceKitClient",
                 "TypeAnnotationClient",
+                "XcodeObject",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ]
         ),
@@ -69,6 +70,7 @@ let package = Package(
             name: "LSPClient",
             dependencies: [
                 "SourceFileClient",
+                "XcodeObject",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "Dependencies", package: "swift-dependencies"),
                 .product(name: "DependenciesMacros", package: "swift-dependencies"),
@@ -78,6 +80,7 @@ let package = Package(
         .target(
             name: "SourceFileClient",
             dependencies: [
+                "XcodeObject",
                 .product(name: "Dependencies", package: "swift-dependencies"),
                 .product(name: "DependenciesMacros", package: "swift-dependencies")
             ]
@@ -97,6 +100,7 @@ let package = Package(
             dependencies: [
                 "LSPClient",
                 "SourceFileClient",
+                "XcodeObject",
                 .product(name: "Dependencies", package: "swift-dependencies"),
                 .product(name: "DependenciesMacros", package: "swift-dependencies"),
                 .product(name: "LSPBindings", package: "sourcekit-lsp")

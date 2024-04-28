@@ -9,6 +9,7 @@ import ComposableArchitecture
 import DerivedDataPathClient
 import SourceFileClient
 import SwiftUI
+import XcodeObject
 
 @Reducer
 public struct SourceFileClientDebugger {

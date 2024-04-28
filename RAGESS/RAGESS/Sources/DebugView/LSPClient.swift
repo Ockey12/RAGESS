@@ -10,6 +10,7 @@ import LanguageServerProtocol
 import LSPClient
 import SourceFileClient
 import SwiftUI
+import XcodeObject
 
 @Reducer
 public struct LSPClientDebugger {

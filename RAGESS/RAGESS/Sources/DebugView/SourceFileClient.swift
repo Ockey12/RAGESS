@@ -122,3 +122,31 @@ public struct SourceFileClientDebugView: View {
         }
     }
 }
+
+struct DirectoryCell: View {
+    let directory: Directory
+
+    var body: some View {
+        DisclosureGroup(
+            content: {
+                ForEach(directory.files) { file in
+                    HStack {
+                        Image(systemName: "swift")
+                        Text(file.name)
+                        Spacer()
+                    }
+                }
+                ForEach(directory.subDirectories) { subDirectory in
+                    Self(directory: subDirectory)
+                }
+            },
+            label: {
+                HStack {
+                    Image(systemName: "folder.fill")
+                    Text(directory.name)
+                    Spacer()
+                }
+            }
+        )
+    }
+}

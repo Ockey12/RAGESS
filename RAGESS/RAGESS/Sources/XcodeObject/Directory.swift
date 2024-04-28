@@ -13,6 +13,9 @@ public struct Directory: Identifiable {
     }
 
     public let path: String
+    public var name: String {
+        NSString(string: path).lastPathComponent
+    }
     public var subDirectories: [Self]
     public var files: [SourceFile]
 

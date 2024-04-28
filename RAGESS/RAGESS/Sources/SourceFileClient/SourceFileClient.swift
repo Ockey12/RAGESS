@@ -20,30 +20,37 @@ public struct SourceFileClient {
 
 extension SourceFileClient: DependencyKey {
     public static let liveValue: Self = {
-        @Sendable func getFilesContent(path: String, ignoredDirectories: [String]) -> [SourceFile] {
+        @Sendable func getDirectories(rootPath: String, ignoredDirectories: [String]) -> Directory? {
             let fileManager = FileManager.default
-            guard let enumerator = fileManager.enumerator(atPath: path) else {
-                return []
+            guard let enumerator = fileManager.enumerator(atPath: rootPath) else {
+                return nil
             }
 
-            var sourceFiles = [SourceFile]()
-            var isDirectory: ObjCBool = false
+            var subDirectories: [Directory] = []
+            var files: [SourceFile] = []
             let ignoredDirectoriesSet = Set(ignoredDirectories)
 
-            while let filePath = enumerator.nextObject() as? String {
-                let fullPath = (path as NSString).appendingPathComponent(filePath)
+            while let path = enumerator.nextObject() as? String {
+                let fullPath = (rootPath as NSString).appendingPathComponent(path)
                 guard fileManager.fileExists(atPath: fullPath, isDirectory: &isDirectory) else {
                     continue
                 }
 
-                if isDirectory.boolValue,
-                   ignoredDirectoriesSet.contains((filePath as NSString).lastPathComponent) {
-                    enumerator.skipDescendants()
+                var isDirectory: ObjCBool = false
+                guard fileManager.fileExists(atPath: fullPath, isDirectory: &isDirectory) else {
                     continue
-                } else if filePath.hasSuffix(".swift") {
-                    if let content = try? String(contentsOfFile: fullPath, encoding: .utf8) {
-                        sourceFiles.append(.init(path: fullPath, content: content))
+                }
+                if isDirectory.boolValue {
+                    let directoryName = NSString(string: fullPath).lastPathComponent
+                    guard !ignoredDirectoriesSet.contains(directoryName) else {
+                        continue
                     }
+                    let subDirectory = getDirectories(rootPath: fullPath, ignoredDirectories: ignoredDirectories)
+                    subDirectories.append(subDirectory)
+                } else {
+                    let content = try? String(contentsOfFile: fullPath)
+                    let file = SourceFile(path: fullPath, content: content ?? "")
+                    files.append(file)
                 }
             }
 

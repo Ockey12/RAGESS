@@ -124,27 +124,46 @@ public struct SourceFileClientDebugView: View {
 
 struct DirectoryCell: View {
     let directory: Directory
+    @State private var isExpanded = true
 
     var body: some View {
         DisclosureGroup(
+            isExpanded: $isExpanded,
             content: {
-                ForEach(directory.files) { file in
-                    HStack {
-                        Image(systemName: "swift")
-                        Text(file.name)
-                        Spacer()
+                HStack {
+                    Divider()
+                        .frame(width: 2)
+                        .padding(.horizontal, 15)
+                    VStack {
+                        ForEach(directory.files) { file in
+                            HStack {
+                                Image(systemName: "swift")
+                                Text(file.name)
+                                Spacer()
+                            }
+                            .frame(height: 20)
+                        }
+                        ForEach(directory.subDirectories) { subDirectory in
+                            Self(directory: subDirectory)
+                        }
                     }
-                    .padding(.leading, 30)
-                }
-                ForEach(directory.subDirectories) { subDirectory in
-                    Self(directory: subDirectory)
-                        .padding(.leading, 30)
                 }
             },
             label: {
                 HStack {
-                    Image(systemName: "folder.fill")
-                    Text(directory.name)
+                    Button(
+                        action: {
+                            withAnimation {
+                                isExpanded.toggle()
+                            }
+                        },
+                        label: {
+                            HStack {
+                                Image(systemName: "folder.fill")
+                                Text(directory.name)
+                            }
+                        }
+                    )
                     Spacer()
                 }
             }

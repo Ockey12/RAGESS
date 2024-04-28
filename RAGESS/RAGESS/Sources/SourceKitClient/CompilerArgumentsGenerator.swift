@@ -56,48 +56,48 @@ struct CompilerArgumentsGenerator {
                 // TODO: Make ↓ dynamically generated
                 "/Applications/Xcode-15.2.0.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks"
             ]
-        + getExecutableMacroPaths(derivedDataPath: derivedDataPath)
+            + getExecutableMacroPaths(derivedDataPath: derivedDataPath)
 
         return path
-                + [
-                    "-Xfrontend",
-                    "-experimental-allow-module-with-compiler-errors",
-                    "-Xfrontend",
-                    "-empty-abi-descriptor",
-                    "-Xcc",
-                    "-fretain-comments-from-system-headers",
-                    "-Xcc",
-                    "-Xclang",
-                    "-Xcc",
-                    "-detailed-preprocessing-record",
-                    "-Xcc",
-                    "-Xclang",
-                    "-Xcc",
-                    "-fmodule-format=raw",
-                    "-Xcc",
-                    "-ferror-limit=10",
-                    "-Xcc",
-                    "-Xclang",
-                    "-Xcc",
-                    "-fallow-pch-with-compiler-errors",
-                    "-Xcc",
-                    "-Xclang",
-                    "-Xcc",
-                    "-fallow-pcm-with-compiler-errors",
-                    "-Xcc",
-                    "-Wno-non-modular-include-in-framework-module",
-                    "-Xcc",
-                    "-Wno-incomplete-umbrella",
-                    "-Xcc",
-                    "-fmodules-validate-system-headers",
-                    "-Xfrontend",
-                    "-package-name",
-                    "-Xfrontend",
-                    // TODO: Make ↓ dynamically generated
-                    "ragess",
-                    "-Xcc",
-                    overridesHmapPath
-                ]
+            + [
+                "-Xfrontend",
+                "-experimental-allow-module-with-compiler-errors",
+                "-Xfrontend",
+                "-empty-abi-descriptor",
+                "-Xcc",
+                "-fretain-comments-from-system-headers",
+                "-Xcc",
+                "-Xclang",
+                "-Xcc",
+                "-detailed-preprocessing-record",
+                "-Xcc",
+                "-Xclang",
+                "-Xcc",
+                "-fmodule-format=raw",
+                "-Xcc",
+                "-ferror-limit=10",
+                "-Xcc",
+                "-Xclang",
+                "-Xcc",
+                "-fallow-pch-with-compiler-errors",
+                "-Xcc",
+                "-Xclang",
+                "-Xcc",
+                "-fallow-pcm-with-compiler-errors",
+                "-Xcc",
+                "-Wno-non-modular-include-in-framework-module",
+                "-Xcc",
+                "-Wno-incomplete-umbrella",
+                "-Xcc",
+                "-fmodules-validate-system-headers",
+                "-Xfrontend",
+                "-package-name",
+                "-Xfrontend",
+                // TODO: Make ↓ dynamically generated
+                "ragess",
+                "-Xcc",
+                overridesHmapPath
+            ]
     }
 
     var moduleCachePath: String {
@@ -115,9 +115,9 @@ struct CompilerArgumentsGenerator {
 
     var overridesHmapPath: String {
         derivedDataPath
-        + "/Index.noindex/Build/Intermediates.noindex/RAGESS.build/Debug/"
-        + moduleName
-        + ".build/swift-overrides.hmap"
+            + "/Index.noindex/Build/Intermediates.noindex/RAGESS.build/Debug/"
+            + moduleName
+            + ".build/swift-overrides.hmap"
     }
 
     func getModuleMapPaths(derivedDataPath: String) -> [String] {
@@ -169,7 +169,6 @@ struct CompilerArgumentsGenerator {
                 macroPaths.append("-load-plugin-executable")
                 macroPaths.append("-Xfrontend")
                 macroPaths.append("\(directoryPath)\(fileName)#\(fileName)")
-
             }
         }
 

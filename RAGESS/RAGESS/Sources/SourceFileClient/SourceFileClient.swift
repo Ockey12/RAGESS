@@ -23,9 +23,9 @@ extension SourceFileClient: DependencyKey {
         @Sendable func getDirectories(rootPath: String, ignoredDirectories: [String]) -> Directory {
             let fileManager = FileManager.default
             print(rootPath)
-            guard let enumerator = fileManager.enumerator(atPath: rootPath) else {
-                return Directory(path: rootPath, subDirectories: [], files: [])
-            }
+//            guard let enumerator = fileManager.enumerator(atPath: rootPath) else {
+//                return Directory(path: rootPath, subDirectories: [], files: [])
+//            }
 
             var subDirectories: [Directory] = []
             var files: [SourceFile] = []
@@ -33,25 +33,31 @@ extension SourceFileClient: DependencyKey {
             let ignoredDirectoriesSet = Set(ignoredDirectories)
             var isDirectory: ObjCBool = false
 
-            while let path = enumerator.nextObject() as? String {
-                let fullPath = (rootPath as NSString).appendingPathComponent(path)
+            guard let paths = try? fileManager.contentsOfDirectory(atPath: rootPath) else {
+                return Directory(path: rootPath, subDirectories: [], files: [])
+            }
+
+            for path in paths {
+                let fullPath = NSString(string: rootPath).appendingPathComponent(path)
                 guard fileManager.fileExists(atPath: fullPath, isDirectory: &isDirectory) else {
                     continue
                 }
 
                 if isDirectory.boolValue {
                     let directoryName = NSString(string: fullPath).lastPathComponent
-                    print(directoryName)
                     guard !ignoredDirectoriesSet.contains(directoryName) else {
-                        enumerator.skipDescendants()
                         continue
                     }
+
                     let subDirectory = getDirectories(rootPath: fullPath, ignoredDirectories: ignoredDirectories)
                     subDirectories.append(subDirectory)
                 } else if path.hasSuffix(".swift") {
-                    let content = try? String(contentsOfFile: fullPath)
-                    let file = SourceFile(path: fullPath, content: content ?? "")
+                    guard let content = try? String(contentsOfFile: fullPath) else {
+                        continue
+                    }
+                    let file = SourceFile(path: fullPath, content: content)
                     files.append(file)
+
                     if file.name == "Package.swift" {
                         let packagePath = NSString(string: fullPath).deletingLastPathComponent
                         let descriptionJSONPath = packagePath + "/.build/arm64-apple-macosx/debug/description.json"
@@ -61,10 +67,40 @@ extension SourceFileClient: DependencyKey {
                         descriptionJSONString = jsonString
                     }
                 }
-
-                enumerator.skipDescendants()
             }
 
+//            while let path = enumerator.nextObject() as? String {
+//                let fullPath = (rootPath as NSString).appendingPathComponent(path)
+//                guard fileManager.fileExists(atPath: fullPath, isDirectory: &isDirectory) else {
+//                    continue
+//                }
+//
+//                if isDirectory.boolValue {
+//                    let directoryName = NSString(string: fullPath).lastPathComponent
+//                    print(directoryName)
+//                    guard !ignoredDirectoriesSet.contains(directoryName) else {
+//                        enumerator.skipDescendants()
+//                        continue
+//                    }
+//                    let subDirectory = getDirectories(rootPath: fullPath, ignoredDirectories: ignoredDirectories)
+//                    subDirectories.append(subDirectory)
+//                } else if path.hasSuffix(".swift") {
+//                    let content = try? String(contentsOfFile: fullPath)
+//                    let file = SourceFile(path: fullPath, content: content ?? "")
+//                    files.append(file)
+//                    if file.name == "Package.swift" {
+//                        let packagePath = NSString(string: fullPath).deletingLastPathComponent
+//                        let descriptionJSONPath = packagePath + "/.build/arm64-apple-macosx/debug/description.json"
+//                        guard let jsonString = try? String(contentsOfFile: descriptionJSONPath) else {
+//                            continue
+//                        }
+//                        descriptionJSONString = jsonString
+//                    }
+//                }
+//
+//                enumerator.skipDescendants()
+//            }
+//
             return Directory(
                 path: rootPath,
                 subDirectories: subDirectories,

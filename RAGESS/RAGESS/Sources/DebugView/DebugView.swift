@@ -58,7 +58,7 @@ public struct DebugReducer {
                 return .none
 
             case let .sourceFileClient(.sourceFileResponse(.success(sourceFiles))):
-                state.kittenClient.allFilePathsInProject = sourceFiles.map { $0.path }
+//                state.kittenClient.allFilePathsInProject = sourceFiles.map { $0.path }
                 return .none
 
             case let .sourceFileClient(.selectButtonTapped(sourceFile)):

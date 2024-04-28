@@ -24,7 +24,7 @@ struct RAGESSApp: App {
                         ),
                         sourceFileClient: .init(
                             xcodeprojPathString: "",
-                            sourceFiles: []
+                            directory: .init(path: "", subDirectories: [], files: [])
                         ),
                         typeAnnotationClient: .init(
                             sourceFile: .init(path: "", content: ""),

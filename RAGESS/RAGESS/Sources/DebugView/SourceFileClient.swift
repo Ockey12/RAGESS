@@ -18,21 +18,21 @@ public struct SourceFileClientDebugger {
     @ObservableState
     public struct State {
         var xcodeprojPathString: String
-        var sourceFiles: IdentifiedArrayOf<SourceFile>
+        var directory: Directory
 
         public init(
             xcodeprojPathString: String,
-            sourceFiles: IdentifiedArrayOf<SourceFile>
+            directory: Directory
         ) {
             self.xcodeprojPathString = xcodeprojPathString
-            self.sourceFiles = sourceFiles
+            self.directory = directory
         }
     }
 
     public enum Action: BindableAction {
         case getSourceFilesButtonTapped
         case derivedDataPathResponse(Result<String, Error>)
-        case sourceFileResponse(Result<IdentifiedArrayOf<SourceFile>, Error>)
+        case sourceFileResponse(Result<Directory, Error>)
         case selectButtonTapped(SourceFile)
         case binding(BindingAction<State>)
     }
@@ -53,13 +53,12 @@ public struct SourceFileClientDebugger {
 
             case let .derivedDataPathResponse(.success(derivedDataPath)):
                 let projectRootPath = NSString(string: state.xcodeprojPathString).deletingLastPathComponent
+                print(projectRootPath)
                 return .run { send in
                     await send(.sourceFileResponse(Result {
-                        try await IdentifiedArray(
-                            uniqueElements: sourceFileClient.getSourceFiles(
-                                rootDirectoryPath: projectRootPath,
-                                ignoredDirectories: [".build", "DerivedData"]
-                            )
+                        try await sourceFileClient.getXcodeObjects(
+                            rootDirectoryPath: projectRootPath,
+                            ignoredDirectories: [".build", "DerivedData"]
                         )
                     }))
                 }
@@ -67,8 +66,8 @@ public struct SourceFileClientDebugger {
             case .derivedDataPathResponse(.failure):
                 return .none
 
-            case let .sourceFileResponse(.success(sourceFiles)):
-                state.sourceFiles = sourceFiles
+            case let .sourceFileResponse(.success(directory)):
+                state.directory = directory
                 return .none
 
             case .sourceFileResponse(.failure):
@@ -101,23 +100,24 @@ public struct SourceFileClientDebugView: View {
             }
 
             ScrollView {
-                ForEach(store.sourceFiles, id: \.path) { sourceFile in
-                    DisclosureGroup(sourceFile.path) {
-                        VStack(alignment: .leading) {
-                            Button("Select") {
-                                store.send(.selectButtonTapped(sourceFile))
-                            }
-                            HStack {
-                                Text(sourceFile.content)
-                                    .padding(.leading)
-                                    .foregroundStyle(.white)
-                                Spacer()
-                            }
-                            .background(.black)
-                        }
-                        .padding(.leading)
-                    }
-                }
+//                ForEach(store.sourceFiles, id: \.path) { sourceFile in
+//                    DisclosureGroup(sourceFile.path) {
+//                        VStack(alignment: .leading) {
+//                            Button("Select") {
+//                                store.send(.selectButtonTapped(sourceFile))
+//                            }
+//                            HStack {
+//                                Text(sourceFile.content)
+//                                    .padding(.leading)
+//                                    .foregroundStyle(.white)
+//                                Spacer()
+//                            }
+//                            .background(.black)
+//                        }
+//                        .padding(.leading)
+//                    }
+//                }
+                DirectoryCell(directory: store.directory)
             }
         }
     }
@@ -135,9 +135,11 @@ struct DirectoryCell: View {
                         Text(file.name)
                         Spacer()
                     }
+                    .padding(.leading, 30)
                 }
                 ForEach(directory.subDirectories) { subDirectory in
                     Self(directory: subDirectory)
+                        .padding(.leading, 30)
                 }
             },
             label: {

@@ -18,10 +18,17 @@ public struct Directory: Identifiable {
     }
     public var subDirectories: [Self]
     public var files: [SourceFile]
+    public var descriptionJSONString: String?
 
-    public init(path: String, subDirectories: [Self], files: [SourceFile]) {
+    public init(
+        path: String,
+        subDirectories: [Self],
+        files: [SourceFile],
+        descriptionJSONString: String? = nil
+    ) {
         self.path = path
         self.subDirectories = subDirectories
         self.files = files
+        self.descriptionJSONString = descriptionJSONString
     }
 }

@@ -10,11 +10,11 @@ import DependenciesMacros
 import Foundation
 
 @DependencyClient
-public struct DerivedDataPathClient {
+public struct BuildSettingsClient {
     public var getPath: @Sendable (_ xcodeprojPath: String) async throws -> String
 }
 
-extension DerivedDataPathClient: DependencyKey {
+extension BuildSettingsClient: DependencyKey {
     public static let liveValue: Self = .init { xcodeprojPath in
         #if DEBUG
             let startTime = CFAbsoluteTimeGetCurrent()

@@ -37,7 +37,7 @@ let package = Package(
         .target(
             name: "DebugView",
             dependencies: [
-                "DerivedDataPathClient",
+                "BuildSettingsClient",
                 "LSPClient",
                 "SourceFileClient",
                 "SourceKitClient",
@@ -60,7 +60,7 @@ let package = Package(
             ]
         ),
         .target(
-            name: "DerivedDataPathClient",
+            name: "BuildSettingsClient",
             dependencies: [
                 .product(name: "Dependencies", package: "swift-dependencies"),
                 .product(name: "DependenciesMacros", package: "swift-dependencies")

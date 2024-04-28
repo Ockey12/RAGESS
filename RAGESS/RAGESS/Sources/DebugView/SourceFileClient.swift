@@ -6,7 +6,7 @@
 //
 
 import ComposableArchitecture
-import DerivedDataPathClient
+import BuildSettingsClient
 import SourceFileClient
 import SwiftUI
 import XcodeObject
@@ -37,7 +37,7 @@ public struct SourceFileClientDebugger {
         case binding(BindingAction<State>)
     }
 
-    @Dependency(DerivedDataPathClient.self) var derivedDataPathClient
+    @Dependency(BuildSettingsClient.self) var derivedDataPathClient
     @Dependency(SourceFileClient.self) var sourceFileClient
 
     public var body: some ReducerOf<Self> {

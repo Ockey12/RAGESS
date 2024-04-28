@@ -16,6 +16,7 @@ public struct Directory: Identifiable {
     public var name: String {
         NSString(string: path).lastPathComponent
     }
+
     public var subDirectories: [Self]
     public var files: [SourceFile]
     public var descriptionJSONString: String?

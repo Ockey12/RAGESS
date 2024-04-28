@@ -105,35 +105,35 @@ extension SourceFileClient: DependencyKey {
 }
 
 #if DEBUG
-extension SourceFileClient {
-    static func printDirectoryContents(_ directory: Directory) -> Int {
-        var numberOfLines = 0
-        print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
-        print(directory.path)
-        print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
+    extension SourceFileClient {
+        static func printDirectoryContents(_ directory: Directory) -> Int {
+            var numberOfLines = 0
+            print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
+            print(directory.path)
+            print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
 
-        if let description = directory.descriptionJSONString {
-            let lines = description.components(separatedBy: "\n")
-            for line in lines {
-                print(line)
+            if let description = directory.descriptionJSONString {
+                let lines = description.components(separatedBy: "\n")
+                for line in lines {
+                    print(line)
+                }
+                print()
             }
-            print()
-        }
 
-        for sourceFile in directory.files {
-            print("*** \(sourceFile.path) ***")
-            let lines = sourceFile.content.components(separatedBy: "\n")
-            numberOfLines += lines.count
-            for line in lines {
-                print(line)
+            for sourceFile in directory.files {
+                print("*** \(sourceFile.path) ***")
+                let lines = sourceFile.content.components(separatedBy: "\n")
+                numberOfLines += lines.count
+                for line in lines {
+                    print(line)
+                }
+                print()
             }
-            print()
-        }
-        for subDirectory in directory.subDirectories {
-            numberOfLines += printDirectoryContents(subDirectory)
-        }
+            for subDirectory in directory.subDirectories {
+                numberOfLines += printDirectoryContents(subDirectory)
+            }
 
-        return numberOfLines
+            return numberOfLines
+        }
     }
-}
 #endif

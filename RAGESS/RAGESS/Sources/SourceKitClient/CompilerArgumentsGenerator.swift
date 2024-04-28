@@ -9,6 +9,7 @@ import Foundation
 
 struct CompilerArgumentsGenerator {
     let derivedDataPath: String
+    let xcodeprojPath: String
     var moduleName: String
     let sourceFilePaths: [String]
 
@@ -182,5 +183,31 @@ struct CompilerArgumentsGenerator {
             let executableMask = 0o111
             return permissions & executableMask != 0
         }
+    }
+
+    func getBuildDirectoryPaths(in directory: String) -> [String] {
+        let fileManager = FileManager.default
+        var buildDirectories: [String] = []
+
+        guard let enumerator = fileManager.enumerator(atPath: directory) else {
+            return buildDirectories
+        }
+
+        while let path = enumerator.nextObject() as? String {
+            let fullPath = (directory as NSString).appendingPathComponent(path)
+            var isDirectory: ObjCBool = false
+
+            fileManager.fileExists(atPath: fullPath, isDirectory: &isDirectory)
+
+            if isDirectory.boolValue {
+                if (path as NSString).lastPathComponent == ".build" {
+                    buildDirectories.append(fullPath)
+                } else {
+                    buildDirectories.append(contentsOf: getBuildDirectoryPaths(in: fullPath))
+                }
+            }
+        }
+
+        return buildDirectories
     }
 }

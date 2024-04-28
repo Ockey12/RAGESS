@@ -25,6 +25,7 @@ extension SourceKitClient: DependencyKey {
             #if DEBUG
                 let compilerArgumentsGenerator = CompilerArgumentsGenerator(
                     derivedDataPath: "/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz",
+                    xcodeprojPath: "/Users/onaga/RAGESS/RAGESS/RAGESS.xcodeproj",
                     moduleName: "DebugView",
                     sourceFilePaths: sourceFilePaths
                 )
@@ -33,6 +34,11 @@ extension SourceKitClient: DependencyKey {
                     print(argument)
                 }
                 print("")
+                print(".build Path")
+                let buildPaths = compilerArgumentsGenerator.getBuildDirectoryPaths(in: "/Users/onaga/RAGESS/RAGESS/")
+                for path in buildPaths {
+                    print(path)
+                }
             #endif
 
             let byteCount = ByteCount(offset)

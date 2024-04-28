@@ -102,6 +102,7 @@ let package = Package(
                 .product(name: "LSPBindings", package: "sourcekit-lsp")
             ]
         ),
+        .target(name: "XcodeObject"),
         .testTarget(
             name: "LSPClientTests",
             dependencies: [

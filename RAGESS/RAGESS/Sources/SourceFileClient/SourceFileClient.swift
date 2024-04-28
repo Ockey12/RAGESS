@@ -35,7 +35,6 @@ extension SourceFileClient: DependencyKey {
 
             while let path = enumerator.nextObject() as? String {
                 let fullPath = (rootPath as NSString).appendingPathComponent(path)
-//                var isDirectory: ObjCBool = false
                 guard fileManager.fileExists(atPath: fullPath, isDirectory: &isDirectory) else {
                     continue
                 }
@@ -62,6 +61,8 @@ extension SourceFileClient: DependencyKey {
                         descriptionJSONString = jsonString
                     }
                 }
+
+                enumerator.skipDescendants()
             }
 
             return Directory(

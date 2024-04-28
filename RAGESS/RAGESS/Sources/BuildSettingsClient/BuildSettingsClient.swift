@@ -42,16 +42,16 @@ extension BuildSettingsClient: DependencyKey {
                 let setting = components[1]
                 settings[key] = setting
                 #if DEBUG
-                print("\(key): \(setting)")
+                    print("\(key): \(setting)")
                 #endif
             }
         }
 
         #if DEBUG
-        let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
-        print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
-        print("TIME ELAPSED: \(timeElapsed)")
-        print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
+            let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
+            print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
+            print("TIME ELAPSED: \(timeElapsed)")
+            print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
         #endif
 
         return settings

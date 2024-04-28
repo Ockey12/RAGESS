@@ -25,6 +25,7 @@ public struct Directory: Identifiable {
         allPaths += xcodeprojPaths
         return allPaths
     }
+
     public var descriptionJSONString: String?
 
     public init(

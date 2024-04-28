@@ -27,7 +27,7 @@ public struct SourceFileClientDebugger {
             directory: Directory,
             buildSettings: [String: String]
         ) {
-            self.rootPath = xcodeprojPathString
+            rootPath = xcodeprojPathString
             self.directory = directory
             self.buildSettings = buildSettings
         }

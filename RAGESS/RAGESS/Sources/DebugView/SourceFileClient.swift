@@ -100,23 +100,6 @@ public struct SourceFileClientDebugView: View {
             }
 
             ScrollView {
-//                ForEach(store.sourceFiles, id: \.path) { sourceFile in
-//                    DisclosureGroup(sourceFile.path) {
-//                        VStack(alignment: .leading) {
-//                            Button("Select") {
-//                                store.send(.selectButtonTapped(sourceFile))
-//                            }
-//                            HStack {
-//                                Text(sourceFile.content)
-//                                    .padding(.leading)
-//                                    .foregroundStyle(.white)
-//                                Spacer()
-//                            }
-//                            .background(.black)
-//                        }
-//                        .padding(.leading)
-//                    }
-//                }
                 DirectoryCell(directory: store.directory)
             }
         }

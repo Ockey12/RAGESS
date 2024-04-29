@@ -279,8 +279,9 @@ public struct SourceKitClientDebugger {
             case .compilerArgumentsGeneratorTapped:
                 var generator = CompilerArgumentsGenerator(derivedDataPath: "", xcodeprojPath: "", moduleName: "", sourceFilePaths: [])
                 print("Start CompilerArgumentsGenerator.getIncludePaths")
-                let includePaths = generator.getIncludePaths(in: "/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz/SourcePackages/checkouts",
-                                              ignoredDirectories: ["swift-package-manager"]
+                let includePaths = generator.getIncludePaths(
+                    in: "/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz/SourcePackages/checkouts",
+                    ignoredDirectories: ["swift-package-manager"]
                 )
                 for path in includePaths {
                     print(path)

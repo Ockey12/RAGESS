@@ -21,7 +21,7 @@ public struct SourceKitClient {
 
 extension SourceKitClient: DependencyKey {
     public static let liveValue: Self = .init(
-        sendCursorInfoRequest: { file, offset, sourceFilePaths, arguments in
+        sendCursorInfoRequest: { file, offset, _, arguments in
 //            #if DEBUG
 //                let compilerArgumentsGenerator = CompilerArgumentsGenerator(
 //                    derivedDataPath: "/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz",

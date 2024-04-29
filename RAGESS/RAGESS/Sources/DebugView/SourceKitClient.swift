@@ -23,6 +23,7 @@ public struct SourceKitClientDebugger {
         var offset: Int = 0
         var cursorInfoResponse = CursorInfoResponse()
         var allFilePathsInProject: [String] = []
+        var buildSettings: [String: String] = [:]
         var compilerArguments: [String] {
             [
                 "-vfsoverlay",
@@ -154,6 +155,7 @@ public struct SourceKitClientDebugger {
         case offsetResponse(Result<Int, Error>)
         case cursorInfoTapped
         case cursorInfoResponse(Result<[String: SourceKitRepresentable], Error>)
+        case compilerArgumentsGeneratorTapped
         case binding(BindingAction<State>)
     }
 
@@ -255,6 +257,18 @@ public struct SourceKitClientDebugger {
                 print(error)
                 return .none
 
+            case .compilerArgumentsGeneratorTapped:
+                var generator = CompilerArgumentsGenerator(derivedDataPath: "", xcodeprojPath: "", moduleName: "", sourceFilePaths: [])
+                print("Start CompilerArgumentsGenerator.getIncludePaths")
+                let includePaths = generator.getIncludePaths(in: "/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz/SourcePackages/checkouts",
+                                              ignoredDirectories: ["swift-package-manager"]
+                )
+                for path in includePaths {
+                    print(path)
+                }
+                print("End CompilerArgumentsGenerator.getIncludePaths")
+                return .none
+
             case .binding:
                 return .none
             }
@@ -277,6 +291,9 @@ public struct SourceKitClientDebugView: View {
                 TextField("Symbol Name", text: $store.symbolName)
                 Button("Dump Symbol") {
                     store.send(.dumpSymbolTapped)
+                }
+                Button("CompilerArgumentsGenerator.resume()") {
+                    store.send(.compilerArgumentsGeneratorTapped)
                 }
                 Section {
                     TextEditor(text: $store.countedString)

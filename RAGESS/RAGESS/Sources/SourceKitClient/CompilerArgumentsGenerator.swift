@@ -7,7 +7,19 @@
 
 import Foundation
 
-struct CompilerArgumentsGenerator {
+public struct CompilerArgumentsGenerator {
+    public init(
+        derivedDataPath: String,
+        xcodeprojPath: String,
+        moduleName: String,
+        sourceFilePaths: [String]
+    ) {
+        self.derivedDataPath = derivedDataPath
+        self.xcodeprojPath = xcodeprojPath
+        self.moduleName = moduleName
+        self.sourceFilePaths = sourceFilePaths
+    }
+
     let derivedDataPath: String
     let xcodeprojPath: String
     var moduleName: String
@@ -208,5 +220,35 @@ struct CompilerArgumentsGenerator {
         }
 
         return buildDirectories
+    }
+
+    public func getIncludePaths(in directory: String, ignoredDirectories: [String]) -> [String] {
+        var includePaths: [String] = []
+        let fileManager = FileManager.default
+        guard let paths = try? fileManager.contentsOfDirectory(atPath: directory) else {
+            return []
+        }
+
+        let ignoredDirectoriesSet = Set(ignoredDirectories)
+        var isDirectory: ObjCBool = false
+
+        for path in paths {
+            let fullPath = NSString(string: directory).appendingPathComponent(path)
+            guard fileManager.fileExists(atPath: fullPath, isDirectory: &isDirectory),
+                  isDirectory.boolValue else {
+                continue
+            }
+            let directoryName = NSString(string: path).lastPathComponent
+            guard !ignoredDirectoriesSet.contains(directoryName) else {
+                continue
+            }
+            if path == "include" {
+                includePaths.append(fullPath)
+            } else {
+                includePaths.append(contentsOf: getIncludePaths(in: fullPath, ignoredDirectories: ignoredDirectories))
+            }
+        }
+
+        return includePaths
     }
 }

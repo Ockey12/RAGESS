@@ -113,6 +113,15 @@ public struct CompilerArgumentsGenerator {
         + getIncludePaths(
             in: NSString(string: derivedDataPath).appendingPathComponent("/SourcePackages/checkouts"),
             ignoredDirectories: ["swift-package-manager"]
+            + [
+                "-Xcc",
+                "-DSWIFT_PACKAGE",
+                "-Xcc",
+                "-DDEBUG=1",
+                "-working-directory",
+                // TODO: Make ↓ dynamically generated
+                "/Users/onaga/RAGESS/RAGESS/RAGESS"
+            ]
         )
     }
 

@@ -25,7 +25,7 @@ public struct CompilerArgumentsGenerator {
     var moduleName: String
     let sourceFilePaths: [String]
 
-    var arguments: [String] {
+    public var arguments: [String] {
         let path = [
             "-vfsoverlay",
             derivedDataPath + "/Index.noindex/Build/Intermediates.noindex/index-overlay.yaml",
@@ -113,16 +113,16 @@ public struct CompilerArgumentsGenerator {
         + getIncludePaths(
             in: NSString(string: derivedDataPath).appendingPathComponent("/SourcePackages/checkouts"),
             ignoredDirectories: ["swift-package-manager"]
-            + [
-                "-Xcc",
-                "-DSWIFT_PACKAGE",
-                "-Xcc",
-                "-DDEBUG=1",
-                "-working-directory",
-                // TODO: Make ↓ dynamically generated
-                "/Users/onaga/RAGESS/RAGESS/RAGESS"
-            ]
         )
+        + [
+            "-Xcc",
+            "-DSWIFT_PACKAGE",
+            "-Xcc",
+            "-DDEBUG=1",
+            "-working-directory",
+            // TODO: Make ↓ dynamically generated
+            "/Users/onaga/RAGESS/RAGESS/RAGESS"
+        ]
     }
 
     var moduleCachePath: String {
@@ -139,7 +139,8 @@ public struct CompilerArgumentsGenerator {
     }
 
     var overridesHmapPath: String {
-        derivedDataPath
+        "-I"
+            + derivedDataPath
             + "/Index.noindex/Build/Intermediates.noindex/RAGESS.build/Debug/"
             + moduleName
             + ".build/swift-overrides.hmap"
@@ -159,7 +160,7 @@ public struct CompilerArgumentsGenerator {
         while let fileURL = enumerator.nextObject() as? URL {
             if fileURL.pathExtension == "modulemap" {
                 moduleMapPaths.append("-Xcc")
-                moduleMapPaths.append(fileURL.path)
+                moduleMapPaths.append("-fmodule-map-file=\(fileURL.path)")
             }
         }
 

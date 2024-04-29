@@ -20,7 +20,7 @@ public struct SourceKitClientDebugger {
         var filePath: String
         var symbolName: String = ""
         var countedString: String = ""
-        var offset: Int = 0
+        var offset: Int = 2170
         var cursorInfoResponse = CursorInfoResponse()
         var allFilePathsInProject: [String] = []
         var buildSettings: [String: String] = [:]
@@ -198,10 +198,29 @@ public struct SourceKitClientDebugger {
                 return .none
 
             case .cursorInfoTapped:
-                return .run { [path = state.filePath, offset = state.offset, allFilePathsInProject = state.allFilePathsInProject, arguments = state.compilerArguments] send in
+                let filePath = "/Users/onaga/RAGESS/RAGESS/RAGESS/Sources/DebugView/DebugView.swift"
+                let moduleFilesPath = [
+                    "/Users/onaga/RAGESS/RAGESS/RAGESS/Sources/DebugView/DebugView.swift",
+                    "/Users/onaga/RAGESS/RAGESS/RAGESS/Sources/DebugView/LSPClient.swift",
+                    "/Users/onaga/RAGESS/RAGESS/RAGESS/Sources/DebugView/SourceFileClient.swift",
+                    "/Users/onaga/RAGESS/RAGESS/RAGESS/Sources/DebugView/SourceKitClient.swift",
+                    "/Users/onaga/RAGESS/RAGESS/RAGESS/Sources/DebugView/TypeAnnotationClient.swift"
+                ]
+                let arguments = CompilerArgumentsGenerator(
+                    derivedDataPath: "/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz",
+                    xcodeprojPath: "/Users/onaga/RAGESS/RAGESS/RAGESS.xcodeproj",
+                    moduleName: "DebugView",
+                    sourceFilePaths: moduleFilesPath
+                ).arguments
+                print("Compiler Arguments")
+                for argument in arguments {
+                    print(argument)
+                }
+                print("")
+                return .run { [offset = state.offset, allFilePathsInProject = state.allFilePathsInProject] send in
                     await send(.cursorInfoResponse(Result {
                         try await sourceKitClient.sendCursorInfoRequest(
-                            file: path,
+                            file: filePath,
                             offset: offset,
                             sourceFilePaths: allFilePathsInProject,
                             arguments: arguments

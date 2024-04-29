@@ -199,18 +199,11 @@ public struct SourceKitClientDebugger {
 
             case .cursorInfoTapped:
                 let filePath = "/Users/onaga/RAGESS/RAGESS/RAGESS/Sources/DebugView/DebugView.swift"
-                let moduleFilesPath = [
-                    "/Users/onaga/RAGESS/RAGESS/RAGESS/Sources/DebugView/DebugView.swift",
-                    "/Users/onaga/RAGESS/RAGESS/RAGESS/Sources/DebugView/LSPClient.swift",
-                    "/Users/onaga/RAGESS/RAGESS/RAGESS/Sources/DebugView/SourceFileClient.swift",
-                    "/Users/onaga/RAGESS/RAGESS/RAGESS/Sources/DebugView/SourceKitClient.swift",
-                    "/Users/onaga/RAGESS/RAGESS/RAGESS/Sources/DebugView/TypeAnnotationClient.swift"
-                ]
                 let arguments = CompilerArgumentsGenerator(
                     derivedDataPath: "/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz",
                     xcodeprojPath: "/Users/onaga/RAGESS/RAGESS/RAGESS.xcodeproj",
                     moduleName: "DebugView",
-                    sourceFilePaths: moduleFilesPath
+                    sourceFilePaths: state.allFilePathsInProject
                 ).arguments
                 print("Compiler Arguments")
                 for argument in arguments {

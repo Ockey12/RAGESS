@@ -7,6 +7,7 @@
 
 import ComposableArchitecture
 import SwiftUI
+import XcodeObject
 
 @Reducer
 public struct DebugReducer {
@@ -57,8 +58,8 @@ public struct DebugReducer {
             case .lspClient:
                 return .none
 
-            case let .sourceFileClient(.sourceFileResponse(.success(sourceFiles))):
-//                state.kittenClient.allFilePathsInProject = sourceFiles.map { $0.path }
+            case let .sourceFileClient(.sourceFileResponse(.success(directory))):
+                state.kittenClient.allFilePathsInProject = getAllSwiftFilePathsInProject(in: directory)
                 return .none
 
             case let .sourceFileClient(.selectButtonTapped(sourceFile)):
@@ -83,6 +84,16 @@ public struct DebugReducer {
                 return .none
             }
         }
+    }
+}
+
+extension DebugReducer {
+    func getAllSwiftFilePathsInProject(in directory: Directory) -> [String] {
+        var swiftFilePaths: [String] = directory.files.map { $0.path }
+        for subDirectory in directory.subDirectories {
+            swiftFilePaths.append(contentsOf: getAllSwiftFilePathsInProject(in: subDirectory))
+        }
+        return swiftFilePaths
     }
 }
 

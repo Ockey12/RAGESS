@@ -110,6 +110,10 @@ public struct CompilerArgumentsGenerator {
                 "-Xcc",
                 overridesHmapPath
             ]
+        + getIncludePaths(
+            in: NSString(string: derivedDataPath).appendingPathComponent("/SourcePackages/checkouts"),
+            ignoredDirectories: ["swift-package-manager"]
+        )
     }
 
     var moduleCachePath: String {
@@ -243,7 +247,8 @@ public struct CompilerArgumentsGenerator {
                 continue
             }
             if path == "include" {
-                includePaths.append(fullPath)
+                includePaths.append("-Xcc")
+                includePaths.append("-I\(fullPath)")
             } else {
                 includePaths.append(contentsOf: getIncludePaths(in: fullPath, ignoredDirectories: ignoredDirectories))
             }

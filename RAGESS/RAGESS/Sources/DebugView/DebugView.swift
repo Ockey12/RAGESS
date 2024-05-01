@@ -142,6 +142,6 @@ public struct DebugView: View {
             .tabItem { Text("SourceKitClient") }
             .padding()
         }
-        .frame(width: 800)
+        .frame(maxWidth: .infinity)
     }
 }

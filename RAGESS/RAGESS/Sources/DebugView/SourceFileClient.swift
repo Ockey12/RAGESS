@@ -18,13 +18,14 @@ public struct SourceFileClientDebugger {
     @ObservableState
     public struct State {
         var rootPath: String
-        var directory: Directory
+        var directory: Directory?
         var buildSettings: [String: String]
         var isLoading: Bool = false
+        var selectedFile: SourceFile? = nil
 
         public init(
             xcodeprojPathString: String,
-            directory: Directory,
+            directory: Directory? = nil,
             buildSettings: [String: String]
         ) {
             rootPath = xcodeprojPathString
@@ -54,14 +55,15 @@ public struct SourceFileClientDebugger {
                     await send(.sourceFileResponse(Result {
                         try await sourceFileClient.getXcodeObjects(
                             rootDirectoryPath: rootPath,
-                            ignoredDirectories: [".build", "DerivedData"]
+                            ignoredDirectories: [".build", "DerivedData", ".git"]
                         )
                     }))
                 }
 
             case let .sourceFileResponse(.success(directory)):
                 state.directory = directory
-                return .run { [paths = state.directory.allXcodeprojPathsUnderDirectory] send in
+                let paths = directory.allXcodeprojPathsUnderDirectory
+                return .run { send in
                     for path in paths {
                         await send(.buildSettingsResponse(Result {
                             try await buildSettingsClient.getSettings(xcodeprojPath: path)
@@ -83,7 +85,8 @@ public struct SourceFileClientDebugger {
                 state.isLoading = false
                 return .none
 
-            case .selectButtonTapped:
+            case let .selectButtonTapped(file):
+                state.selectedFile = file
                 return .none
 
             case .binding:
@@ -110,63 +113,91 @@ public struct SourceFileClientDebugView: View {
                     }
                 }
 
-                ScrollView {
-                    DirectoryCell(directory: store.directory)
+                HStack {
+                    ScrollView {
+                        if let directory = store.directory {
+                            FileTreeView(store: store, directory: directory)
+                        }
+                    }
+                    .frame(width: 500)
+
+                    if let file = store.selectedFile {
+                        VStack {
+                            HStack {
+                                Text(file.path)
+                                Spacer()
+                            }
+                            ScrollView {
+                                HStack {
+                                    Text(file.content)
+                                        .foregroundStyle(.white)
+                                    Spacer()
+                                }
+                                .background(.black)
+                            }
+                            Spacer()
+                        }
+                    } else {
+                        Spacer()
+                    }
                 }
             }
+        }
 
-            if store.isLoading {
-                ProgressView()
-            }
+        if store.isLoading {
+            ProgressView()
         }
     }
 }
 
-struct DirectoryCell: View {
+struct FileTreeView: View {
+    @Bindable var store: StoreOf<SourceFileClientDebugger>
     let directory: Directory
-    @State private var isExpanded = true
+
+    init(store: StoreOf<SourceFileClientDebugger>, directory: Directory) {
+        self.store = store
+        self.directory = directory
+    }
 
     var body: some View {
-        DisclosureGroup(
-            isExpanded: $isExpanded,
-            content: {
-                HStack {
-                    Divider()
-                        .frame(width: 2)
-                        .padding(.horizontal, 15)
-                    VStack {
-                        ForEach(directory.files) { file in
-                            HStack {
-                                Image(systemName: "swift")
-                                Text(file.name)
-                                Spacer()
-                            }
-                            .frame(height: 20)
-                        }
-                        ForEach(directory.subDirectories) { subDirectory in
-                            Self(directory: subDirectory)
-                        }
-                    }
+        VStack(spacing: 0) {
+            HStack {
+                if directory.files.isEmpty,
+                   directory.subDirectories.isEmpty {
+                    Image(systemName: "folder")
+                } else {
+                    Image(systemName: "folder.fill")
                 }
-            },
-            label: {
-                HStack {
-                    Button(
-                        action: {
-                            withAnimation {
-                                isExpanded.toggle()
+                Text(directory.name)
+                Spacer()
+            }
+            .frame(height: 20)
+            VStack(spacing: 0) {
+                ForEach(directory.files) { file in
+                    HStack {
+                        Button(
+                            action: {
+                                store.send(.selectButtonTapped(file))
+                            },
+                            label: {
+                                HStack {
+                                    Image(systemName: "swift")
+                                        .foregroundStyle(.orange)
+                                    Text(file.name)
+                                }
                             }
-                        },
-                        label: {
-                            HStack {
-                                Image(systemName: "folder.fill")
-                                Text(directory.name)
-                            }
-                        }
-                    )
-                    Spacer()
+                        )
+                        .buttonStyle(PlainButtonStyle())
+                        Spacer()
+                    }
+                    .frame(height: 20)
+                }
+                ForEach(directory.subDirectories) { subDirectory in
+                    FileTreeView(store: store, directory: subDirectory)
                 }
             }
-        )
+            .padding(.leading, 24)
+        }
     }
 }
+

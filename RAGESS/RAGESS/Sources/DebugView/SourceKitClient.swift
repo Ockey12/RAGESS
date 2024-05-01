@@ -270,7 +270,7 @@ public struct SourceKitClientDebugger {
                 return .none
 
             case .compilerArgumentsGeneratorTapped:
-                var generator = CompilerArgumentsGenerator(derivedDataPath: "", xcodeprojPath: "", moduleName: "", sourceFilePaths: [])
+                let generator = CompilerArgumentsGenerator(derivedDataPath: "", xcodeprojPath: "", moduleName: "", sourceFilePaths: [])
                 print("Start CompilerArgumentsGenerator.getIncludePaths")
                 let includePaths = generator.getIncludePaths(
                     in: "/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz/SourcePackages/checkouts",
@@ -297,7 +297,7 @@ public struct SourceKitClientDebugView: View {
     }
 
     public var body: some View {
-        VStack {
+        ScrollView {
             Text("File Path: \(store.filePath)")
 
             Form {
@@ -310,7 +310,7 @@ public struct SourceKitClientDebugView: View {
                 }
                 Section {
                     TextEditor(text: $store.countedString)
-                        .frame(height: 300)
+                        .frame(height: 700)
                     Button("Get Trailing Offset") {
                         store.send(.getTrailingOffsetTapped)
                     }

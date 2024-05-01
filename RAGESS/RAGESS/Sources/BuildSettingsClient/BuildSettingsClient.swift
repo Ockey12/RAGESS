@@ -38,7 +38,7 @@ extension BuildSettingsClient: DependencyKey {
                 guard components.count == 2 else {
                     continue
                 }
-                let key = components[0]
+                let key = components[0].trimmingCharacters(in: .whitespaces)
                 let setting = components[1]
                 settings[key] = setting
                 #if DEBUG

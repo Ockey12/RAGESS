@@ -9,42 +9,70 @@ import Foundation
 
 public struct CompilerArgumentsGenerator {
     public init(
+        buildSettings: [String: String],
         derivedDataPath: String,
         xcodeprojPath: String,
         moduleName: String,
         sourceFilePaths: [String]
     ) {
+        self.buildSettings = buildSettings
         self.derivedDataPath = derivedDataPath
         self.xcodeprojPath = xcodeprojPath
         self.moduleName = moduleName
         self.sourceFilePaths = sourceFilePaths
     }
 
+    let buildSettings: [String: String]
+
     let derivedDataPath: String
     let xcodeprojPath: String
     var moduleName: String
     let sourceFilePaths: [String]
 
+    public func generateArguments() throws -> [String] {
+        var arguments = ["-vfsoverlay"]
+        arguments.append(NSString(string: derivedDataPath).appendingPathComponent("/Index.noindex/Build/Intermediates.noindex/index-overlay.yaml"))
+        arguments.append("-module-name")
+        arguments.append(moduleName)
+        arguments.append("-Onone")
+        arguments.append("-enforce-exclusivity=checked")
+        arguments.append(contentsOf: sourceFilePaths)
+        arguments.append("-DSWIFT_PACKAGE")
+        arguments.append("-DDEBUG")
+        arguments.append(contentsOf: getModuleMapPaths(derivedDataPath: derivedDataPath))
+        arguments.append("-DXcode")
+        arguments.append("-sdk")
+
+        guard let sdkPath = buildSettings["SDKROOT"] else {
+            throw CompilerArgumentGenerationError.notFoundSDK
+        }
+        arguments.append(sdkPath)
+        arguments.append("-target")
+
+        return arguments
+    }
+
     public var arguments: [String] {
         let path = [
-            "-vfsoverlay",
-            derivedDataPath + "/Index.noindex/Build/Intermediates.noindex/index-overlay.yaml",
-            "-module-name",
-            moduleName,
-            "-Onone",
-            "-enforce-exclusivity=checked"
+//            "-vfsoverlay",
+//            derivedDataPath + "/Index.noindex/Build/Intermediates.noindex/index-overlay.yaml",
+//            "-module-name",
+//            moduleName,
+//            "-Onone",
+//            "-enforce-exclusivity=checked",
+            ""
         ]
-            + sourceFilePaths
+//            + sourceFilePaths
             + [
-                "-DSWIFT_PACKAGE",
-                "-DDEBUG"
+//                "-DSWIFT_PACKAGE",
+//                "-DDEBUG"
             ]
-            + getModuleMapPaths(derivedDataPath: derivedDataPath)
+//            + getModuleMapPaths(derivedDataPath: derivedDataPath)
             + [
-                "-DXcode",
-                "-sdk",
-                // TODO: Make ↓ dynamically generated
-                "/Applications/Xcode-15.2.0.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk",
+//                "-DXcode",
+//                "-sdk",
+//                // TODO: Make ↓ dynamically generated
+//                "/Applications/Xcode-15.2.0.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk",
                 "-target",
                 "arm64-apple-macos14.0",
                 "-g",
@@ -266,4 +294,8 @@ public struct CompilerArgumentsGenerator {
 
         return includePaths
     }
+}
+
+public enum CompilerArgumentGenerationError: Error {
+    case notFoundSDK
 }

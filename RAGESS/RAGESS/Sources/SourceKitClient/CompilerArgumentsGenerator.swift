@@ -5,7 +5,9 @@
 //  Created by ockey12 on 2024/04/27.
 //
 
+import Dependencies
 import Foundation
+import TargetClient
 
 public struct CompilerArgumentsGenerator {
     public init(
@@ -29,7 +31,7 @@ public struct CompilerArgumentsGenerator {
     var moduleName: String
     let sourceFilePaths: [String]
 
-    public func generateArguments() throws -> [String] {
+    public func generateArguments() async throws -> [String] {
         var arguments = ["-vfsoverlay"]
         arguments.append(NSString(string: derivedDataPath).appendingPathComponent("/Index.noindex/Build/Intermediates.noindex/index-overlay.yaml"))
         arguments.append("-module-name")
@@ -48,6 +50,12 @@ public struct CompilerArgumentsGenerator {
         }
         arguments.append(sdkPath)
         arguments.append("-target")
+
+        @Dependency(TargetClient.self) var targetClient
+        guard let target = try? await targetClient.getTarget() else {
+            throw CompilerArgumentGenerationError.notFoundTarget
+        }
+        arguments.append(target)
 
         return arguments
     }
@@ -73,8 +81,8 @@ public struct CompilerArgumentsGenerator {
 //                "-sdk",
 //                // TODO: Make ↓ dynamically generated
 //                "/Applications/Xcode-15.2.0.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk",
-                "-target",
-                "arm64-apple-macos14.0",
+//                "-target",
+//                "arm64-apple-macos14.0",
                 "-g",
                 "-module-cache-path",
                 moduleCachePath,
@@ -298,4 +306,5 @@ public struct CompilerArgumentsGenerator {
 
 public enum CompilerArgumentGenerationError: Error {
     case notFoundSDK
+    case notFoundTarget
 }

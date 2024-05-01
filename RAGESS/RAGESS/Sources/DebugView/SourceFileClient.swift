@@ -21,7 +21,7 @@ public struct SourceFileClientDebugger {
         var directory: Directory?
         var buildSettings: [String: String]
         var isLoading: Bool = false
-        var selectedFile: SourceFile? = nil
+        var selectedFile: SourceFile?
 
         public init(
             xcodeprojPathString: String,
@@ -148,7 +148,7 @@ public struct SourceFileClientDebugView: View {
             if store.isLoading {
                 ProgressView()
             }
-        }// ZStack
+        } // ZStack
     }
 }
 
@@ -202,4 +202,3 @@ struct FileTreeView: View {
         }
     }
 }
-

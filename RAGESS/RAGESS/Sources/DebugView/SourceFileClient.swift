@@ -51,6 +51,9 @@ public struct SourceFileClientDebugger {
             switch action {
             case .getSourceFilesButtonTapped:
                 state.isLoading = true
+                state.directory = nil
+                state.buildSettings = [:]
+                state.selectedFile = nil
                 return .run { [rootPath = state.rootPath] send in
                     await send(.sourceFileResponse(Result {
                         try await sourceFileClient.getXcodeObjects(

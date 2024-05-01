@@ -140,13 +140,12 @@ public struct SourceFileClientDebugView: View {
                     } else {
                         Spacer()
                     }
-                }
+                } // HStack
+            } // VStack
+            if store.isLoading {
+                ProgressView()
             }
-        }
-
-        if store.isLoading {
-            ProgressView()
-        }
+        }// ZStack
     }
 }
 

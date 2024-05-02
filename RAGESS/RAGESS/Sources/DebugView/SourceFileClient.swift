@@ -24,11 +24,11 @@ public struct SourceFileClientDebugger {
         var selectedFile: SourceFile?
 
         public init(
-            xcodeprojPathString: String,
+            rootPath: String,
             directory: Directory? = nil,
             buildSettings: [String: String]
         ) {
-            rootPath = xcodeprojPathString
+            self.rootPath = rootPath
             self.directory = directory
             self.buildSettings = buildSettings
         }
@@ -66,12 +66,14 @@ public struct SourceFileClientDebugger {
             case let .sourceFileResponse(.success(directory)):
                 state.directory = directory
                 let paths = directory.allXcodeprojPathsUnderDirectory
+                if paths.isEmpty {
+                    return .none
+                }
+                let path = paths[0]
                 return .run { send in
-                    for path in paths {
-                        await send(.buildSettingsResponse(Result {
-                            try await buildSettingsClient.getSettings(xcodeprojPath: path)
-                        }))
-                    }
+                    await send(.buildSettingsResponse(Result {
+                        try await buildSettingsClient.getSettings(xcodeprojPath: path)
+                    }))
                 }
 
             case .sourceFileResponse(.failure):

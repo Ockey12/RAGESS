@@ -74,6 +74,10 @@ public struct DebugReducer {
 
                 return .none
 
+            case let .sourceFileClient(.buildSettingsResponse(.success(buildSettings))):
+                state.kittenClient.buildSettings = buildSettings
+                return .none
+
             case .sourceFileClient:
                 return .none
 

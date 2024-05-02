@@ -148,7 +148,7 @@ public struct CompilerArgumentsGenerator {
 
     public var arguments: [String] {
         let path = [
-//            "-vfsoverlay",
+            //            "-vfsoverlay",
 //            derivedDataPath + "/Index.noindex/Build/Intermediates.noindex/index-overlay.yaml",
 //            "-module-name",
 //            moduleName,
@@ -227,7 +227,7 @@ public struct CompilerArgumentsGenerator {
 //                "-Xfrontend",
 //                "-package-name",
 //                "-Xfrontend",
-                // TODO: Make ↓ dynamically generated
+        // TODO: Make ↓ dynamically generated
 //                "ragess",
 //                "-Xcc",
 //                overridesHmapPath

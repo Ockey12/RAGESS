@@ -11,7 +11,7 @@ import Foundation
 
 @DependencyClient
 public struct TargetClient {
-    public var getTarget: @Sendable() async throws -> String
+    public var getTarget: @Sendable () async throws -> String
 }
 
 extension TargetClient: DependencyKey {

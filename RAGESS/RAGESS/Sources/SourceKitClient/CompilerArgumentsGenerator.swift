@@ -56,6 +56,70 @@ public struct CompilerArgumentsGenerator {
             throw CompilerArgumentGenerationError.notFoundTarget
         }
         arguments.append(target)
+        arguments.append("-g")
+        arguments.append("-module-cache-path")
+        arguments.append(moduleCachePath)
+        arguments.append("-Xfrontend")
+        arguments.append("-serialize-debugging-options")
+        arguments.append("-enable-testing")
+        arguments.append("-swift-version")
+
+        guard let swiftVersion = buildSettings["SWIFT_VERSION"] else {
+            throw CompilerArgumentGenerationError.notFoundSwiftVersion
+        }
+        arguments.append(swiftVersion)
+        arguments.append("-I")
+        arguments.append(debugPath)
+        arguments.append("-I")
+
+        guard let testLibraryPath = buildSettings["TEST_LIBRARY_SEARCH_PATHS"] else {
+            throw CompilerArgumentGenerationError.notFoundTestLibraryPath
+        }
+        arguments.append(testLibraryPath)
+        arguments.append("-F")
+        arguments.append(packageFrameworksPath)
+        arguments.append("-F")
+        arguments.append(debugPath)
+        arguments.append("-F")
+
+        guard let testFrameworkPath = buildSettings["TEST_FRAMEWORK_SEARCH_PATHS"] else {
+            throw CompilerArgumentGenerationError.notFoundTestFrameworkPath
+        }
+        arguments.append(testFrameworkPath)
+        arguments.append(contentsOf: getExecutableMacroPaths(derivedDataPath: derivedDataPath))
+        arguments.append("-Xfrontend")
+        arguments.append("-experimental-allow-module-with-compiler-errors")
+        arguments.append("-Xfrontend")
+        arguments.append("-empty-abi-descriptor")
+        arguments.append("-Xcc")
+        arguments.append("-fretain-comments-from-system-headers")
+        arguments.append("-Xcc")
+        arguments.append("-Xclang")
+        arguments.append("-Xcc")
+        arguments.append("-detailed-preprocessing-record")
+        arguments.append("-Xcc")
+        arguments.append("-Xclang")
+        arguments.append("-Xcc")
+        arguments.append("-fmodule-format=raw")
+        arguments.append("-Xcc")
+        arguments.append("-ferror-limit=10")
+        arguments.append("-Xcc")
+        arguments.append("-Xclang")
+        arguments.append("-Xcc")
+        arguments.append("-fallow-pch-with-compiler-errors")
+        arguments.append("-Xcc")
+        arguments.append("-Xclang")
+        arguments.append("-Xcc")
+        arguments.append("-fallow-pcm-with-compiler-errors")
+        arguments.append("-Xcc")
+        arguments.append("-Wno-non-modular-include-in-framework-module")
+        arguments.append("-Xcc")
+        arguments.append("-Wno-incomplete-umbrella")
+        arguments.append("-Xcc")
+        arguments.append("-fmodules-validate-system-headers")
+        arguments.append("-Xfrontend")
+        arguments.append("-package-name")
+        arguments.append("-Xfrontend")
 
         return arguments
     }
@@ -83,64 +147,64 @@ public struct CompilerArgumentsGenerator {
 //                "/Applications/Xcode-15.2.0.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk",
 //                "-target",
 //                "arm64-apple-macos14.0",
-                "-g",
-                "-module-cache-path",
-                moduleCachePath,
-                "-Xfrontend",
-                "-serialize-debugging-options",
-                "-enable-testing",
-                "-swift-version",
-                "5",
-                "-I",
-                debugPath,
-                "-I",
-                // TODO: Make ↓ dynamically generated
-                "/Applications/Xcode-15.2.0.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
-                "-F",
-                packageFrameworksPath,
-                "-F",
-                debugPath,
-                "-F",
-                // TODO: Make ↓ dynamically generated
-                "/Applications/Xcode-15.2.0.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks"
+//                "-g",
+//                "-module-cache-path",
+//                moduleCachePath,
+//                "-Xfrontend",
+//                "-serialize-debugging-options",
+//                "-enable-testing",
+//                "-swift-version",
+//                "5",
+//                "-I",
+//                debugPath,
+//                "-I",
+//                // TODO: Make ↓ dynamically generated
+//                "/Applications/Xcode-15.2.0.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+//                "-F",
+//                packageFrameworksPath,
+//                "-F",
+//                debugPath,
+//                "-F",
+//                // TODO: Make ↓ dynamically generated
+//                "/Applications/Xcode-15.2.0.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks"
             ]
-            + getExecutableMacroPaths(derivedDataPath: derivedDataPath)
+//            + getExecutableMacroPaths(derivedDataPath: derivedDataPath)
 
         return path
             + [
-                "-Xfrontend",
-                "-experimental-allow-module-with-compiler-errors",
-                "-Xfrontend",
-                "-empty-abi-descriptor",
-                "-Xcc",
-                "-fretain-comments-from-system-headers",
-                "-Xcc",
-                "-Xclang",
-                "-Xcc",
-                "-detailed-preprocessing-record",
-                "-Xcc",
-                "-Xclang",
-                "-Xcc",
-                "-fmodule-format=raw",
-                "-Xcc",
-                "-ferror-limit=10",
-                "-Xcc",
-                "-Xclang",
-                "-Xcc",
-                "-fallow-pch-with-compiler-errors",
-                "-Xcc",
-                "-Xclang",
-                "-Xcc",
-                "-fallow-pcm-with-compiler-errors",
-                "-Xcc",
-                "-Wno-non-modular-include-in-framework-module",
-                "-Xcc",
-                "-Wno-incomplete-umbrella",
-                "-Xcc",
-                "-fmodules-validate-system-headers",
-                "-Xfrontend",
-                "-package-name",
-                "-Xfrontend",
+//                "-Xfrontend",
+//                "-experimental-allow-module-with-compiler-errors",
+//                "-Xfrontend",
+//                "-empty-abi-descriptor",
+//                "-Xcc",
+//                "-fretain-comments-from-system-headers",
+//                "-Xcc",
+//                "-Xclang",
+//                "-Xcc",
+//                "-detailed-preprocessing-record",
+//                "-Xcc",
+//                "-Xclang",
+//                "-Xcc",
+//                "-fmodule-format=raw",
+//                "-Xcc",
+//                "-ferror-limit=10",
+//                "-Xcc",
+//                "-Xclang",
+//                "-Xcc",
+//                "-fallow-pch-with-compiler-errors",
+//                "-Xcc",
+//                "-Xclang",
+//                "-Xcc",
+//                "-fallow-pcm-with-compiler-errors",
+//                "-Xcc",
+//                "-Wno-non-modular-include-in-framework-module",
+//                "-Xcc",
+//                "-Wno-incomplete-umbrella",
+//                "-Xcc",
+//                "-fmodules-validate-system-headers",
+//                "-Xfrontend",
+//                "-package-name",
+//                "-Xfrontend",
                 // TODO: Make ↓ dynamically generated
                 "ragess",
                 "-Xcc",
@@ -163,15 +227,15 @@ public struct CompilerArgumentsGenerator {
 
     var moduleCachePath: String {
         let path = NSString(string: derivedDataPath).deletingLastPathComponent
-        return path + "/ModuleCache.noindex"
-    }
-
-    var debugPath: String {
-        derivedDataPath + "/Index.noindex/Build/Products/Debug"
+        return NSString(string: path).appendingPathComponent("/ModuleCache.noindex")
     }
 
     var packageFrameworksPath: String {
-        derivedDataPath + "/Index.noindex/Build/Products/Debug/PackageFrameworks"
+        NSString(string: derivedDataPath).appendingPathComponent("/Index.noindex/Build/Products/Debug/PackageFrameworks")
+    }
+
+    var debugPath: String {
+        NSString(string: derivedDataPath).appendingPathComponent("/Index.noindex/Build/Products/Debug")
     }
 
     var overridesHmapPath: String {
@@ -307,4 +371,7 @@ public struct CompilerArgumentsGenerator {
 public enum CompilerArgumentGenerationError: Error {
     case notFoundSDK
     case notFoundTarget
+    case notFoundSwiftVersion
+    case notFoundTestLibraryPath
+    case notFoundTestFrameworkPath
 }

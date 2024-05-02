@@ -292,7 +292,7 @@ public struct CompilerArgumentsGenerator {
 
     func getModuleMapPaths(derivedDataPath: String) -> [String] {
         let fileManager = FileManager.default
-        let path = derivedDataPath + "/Index.noindex/Build/Intermediates.noindex/GeneratedModuleMaps/"
+        let path = NSString(string: derivedDataPath).appendingPathComponent("/Index.noindex/Build/Intermediates.noindex/GeneratedModuleMaps/")
         let url = URL(fileURLWithPath: path)
 
         guard let enumerator = fileManager.enumerator(at: url, includingPropertiesForKeys: nil) else {
@@ -313,7 +313,7 @@ public struct CompilerArgumentsGenerator {
 
     func getExecutableMacroPaths(derivedDataPath: String) -> [String] {
         let fileManager = FileManager.default
-        let directoryPath = derivedDataPath + "/Index.noindex/Build/Products/Debug/"
+        let directoryPath = NSString(string: derivedDataPath).appendingPathComponent("/Index.noindex/Build/Products/Debug/")
         let url = URL(fileURLWithPath: directoryPath)
 
         guard let enumerator = fileManager.enumerator(at: url, includingPropertiesForKeys: nil) else {

@@ -13,14 +13,12 @@ public struct CompilerArgumentsGenerator {
     public init(
         targetFilePath: String,
         buildSettings: [String: String],
-        derivedDataPath: String,
         xcodeprojPath: String,
         moduleName: String,
         sourceFilePaths: [String]
     ) {
         self.targetFilePath = targetFilePath
         self.buildSettings = buildSettings
-        self.derivedDataPath = derivedDataPath
         self.xcodeprojPath = xcodeprojPath
         self.moduleName = moduleName
         self.sourceFilePaths = sourceFilePaths
@@ -28,13 +26,37 @@ public struct CompilerArgumentsGenerator {
 
     let targetFilePath: String
     let buildSettings: [String: String]
-
-    let derivedDataPath: String
     let xcodeprojPath: String
     var moduleName: String
     let sourceFilePaths: [String]
 
     public func generateArguments() async throws -> [String] {
+        guard let buildDirectory = buildSettings["BUILD_DIR"] else {
+            throw CompilerArgumentGenerationError.notFoundBuildDirectory
+        }
+
+        let derivedDataPath = URL(filePath: buildDirectory)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .path()
+
+        var moduleCachePath: String {
+            let path = NSString(string: derivedDataPath).deletingLastPathComponent
+            return NSString(string: path).appendingPathComponent("/ModuleCache.noindex")
+        }
+
+        let packageFrameworksPath = NSString(string: derivedDataPath)
+            .appendingPathComponent("/Index.noindex/Build/Products/Debug/PackageFrameworks")
+
+        let debugPath = NSString(string: derivedDataPath)
+            .appendingPathComponent("/Index.noindex/Build/Products/Debug")
+
+        let overridesHmapPath = URL(fileURLWithPath: "-I")
+            .appendingPathComponent(derivedDataPath)
+            .appendingPathComponent("/Index.noindex/Build/Intermediates.noindex/RAGESS.build/Debug/")
+            .appendingPathComponent("\(moduleName).build/swift-overrides.hmap")
+            .path()
+
         var arguments = ["-vfsoverlay"]
         arguments.append(NSString(string: derivedDataPath).appendingPathComponent("/Index.noindex/Build/Intermediates.noindex/index-overlay.yaml"))
         arguments.append("-module-name")
@@ -247,26 +269,26 @@ public struct CompilerArgumentsGenerator {
 //            ]
     }
 
-    var moduleCachePath: String {
-        let path = NSString(string: derivedDataPath).deletingLastPathComponent
-        return NSString(string: path).appendingPathComponent("/ModuleCache.noindex")
-    }
-
-    var packageFrameworksPath: String {
-        NSString(string: derivedDataPath).appendingPathComponent("/Index.noindex/Build/Products/Debug/PackageFrameworks")
-    }
-
-    var debugPath: String {
-        NSString(string: derivedDataPath).appendingPathComponent("/Index.noindex/Build/Products/Debug")
-    }
-
-    var overridesHmapPath: String {
-        URL(fileURLWithPath: "-I")
-            .appendingPathComponent(derivedDataPath)
-            .appendingPathComponent("/Index.noindex/Build/Intermediates.noindex/RAGESS.build/Debug/")
-            .appendingPathComponent("\(moduleName).build/swift-overrides.hmap")
-            .path()
-    }
+//    var moduleCachePath: String {
+//        let path = NSString(string: derivedDataPath).deletingLastPathComponent
+//        return NSString(string: path).appendingPathComponent("/ModuleCache.noindex")
+//    }
+//
+//    var packageFrameworksPath: String {
+//        NSString(string: derivedDataPath).appendingPathComponent("/Index.noindex/Build/Products/Debug/PackageFrameworks")
+//    }
+//
+//    var debugPath: String {
+//        NSString(string: derivedDataPath).appendingPathComponent("/Index.noindex/Build/Products/Debug")
+//    }
+//
+//    var overridesHmapPath: String {
+//        URL(fileURLWithPath: "-I")
+//            .appendingPathComponent(derivedDataPath)
+//            .appendingPathComponent("/Index.noindex/Build/Intermediates.noindex/RAGESS.build/Debug/")
+//            .appendingPathComponent("\(moduleName).build/swift-overrides.hmap")
+//            .path()
+//    }
 
     func getModuleMapPaths(derivedDataPath: String) -> [String] {
         let fileManager = FileManager.default
@@ -434,6 +456,7 @@ public struct CompilerArgumentsGenerator {
 }
 
 public enum CompilerArgumentGenerationError: Error {
+    case notFoundBuildDirectory
     case notFoundSDK
     case notFoundTarget
     case notFoundSwiftVersion

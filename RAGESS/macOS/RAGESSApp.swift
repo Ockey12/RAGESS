@@ -23,7 +23,7 @@ struct RAGESSApp: App {
                             column: 0
                         ),
                         sourceFileClient: .init(
-                            xcodeprojPathString: "",
+                            rootPath: "",
                             buildSettings: [:]
                         ),
                         typeAnnotationClient: .init(

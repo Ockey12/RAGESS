@@ -67,6 +67,12 @@ public struct CompilerArgumentsGenerator {
         arguments.append("-DSWIFT_PACKAGE")
         arguments.append("-DDEBUG")
         arguments.append(contentsOf: getModuleMapPaths(derivedDataPath: derivedDataPath))
+//        arguments.append(contentsOf: [
+//            "-Xcc",
+//            "-fmodule-map-file=/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz/Index.noindex/Build/Intermediates.noindex/GeneratedModuleMaps/SourceKit.modulemap",
+//            "-Xcc",
+//            "-fmodule-map-file=/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz/Index.noindex/Build/Intermediates.noindex/GeneratedModuleMaps/Clang_C.modulemap"
+//        ])
         arguments.append("-DXcode")
         arguments.append("-sdk")
 
@@ -81,6 +87,7 @@ public struct CompilerArgumentsGenerator {
             throw CompilerArgumentGenerationError.notFoundTarget
         }
         arguments.append(target)
+//        arguments.append("arm64-apple-macos14.0")
         arguments.append("-g")
         arguments.append("-module-cache-path")
         arguments.append(moduleCachePath)
@@ -92,7 +99,12 @@ public struct CompilerArgumentsGenerator {
         guard let swiftVersion = buildSettings["SWIFT_VERSION"] else {
             throw CompilerArgumentGenerationError.notFoundSwiftVersion
         }
-        arguments.append(swiftVersion)
+        if swiftVersion.hasSuffix(".0") {
+            arguments.append(String(swiftVersion.dropLast(2)))
+        } else {
+            arguments.append(swiftVersion)
+        }
+
         arguments.append("-I")
         arguments.append(debugPath)
         arguments.append("-I")
@@ -100,7 +112,7 @@ public struct CompilerArgumentsGenerator {
         guard let testLibraryPath = buildSettings["TEST_LIBRARY_SEARCH_PATHS"] else {
             throw CompilerArgumentGenerationError.notFoundTestLibraryPath
         }
-        arguments.append(testLibraryPath)
+        arguments.append(testLibraryPath.trimmingCharacters(in: .whitespaces))
         arguments.append("-F")
         arguments.append(packageFrameworksPath)
         arguments.append("-F")
@@ -110,8 +122,26 @@ public struct CompilerArgumentsGenerator {
         guard let testFrameworkPath = buildSettings["TEST_FRAMEWORK_SEARCH_PATHS"] else {
             throw CompilerArgumentGenerationError.notFoundTestFrameworkPath
         }
-        arguments.append(testFrameworkPath)
+        arguments.append(testFrameworkPath.trimmingCharacters(in: .whitespaces))
         arguments.append(contentsOf: getExecutableMacroPaths(derivedDataPath: derivedDataPath))
+//        arguments.append(contentsOf: [
+//            "-Xfrontend",
+//             "-load-plugin-executable",
+//             "-Xfrontend",
+//             "/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz/Index.noindex/Build/Products/Debug/CasePathsMacros#CasePathsMacros",
+//             "-Xfrontend",
+//             "-load-plugin-executable",
+//             "-Xfrontend",
+//             "/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz/Index.noindex/Build/Products/Debug/ComposableArchitectureMacros#ComposableArchitectureMacros",
+//             "-Xfrontend",
+//             "-load-plugin-executable",
+//             "-Xfrontend",
+//             "/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz/Index.noindex/Build/Products/Debug/DependenciesMacrosPlugin#DependenciesMacrosPlugin",
+//             "-Xfrontend",
+//             "-load-plugin-executable",
+//             "-Xfrontend",
+//             "/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz/Index.noindex/Build/Products/Debug/PerceptionMacros#PerceptionMacros"
+//        ])
         arguments.append("-Xfrontend")
         arguments.append("-experimental-allow-module-with-compiler-errors")
         arguments.append("-Xfrontend")
@@ -158,6 +188,30 @@ public struct CompilerArgumentsGenerator {
                 ignoredDirectories: ["swift-package-manager"]
             )
         )
+//        arguments.append(contentsOf: [
+//            "-Xcc",
+//             "-I/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz/SourcePackages/checkouts/swift-system/Sources/CSystem/include",
+//             "-Xcc",
+//             "-I/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz/SourcePackages/checkouts/swift-tools-support-core/Sources/TSCclibc/include",
+//             "-Xcc",
+//             "-I/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz/SourcePackages/checkouts/Yams/Sources/CYaml/include",
+//             "-Xcc",
+//             "-I/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz/SourcePackages/checkouts/SourceKitten/Source/SourceKit/include",
+//             "-Xcc",
+//             "-I/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz/SourcePackages/checkouts/SourceKitten/Source/Clang_C/include",
+//             "-Xcc",
+//             "-I/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz/Index.noindex/Build/Products/Debug/include"
+//        ])
+
+//        arguments.append(contentsOf: [
+//            "-Xcc",
+//            "-I/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz/Index.noindex/Build/Intermediates.noindex/RAGESS.build/Debug/DebugView.build/DerivedSources-normal/arm64",
+//            "-Xcc",
+//            "-I/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz/Index.noindex/Build/Intermediates.noindex/RAGESS.build/Debug/DebugView.build/DerivedSources/arm64",
+//            "-Xcc",
+//            "-I/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz/Index.noindex/Build/Intermediates.noindex/RAGESS.build/Debug/DebugView.build/DerivedSources"
+//        ])
+
         arguments.append("-Xcc")
         arguments.append("-DSWIFT_PACKAGE")
         arguments.append("-Xcc")
@@ -335,14 +389,25 @@ public struct CompilerArgumentsGenerator {
             if fileType == .typeRegular,
                isExecutable(filePermissions) {
                 let fileName = fileURL.lastPathComponent
-                macroPaths.append("-Xfrontend")
-                macroPaths.append("-load-plugin-executable")
-                macroPaths.append("-Xfrontend")
-                macroPaths.append("\(directoryPath)\(fileName)#\(fileName)")
+//                macroPaths.append("-Xfrontend")
+//                macroPaths.append("-load-plugin-executable")
+//                macroPaths.append("-Xfrontend")
+                let macroPath = NSString(string: directoryPath).appendingPathComponent("\(fileName)#\(fileName)")
+//                macroPaths.append("\(directoryPath)\(fileName)#\(fileName)")
+                macroPaths.append(macroPath)
             }
         }
 
-        return macroPaths
+        macroPaths = macroPaths.sorted { NSString(string: $0).lastPathComponent < NSString(string: $1).lastPathComponent }
+        var arguments: [String] = []
+        for path in macroPaths {
+            arguments.append("-Xfrontend")
+            arguments.append("-load-plugin-executable")
+            arguments.append("-Xfrontend")
+            arguments.append(path)
+        }
+
+        return arguments
 
         func isExecutable(_ permissions: Int?) -> Bool {
             guard let permissions = permissions else {

@@ -41,7 +41,7 @@ extension TargetClient: DependencyKey {
                 fatalError()
             }
 
-            return triple
+            return triple.trimmingCharacters(in: .whitespaces)
         }
     )
 }

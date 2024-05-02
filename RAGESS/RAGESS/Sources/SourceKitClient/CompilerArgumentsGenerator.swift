@@ -130,6 +130,18 @@ public struct CompilerArgumentsGenerator {
 
         arguments.append("-Xcc")
         arguments.append(overridesHmapPath)
+        arguments.append(
+            contentsOf: getIncludePaths(
+                in: NSString(string: derivedDataPath).appendingPathComponent("/SourcePackages/checkouts"),
+                ignoredDirectories: ["swift-package-manager"]
+            )
+        )
+        arguments.append("-Xcc")
+        arguments.append("-DSWIFT_PACKAGE")
+        arguments.append("-Xcc")
+        arguments.append("-DDEBUG=1")
+        arguments.append("-working-directory")
+        arguments.append(getWorkingDirectoryPath(sourceFilePath: targetFilePath))
 
         return arguments
     }
@@ -145,12 +157,12 @@ public struct CompilerArgumentsGenerator {
             ""
         ]
 //            + sourceFilePaths
-            + [
+//            + [
 //                "-DSWIFT_PACKAGE",
 //                "-DDEBUG"
-            ]
+//            ]
 //            + getModuleMapPaths(derivedDataPath: derivedDataPath)
-            + [
+//            + [
 //                "-DXcode",
 //                "-sdk",
 //                // TODO: Make ↓ dynamically generated
@@ -177,11 +189,11 @@ public struct CompilerArgumentsGenerator {
 //                "-F",
 //                // TODO: Make ↓ dynamically generated
 //                "/Applications/Xcode-15.2.0.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks"
-            ]
+//            ]
 //            + getExecutableMacroPaths(derivedDataPath: derivedDataPath)
 
         return path
-            + [
+//            + [
 //                "-Xfrontend",
 //                "-experimental-allow-module-with-compiler-errors",
 //                "-Xfrontend",
@@ -219,20 +231,20 @@ public struct CompilerArgumentsGenerator {
 //                "ragess",
 //                "-Xcc",
 //                overridesHmapPath
-            ]
-            + getIncludePaths(
-                in: NSString(string: derivedDataPath).appendingPathComponent("/SourcePackages/checkouts"),
-                ignoredDirectories: ["swift-package-manager"]
-            )
-            + [
-                "-Xcc",
-                "-DSWIFT_PACKAGE",
-                "-Xcc",
-                "-DDEBUG=1",
-                "-working-directory",
-                // TODO: Make ↓ dynamically generated
-                "/Users/onaga/RAGESS/RAGESS/RAGESS"
-            ]
+//            ]
+//            + getIncludePaths(
+//                in: NSString(string: derivedDataPath).appendingPathComponent("/SourcePackages/checkouts"),
+//                ignoredDirectories: ["swift-package-manager"]
+//            )
+//            + [
+//                "-Xcc",
+//                "-DSWIFT_PACKAGE",
+//                "-Xcc",
+//                "-DDEBUG=1",
+//                "-working-directory",
+//                // TODO: Make ↓ dynamically generated
+//                "/Users/onaga/RAGESS/RAGESS/RAGESS"
+//            ]
     }
 
     var moduleCachePath: String {
@@ -332,6 +344,35 @@ public struct CompilerArgumentsGenerator {
             currentDirectory = currentDirectory.deletingLastPathComponent()
         }
         return nil
+    }
+
+    func getWorkingDirectoryPath(sourceFilePath: String) -> String {
+        let fileManager = FileManager.default
+        var currentDirectory = URL(filePath: sourceFilePath).deletingLastPathComponent()
+
+        while currentDirectory.path != "/" {
+            let packageSwiftPath = currentDirectory.appendingPathComponent("Package.swift").path
+            if fileManager.fileExists(atPath: packageSwiftPath) {
+                return currentDirectory.path()
+            }
+            currentDirectory = currentDirectory.deletingLastPathComponent()
+        }
+
+        currentDirectory = URL(filePath: sourceFilePath).deletingLastPathComponent()
+        while currentDirectory.path != "/" {
+            guard let contents = try? fileManager.contentsOfDirectory(atPath: currentDirectory.path) else {
+                currentDirectory = currentDirectory.deletingLastPathComponent()
+                continue
+            }
+            for filePath in contents {
+                if URL(filePath: filePath).pathExtension == "xcodeproj" {
+                    return currentDirectory.path()
+                }
+            }
+            currentDirectory = currentDirectory.deletingLastPathComponent()
+        }
+
+        return URL(filePath: sourceFilePath).deletingLastPathComponent().path()
     }
 
     func getBuildDirectoryPaths(in directory: String) -> [String] {

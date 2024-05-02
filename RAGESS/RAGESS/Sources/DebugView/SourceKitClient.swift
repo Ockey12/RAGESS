@@ -200,6 +200,7 @@ public struct SourceKitClientDebugger {
             case .cursorInfoTapped:
                 let filePath = "/Users/onaga/RAGESS/RAGESS/RAGESS/Sources/DebugView/DebugView.swift"
                 let arguments = CompilerArgumentsGenerator(
+                    targetFilePath: state.filePath,
                     buildSettings: state.buildSettings,
                     derivedDataPath: "/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz",
                     xcodeprojPath: "/Users/onaga/RAGESS/RAGESS/RAGESS.xcodeproj",
@@ -272,6 +273,7 @@ public struct SourceKitClientDebugger {
 
             case .compilerArgumentsGeneratorTapped:
                 let generator = CompilerArgumentsGenerator(
+                    targetFilePath: state.filePath,
                     buildSettings: state.buildSettings,
                     derivedDataPath: "",
                     xcodeprojPath: "",

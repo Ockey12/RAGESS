@@ -11,12 +11,14 @@ import TargetClient
 
 public struct CompilerArgumentsGenerator {
     public init(
+        targetFilePath: String,
         buildSettings: [String: String],
         derivedDataPath: String,
         xcodeprojPath: String,
         moduleName: String,
         sourceFilePaths: [String]
     ) {
+        self.targetFilePath = targetFilePath
         self.buildSettings = buildSettings
         self.derivedDataPath = derivedDataPath
         self.xcodeprojPath = xcodeprojPath
@@ -24,6 +26,7 @@ public struct CompilerArgumentsGenerator {
         self.sourceFilePaths = sourceFilePaths
     }
 
+    let targetFilePath: String
     let buildSettings: [String: String]
 
     let derivedDataPath: String
@@ -117,9 +120,13 @@ public struct CompilerArgumentsGenerator {
         arguments.append("-Wno-incomplete-umbrella")
         arguments.append("-Xcc")
         arguments.append("-fmodules-validate-system-headers")
-        arguments.append("-Xfrontend")
-        arguments.append("-package-name")
-        arguments.append("-Xfrontend")
+
+        if let packageName = getPackageName(sourceFilePath: targetFilePath) {
+            arguments.append("-Xfrontend")
+            arguments.append("-package-name")
+            arguments.append("-Xfrontend")
+            arguments.append(packageName.lowercased())
+        }
 
         return arguments
     }
@@ -206,7 +213,7 @@ public struct CompilerArgumentsGenerator {
 //                "-package-name",
 //                "-Xfrontend",
                 // TODO: Make ↓ dynamically generated
-                "ragess",
+//                "ragess",
                 "-Xcc",
                 overridesHmapPath
             ]
@@ -308,6 +315,20 @@ public struct CompilerArgumentsGenerator {
             let executableMask = 0o111
             return permissions & executableMask != 0
         }
+    }
+
+    func getPackageName(sourceFilePath: String) -> String? {
+        let fileManager = FileManager.default
+        var currentDirectory = URL(fileURLWithPath: sourceFilePath).deletingLastPathComponent()
+
+        while currentDirectory.path != "/" {
+            let packageSwiftPath = currentDirectory.appendingPathComponent("Package.swift").path
+            if fileManager.fileExists(atPath: packageSwiftPath) {
+                return currentDirectory.lastPathComponent
+            }
+            currentDirectory = currentDirectory.deletingLastPathComponent()
+        }
+        return nil
     }
 
     func getBuildDirectoryPaths(in directory: String) -> [String] {

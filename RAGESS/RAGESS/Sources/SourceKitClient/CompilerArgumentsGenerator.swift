@@ -128,6 +128,9 @@ public struct CompilerArgumentsGenerator {
             arguments.append(packageName.lowercased())
         }
 
+        arguments.append("-Xcc")
+        arguments.append(overridesHmapPath)
+
         return arguments
     }
 
@@ -214,8 +217,8 @@ public struct CompilerArgumentsGenerator {
 //                "-Xfrontend",
                 // TODO: Make ↓ dynamically generated
 //                "ragess",
-                "-Xcc",
-                overridesHmapPath
+//                "-Xcc",
+//                overridesHmapPath
             ]
             + getIncludePaths(
                 in: NSString(string: derivedDataPath).appendingPathComponent("/SourcePackages/checkouts"),
@@ -246,11 +249,11 @@ public struct CompilerArgumentsGenerator {
     }
 
     var overridesHmapPath: String {
-        "-I"
-            + derivedDataPath
-            + "/Index.noindex/Build/Intermediates.noindex/RAGESS.build/Debug/"
-            + moduleName
-            + ".build/swift-overrides.hmap"
+        URL(fileURLWithPath: "-I")
+            .appendingPathComponent(derivedDataPath)
+            .appendingPathComponent("/Index.noindex/Build/Intermediates.noindex/RAGESS.build/Debug/")
+            .appendingPathComponent("\(moduleName).build/swift-overrides.hmap")
+            .path()
     }
 
     func getModuleMapPaths(derivedDataPath: String) -> [String] {

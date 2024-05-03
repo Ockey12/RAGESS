@@ -34,10 +34,6 @@ extension DumpPackageClient: DependencyKey {
             let jsonString = pipe.fileHandleForReading.readDataToEndOfFile()
             let decoder = JSONDecoder()
             let data = try decoder.decode(DumpPackageResponse.self, from: jsonString)
-//            #if DEBUG
-//                print("DumpPackageClient.dumpPackage")
-//                dump(data)
-//            #endif
             return data
         }
     )

@@ -53,6 +53,7 @@ public struct CompilerArgumentsGenerator {
 
         let overridesHmapPath = URL(fileURLWithPath: "-I")
             .appendingPathComponent(derivedDataPath)
+            // TODO: Make ↓ dynamically generated
             .appendingPathComponent("/Index.noindex/Build/Intermediates.noindex/RAGESS.build/Debug/")
             .appendingPathComponent("\(moduleName).build/swift-overrides.hmap")
             .path()
@@ -67,12 +68,6 @@ public struct CompilerArgumentsGenerator {
         arguments.append("-DSWIFT_PACKAGE")
         arguments.append("-DDEBUG")
         arguments.append(contentsOf: getModuleMapPaths(derivedDataPath: derivedDataPath))
-//        arguments.append(contentsOf: [
-//            "-Xcc",
-//            "-fmodule-map-file=/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz/Index.noindex/Build/Intermediates.noindex/GeneratedModuleMaps/SourceKit.modulemap",
-//            "-Xcc",
-//            "-fmodule-map-file=/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz/Index.noindex/Build/Intermediates.noindex/GeneratedModuleMaps/Clang_C.modulemap"
-//        ])
         arguments.append("-DXcode")
         arguments.append("-sdk")
 
@@ -87,7 +82,6 @@ public struct CompilerArgumentsGenerator {
             throw CompilerArgumentGenerationError.notFoundTarget
         }
         arguments.append(target)
-//        arguments.append("arm64-apple-macos14.0")
         arguments.append("-g")
         arguments.append("-module-cache-path")
         arguments.append(moduleCachePath)
@@ -124,24 +118,6 @@ public struct CompilerArgumentsGenerator {
         }
         arguments.append(testFrameworkPath.trimmingCharacters(in: .whitespaces))
         arguments.append(contentsOf: getExecutableMacroPaths(derivedDataPath: derivedDataPath))
-//        arguments.append(contentsOf: [
-//            "-Xfrontend",
-//             "-load-plugin-executable",
-//             "-Xfrontend",
-//             "/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz/Index.noindex/Build/Products/Debug/CasePathsMacros#CasePathsMacros",
-//             "-Xfrontend",
-//             "-load-plugin-executable",
-//             "-Xfrontend",
-//             "/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz/Index.noindex/Build/Products/Debug/ComposableArchitectureMacros#ComposableArchitectureMacros",
-//             "-Xfrontend",
-//             "-load-plugin-executable",
-//             "-Xfrontend",
-//             "/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz/Index.noindex/Build/Products/Debug/DependenciesMacrosPlugin#DependenciesMacrosPlugin",
-//             "-Xfrontend",
-//             "-load-plugin-executable",
-//             "-Xfrontend",
-//             "/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz/Index.noindex/Build/Products/Debug/PerceptionMacros#PerceptionMacros"
-//        ])
         arguments.append("-Xfrontend")
         arguments.append("-experimental-allow-module-with-compiler-errors")
         arguments.append("-Xfrontend")
@@ -188,29 +164,6 @@ public struct CompilerArgumentsGenerator {
                 ignoredDirectories: ["swift-package-manager"]
             )
         )
-//        arguments.append(contentsOf: [
-//            "-Xcc",
-//             "-I/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz/SourcePackages/checkouts/swift-system/Sources/CSystem/include",
-//             "-Xcc",
-//             "-I/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz/SourcePackages/checkouts/swift-tools-support-core/Sources/TSCclibc/include",
-//             "-Xcc",
-//             "-I/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz/SourcePackages/checkouts/Yams/Sources/CYaml/include",
-//             "-Xcc",
-//             "-I/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz/SourcePackages/checkouts/SourceKitten/Source/SourceKit/include",
-//             "-Xcc",
-//             "-I/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz/SourcePackages/checkouts/SourceKitten/Source/Clang_C/include",
-//             "-Xcc",
-//             "-I/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz/Index.noindex/Build/Products/Debug/include"
-//        ])
-
-//        arguments.append(contentsOf: [
-//            "-Xcc",
-//            "-I/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz/Index.noindex/Build/Intermediates.noindex/RAGESS.build/Debug/DebugView.build/DerivedSources-normal/arm64",
-//            "-Xcc",
-//            "-I/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz/Index.noindex/Build/Intermediates.noindex/RAGESS.build/Debug/DebugView.build/DerivedSources/arm64",
-//            "-Xcc",
-//            "-I/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz/Index.noindex/Build/Intermediates.noindex/RAGESS.build/Debug/DebugView.build/DerivedSources"
-//        ])
 
         arguments.append("-Xcc")
         arguments.append("-DSWIFT_PACKAGE")
@@ -221,161 +174,6 @@ public struct CompilerArgumentsGenerator {
 
         return arguments
     }
-
-    public var arguments: [String] {
-        let path = [
-            //            "-vfsoverlay",
-//            derivedDataPath + "/Index.noindex/Build/Intermediates.noindex/index-overlay.yaml",
-//            "-module-name",
-//            moduleName,
-//            "-Onone",
-//            "-enforce-exclusivity=checked",
-            ""
-        ]
-//            + sourceFilePaths
-//            + [
-//                "-DSWIFT_PACKAGE",
-//                "-DDEBUG"
-//            ]
-//            + getModuleMapPaths(derivedDataPath: derivedDataPath)
-//            + [
-//                "-DXcode",
-//                "-sdk",
-//                // TODO: Make ↓ dynamically generated
-//                "/Applications/Xcode-15.2.0.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk",
-//                "-target",
-//                "arm64-apple-macos14.0",
-//                "-g",
-//                "-module-cache-path",
-//                moduleCachePath,
-//                "-Xfrontend",
-//                "-serialize-debugging-options",
-//                "-enable-testing",
-//                "-swift-version",
-//                "5",
-//                "-I",
-//                debugPath,
-//                "-I",
-//                // TODO: Make ↓ dynamically generated
-//                "/Applications/Xcode-15.2.0.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
-//                "-F",
-//                packageFrameworksPath,
-//                "-F",
-//                debugPath,
-//                "-F",
-//                // TODO: Make ↓ dynamically generated
-//                "/Applications/Xcode-15.2.0.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks"
-//            ]
-//            + getExecutableMacroPaths(derivedDataPath: derivedDataPath)
-
-        return path
-//            + [
-//                "-Xfrontend",
-//                "-experimental-allow-module-with-compiler-errors",
-//                "-Xfrontend",
-//                "-empty-abi-descriptor",
-//                "-Xcc",
-//                "-fretain-comments-from-system-headers",
-//                "-Xcc",
-//                "-Xclang",
-//                "-Xcc",
-//                "-detailed-preprocessing-record",
-//                "-Xcc",
-//                "-Xclang",
-//                "-Xcc",
-//                "-fmodule-format=raw",
-//                "-Xcc",
-//                "-ferror-limit=10",
-//                "-Xcc",
-//                "-Xclang",
-//                "-Xcc",
-//                "-fallow-pch-with-compiler-errors",
-//                "-Xcc",
-//                "-Xclang",
-//                "-Xcc",
-//                "-fallow-pcm-with-compiler-errors",
-//                "-Xcc",
-//                "-Wno-non-modular-include-in-framework-module",
-//                "-Xcc",
-//                "-Wno-incomplete-umbrella",
-//                "-Xcc",
-//                "-fmodules-validate-system-headers",
-//                "-Xfrontend",
-//                "-package-name",
-//                "-Xfrontend",
-        // TODO: Make ↓ dynamically generated
-//                "ragess",
-//                "-Xcc",
-//                overridesHmapPath
-//            ]
-//            + getIncludePaths(
-//                in: NSString(string: derivedDataPath).appendingPathComponent("/SourcePackages/checkouts"),
-//                ignoredDirectories: ["swift-package-manager"]
-//            )
-//            + [
-//                "-Xcc",
-//                "-DSWIFT_PACKAGE",
-//                "-Xcc",
-//                "-DDEBUG=1",
-//                "-working-directory",
-//                // TODO: Make ↓ dynamically generated
-//                "/Users/onaga/RAGESS/RAGESS/RAGESS"
-//            ]
-    }
-
-//    var moduleCachePath: String {
-//        let path = NSString(string: derivedDataPath).deletingLastPathComponent
-//        return NSString(string: path).appendingPathComponent("/ModuleCache.noindex")
-//    }
-//
-//    var packageFrameworksPath: String {
-//        NSString(string: derivedDataPath).appendingPathComponent("/Index.noindex/Build/Products/Debug/PackageFrameworks")
-//    }
-//
-//    var debugPath: String {
-//        NSString(string: derivedDataPath).appendingPathComponent("/Index.noindex/Build/Products/Debug")
-//    }
-//
-//    var overridesHmapPath: String {
-//        URL(fileURLWithPath: "-I")
-//            .appendingPathComponent(derivedDataPath)
-//            .appendingPathComponent("/Index.noindex/Build/Intermediates.noindex/RAGESS.build/Debug/")
-//            .appendingPathComponent("\(moduleName).build/swift-overrides.hmap")
-//            .path()
-//    }
-
-//    func getModuleName(sourceFilePath: String) -> String {
-//        let fileManager = FileManager.default
-//        var currentDirectory = URL(filePath: sourceFilePath).deletingLastPathComponent()
-//        var packageSwiftContent = ""
-//
-//        while currentDirectory.path() != "/" {
-//            guard let paths = try? fileManager.contentsOfDirectory(
-//                at: currentDirectory,
-//                includingPropertiesForKeys: nil,
-//                options: .skipsHiddenFiles
-//            ) else {
-//                currentDirectory = currentDirectory.deletingLastPathComponent()
-//                continue
-//            }
-//            let packageSwiftPath = paths.filter { $0.lastPathComponent == "Package.swift" }
-//            guard !packageSwiftPath.isEmpty else {
-//                currentDirectory = currentDirectory.deletingLastPathComponent()
-//                continue
-//            }
-//            guard let content = try? String(contentsOfFile: packageSwiftPath[0].path()) else {
-//                return "main"
-//            }
-//            packageSwiftContent = content
-//            break
-//        }
-//
-//        if currentDirectory.path() == "/" {
-//            return "main"
-//        }
-//
-//
-//    }
 
     func getModuleMapPaths(derivedDataPath: String) -> [String] {
         let fileManager = FileManager.default
@@ -422,11 +220,7 @@ public struct CompilerArgumentsGenerator {
             if fileType == .typeRegular,
                isExecutable(filePermissions) {
                 let fileName = fileURL.lastPathComponent
-//                macroPaths.append("-Xfrontend")
-//                macroPaths.append("-load-plugin-executable")
-//                macroPaths.append("-Xfrontend")
                 let macroPath = NSString(string: directoryPath).appendingPathComponent("\(fileName)#\(fileName)")
-//                macroPaths.append("\(directoryPath)\(fileName)#\(fileName)")
                 macroPaths.append(macroPath)
             }
         }

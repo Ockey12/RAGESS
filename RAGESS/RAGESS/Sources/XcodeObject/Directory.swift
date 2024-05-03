@@ -17,12 +17,20 @@ public struct Directory: Identifiable {
         NSString(string: path).lastPathComponent
     }
 
-    public var subDirectories: [Self]
-    public var files: [SourceFile]
-    public var xcodeprojPaths: [String]
+    public let subDirectories: [Self]
+    public let files: [SourceFile]
+    public let xcodeprojPaths: [String]
     public var allXcodeprojPathsUnderDirectory: [String] {
         var allPaths = subDirectories.map { $0.allXcodeprojPathsUnderDirectory }.flatMap { $0 }
         allPaths += xcodeprojPaths
+        return allPaths
+    }
+    public let packageSwiftPath: String?
+    public var allPackageSwiftPath: [String] {
+        var allPaths = subDirectories.compactMap({ $0.packageSwiftPath })
+        if let path = packageSwiftPath {
+            allPaths.append(path)
+        }
         return allPaths
     }
 
@@ -33,12 +41,14 @@ public struct Directory: Identifiable {
         subDirectories: [Self],
         files: [SourceFile],
         xcodeprojPaths: [String] = [],
-        descriptionJSONString: String? = nil
+//        descriptionJSONString: String? = nil
+        packageSwiftPath: String? = nil
     ) {
         self.path = path
         self.subDirectories = subDirectories
         self.files = files
         self.xcodeprojPaths = xcodeprojPaths
-        self.descriptionJSONString = descriptionJSONString
+//        self.descriptionJSONString = descriptionJSONString
+        self.packageSwiftPath = packageSwiftPath
     }
 }

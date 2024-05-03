@@ -7,6 +7,7 @@
 
 import BuildSettingsClient
 import ComposableArchitecture
+import DumpPackageClient
 import SourceFileClient
 import SwiftUI
 import XcodeObject
@@ -38,11 +39,13 @@ public struct SourceFileClientDebugger {
         case getSourceFilesButtonTapped
         case sourceFileResponse(Result<Directory, Error>)
         case buildSettingsResponse(Result<[String: String], Error>)
+        case dumpPackageResponse(Result<DumpPackageResponse, Error>)
         case selectButtonTapped(SourceFile)
         case binding(BindingAction<State>)
     }
 
     @Dependency(BuildSettingsClient.self) var buildSettingsClient
+    @Dependency(DumpPackageClient.self) var dumpPackageClient
     @Dependency(SourceFileClient.self) var sourceFileClient
 
     public var body: some ReducerOf<Self> {
@@ -65,15 +68,21 @@ public struct SourceFileClientDebugger {
 
             case let .sourceFileResponse(.success(directory)):
                 state.directory = directory
-                let paths = directory.allXcodeprojPathsUnderDirectory
-                if paths.isEmpty {
-                    return .none
-                }
-                let path = paths[0]
-                return .run { send in
+
+                return .run {  send in
                     await send(.buildSettingsResponse(Result {
-                        try await buildSettingsClient.getSettings(xcodeprojPath: path)
+                        try await buildSettingsClient.getSettings(
+                            xcodeprojPath: directory.allXcodeprojPathsUnderDirectory[0]
+                        )
                     }))
+
+                    for packageSwiftPath in directory.allPackageSwiftPath {
+                        let packageDirectory = NSString(string: packageSwiftPath).deletingLastPathComponent
+                        await send(.dumpPackageResponse(Result {
+                            try await dumpPackageClient.dumpPackage(currentDirectory: packageDirectory)
+                        }))
+                    }
+
                 }
 
             case .sourceFileResponse(.failure):
@@ -88,6 +97,17 @@ public struct SourceFileClientDebugger {
 
             case .buildSettingsResponse(.failure):
                 state.isLoading = false
+                return .none
+
+            case let .dumpPackageResponse(.success(response)):
+                #if DEBUG
+                    print("\n.dumpPackageResponse")
+                    dump(response)
+                    print("")
+                #endif
+                return .none
+
+            case let .dumpPackageResponse(.failure(error)):
                 return .none
 
             case let .selectButtonTapped(file):

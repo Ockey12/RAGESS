@@ -45,6 +45,7 @@ let package = Package(
             name: "DebugView",
             dependencies: [
                 "BuildSettingsClient",
+                "DumpPackageClient",
                 "LSPClient",
                 "SourceFileClient",
                 "SourceKitClient",
@@ -62,6 +63,14 @@ let package = Package(
         .target(
             name: "DependenciesClient",
             dependencies: [
+                .product(name: "Dependencies", package: "swift-dependencies"),
+                .product(name: "DependenciesMacros", package: "swift-dependencies")
+            ]
+        ),
+        .target(
+            name: "DumpPackageClient",
+            dependencies: [
+                "XcodeObject",
                 .product(name: "Dependencies", package: "swift-dependencies"),
                 .product(name: "DependenciesMacros", package: "swift-dependencies")
             ]

@@ -36,7 +36,7 @@ extension DumpPackageClient: DependencyKey {
             let data = try decoder.decode(DumpPackageResponse.self, from: jsonString)
             let modules = data.targets.map { target in
                 let byNames = target.dependencies.compactMap { $0.byName?.compactMap { $0 }.first }
-                let products = target.dependencies.compactMap { $0.product?.compactMap{ $0 }.first }
+                let products = target.dependencies.compactMap { $0.product?.compactMap { $0 }.first }
                 return Module(name: target.name, internalDependencies: byNames, externalDependencies: products)
             }
 

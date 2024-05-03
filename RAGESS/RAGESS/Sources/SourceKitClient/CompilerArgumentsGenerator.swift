@@ -201,7 +201,7 @@ public struct CompilerArgumentsGenerator {
         var sourceDirectory = NSString(string: sourceFilePath).deletingLastPathComponent
 
         while sourceDirectory != "/" {
-            guard let package = packages.filter( { $0.name == packageName } ).first else {
+            guard let package = packages.filter({ $0.name == packageName }).first else {
                 sourceDirectory = NSString(string: sourceDirectory).deletingLastPathComponent
                 continue
             }

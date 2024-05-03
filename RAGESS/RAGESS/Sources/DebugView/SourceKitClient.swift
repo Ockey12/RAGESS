@@ -21,7 +21,7 @@ public struct SourceKitClientDebugger {
         var filePath: String
         var symbolName: String = ""
         var countedString: String = ""
-        var offset: Int = 2200
+        var offset: Int = 0
         var cursorInfoResponse = CursorInfoResponse()
         var allFilePathsInProject: [String] = []
         var buildSettings: [String: String] = [:]
@@ -201,13 +201,12 @@ public struct SourceKitClientDebugger {
                 return .none
 
             case .cursorInfoTapped:
+                state.cursorInfoResponse = CursorInfoResponse()
                 print("\nSourceKitClientDebugger")
                 dump(state.packages)
                 let generator = CompilerArgumentsGenerator(
                     targetFilePath: state.filePath,
                     buildSettings: state.buildSettings,
-                    xcodeprojPath: "/Users/onaga/RAGESS/RAGESS/RAGESS.xcodeproj",
-                    moduleName: "DebugView",
                     sourceFilePaths: state.allFilePathsInProject,
                     packages: state.packages
                 )
@@ -240,6 +239,7 @@ public struct SourceKitClientDebugger {
                 }
 
             case let .compilerArgumentsResponse(.failure(error)):
+                print(error)
                 return .none
 
             case let .cursorInfoResponse(.success(response)):
@@ -373,6 +373,11 @@ public struct SourceKitClientDebugView: View {
                         }
                         Spacer()
                     }
+                    HStack(alignment: .top) {
+                        Text("key.modulename:")
+                        Text(store.cursorInfoResponse.moduleName ?? "")
+                        Spacer()
+                    }
                     Divider()
                     HStack(alignment: .top) {
                         Text("key.decl_lang:")
@@ -399,11 +404,6 @@ public struct SourceKitClientDebugView: View {
                     HStack(alignment: .top) {
                         Text("key.filepath:")
                         Text(store.cursorInfoResponse.filePath ?? "")
-                        Spacer()
-                    }
-                    HStack(alignment: .top) {
-                        Text("key.modulename:")
-                        Text(store.cursorInfoResponse.moduleName ?? "")
                         Spacer()
                     }
                     HStack(alignment: .top) {

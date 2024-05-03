@@ -21,7 +21,6 @@ public struct SourceFileClientDebugger {
         var rootPath: String
         var directory: Directory?
         var buildSettings: [String: String]
-        var isLoading: Bool = false
         var selectedFile: SourceFile?
         var packageObjects: [PackageObject] = []
         var packages: [PackageObject] = []
@@ -55,7 +54,6 @@ public struct SourceFileClientDebugger {
         Reduce { state, action in
             switch action {
             case .getSourceFilesButtonTapped:
-                state.isLoading = true
                 state.directory = nil
                 state.buildSettings = [:]
                 state.selectedFile = nil
@@ -88,17 +86,14 @@ public struct SourceFileClientDebugger {
                 }
 
             case .sourceFileResponse(.failure):
-                state.isLoading = false
                 return .none
 
             case let .buildSettingsResponse(.success(buildSettings)):
-                state.isLoading = false
                 state.buildSettings = buildSettings
                 dump(state.buildSettings)
                 return .none
 
             case .buildSettingsResponse(.failure):
-                state.isLoading = false
                 return .none
 
             case let .dumpPackageResponse(.success(packageObject)):
@@ -170,9 +165,6 @@ public struct SourceFileClientDebugView: View {
                     }
                 } // HStack
             } // VStack
-            if store.isLoading {
-                ProgressView()
-            }
         } // ZStack
     }
 }

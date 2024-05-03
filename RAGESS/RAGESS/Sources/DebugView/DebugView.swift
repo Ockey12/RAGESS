@@ -20,6 +20,9 @@ public struct DebugReducer {
         var typeAnnotationClient: TypeAnnotationDebugger.State
         var kittenClient: SourceKitClientDebugger.State
 
+        var buildSettingsLoading = false
+        var dumpPackageSwiftLoading = false
+
         public init(
             lspClient: LSPClientDebugger.State,
             sourceFileClient: SourceFileClientDebugger.State,
@@ -64,6 +67,7 @@ public struct DebugReducer {
 
             case let .sourceFileClient(.sourceFileResponse(.success(directory))):
                 state.kittenClient.allFilePathsInProject = getAllSwiftFilePathsInProject(in: directory)
+                state.buildSettingsLoading = true
                 return .none
 
             case let .sourceFileClient(.sourceFileSelected(sourceFile)):
@@ -80,13 +84,24 @@ public struct DebugReducer {
 
             case let .sourceFileClient(.buildSettingsResponse(.success(buildSettings))):
                 state.kittenClient.buildSettings = buildSettings
+                state.buildSettingsLoading = false
+                state.dumpPackageSwiftLoading = true
+                return .none
+
+            case .sourceFileClient(.buildSettingsResponse):
+                state.buildSettingsLoading = false
                 return .none
 
             case let .sourceFileClient(.dumpPackageResponse(.success(packageObject))):
                 state.kittenClient.packages.append(packageObject)
+                state.dumpPackageSwiftLoading = false
                 print("\nstate.kittenClient.packages.append(packageObject)")
                 dump(state.kittenClient.packages)
                 print("")
+                return .none
+
+            case .sourceFileClient(.dumpPackageResponse):
+                state.dumpPackageSwiftLoading = false
                 return .none
 
             case .sourceFileClient:
@@ -120,43 +135,49 @@ public struct DebugView: View {
     }
 
     public var body: some View {
-        TabView {
-            SourceFileClientDebugView(
-                store: store.scope(
-                    state: \.sourceFileClient,
-                    action: \.sourceFileClient
+        ZStack {
+            TabView {
+                SourceFileClientDebugView(
+                    store: store.scope(
+                        state: \.sourceFileClient,
+                        action: \.sourceFileClient
+                    )
                 )
-            )
-            .tabItem { Text("SourceFileClient") }
-            .padding()
+                .tabItem { Text("SourceFileClient") }
+                .padding()
 
-            LSPClientDebugView(
-                store: store.scope(
-                    state: \.lspClient,
-                    action: \.lspClient
+                LSPClientDebugView(
+                    store: store.scope(
+                        state: \.lspClient,
+                        action: \.lspClient
+                    )
                 )
-            )
-            .tabItem { Text("LSPClient") }
-            .padding()
+                .tabItem { Text("LSPClient") }
+                .padding()
 
-            TypeAnnotationDebugView(
-                store: store.scope(
-                    state: \.typeAnnotationClient,
-                    action: \.typeAnnotationClient
+                TypeAnnotationDebugView(
+                    store: store.scope(
+                        state: \.typeAnnotationClient,
+                        action: \.typeAnnotationClient
+                    )
                 )
-            )
-            .tabItem { Text("TypeAnnotationClient") }
-            .padding()
+                .tabItem { Text("TypeAnnotationClient") }
+                .padding()
 
-            SourceKitClientDebugView(
-                store: store.scope(
-                    state: \.kittenClient,
-                    action: \.kittenClient
+                SourceKitClientDebugView(
+                    store: store.scope(
+                        state: \.kittenClient,
+                        action: \.kittenClient
+                    )
                 )
-            )
-            .tabItem { Text("SourceKitClient") }
-            .padding()
-        }
-        .frame(maxWidth: .infinity)
+                .tabItem { Text("SourceKitClient") }
+                .padding()
+            }
+            .frame(maxWidth: .infinity)
+
+            if store.buildSettingsLoading || store.dumpPackageSwiftLoading {
+                ProgressView()
+            }
+        } // ZStack
     }
 }

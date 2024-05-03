@@ -14,27 +14,27 @@ public struct CompilerArgumentsGenerator {
     public init(
         targetFilePath: String,
         buildSettings: [String: String],
-        xcodeprojPath: String,
-        moduleName: String,
         sourceFilePaths: [String],
         packages: [PackageObject]
     ) {
         self.targetFilePath = targetFilePath
         self.buildSettings = buildSettings
-        self.xcodeprojPath = xcodeprojPath
-        self.moduleName = moduleName
         self.sourceFilePaths = sourceFilePaths
         self.packages = packages
     }
 
     let targetFilePath: String
     let buildSettings: [String: String]
-    let xcodeprojPath: String
-    var moduleName: String
     let sourceFilePaths: [String]
     let packages: [PackageObject]
 
     public func generateArguments() async throws -> [String] {
+        guard let packageName = getPackageName(sourceFilePath: targetFilePath, buildSettings: buildSettings) else {
+            throw CompilerArgumentGenerationError.notFoundPackageName
+        }
+        guard let moduleName = getModuleName(sourceFilePath: targetFilePath, packages: packages, buildSettings: buildSettings) else {
+            throw CompilerArgumentGenerationError.notFoundModuleName
+        }
         guard let buildDirectory = buildSettings["BUILD_DIR"] else {
             throw CompilerArgumentGenerationError.notFoundBuildDirectory
         }
@@ -57,28 +57,18 @@ public struct CompilerArgumentsGenerator {
 
         let overridesHmapPath = URL(fileURLWithPath: "-I")
             .appendingPathComponent(derivedDataPath)
-            // TODO: Make ↓ dynamically generated
-            .appendingPathComponent("/Index.noindex/Build/Intermediates.noindex/RAGESS.build/Debug/")
+            .appendingPathComponent("/Index.noindex/Build/Intermediates.noindex/\(packageName).build/Debug/")
             .appendingPathComponent("\(moduleName).build/swift-overrides.hmap")
             .path()
 
         var arguments = ["-vfsoverlay"]
         arguments.append(NSString(string: derivedDataPath).appendingPathComponent("/Index.noindex/Build/Intermediates.noindex/index-overlay.yaml"))
 
-        if let moduleName = getModuleName(sourceFilePath: targetFilePath, packages: packages, buildSettings: buildSettings) {
-            arguments.append("-module-name")
-            arguments.append(moduleName)
-        }
+        arguments.append("-module-name")
+        arguments.append(moduleName)
         arguments.append("-Onone")
         arguments.append("-enforce-exclusivity=checked")
-//        arguments.append(contentsOf: sourceFilePaths)
-        arguments.append(contentsOf: [
-            "/Users/onaga/RAGESS/RAGESS/RAGESS/Sources/DebugView/DebugView.swift",
-            "/Users/onaga/RAGESS/RAGESS/RAGESS/Sources/DebugView/LSPClient.swift",
-            "/Users/onaga/RAGESS/RAGESS/RAGESS/Sources/DebugView/SourceFileClient.swift",
-            "/Users/onaga/RAGESS/RAGESS/RAGESS/Sources/DebugView/SourceKitClient.swift",
-            "/Users/onaga/RAGESS/RAGESS/RAGESS/Sources/DebugView/TypeAnnotationClient.swift",
-        ])
+        arguments.append(contentsOf: sourceFilePaths)
         arguments.append("-DSWIFT_PACKAGE")
         arguments.append("-DDEBUG")
         arguments.append(contentsOf: getModuleMapPaths(derivedDataPath: derivedDataPath))
@@ -162,14 +152,10 @@ public struct CompilerArgumentsGenerator {
         arguments.append("-Wno-incomplete-umbrella")
         arguments.append("-Xcc")
         arguments.append("-fmodules-validate-system-headers")
-
-        if let packageName = getPackageName(sourceFilePath: targetFilePath, buildSettings: buildSettings) {
-            arguments.append("-Xfrontend")
-            arguments.append("-package-name")
-            arguments.append("-Xfrontend")
-            arguments.append(packageName.lowercased())
-        }
-
+        arguments.append("-Xfrontend")
+        arguments.append("-package-name")
+        arguments.append("-Xfrontend")
+        arguments.append(packageName.lowercased())
         arguments.append("-Xcc")
         arguments.append(overridesHmapPath)
         arguments.append(
@@ -187,6 +173,24 @@ public struct CompilerArgumentsGenerator {
         arguments.append(getWorkingDirectoryPath(sourceFilePath: targetFilePath))
 
         return arguments
+    }
+
+    func getPackageName(sourceFilePath: String, buildSettings: [String: String]) -> String? {
+        if let moduleName = buildSettings["PRODUCT_MODULE_NAME"] {
+            return moduleName
+        }
+
+        let fileManager = FileManager.default
+        var currentDirectory = URL(fileURLWithPath: sourceFilePath).deletingLastPathComponent()
+
+        while currentDirectory.path != "/" {
+            let packageSwiftPath = currentDirectory.appendingPathComponent("Package.swift").path
+            if fileManager.fileExists(atPath: packageSwiftPath) {
+                return currentDirectory.lastPathComponent
+            }
+            currentDirectory = currentDirectory.deletingLastPathComponent()
+        }
+        return nil
     }
 
     func getModuleName(sourceFilePath: String, packages: [PackageObject], buildSettings: [String: String]) -> String? {
@@ -286,24 +290,6 @@ public struct CompilerArgumentsGenerator {
         }
     }
 
-    func getPackageName(sourceFilePath: String, buildSettings: [String: String]) -> String? {
-        if let moduleName = buildSettings["PRODUCT_MODULE_NAME"] {
-            return moduleName
-        }
-
-        let fileManager = FileManager.default
-        var currentDirectory = URL(fileURLWithPath: sourceFilePath).deletingLastPathComponent()
-
-        while currentDirectory.path != "/" {
-            let packageSwiftPath = currentDirectory.appendingPathComponent("Package.swift").path
-            if fileManager.fileExists(atPath: packageSwiftPath) {
-                return currentDirectory.lastPathComponent
-            }
-            currentDirectory = currentDirectory.deletingLastPathComponent()
-        }
-        return nil
-    }
-
     func getWorkingDirectoryPath(sourceFilePath: String) -> String {
         let fileManager = FileManager.default
         var currentDirectory = URL(filePath: sourceFilePath).deletingLastPathComponent()
@@ -392,6 +378,8 @@ public struct CompilerArgumentsGenerator {
 }
 
 public enum CompilerArgumentGenerationError: Error {
+    case notFoundPackageName
+    case notFoundModuleName
     case notFoundBuildDirectory
     case notFoundSDK
     case notFoundTarget

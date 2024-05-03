@@ -11,7 +11,7 @@ public struct DumpPackageResponse: Decodable {
     let name: String
     let targets: [Target]
 
-     struct Target: Decodable {
+    struct Target: Decodable {
         let name: String
         let dependencies: [Dependency]
 
@@ -25,4 +25,3 @@ public struct DumpPackageResponse: Decodable {
         let identity: String
     }
 }
-

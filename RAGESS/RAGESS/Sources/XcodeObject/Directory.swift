@@ -25,9 +25,10 @@ public struct Directory: Identifiable {
         allPaths += xcodeprojPaths
         return allPaths
     }
+
     public let packageSwiftPath: String?
     public var allPackageSwiftPath: [String] {
-        var allPaths = subDirectories.compactMap({ $0.packageSwiftPath })
+        var allPaths = subDirectories.compactMap { $0.packageSwiftPath }
         if let path = packageSwiftPath {
             allPaths.append(path)
         }

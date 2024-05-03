@@ -69,7 +69,7 @@ public struct SourceFileClientDebugger {
             case let .sourceFileResponse(.success(directory)):
                 state.directory = directory
 
-                return .run {  send in
+                return .run { send in
                     await send(.buildSettingsResponse(Result {
                         try await buildSettingsClient.getSettings(
                             xcodeprojPath: directory.allXcodeprojPathsUnderDirectory[0]
@@ -82,7 +82,6 @@ public struct SourceFileClientDebugger {
                             try await dumpPackageClient.dumpPackage(currentDirectory: packageDirectory)
                         }))
                     }
-
                 }
 
             case .sourceFileResponse(.failure):

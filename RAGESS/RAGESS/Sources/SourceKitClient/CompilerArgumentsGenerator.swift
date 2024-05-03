@@ -374,7 +374,7 @@ public struct CompilerArgumentsGenerator {
 //            return "main"
 //        }
 //
-//        
+//
 //    }
 
     func getModuleMapPaths(derivedDataPath: String) -> [String] {

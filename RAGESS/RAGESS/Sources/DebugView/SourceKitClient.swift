@@ -10,6 +10,7 @@ import LSPClient
 import SourceKitClient
 import SourceKittenFramework
 import SwiftUI
+import XcodeObject
 
 @Reducer
 public struct SourceKitClientDebugger {
@@ -24,6 +25,7 @@ public struct SourceKitClientDebugger {
         var cursorInfoResponse = CursorInfoResponse()
         var allFilePathsInProject: [String] = []
         var buildSettings: [String: String] = [:]
+        var packages: [PackageObject] = []
         var compilerArguments: [String] {
             [
                 "-vfsoverlay",
@@ -199,12 +201,15 @@ public struct SourceKitClientDebugger {
                 return .none
 
             case .cursorInfoTapped:
+                print("\nSourceKitClientDebugger")
+                dump(state.packages)
                 let generator = CompilerArgumentsGenerator(
                     targetFilePath: state.filePath,
                     buildSettings: state.buildSettings,
                     xcodeprojPath: "/Users/onaga/RAGESS/RAGESS/RAGESS.xcodeproj",
                     moduleName: "DebugView",
-                    sourceFilePaths: state.allFilePathsInProject
+                    sourceFilePaths: state.allFilePathsInProject,
+                    packages: state.packages
                 )
                 return .run { send in
                     await send(.compilerArgumentsResponse(Result {
@@ -223,6 +228,7 @@ public struct SourceKitClientDebugger {
                 print("arguments == arg: \(arguments == arg)")
 
                 return .run { [filePath = state.filePath, offset = state.offset, allFilePathsInProject = state.allFilePathsInProject] send in
+                    print("\n=====send cursorinfo request=====\n")
                     await send(.cursorInfoResponse(Result {
                         try await sourceKitClient.sendCursorInfoRequest(
                             file: filePath,
@@ -273,6 +279,9 @@ public struct SourceKitClientDebugger {
                         case .reusingASTContext:
                             state.cursorInfoResponse.reusingASTContext = value as? Bool
                         }
+                    } else {
+                        print("Unexpected Response")
+                        dump(response)
                     }
 //                    } else {
 //                        fatalError("Unexpected Response [\(key): \(value)]")

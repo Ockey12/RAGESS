@@ -58,11 +58,15 @@ public struct DebugReducer {
             case .lspClient:
                 return .none
 
+            case .sourceFileClient(.getSourceFilesButtonTapped):
+                state.kittenClient.packages = []
+                return .none
+
             case let .sourceFileClient(.sourceFileResponse(.success(directory))):
                 state.kittenClient.allFilePathsInProject = getAllSwiftFilePathsInProject(in: directory)
                 return .none
 
-            case let .sourceFileClient(.selectButtonTapped(sourceFile)):
+            case let .sourceFileClient(.sourceFileSelected(sourceFile)):
                 state.lspClient.rootPathString = state.sourceFileClient.rootPath
                 state.lspClient.filePathString = sourceFile.path
                 state.lspClient.sourceCode = sourceFile.content
@@ -76,6 +80,13 @@ public struct DebugReducer {
 
             case let .sourceFileClient(.buildSettingsResponse(.success(buildSettings))):
                 state.kittenClient.buildSettings = buildSettings
+                return .none
+
+            case let .sourceFileClient(.dumpPackageResponse(.success(packageObject))):
+                state.kittenClient.packages.append(packageObject)
+                print("\nstate.kittenClient.packages.append(packageObject)")
+                dump(state.kittenClient.packages)
+                print("")
                 return .none
 
             case .sourceFileClient:

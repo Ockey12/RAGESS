@@ -23,6 +23,8 @@ public struct SourceFileClientDebugger {
         var buildSettings: [String: String]
         var isLoading: Bool = false
         var selectedFile: SourceFile?
+        var packageObjects: [PackageObject] = []
+        var packages: [PackageObject] = []
 
         public init(
             rootPath: String,
@@ -39,8 +41,8 @@ public struct SourceFileClientDebugger {
         case getSourceFilesButtonTapped
         case sourceFileResponse(Result<Directory, Error>)
         case buildSettingsResponse(Result<[String: String], Error>)
-        case dumpPackageResponse(Result<DumpPackageResponse, Error>)
-        case selectButtonTapped(SourceFile)
+        case dumpPackageResponse(Result<PackageObject, Error>)
+        case sourceFileSelected(SourceFile)
         case binding(BindingAction<State>)
     }
 
@@ -68,6 +70,7 @@ public struct SourceFileClientDebugger {
 
             case let .sourceFileResponse(.success(directory)):
                 state.directory = directory
+                state.packageObjects = []
 
                 return .run { send in
                     await send(.buildSettingsResponse(Result {
@@ -98,18 +101,19 @@ public struct SourceFileClientDebugger {
                 state.isLoading = false
                 return .none
 
-            case let .dumpPackageResponse(.success(response)):
+            case let .dumpPackageResponse(.success(packageObject)):
+                state.packageObjects.append(packageObject)
                 #if DEBUG
                     print("\n.dumpPackageResponse")
-                    dump(response)
+                    dump(packageObject)
                     print("")
                 #endif
                 return .none
 
-            case let .dumpPackageResponse(.failure(error)):
+            case .dumpPackageResponse(.failure):
                 return .none
 
-            case let .selectButtonTapped(file):
+            case let .sourceFileSelected(file):
                 state.selectedFile = file
                 return .none
 
@@ -200,7 +204,7 @@ struct FileTreeView: View {
                     HStack {
                         Button(
                             action: {
-                                store.send(.selectButtonTapped(file))
+                                store.send(.sourceFileSelected(file))
                             },
                             label: {
                                 HStack {

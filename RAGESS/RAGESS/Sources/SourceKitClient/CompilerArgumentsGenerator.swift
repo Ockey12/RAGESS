@@ -8,6 +8,7 @@
 import Dependencies
 import Foundation
 import TargetClient
+import XcodeObject
 
 public struct CompilerArgumentsGenerator {
     public init(
@@ -15,13 +16,15 @@ public struct CompilerArgumentsGenerator {
         buildSettings: [String: String],
         xcodeprojPath: String,
         moduleName: String,
-        sourceFilePaths: [String]
+        sourceFilePaths: [String],
+        packages: [PackageObject]
     ) {
         self.targetFilePath = targetFilePath
         self.buildSettings = buildSettings
         self.xcodeprojPath = xcodeprojPath
         self.moduleName = moduleName
         self.sourceFilePaths = sourceFilePaths
+        self.packages = packages
     }
 
     let targetFilePath: String
@@ -29,6 +32,7 @@ public struct CompilerArgumentsGenerator {
     let xcodeprojPath: String
     var moduleName: String
     let sourceFilePaths: [String]
+    let packages: [PackageObject]
 
     public func generateArguments() async throws -> [String] {
         guard let buildDirectory = buildSettings["BUILD_DIR"] else {
@@ -60,11 +64,21 @@ public struct CompilerArgumentsGenerator {
 
         var arguments = ["-vfsoverlay"]
         arguments.append(NSString(string: derivedDataPath).appendingPathComponent("/Index.noindex/Build/Intermediates.noindex/index-overlay.yaml"))
-        arguments.append("-module-name")
-        arguments.append(moduleName)
+
+        if let moduleName = getModuleName(sourceFilePath: targetFilePath, packages: packages, buildSettings: buildSettings) {
+            arguments.append("-module-name")
+            arguments.append(moduleName)
+        }
         arguments.append("-Onone")
         arguments.append("-enforce-exclusivity=checked")
-        arguments.append(contentsOf: sourceFilePaths)
+//        arguments.append(contentsOf: sourceFilePaths)
+        arguments.append(contentsOf: [
+            "/Users/onaga/RAGESS/RAGESS/RAGESS/Sources/DebugView/DebugView.swift",
+            "/Users/onaga/RAGESS/RAGESS/RAGESS/Sources/DebugView/LSPClient.swift",
+            "/Users/onaga/RAGESS/RAGESS/RAGESS/Sources/DebugView/SourceFileClient.swift",
+            "/Users/onaga/RAGESS/RAGESS/RAGESS/Sources/DebugView/SourceKitClient.swift",
+            "/Users/onaga/RAGESS/RAGESS/RAGESS/Sources/DebugView/TypeAnnotationClient.swift",
+        ])
         arguments.append("-DSWIFT_PACKAGE")
         arguments.append("-DDEBUG")
         arguments.append(contentsOf: getModuleMapPaths(derivedDataPath: derivedDataPath))
@@ -175,6 +189,32 @@ public struct CompilerArgumentsGenerator {
         return arguments
     }
 
+    func getModuleName(sourceFilePath: String, packages: [PackageObject], buildSettings: [String: String]) -> String? {
+        guard !packages.isEmpty,
+              let packageName = getPackageName(sourceFilePath: sourceFilePath, buildSettings: buildSettings) else {
+            return nil
+        }
+        var sourceDirectory = NSString(string: sourceFilePath).deletingLastPathComponent
+
+        while sourceDirectory != "/" {
+            guard let package = packages.filter( { $0.name == packageName } ).first else {
+                sourceDirectory = NSString(string: sourceDirectory).deletingLastPathComponent
+                continue
+            }
+
+            let targetName = NSString(string: sourceDirectory).lastPathComponent
+            for module in package.modules {
+                if targetName == module.name {
+                    return module.name
+                }
+            }
+
+            sourceDirectory = NSString(string: sourceDirectory).deletingLastPathComponent
+        }
+
+        return nil
+    }
+
     func getModuleMapPaths(derivedDataPath: String) -> [String] {
         let fileManager = FileManager.default
         let path = NSString(string: derivedDataPath).appendingPathComponent("/Index.noindex/Build/Intermediates.noindex/GeneratedModuleMaps/")
@@ -248,7 +288,7 @@ public struct CompilerArgumentsGenerator {
 
     func getPackageName(sourceFilePath: String, buildSettings: [String: String]) -> String? {
         if let moduleName = buildSettings["PRODUCT_MODULE_NAME"] {
-            return moduleName.lowercased()
+            return moduleName
         }
 
         let fileManager = FileManager.default

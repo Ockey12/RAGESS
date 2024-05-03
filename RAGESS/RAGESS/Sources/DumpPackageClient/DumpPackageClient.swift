@@ -14,7 +14,7 @@ import XcodeObject
 public struct DumpPackageClient {
     public var dumpPackage: @Sendable (
         _ currentDirectory: String
-    ) async throws -> DumpPackageResponse
+    ) async throws -> PackageObject
 }
 
 extension DumpPackageClient: DependencyKey {
@@ -34,7 +34,13 @@ extension DumpPackageClient: DependencyKey {
             let jsonString = pipe.fileHandleForReading.readDataToEndOfFile()
             let decoder = JSONDecoder()
             let data = try decoder.decode(DumpPackageResponse.self, from: jsonString)
-            return data
+            let modules = data.targets.map { target in
+                let byNames = target.dependencies.compactMap { $0.byName?.compactMap { $0 }.first }
+                let products = target.dependencies.compactMap { $0.product?.compactMap{ $0 }.first }
+                return Module(name: target.name, internalDependencies: byNames, externalDependencies: products)
+            }
+
+            return PackageObject(name: data.name, modules: modules)
         }
     )
 }

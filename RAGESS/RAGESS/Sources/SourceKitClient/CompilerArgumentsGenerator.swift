@@ -344,6 +344,39 @@ public struct CompilerArgumentsGenerator {
 //            .path()
 //    }
 
+//    func getModuleName(sourceFilePath: String) -> String {
+//        let fileManager = FileManager.default
+//        var currentDirectory = URL(filePath: sourceFilePath).deletingLastPathComponent()
+//        var packageSwiftContent = ""
+//
+//        while currentDirectory.path() != "/" {
+//            guard let paths = try? fileManager.contentsOfDirectory(
+//                at: currentDirectory,
+//                includingPropertiesForKeys: nil,
+//                options: .skipsHiddenFiles
+//            ) else {
+//                currentDirectory = currentDirectory.deletingLastPathComponent()
+//                continue
+//            }
+//            let packageSwiftPath = paths.filter { $0.lastPathComponent == "Package.swift" }
+//            guard !packageSwiftPath.isEmpty else {
+//                currentDirectory = currentDirectory.deletingLastPathComponent()
+//                continue
+//            }
+//            guard let content = try? String(contentsOfFile: packageSwiftPath[0].path()) else {
+//                return "main"
+//            }
+//            packageSwiftContent = content
+//            break
+//        }
+//
+//        if currentDirectory.path() == "/" {
+//            return "main"
+//        }
+//
+//        
+//    }
+
     func getModuleMapPaths(derivedDataPath: String) -> [String] {
         let fileManager = FileManager.default
         let path = NSString(string: derivedDataPath).appendingPathComponent("/Index.noindex/Build/Intermediates.noindex/GeneratedModuleMaps/")

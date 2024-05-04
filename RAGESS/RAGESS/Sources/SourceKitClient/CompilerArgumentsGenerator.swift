@@ -7,7 +7,6 @@
 
 import Dependencies
 import Foundation
-import TargetClient
 import XcodeObject
 
 public struct CompilerArgumentsGenerator {

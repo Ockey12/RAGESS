@@ -5,6 +5,7 @@
 //  Created by ockey12 on 2024/05/03.
 //
 
+import CommandClient
 import Dependencies
 import DependenciesMacros
 import Foundation
@@ -20,26 +21,14 @@ public struct DumpPackageClient {
 extension DumpPackageClient: DependencyKey {
     public static let liveValue: DumpPackageClient = .init(
         dumpPackage: { currentDirectory in
-            let process = Process()
-            process.launchPath = "/usr/bin/env"
-            process.currentDirectoryPath = currentDirectory
-            process.arguments = ["swift", "package", "dump-package"]
+            @Dependency(CommandClient.self) var commandClient
 
-            print("DumpPackageClient.dumpPackage")
-            print(currentDirectory)
+            let jsonString = try commandClient.execute(
+                launchPath: "/usr/bin/env",
+                arguments: ["swift", "package", "dump-package"],
+                currentDirectory: currentDirectory
+            )
 
-            let pipe = Pipe()
-            process.standardOutput = pipe
-
-            try process.run()
-            print("task.run()")
-
-            guard let response = try pipe.fileHandleForReading.readToEnd() else {
-                throw DumpPackageError.cannotReadData
-            }
-            guard let jsonString = String(data: response, encoding: .utf8) else {
-                throw DumpPackageError.cannnotEncodingResponse
-            }
             let jsonData = jsonString.data(using: .utf8)!
             let decoder = JSONDecoder()
             let data = try decoder.decode(DumpPackageResponse.self, from: jsonData)

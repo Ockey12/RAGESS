@@ -77,6 +77,7 @@ let package = Package(
         .target(
             name: "DumpPackageClient",
             dependencies: [
+                "CommandClient",
                 "XcodeObject",
                 .product(name: "Dependencies", package: "swift-dependencies"),
                 .product(name: "DependenciesMacros", package: "swift-dependencies")

@@ -20,20 +20,29 @@ public struct DumpPackageClient {
 extension DumpPackageClient: DependencyKey {
     public static let liveValue: DumpPackageClient = .init(
         dumpPackage: { currentDirectory in
-            let task = Process()
-            task.launchPath = "/usr/bin/env"
-            task.currentDirectoryPath = currentDirectory
-            task.arguments = ["swift", "package", "dump-package"]
+            let process = Process()
+            process.launchPath = "/usr/bin/env"
+            process.currentDirectoryPath = currentDirectory
+            process.arguments = ["swift", "package", "dump-package"]
+
+            print("DumpPackageClient.dumpPackage")
+            print(currentDirectory)
 
             let pipe = Pipe()
-            task.standardOutput = pipe
+            process.standardOutput = pipe
 
-            task.launch()
-            task.waitUntilExit()
+            try process.run()
+            print("task.run()")
 
-            let jsonString = pipe.fileHandleForReading.readDataToEndOfFile()
+            guard let response = try pipe.fileHandleForReading.readToEnd() else {
+                throw DumpPackageError.cannotReadData
+            }
+            guard let jsonString = String(data: response, encoding: .utf8) else {
+                throw DumpPackageError.cannnotEncodingResponse
+            }
+            let jsonData = jsonString.data(using: .utf8)!
             let decoder = JSONDecoder()
-            let data = try decoder.decode(DumpPackageResponse.self, from: jsonString)
+            let data = try decoder.decode(DumpPackageResponse.self, from: jsonData)
             let modules = data.targets.map { target in
                 let byNames = target.dependencies.compactMap { $0.byName?.compactMap { $0 }.first }
                 let products = target.dependencies.compactMap { $0.product?.compactMap { $0 }.first }
@@ -43,4 +52,9 @@ extension DumpPackageClient: DependencyKey {
             return PackageObject(name: data.name, modules: modules)
         }
     )
+}
+
+enum DumpPackageError: Error {
+    case cannotReadData
+    case cannnotEncodingResponse
 }

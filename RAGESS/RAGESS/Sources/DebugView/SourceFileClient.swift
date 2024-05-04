@@ -78,6 +78,8 @@ public struct SourceFileClientDebugger {
                     }))
 
                     for packageSwiftPath in directory.allPackageSwiftPath {
+                        print("SourceFileClientDebugger.Action.sourceFileResponse")
+                        print(packageSwiftPath)
                         let packageDirectory = NSString(string: packageSwiftPath).deletingLastPathComponent
                         await send(.dumpPackageResponse(Result {
                             try await dumpPackageClient.dumpPackage(currentDirectory: packageDirectory)
@@ -90,7 +92,6 @@ public struct SourceFileClientDebugger {
 
             case let .buildSettingsResponse(.success(buildSettings)):
                 state.buildSettings = buildSettings
-                dump(state.buildSettings)
                 return .none
 
             case .buildSettingsResponse(.failure):
@@ -105,7 +106,8 @@ public struct SourceFileClientDebugger {
                 #endif
                 return .none
 
-            case .dumpPackageResponse(.failure):
+            case let .dumpPackageResponse(.failure(error)):
+                print(error)
                 return .none
 
             case let .sourceFileSelected(file):

@@ -81,11 +81,21 @@ public struct CompilerArgumentsGenerator {
         arguments.append(sdkPath)
         arguments.append("-target")
 
-        @Dependency(TargetClient.self) var targetClient
-        guard let target = try? await targetClient.getTarget() else {
-            throw CompilerArgumentGenerationError.notFoundTarget
+
+        guard let sdkName = buildSettings["SDK_NAME"] else {
+            throw CompilerArgumentGenerationError.notFoundSDKName
         }
-        arguments.append(target)
+        guard let sdkVersion = buildSettings["SDK_VERSION"] else {
+            throw CompilerArgumentGenerationError.notFoundSDKVersion
+        }
+        if sdkName.hasPrefix("iphoneos") {
+            arguments.append("arm64-apple-ios\(sdkVersion)")
+        } else if sdkName.hasPrefix("macosx") {
+            arguments.append("arm64-apple-macos\(sdkVersion)")
+        } else {
+            throw CompilerArgumentGenerationError.unexpectedSDK
+        }
+
         arguments.append("-g")
         arguments.append("-module-cache-path")
         arguments.append(moduleCachePath)
@@ -383,6 +393,9 @@ public enum CompilerArgumentGenerationError: Error {
     case notFoundBuildDirectory
     case notFoundSDK
     case notFoundTarget
+    case notFoundSDKName
+    case notFoundSDKVersion
+    case unexpectedSDK
     case notFoundSwiftVersion
     case notFoundTestLibraryPath
     case notFoundTestFrameworkPath

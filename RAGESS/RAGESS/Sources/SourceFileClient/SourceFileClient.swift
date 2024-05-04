@@ -74,8 +74,8 @@ extension SourceFileClient: DependencyKey {
 
             return Directory(
                 path: rootPath,
-                subDirectories: subDirectories,
-                files: files,
+                subDirectories: subDirectories.sorted { $0.name < $1.name },
+                files: files.sorted { $0.name < $1.name },
                 xcodeprojPaths: xcodeprojPaths,
                 packageSwiftPath: packageSwiftPath
 //                descriptionJSONString: descriptionJSONString

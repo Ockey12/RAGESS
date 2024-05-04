@@ -24,14 +24,29 @@ extension CommandClient: DependencyKey {
             let process = Process()
             process.launchPath = launchPath
             process.arguments = arguments
+
+            #if DEBUG
+                var debugText = launchPath
+                debugText += arguments.joined(separator: " ")
+                print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
+                print("CommandClient.execute()")
+                print(debugText)
+            #endif
+
             if let currentDirectory {
                 process.currentDirectoryPath = currentDirectory
+                #if DEBUG
+                    print("IN: \(currentDirectory)")
+                #endif
             }
 
             let pipe = Pipe()
             process.standardOutput = pipe
 
             try process.run()
+            #if DEBUG
+                let startTime = CFAbsoluteTimeGetCurrent()
+            #endif
 
             guard let response = try pipe.fileHandleForReading.readToEnd() else {
                 throw CommandClientError.cannotReadResponse
@@ -40,6 +55,14 @@ extension CommandClient: DependencyKey {
             guard let responseString = String(data: response, encoding: .utf8) else {
                 throw CommandClientError.cannotConvertResponseToString
             }
+
+            #if DEBUG
+                print("RESPONSE")
+                print(responseString)
+                let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
+                print("TIME ELAPSED: \(timeElapsed)")
+                print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=\n")
+            #endif
 
             return responseString
         }

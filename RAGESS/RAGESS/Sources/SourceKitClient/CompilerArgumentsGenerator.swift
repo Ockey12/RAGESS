@@ -81,7 +81,6 @@ public struct CompilerArgumentsGenerator {
         arguments.append(sdkPath)
         arguments.append("-target")
 
-
         guard let sdkName = buildSettings["SDK_NAME"] else {
             throw CompilerArgumentGenerationError.notFoundSDKName
         }

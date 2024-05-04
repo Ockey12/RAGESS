@@ -42,6 +42,13 @@ let package = Package(
             ]
         ),
         .target(
+            name: "CommandClient",
+            dependencies: [
+                .product(name: "Dependencies", package: "swift-dependencies"),
+                .product(name: "DependenciesMacros", package: "swift-dependencies")
+            ]
+        ),
+        .target(
             name: "DebugView",
             dependencies: [
                 "BuildSettingsClient",

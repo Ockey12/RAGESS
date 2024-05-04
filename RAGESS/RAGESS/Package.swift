@@ -37,6 +37,7 @@ let package = Package(
         .target(
             name: "BuildSettingsClient",
             dependencies: [
+                "CommandClient",
                 .product(name: "Dependencies", package: "swift-dependencies"),
                 .product(name: "DependenciesMacros", package: "swift-dependencies")
             ]

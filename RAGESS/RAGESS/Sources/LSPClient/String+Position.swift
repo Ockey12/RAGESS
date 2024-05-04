@@ -10,22 +10,7 @@ import LanguageServerProtocol
 
 public extension String {
     var lengthInEditor: Int {
-        let utf8View = utf8
-        var length = 0
-        var i = utf8View.startIndex
-        while i < utf8View.endIndex {
-            let codeUnit = utf8View[i]
-            if codeUnit & 0xC0 == 0x80 {
-                i = utf8View.index(after: i)
-            } else if codeUnit & 0xF0 == 0xF0 {
-                length += 2
-                i = utf8View.index(i, offsetBy: 3, limitedBy: utf8View.endIndex) ?? utf8View.endIndex
-            } else {
-                length += 1
-                i = utf8View.index(after: i)
-            }
-        }
-        return length
+        utf16.count
     }
 
     var lastPosition: Position {

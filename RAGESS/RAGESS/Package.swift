@@ -27,15 +27,38 @@ let package = Package(
         .package(
             url: "https://github.com/pointfreeco/swift-dependencies",
             .upToNextMinor(from: "1.2.2")
+        ),
+        .package(
+            url: "https://github.com/jpsim/SourceKitten.git",
+            .upToNextMinor(from: "0.34.1")
         )
     ],
     targets: [
         .target(
+            name: "BuildSettingsClient",
+            dependencies: [
+                "CommandClient",
+                .product(name: "Dependencies", package: "swift-dependencies"),
+                .product(name: "DependenciesMacros", package: "swift-dependencies")
+            ]
+        ),
+        .target(
+            name: "CommandClient",
+            dependencies: [
+                .product(name: "Dependencies", package: "swift-dependencies"),
+                .product(name: "DependenciesMacros", package: "swift-dependencies")
+            ]
+        ),
+        .target(
             name: "DebugView",
             dependencies: [
+                "BuildSettingsClient",
+                "DumpPackageClient",
                 "LSPClient",
                 "SourceFileClient",
+                "SourceKitClient",
                 "TypeAnnotationClient",
+                "XcodeObject",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ]
         ),
@@ -53,9 +76,19 @@ let package = Package(
             ]
         ),
         .target(
+            name: "DumpPackageClient",
+            dependencies: [
+                "CommandClient",
+                "XcodeObject",
+                .product(name: "Dependencies", package: "swift-dependencies"),
+                .product(name: "DependenciesMacros", package: "swift-dependencies")
+            ]
+        ),
+        .target(
             name: "LSPClient",
             dependencies: [
                 "SourceFileClient",
+                "XcodeObject",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "Dependencies", package: "swift-dependencies"),
                 .product(name: "DependenciesMacros", package: "swift-dependencies"),
@@ -65,8 +98,20 @@ let package = Package(
         .target(
             name: "SourceFileClient",
             dependencies: [
+                "XcodeObject",
                 .product(name: "Dependencies", package: "swift-dependencies"),
                 .product(name: "DependenciesMacros", package: "swift-dependencies")
+            ]
+        ),
+        .target(
+            name: "SourceKitClient",
+            dependencies: [
+                "LSPClient",
+                "XcodeObject",
+                .product(name: "Dependencies", package: "swift-dependencies"),
+                .product(name: "DependenciesMacros", package: "swift-dependencies"),
+                .product(name: "LSPBindings", package: "sourcekit-lsp"),
+                .product(name: "SourceKittenFramework", package: "SourceKitten")
             ]
         ),
         .target(
@@ -74,16 +119,29 @@ let package = Package(
             dependencies: [
                 "LSPClient",
                 "SourceFileClient",
+                "XcodeObject",
                 .product(name: "Dependencies", package: "swift-dependencies"),
                 .product(name: "DependenciesMacros", package: "swift-dependencies"),
                 .product(name: "LSPBindings", package: "sourcekit-lsp")
             ]
         ),
+        .target(name: "XcodeObject"),
         .testTarget(
             name: "LSPClientTests",
             dependencies: [
                 "LSPClient",
                 .product(name: "LSPBindings", package: "sourcekit-lsp")
+            ]
+        ),
+        .testTarget(
+            name: "SourceKitClientTests",
+            dependencies: [
+                "LSPClient",
+                "SourceKitClient",
+                .product(name: "Dependencies", package: "swift-dependencies"),
+                .product(name: "DependenciesMacros", package: "swift-dependencies"),
+                .product(name: "LSPBindings", package: "sourcekit-lsp"),
+                .product(name: "SourceKittenFramework", package: "SourceKitten")
             ]
         ),
         .testTarget(

@@ -25,6 +25,13 @@
         "identifier" : "LSPClientTests",
         "name" : "LSPClientTests"
       }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:RAGESS",
+        "identifier" : "SourceKitClientTests",
+        "name" : "SourceKitClientTests"
+      }
     }
   ],
   "version" : 1

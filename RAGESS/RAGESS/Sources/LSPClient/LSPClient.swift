@@ -11,6 +11,7 @@ import Foundation
 import LanguageServerProtocol
 import LanguageServerProtocolJSONRPC
 import SourceFileClient
+import XcodeObject
 
 @DependencyClient
 public struct LSPClient {

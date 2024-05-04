@@ -13,6 +13,10 @@ public struct SourceFile: Identifiable {
     }
 
     public var path: String
+    public var name: String {
+        NSString(string: path).lastPathComponent
+    }
+
     public var content: String
 
     public init(path: String, content: String) {

@@ -23,13 +23,14 @@ struct RAGESSApp: App {
                             column: 0
                         ),
                         sourceFileClient: .init(
-                            rootPathString: "",
-                            sourceFiles: []
+                            rootPath: "",
+                            buildSettings: [:]
                         ),
                         typeAnnotationClient: .init(
                             sourceFile: .init(path: "", content: ""),
                             typeAnnotatedCode: ""
-                        )
+                        ),
+                        kittenClient: .init(filePath: "")
                     ),
                     reducer: {
                         DebugReducer()

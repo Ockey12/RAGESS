@@ -6,26 +6,12 @@
 //
 
 import SwiftSyntax
-
-//final class TokenVisitor: SyntaxVisitor {
-//    private let locationConverter: SourceLocationConverter
-//
-//    init(locatonConverter: SourceLocationConverter) {
-//        self.locationConverter = locatonConverter
-//        super.init(viewMode: .fixedUp)
-//    }
-//
-//    override func visit(_ token: TokenSyntax) -> SyntaxVisitorContinueKind {
-//        return .visitChildren
-//    }
-//
-//    override func visit(_ node: StructDeclSyntax) -> SyntaxVisitorContinueKind {
-//        print("SourceRange: \(node.sourceRange(converter: self.locationConverter))")
-//        return .visitChildren
-//    }
-//}
+import DeclarationType
+import LanguageServerProtocol
 
 final class TokenVisitor: SyntaxRewriter {
+    private var declarationTypes: [DeclarationType] = []
+
     private let locationConverter: SourceLocationConverter
 
     init(locatonConverter: SourceLocationConverter) {
@@ -38,10 +24,28 @@ final class TokenVisitor: SyntaxRewriter {
     }
 
     override func visit(_ node: StructDeclSyntax) -> DeclSyntax {
-
         print("VISIT: StructDeclSyntax(\(node.name.text))")
         print("SourceRange:")
-        dump(node.sourceRange(converter: self.locationConverter))
+
+        let sourceRange = node.sourceRange(converter: self.locationConverter)
+        dump(sourceRange)
+        print("")
+
+        self.declarationTypes.append(
+            DeclarationType(
+                name: node.name.text,
+                type: .struct,
+                fullPath: "",
+                sourceCode: "",
+                sourceRange: Position(line: sourceRange.start.line, utf16index: sourceRange.start.column) ... Position(line: sourceRange.end.line, utf16index: sourceRange.end.column),
+                dependsOn: [],
+                dependsBy: []
+            )
+        )
         return DeclSyntax(node)
+    }
+
+    func getDeclarationTypes() -> [DeclarationType] {
+        self.declarationTypes
     }
 }

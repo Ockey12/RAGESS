@@ -20,7 +20,6 @@ public struct TypeDeclarationExtractor {
             print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
             print("PATH: \(sourceFile.path)")
             print(parsedFile.debugDescription)
-            print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=\n")
         #endif
 
         let visitor = TokenVisitor(
@@ -32,6 +31,14 @@ public struct TypeDeclarationExtractor {
 
         _ = visitor.rewrite(Syntax(parsedFile))
 
-        return []
+        #if DEBUG
+        print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=\n")
+        #endif
+
+        return visitor.getDeclarationTypes().map { type in
+            var declarationType = type
+            declarationType.fullPath = sourceFile.path
+            return declarationType
+        }
     }
 }

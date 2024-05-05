@@ -6,6 +6,7 @@
 //
 
 import ComposableArchitecture
+import DeclarationType
 import SwiftUI
 import TypeDeclarationExtractor
 import XcodeObject
@@ -30,9 +31,14 @@ public struct TypeDeclarationExtractorDebugger {
             switch action {
             case .extractTapped:
                 let extractor = TypeDeclarationExtractor()
+                var declarationTypes: [DeclarationType] = []
                 for sourceFile in getAllSourceFiles(in: state.directory) {
-                    _ = extractor.extract(from: sourceFile)
+                    declarationTypes.append(contentsOf: extractor.extract(from: sourceFile))
                 }
+                print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
+                print("TypeDeclarationExtractorDebugger.Action.extractTapped")
+                dump(declarationTypes)
+                print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=\n")
                 return .none
             }
         }

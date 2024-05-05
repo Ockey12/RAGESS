@@ -24,12 +24,11 @@ final class TokenVisitor: SyntaxRewriter {
     }
 
     override func visit(_ node: StructDeclSyntax) -> DeclSyntax {
-        print("VISIT: StructDeclSyntax(\(node.name.text))")
+        print("\nVISIT: StructDeclSyntax(\(node.name.text))")
         print("SourceRange:")
 
         let sourceRange = node.sourceRange(converter: self.locationConverter)
         dump(sourceRange)
-        print("")
 
         self.declarationTypes.append(
             DeclarationType(
@@ -37,7 +36,15 @@ final class TokenVisitor: SyntaxRewriter {
                 type: .struct,
                 fullPath: "",
                 sourceCode: "",
-                sourceRange: Position(line: sourceRange.start.line, utf16index: sourceRange.start.column) ... Position(line: sourceRange.end.line, utf16index: sourceRange.end.column),
+                sourceRange: 
+                    Position(
+                        line: sourceRange.start.line,
+                        utf16index: sourceRange.start.column
+                    )
+                    ... Position(
+                        line: sourceRange.end.line,
+                        utf16index: sourceRange.end.column
+                    ),
                 dependsOn: [],
                 dependsBy: []
             )

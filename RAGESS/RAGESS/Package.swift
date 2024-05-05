@@ -58,6 +58,7 @@ let package = Package(
                 "SourceFileClient",
                 "SourceKitClient",
                 "TypeAnnotationClient",
+                "TypeDeclarationExtractor",
                 "XcodeObject",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ]

@@ -10,6 +10,8 @@ import SwiftParser
 import XcodeObject
 
 public struct TypeDeclarationExtractor {
+    public init() {}
+
     public func extract(from sourceFile: SourceFile) -> [DeclarationType] {
         let parsedFile = Parser.parse(source: sourceFile.content)
 

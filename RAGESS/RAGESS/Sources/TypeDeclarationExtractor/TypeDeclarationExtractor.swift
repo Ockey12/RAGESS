@@ -16,10 +16,10 @@ public struct TypeDeclarationExtractor {
         let parsedFile = Parser.parse(source: sourceFile.content)
 
         #if DEBUG
-        print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
-        print("PATH: \(sourceFile.path)")
-        print(parsedFile.debugDescription)
-        print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=\n")
+            print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
+            print("PATH: \(sourceFile.path)")
+            print(parsedFile.debugDescription)
+            print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=\n")
         #endif
 
         return []

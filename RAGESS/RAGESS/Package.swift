@@ -125,6 +125,14 @@ let package = Package(
                 .product(name: "LSPBindings", package: "sourcekit-lsp")
             ]
         ),
+        .target(
+            name: "TypeDeclarationExtractor",
+            dependencies: [
+                "DeclarationType",
+                "XcodeObject",
+                .product(name: "SwiftParser", package: "swift-syntax")
+            ]
+        ),
         .target(name: "XcodeObject"),
         .testTarget(
             name: "LSPClientTests",

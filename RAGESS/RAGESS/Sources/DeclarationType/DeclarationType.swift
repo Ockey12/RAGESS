@@ -13,6 +13,7 @@ public struct DeclarationType: Hashable {
     let fullPath: String
     let declarationStartPosition: Position
     let sourceCode: String
+    let sourceRange: Range<Position>
 
     /// A set of types that the current type depends on.
     /// For example, the current type uses another type as a property, parameter, or return type.

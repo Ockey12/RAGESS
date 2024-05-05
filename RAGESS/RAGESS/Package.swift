@@ -131,7 +131,8 @@ let package = Package(
             dependencies: [
                 "DeclarationType",
                 "XcodeObject",
-                .product(name: "SwiftParser", package: "swift-syntax")
+                .product(name: "SwiftParser", package: "swift-syntax"),
+                .product(name: "SwiftSyntax", package: "swift-syntax")
             ]
         ),
         .target(name: "XcodeObject"),

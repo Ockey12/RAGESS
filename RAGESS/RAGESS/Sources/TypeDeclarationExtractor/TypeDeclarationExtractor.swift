@@ -7,6 +7,7 @@
 
 import DeclarationType
 import SwiftParser
+import SwiftSyntax
 import XcodeObject
 
 public struct TypeDeclarationExtractor {
@@ -21,6 +22,15 @@ public struct TypeDeclarationExtractor {
             print(parsedFile.debugDescription)
             print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=\n")
         #endif
+
+        let visitor = TokenVisitor(
+            locatonConverter: SourceLocationConverter(
+                fileName: sourceFile.path,
+                tree: parsedFile
+            )
+        )
+
+        _ = visitor.rewrite(Syntax(parsedFile))
 
         return []
     }

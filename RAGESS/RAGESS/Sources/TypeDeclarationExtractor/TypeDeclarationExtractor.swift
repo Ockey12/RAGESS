@@ -31,7 +31,7 @@ public struct TypeDeclarationExtractor {
         visitor.walk(Syntax(parsedFile))
 
         #if DEBUG
-        print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=\n")
+            print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=\n")
         #endif
 
         return visitor.getDeclarationTypes().map { type in

@@ -6,7 +6,7 @@
 //
 
 public enum AccessLevel {
-    case `open`
+    case open
     case `public`
     case `internal`
     case `fileprivate`

@@ -36,16 +36,6 @@ public struct TypeDeclarationExtractor {
         #endif
 
         var result: [any TypeDeclaration] = []
-//        result.append(contentsOf: visitor.getStructDeclarations().map { type in
-//            var declarationType = type
-//            declarationType.fullPath = sourceFile.path
-//            return declarationType
-//        })
-//        result.append(contentsOf: visitor.getClassDeclarations().map { type in
-//            var declarationType = type
-//            declarationType.fullPath = sourceFile.path
-//            return declarationType
-//        })
         result.append(contentsOf: visitor.getStructDeclarations())
         result.append(contentsOf: visitor.getClassDeclarations())
 

@@ -7,36 +7,36 @@
 
 import LanguageServerProtocol
 
-public struct DeclarationType: Hashable {
-    public let name: String
-    public let type: Type
-    public var fullPath: String
-    public let sourceCode: String
-    public let sourceRange: ClosedRange<Position>
+public protocol DeclarationType: Hashable {
+    var name: String { get }
+    var type: Type { get }
+    var fullPath: String { get }
+    var sourceCode: String { get }
+    var sourceRange: ClosedRange<Position> { get }
 
     /// A set of types that the current type depends on.
     /// For example, the current type uses another type as a property, parameter, or return type.
-    var dependsOn: Set<Self>
+    var dependsOn: Set<Self> { get }
 
     /// A set of types that depend on the current type.
     /// For example, another type uses the current type as a property, parameter, or return type.
-    var dependsBy: Set<Self>
+    var dependsBy: Set<Self> { get }
 
-    public init(
-        name: String,
-        type: Type,
-        fullPath: String,
-        sourceCode: String,
-        sourceRange: ClosedRange<Position>,
-        dependsOn: Set<Self>,
-        dependsBy: Set<Self>
-    ) {
-        self.name = name
-        self.type = type
-        self.fullPath = fullPath
-        self.sourceCode = sourceCode
-        self.sourceRange = sourceRange
-        self.dependsOn = dependsOn
-        self.dependsBy = dependsBy
-    }
+//    public init(
+//        name: String,
+//        type: Type,
+//        fullPath: String,
+//        sourceCode: String,
+//        sourceRange: ClosedRange<Position>,
+//        dependsOn: Set<Self>,
+//        dependsBy: Set<Self>
+//    ) {
+//        self.name = name
+//        self.type = type
+//        self.fullPath = fullPath
+//        self.sourceCode = sourceCode
+//        self.sourceRange = sourceRange
+//        self.dependsOn = dependsOn
+//        self.dependsBy = dependsBy
+//    }
 }

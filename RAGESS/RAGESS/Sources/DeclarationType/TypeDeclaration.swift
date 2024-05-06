@@ -7,7 +7,7 @@
 
 import LanguageServerProtocol
 
-public protocol DeclarationType: Hashable {
+public protocol TypeDeclaration: Hashable {
     var name: String { get }
     var type: Type { get }
     var fullPath: String { get }

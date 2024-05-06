@@ -1,13 +1,13 @@
 //
-//  StructObject.swift
+//  ClassObject.swift
 //
 //
-//  Created by ockey12 on 2024/05/06.
+//  Created by ockey12 on 2024/05/07.
 //
 
 import LanguageServerProtocol
 
-public struct StructObject: TypeDeclaration {
+public struct ClassObject: TypeDeclaration {
     public let name: String
     public var fullPath: String
     public let sourceCode: String

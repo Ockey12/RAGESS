@@ -22,15 +22,6 @@ public struct TypeDeclarationExtractor {
             print(parsedFile.debugDescription)
         #endif
 
-//        let rewriter = Rewriter(
-//            locatonConverter: SourceLocationConverter(
-//                fileName: sourceFile.path,
-//                tree: parsedFile
-//            )
-//        )
-//
-//        _ = rewriter.rewrite(Syntax(parsedFile))
-
         let visitor = TypeDeclVisitor(
             locatonConverter: SourceLocationConverter(
                 fileName: sourceFile.path,

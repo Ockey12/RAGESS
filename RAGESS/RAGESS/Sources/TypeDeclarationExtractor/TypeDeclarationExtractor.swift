@@ -38,6 +38,7 @@ public struct TypeDeclarationExtractor {
         var result: [any TypeDeclaration] = []
         result.append(contentsOf: visitor.getStructDeclarations())
         result.append(contentsOf: visitor.getClassDeclarations())
+        result.append(contentsOf: visitor.getEnumDeclarations())
 
         return result
     }

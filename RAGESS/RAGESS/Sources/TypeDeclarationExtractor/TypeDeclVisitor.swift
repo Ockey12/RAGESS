@@ -13,6 +13,7 @@ final class TypeDeclVisitor: SyntaxVisitor {
     let fullPath: String
     private var structDeclarations: [StructObject] = []
     private var classDeclarations: [ClassObject] = []
+    private var enumDeclarations: [EnumObject] = []
     private var buffer: [any TypeDeclaration] = []
 
     private let locationConverter: SourceLocationConverter
@@ -166,6 +167,77 @@ final class TypeDeclVisitor: SyntaxVisitor {
 
     func getClassDeclarations() -> [ClassObject] {
         classDeclarations
+    }
+
+    // MARK: EnumDeclSyntax
+
+    override func visit(_ node: EnumDeclSyntax) -> SyntaxVisitorContinueKind {
+        #if DEBUG
+            print("\nvisit(EnumDeclSyntax(\(node.name.text)))")
+        #endif
+        let sourceRange = node.sourceRange(converter: locationConverter)
+
+        let currentEnum = EnumObject(
+            name: node.name.text,
+            fullPath: fullPath,
+            sourceRange: Position(
+                line: sourceRange.start.line,
+                utf16index: sourceRange.start.column
+            )
+                ... Position(
+                    line: sourceRange.end.line,
+                    utf16index: sourceRange.end.column
+                )
+        )
+
+        appendToBuffer(currentEnum)
+        return .visitChildren
+    }
+
+    override func visitPost(_ node: EnumDeclSyntax) {
+        #if DEBUG
+            print("\nvisitPost(EnumDeclSyntax(\(node.name.text)))")
+        #endif
+
+        guard !buffer.isEmpty else {
+            fatalError("The buffer is empty.")
+        }
+
+        #if DEBUG
+            print("buffer.popLast()")
+            print("- \(buffer.map { $0.name })")
+        #endif
+
+        guard let lastItem = buffer.popLast(),
+              let currentEnum = lastItem as? EnumObject else {
+            fatalError("The type of the last element of buffer is not a \(EnumObject.self).")
+        }
+
+        #if DEBUG
+            print("+ \(buffer.map { $0.name })")
+        #endif
+
+        if buffer.count >= 1 {
+            // If there is an element in the buffer, the last element in the buffer is the parent of this.
+            let lastIndex = buffer.endIndex - 1
+            #if DEBUG
+                print("buffer[\(lastIndex)].nestingEnums.append(\(currentEnum.name))")
+            #endif
+            buffer[lastIndex].nestingEnums.append(currentEnum)
+        } else {
+            #if DEBUG
+                print("classDeclarations.append(\(currentEnum.name))")
+                print("- \(enumDeclarations.map { $0.name })")
+            #endif
+            enumDeclarations.append(currentEnum)
+            #if DEBUG
+                print("+ \(enumDeclarations.map { $0.name })")
+            #endif
+        }
+    }
+
+    func getEnumDeclarations() -> [EnumObject] {
+        enumDeclarations
     }
 }
 

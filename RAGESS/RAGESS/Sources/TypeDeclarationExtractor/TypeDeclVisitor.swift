@@ -21,7 +21,9 @@ final class TypeDeclVisitor: SyntaxVisitor {
     }
 
     override func visit(_ node: StructDeclSyntax) -> SyntaxVisitorContinueKind {
-        print("\nVISIT: StructDeclSyntax(\(node.name.text))")
+        #if DEBUG
+            print("\nvisit(StructDeclSyntax(\(node.name.text)))")
+        #endif
         let sourceRange = node.sourceRange(converter: locationConverter)
 
         let currentStruct = StructObject(
@@ -40,33 +42,59 @@ final class TypeDeclVisitor: SyntaxVisitor {
                 )
         )
 
+        #if DEBUG
+            print("buffer.append(\(node.name.text))")
+            print("- \(buffer.map { $0.name })")
+        #endif
+
         buffer.append(currentStruct)
+
+        #if DEBUG
+            print("+ \(buffer.map { $0.name })")
+        #endif
 
         return .visitChildren
     }
 
     override func visitPost(_ node: StructDeclSyntax) {
-        print("VISIT POST: StructDeclSyntax(\(node.name.text))")
+        #if DEBUG
+            print("\nvisitPost(StructDeclSyntax(\(node.name.text)))")
+        #endif
 
         guard !buffer.isEmpty else {
             fatalError("The buffer is empty.")
         }
+
+        #if DEBUG
+            print("buffer.popLast()")
+            print("- \(buffer.map { $0.name })")
+        #endif
 
         guard let lastItem = buffer.popLast(),
               let currentStruct = lastItem as? StructObject else {
             fatalError("The type of the last element of buffer is not a \(StructObject.self).")
         }
 
-        if 1 <= buffer.count {
+        #if DEBUG
+            print("+ \(buffer.map { $0.name })")
+        #endif
+
+        if buffer.count >= 1 {
             // If there is an element in the buffer, the last element in the buffer is the parent of this.
             let lastIndex = buffer.endIndex - 1
-            print("buffer: \(buffer.map { $0.name })")
-            print("lastIndex: \(lastIndex)")
+            #if DEBUG
+                print("buffer[\(lastIndex)].nestingStructs.append(\(currentStruct.name))")
+            #endif
             buffer[lastIndex].nestingStructs.append(currentStruct)
         } else {
+            #if DEBUG
+                print("structDeclarations.append(\(currentStruct.name))")
+                print("- \(structDeclarations.map { $0.name })")
+            #endif
             structDeclarations.append(currentStruct)
-            print("structDeclarations.append(\(currentStruct.name)")
-            print("structDeclarations: \(structDeclarations.map { $0.name })")
+            #if DEBUG
+                print("+ \(structDeclarations.map { $0.name })")
+            #endif
         }
     }
 

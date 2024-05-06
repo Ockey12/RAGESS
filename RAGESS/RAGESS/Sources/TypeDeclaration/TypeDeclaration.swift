@@ -14,6 +14,8 @@ public protocol TypeDeclaration: Hashable {
     var sourceCode: String { get }
     var sourceRange: ClosedRange<Position> { get }
 
+    var nestingStructs: [StructObject] { get set }
+
     /// A set of types that the current type depends on.
     /// For example, the current type uses another type as a property, parameter, or return type.
     var dependsOn: Set<Self> { get set }

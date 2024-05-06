@@ -14,6 +14,8 @@ public struct StructObject: TypeDeclaration {
     public let sourceCode: String
     public let sourceRange: ClosedRange<Position>
 
+    public var nestingStructs: [StructObject] = []
+
     public var dependsOn: Set<StructObject> = []
     public var dependsBy: Set<StructObject> = []
 

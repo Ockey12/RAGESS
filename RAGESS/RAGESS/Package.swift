@@ -53,7 +53,7 @@ let package = Package(
             name: "DebugView",
             dependencies: [
                 "BuildSettingsClient",
-                "DeclarationType",
+                "TypeDeclaration",
                 "DumpPackageClient",
                 "LSPClient",
                 "SourceFileClient",
@@ -65,7 +65,7 @@ let package = Package(
             ]
         ),
         .target(
-            name: "DeclarationType",
+            name: "TypeDeclaration",
             dependencies: [
                 .product(name: "LSPBindings", package: "sourcekit-lsp")
             ]
@@ -130,7 +130,7 @@ let package = Package(
         .target(
             name: "TypeDeclarationExtractor",
             dependencies: [
-                "DeclarationType",
+                "TypeDeclaration",
                 "XcodeObject",
                 .product(name: "LSPBindings", package: "sourcekit-lsp"),
                 .product(name: "SwiftParser", package: "swift-syntax"),

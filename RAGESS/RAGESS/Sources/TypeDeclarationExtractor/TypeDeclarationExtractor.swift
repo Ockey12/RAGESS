@@ -5,7 +5,7 @@
 //  Created by ockey12 on 2024/05/05.
 //
 
-import DeclarationType
+import TypeDeclaration
 import SwiftParser
 import SwiftSyntax
 import XcodeObject

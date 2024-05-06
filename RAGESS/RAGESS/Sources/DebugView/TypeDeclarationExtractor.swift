@@ -31,10 +31,10 @@ public struct TypeDeclarationExtractorDebugger {
             switch action {
             case .extractTapped:
                 let extractor = TypeDeclarationExtractor()
-                var declarationTypes: [StructObject] = []
+                var declarationTypes: [any TypeDeclaration] = []
                 for sourceFile in getAllSourceFiles(in: state.directory) {
                     declarationTypes.append(
-                        contentsOf: extractor.extractStructureDeclarations(from: sourceFile)
+                        contentsOf: extractor.extractTypeDeclarations(from: sourceFile)
                     )
                 }
                 print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")

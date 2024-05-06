@@ -22,7 +22,7 @@ public struct StructObject: TypeDeclaration {
     public init(
         name: String,
         fullPath: String,
-        sourceCode: String,
+        sourceCode: String = "",
         sourceRange: ClosedRange<Position>
     ) {
         self.name = name

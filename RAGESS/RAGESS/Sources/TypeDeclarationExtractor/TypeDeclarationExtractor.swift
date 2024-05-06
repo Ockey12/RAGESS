@@ -13,7 +13,7 @@ import XcodeObject
 public struct TypeDeclarationExtractor {
     public init() {}
 
-    public func extractStructureDeclarations(from sourceFile: SourceFile) -> [StructObject] {
+    public func extractTypeDeclarations(from sourceFile: SourceFile) -> [any TypeDeclaration] {
         let parsedFile = Parser.parse(source: sourceFile.content)
 
         #if DEBUG
@@ -23,6 +23,7 @@ public struct TypeDeclarationExtractor {
         #endif
 
         let visitor = TypeDeclVisitor(
+            in: sourceFile.path,
             locatonConverter: SourceLocationConverter(
                 fileName: sourceFile.path,
                 tree: parsedFile
@@ -34,10 +35,20 @@ public struct TypeDeclarationExtractor {
             print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=\n")
         #endif
 
-        return visitor.getStructDeclarations().map { type in
-            var declarationType = type
-            declarationType.fullPath = sourceFile.path
-            return declarationType
-        }
+        var result: [any TypeDeclaration] = []
+//        result.append(contentsOf: visitor.getStructDeclarations().map { type in
+//            var declarationType = type
+//            declarationType.fullPath = sourceFile.path
+//            return declarationType
+//        })
+//        result.append(contentsOf: visitor.getClassDeclarations().map { type in
+//            var declarationType = type
+//            declarationType.fullPath = sourceFile.path
+//            return declarationType
+//        })
+        result.append(contentsOf: visitor.getStructDeclarations())
+        result.append(contentsOf: visitor.getClassDeclarations())
+
+        return result
     }
 }

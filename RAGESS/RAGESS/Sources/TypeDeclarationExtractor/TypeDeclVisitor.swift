@@ -28,7 +28,6 @@ final class TypeDeclVisitor: SyntaxVisitor {
 
         let currentStruct = StructObject(
             name: node.name.text,
-            type: .struct,
             fullPath: "",
             sourceCode: "",
             sourceRange:

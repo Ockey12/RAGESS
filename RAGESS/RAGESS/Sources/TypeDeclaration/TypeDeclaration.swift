@@ -9,7 +9,6 @@ import LanguageServerProtocol
 
 public protocol TypeDeclaration: Hashable {
     var name: String { get }
-    var type: Type { get }
     var fullPath: String { get set }
     var sourceCode: String { get }
     var sourceRange: ClosedRange<Position> { get }

@@ -41,16 +41,7 @@ final class TypeDeclVisitor: SyntaxVisitor {
                 )
         )
 
-        #if DEBUG
-            print("buffer.append(\(node.name.text))")
-            print("- \(buffer.map { $0.name })")
-        #endif
-
-        buffer.append(currentStruct)
-
-        #if DEBUG
-            print("+ \(buffer.map { $0.name })")
-        #endif
+        appendToBuffer(currentStruct)
 
         return .visitChildren
     }
@@ -99,6 +90,21 @@ final class TypeDeclVisitor: SyntaxVisitor {
 
     func getStructDeclarations() -> [StructObject] {
         structDeclarations
+    }
+}
+
+extension TypeDeclVisitor {
+    private func appendToBuffer(_ typeObject: any TypeDeclaration) {
+        #if DEBUG
+            print("buffer.append(\(typeObject.name))")
+            print("- \(buffer.map { $0.name })")
+        #endif
+
+        buffer.append(typeObject)
+
+        #if DEBUG
+            print("+ \(buffer.map { $0.name })")
+        #endif
     }
 }
 

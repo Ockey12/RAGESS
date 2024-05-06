@@ -1,13 +1,13 @@
 //
-//  StructObject.swift
+//  EnumObject.swift
 //
 //
-//  Created by ockey12 on 2024/05/06.
+//  Created by ockey12 on 2024/05/07.
 //
 
 import LanguageServerProtocol
 
-public struct StructObject: TypeDeclaration {
+public struct EnumObject: TypeDeclaration {
     public let name: String
     public var fullPath: String
     public let sourceCode: String

@@ -15,6 +15,7 @@ public struct ClassObject: TypeDeclaration {
 
     public var nestingStructs: [StructObject] = []
     public var nestingClasses: [ClassObject] = []
+    public var nestingEnums: [EnumObject] = []
 
     public var dependsOn: [any TypeDeclaration] = []
     public var dependsBy: [any TypeDeclaration] = []

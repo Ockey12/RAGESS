@@ -13,7 +13,7 @@ import XcodeObject
 public struct TypeDeclarationExtractor {
     public init() {}
 
-    public func extract(from sourceFile: SourceFile) -> [DeclarationType] {
+    public func extractStructureDeclarations(from sourceFile: SourceFile) -> [StructObject] {
         let parsedFile = Parser.parse(source: sourceFile.content)
 
         #if DEBUG
@@ -34,7 +34,7 @@ public struct TypeDeclarationExtractor {
             print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=\n")
         #endif
 
-        return visitor.getDeclarationTypes().map { type in
+        return visitor.getStructDeclarations().map { type in
             var declarationType = type
             declarationType.fullPath = sourceFile.path
             return declarationType

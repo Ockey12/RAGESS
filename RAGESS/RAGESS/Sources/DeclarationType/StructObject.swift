@@ -10,7 +10,7 @@ import LanguageServerProtocol
 public struct StructObject: TypeDeclaration {
     public let name: String
     public let type: Type
-    public let fullPath: String
+    public var fullPath: String
     public let sourceCode: String
     public let sourceRange: ClosedRange<Position>
 

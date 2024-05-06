@@ -10,7 +10,7 @@ import LanguageServerProtocol
 import SwiftSyntax
 
 final class TypeDeclVisitor: SyntaxVisitor {
-    private var declarationTypes: [DeclarationType] = []
+    private var structDeclarations: [StructObject] = []
 
     private let locationConverter: SourceLocationConverter
 
@@ -30,8 +30,8 @@ final class TypeDeclVisitor: SyntaxVisitor {
         let members = node.memberBlock.members
         dump(members)
 
-        declarationTypes.append(
-            DeclarationType(
+        structDeclarations.append(
+            StructObject(
                 name: node.name.text,
                 type: .struct,
                 fullPath: "",
@@ -44,16 +44,14 @@ final class TypeDeclVisitor: SyntaxVisitor {
                     ... Position(
                         line: sourceRange.end.line,
                         utf16index: sourceRange.end.column
-                    ),
-                dependsOn: [],
-                dependsBy: []
+                    )
             )
         )
 
         return .visitChildren
     }
 
-    func getDeclarationTypes() -> [DeclarationType] {
-        declarationTypes
+    func getStructDeclarations() -> [StructObject] {
+        structDeclarations
     }
 }

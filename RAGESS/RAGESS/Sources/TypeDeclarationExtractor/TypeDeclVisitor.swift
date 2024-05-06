@@ -5,9 +5,9 @@
 //  Created by ockey12 on 2024/05/05.
 //
 
-import TypeDeclaration
 import LanguageServerProtocol
 import SwiftSyntax
+import TypeDeclaration
 
 final class TypeDeclVisitor: SyntaxVisitor {
     private var structDeclarations: [StructObject] = []

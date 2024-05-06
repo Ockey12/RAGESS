@@ -5,9 +5,9 @@
 //  Created by ockey12 on 2024/05/05.
 //
 
-import TypeDeclaration
 import SwiftParser
 import SwiftSyntax
+import TypeDeclaration
 import XcodeObject
 
 public struct TypeDeclarationExtractor {

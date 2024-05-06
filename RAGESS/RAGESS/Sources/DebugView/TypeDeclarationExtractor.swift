@@ -6,8 +6,8 @@
 //
 
 import ComposableArchitecture
-import TypeDeclaration
 import SwiftUI
+import TypeDeclaration
 import TypeDeclarationExtractor
 import XcodeObject
 

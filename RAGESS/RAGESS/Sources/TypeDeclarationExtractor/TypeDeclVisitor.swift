@@ -14,6 +14,7 @@ final class TypeDeclVisitor: SyntaxVisitor {
     private var structDeclarations: [StructObject] = []
     private var classDeclarations: [ClassObject] = []
     private var enumDeclarations: [EnumObject] = []
+    private var functionDeclarations: [FunctionObject] = []
     private var buffer: [any TypeDeclaration] = []
 
     private let locationConverter: SourceLocationConverter
@@ -238,6 +239,30 @@ final class TypeDeclVisitor: SyntaxVisitor {
 
     func getEnumDeclarations() -> [EnumObject] {
         enumDeclarations
+    }
+
+    // MARK: FunctionDeclSyntax
+
+    override func visit(_ node: FunctionDeclSyntax) -> SyntaxVisitorContinueKind {
+        #if DEBUG
+            print("\nvisit(FunctionDeclSyntax(\(node.name.text)))")
+        #endif
+        let sourceRange = node.sourceRange(converter: locationConverter)
+
+        let currentFunction = FunctionObject(
+            name: node.name.text,
+            fullPath: fullPath,
+            sourceRange: Position(
+                line: sourceRange.start.line,
+                utf16index: sourceRange.start.column
+            )
+                ... Position(
+                    line: sourceRange.end.line,
+                    utf16index: sourceRange.end.column
+                )
+        )
+
+        return .visitChildren
     }
 }
 

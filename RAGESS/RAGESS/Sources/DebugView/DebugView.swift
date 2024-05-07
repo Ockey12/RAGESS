@@ -19,6 +19,7 @@ public struct DebugReducer {
         var sourceFileClient: SourceFileClientDebugger.State
         var typeAnnotationClient: TypeAnnotationDebugger.State
         var kittenClient: SourceKitClientDebugger.State
+        var typeDeclarationExtractor: TypeDeclarationExtractorDebugger.State
 
         var buildSettingsLoading = false
         var dumpPackageSwiftLoading = false
@@ -27,12 +28,14 @@ public struct DebugReducer {
             lspClient: LSPClientDebugger.State,
             sourceFileClient: SourceFileClientDebugger.State,
             typeAnnotationClient: TypeAnnotationDebugger.State,
-            kittenClient: SourceKitClientDebugger.State
+            kittenClient: SourceKitClientDebugger.State,
+            typeDeclarationExtractor: TypeDeclarationExtractorDebugger.State
         ) {
             self.lspClient = lspClient
             self.sourceFileClient = sourceFileClient
             self.typeAnnotationClient = typeAnnotationClient
             self.kittenClient = kittenClient
+            self.typeDeclarationExtractor = typeDeclarationExtractor
         }
     }
 
@@ -41,6 +44,7 @@ public struct DebugReducer {
         case sourceFileClient(SourceFileClientDebugger.Action)
         case typeAnnotationClient(TypeAnnotationDebugger.Action)
         case kittenClient(SourceKitClientDebugger.Action)
+        case typeDeclarationExtractor(TypeDeclarationExtractorDebugger.Action)
     }
 
     public var body: some ReducerOf<Self> {
@@ -56,6 +60,9 @@ public struct DebugReducer {
         Scope(state: \.kittenClient, action: \.kittenClient) {
             SourceKitClientDebugger()
         }
+        Scope(state: \.typeDeclarationExtractor, action: \.typeDeclarationExtractor) {
+            TypeDeclarationExtractorDebugger()
+        }
         Reduce { state, action in
             switch action {
             case .lspClient:
@@ -67,6 +74,7 @@ public struct DebugReducer {
 
             case let .sourceFileClient(.sourceFileResponse(.success(directory))):
                 state.kittenClient.allFilePathsInProject = getAllSwiftFilePathsInProject(in: directory)
+                state.typeDeclarationExtractor.directory = directory
                 state.buildSettingsLoading = true
                 return .none
 
@@ -108,6 +116,9 @@ public struct DebugReducer {
                 return .none
 
             case .typeAnnotationClient:
+                return .none
+
+            case .typeDeclarationExtractor:
                 return .none
 
             case .kittenClient:
@@ -171,6 +182,15 @@ public struct DebugView: View {
                     )
                 )
                 .tabItem { Text("SourceKitClient") }
+                .padding()
+
+                TypeDeclarationExtractorDebugView(
+                    store: store.scope(
+                        state: \.typeDeclarationExtractor,
+                        action: \.typeDeclarationExtractor
+                    )
+                )
+                .tabItem { Text("TypeDeclarationExtractor") }
                 .padding()
             }
             .frame(maxWidth: .infinity)

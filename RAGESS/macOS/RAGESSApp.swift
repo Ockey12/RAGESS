@@ -30,7 +30,14 @@ struct RAGESSApp: App {
                             sourceFile: .init(path: "", content: ""),
                             typeAnnotatedCode: ""
                         ),
-                        kittenClient: .init(filePath: "")
+                        kittenClient: .init(filePath: ""),
+                        typeDeclarationExtractor: .init(
+                            directory: .init(
+                                path: "",
+                                subDirectories: [],
+                                files: []
+                            )
+                        )
                     ),
                     reducer: {
                         DebugReducer()

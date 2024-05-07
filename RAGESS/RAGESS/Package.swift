@@ -53,17 +53,19 @@ let package = Package(
             name: "DebugView",
             dependencies: [
                 "BuildSettingsClient",
+                "TypeDeclaration",
                 "DumpPackageClient",
                 "LSPClient",
                 "SourceFileClient",
                 "SourceKitClient",
                 "TypeAnnotationClient",
+                "TypeDeclarationExtractor",
                 "XcodeObject",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ]
         ),
         .target(
-            name: "DeclarationType",
+            name: "TypeDeclaration",
             dependencies: [
                 .product(name: "LSPBindings", package: "sourcekit-lsp")
             ]
@@ -123,6 +125,16 @@ let package = Package(
                 .product(name: "Dependencies", package: "swift-dependencies"),
                 .product(name: "DependenciesMacros", package: "swift-dependencies"),
                 .product(name: "LSPBindings", package: "sourcekit-lsp")
+            ]
+        ),
+        .target(
+            name: "TypeDeclarationExtractor",
+            dependencies: [
+                "TypeDeclaration",
+                "XcodeObject",
+                .product(name: "LSPBindings", package: "sourcekit-lsp"),
+                .product(name: "SwiftParser", package: "swift-syntax"),
+                .product(name: "SwiftSyntax", package: "swift-syntax")
             ]
         ),
         .target(name: "XcodeObject"),

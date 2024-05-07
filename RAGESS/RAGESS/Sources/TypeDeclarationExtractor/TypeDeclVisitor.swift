@@ -82,7 +82,7 @@ final class TypeDeclVisitor: SyntaxVisitor {
                 fatalError("The type of the last element of buffer does not conform to \(TypeDeclaration.self).")
             }
             #if DEBUG
-                print("buffer[\(buffer.count - 1)].nestingStructs.append(\(currentStruct.name))")
+                print("buffer[\(buffer.count)].nestingStructs.append(\(currentStruct.name))")
             #endif
             ownerTypeObject.nestingStructs.append(currentStruct)
             buffer.append(ownerTypeObject)
@@ -158,7 +158,7 @@ final class TypeDeclVisitor: SyntaxVisitor {
                 fatalError("The type of the last element of buffer does not conform to \(TypeDeclaration.self).")
             }
             #if DEBUG
-            print("buffer[\(buffer.count - 1)].nestingClasses.append(\(currentClass.name))")
+                print("buffer[\(buffer.count)].nestingClasses.append(\(currentClass.name))")
             #endif
             ownerTypeObject.nestingClasses.append(currentClass)
             buffer.append(ownerTypeObject)
@@ -233,7 +233,7 @@ final class TypeDeclVisitor: SyntaxVisitor {
                 fatalError("The type of the last element of buffer does not conform to \(TypeDeclaration.self).")
             }
             #if DEBUG
-                print("buffer[\(buffer.count - 1)].nestingEnums.append(\(currentEnum.name))")
+                print("buffer[\(buffer.count)].nestingEnums.append(\(currentEnum.name))")
             #endif
             ownerTypeObject.nestingEnums.append(currentEnum)
             buffer.append(ownerTypeObject)
@@ -274,7 +274,59 @@ final class TypeDeclVisitor: SyntaxVisitor {
                 )
         )
 
+        appendToBuffer(currentFunction)
+
         return .visitChildren
+    }
+
+    override func visitPost(_ node: FunctionDeclSyntax) {
+        #if DEBUG
+            print("\nvisitPost(FunctionDeclSyntax(\(node.name.text)))")
+        #endif
+
+        guard !buffer.isEmpty else {
+            fatalError("The buffer is empty.")
+        }
+
+        #if DEBUG
+            print("buffer.popLast()")
+            print("- \(buffer.map { $0.name })")
+        #endif
+
+        guard let lastItem = buffer.popLast(),
+              let currentFunction = lastItem as? FunctionObject else {
+            fatalError("The type of the last element of buffer is not a \(FunctionObject.self).")
+        }
+
+        #if DEBUG
+            print("+ \(buffer.map { $0.name })")
+        #endif
+
+        if buffer.count >= 1 {
+            // If there is an element in the buffer, the last element in the buffer is the parent of this.
+            guard let owner = buffer.popLast(),
+                  var ownerObject = owner as? FunctionOwner else {
+                fatalError("The type of the last element of buffer does not conform to \(FunctionOwner.self).")
+            }
+            #if DEBUG
+                print("buffer[\(buffer.count)].functions.append(\(currentFunction.name))")
+            #endif
+            ownerObject.functions.append(currentFunction)
+            buffer.append(ownerObject)
+        } else {
+            #if DEBUG
+                print("functionDeclarations.append(\(currentFunction.name))")
+                print("- \(functionDeclarations.map { $0.name })")
+            #endif
+            functionDeclarations.append(currentFunction)
+            #if DEBUG
+                print("+ \(functionDeclarations.map { $0.name })")
+            #endif
+        }
+    }
+
+    func getFunctionDeclarations() -> [FunctionObject] {
+        functionDeclarations
     }
 }
 

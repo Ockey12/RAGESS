@@ -1,5 +1,5 @@
 //
-//  TypeDeclarationExtractor.swift
+//  DeclarationExtractor.swift
 //
 //
 //  Created by ockey12 on 2024/05/05.
@@ -10,10 +10,10 @@ import SwiftSyntax
 import TypeDeclaration
 import XcodeObject
 
-public struct TypeDeclarationExtractor {
+public struct DeclarationExtractor {
     public init() {}
 
-    public func extractTypeDeclarations(from sourceFile: SourceFile) -> [any TypeDeclaration] {
+    public func extractDeclarations(from sourceFile: SourceFile) -> [any DeclarationObject] {
         let parsedFile = Parser.parse(source: sourceFile.content)
 
         #if DEBUG
@@ -35,10 +35,11 @@ public struct TypeDeclarationExtractor {
             print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=\n")
         #endif
 
-        var result: [any TypeDeclaration] = []
+        var result: [any DeclarationObject] = []
         result.append(contentsOf: visitor.getStructDeclarations())
         result.append(contentsOf: visitor.getClassDeclarations())
         result.append(contentsOf: visitor.getEnumDeclarations())
+        result.append(contentsOf: visitor.getFunctionDeclarations())
 
         return result
     }

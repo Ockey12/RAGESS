@@ -1,5 +1,5 @@
 //
-//  Function.swift
+//  FunctionObject.swift
 //
 //
 //  Created by ockey12 on 2024/05/06.
@@ -7,7 +7,7 @@
 
 import LanguageServerProtocol
 
-public struct FunctionObject {
+public struct FunctionObject: DeclarationObject {
     public let name: String
     public var fullPath: String
     public let sourceCode: String

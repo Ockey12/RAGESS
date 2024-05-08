@@ -7,7 +7,7 @@
 
 import LanguageServerProtocol
 
-public struct EnumObject: TypeDeclaration, PropertyOwner, FunctionOwner {
+public struct EnumObject: TypeDeclaration {
     public let name: String
     public var fullPath: String
     public let sourceCode: String

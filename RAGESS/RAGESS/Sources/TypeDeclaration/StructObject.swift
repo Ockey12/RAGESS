@@ -7,7 +7,7 @@
 
 import LanguageServerProtocol
 
-public struct StructObject: TypeDeclaration, PropertyOwner, FunctionOwner {
+public struct StructObject: TypeDeclaration {
     public let name: String
     public var fullPath: String
     public let sourceCode: String

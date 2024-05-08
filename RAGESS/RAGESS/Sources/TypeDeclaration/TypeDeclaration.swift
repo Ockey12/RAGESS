@@ -7,12 +7,7 @@
 
 import LanguageServerProtocol
 
-public protocol TypeDeclaration {
-    var name: String { get }
-    var fullPath: String { get set }
-    var sourceCode: String { get }
-    var sourceRange: ClosedRange<Position> { get }
-
+public protocol TypeDeclaration: DeclarationObject {
     var nestingStructs: [StructObject] { get set }
     var nestingClasses: [ClassObject] { get set }
     var nestingEnums: [EnumObject] { get set }

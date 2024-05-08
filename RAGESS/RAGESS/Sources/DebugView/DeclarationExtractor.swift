@@ -1,5 +1,5 @@
 //
-//  TypeDeclarationExtractor.swift
+//  DeclarationExtractor.swift
 //
 //
 //  Created by ockey12 on 2024/05/05.
@@ -30,16 +30,16 @@ public struct TypeDeclarationExtractorDebugger {
         Reduce { state, action in
             switch action {
             case .extractTapped:
-                let extractor = TypeDeclarationExtractor()
-                var declarationTypes: [any TypeDeclaration] = []
+                let extractor = DeclarationExtractor()
+                var declarationObjects: [any DeclarationObject] = []
                 for sourceFile in getAllSourceFiles(in: state.directory) {
-                    declarationTypes.append(
-                        contentsOf: extractor.extractTypeDeclarations(from: sourceFile)
+                    declarationObjects.append(
+                        contentsOf: extractor.extractDeclarations(from: sourceFile)
                     )
                 }
                 print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
                 print("TypeDeclarationExtractorDebugger.Action.extractTapped")
-                dump(declarationTypes)
+                dump(declarationObjects)
                 print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=\n")
                 return .none
             }

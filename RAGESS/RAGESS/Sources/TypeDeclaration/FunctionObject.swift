@@ -1,26 +1,19 @@
 //
-//  ClassObject.swift
+//  FunctionObject.swift
 //
 //
-//  Created by ockey12 on 2024/05/07.
+//  Created by ockey12 on 2024/05/06.
 //
 
 import LanguageServerProtocol
 
-public struct ClassObject: TypeDeclaration, FunctionOwner {
+public struct FunctionObject: DeclarationObject, FunctionOwner {
     public let name: String
     public var fullPath: String
     public let sourceCode: String
     public let sourceRange: ClosedRange<Position>
 
     public var functions: [FunctionObject] = []
-
-    public var nestingStructs: [StructObject] = []
-    public var nestingClasses: [ClassObject] = []
-    public var nestingEnums: [EnumObject] = []
-
-    public var dependsOn: [any TypeDeclaration] = []
-    public var dependsBy: [any TypeDeclaration] = []
 
     public init(
         name: String,

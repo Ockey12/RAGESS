@@ -184,10 +184,6 @@ public struct CompilerArgumentsGenerator {
     }
 
     func getPackageName(sourceFilePath: String, buildSettings: [String: String]) -> String? {
-        if let moduleName = buildSettings["PRODUCT_MODULE_NAME"] {
-            return moduleName
-        }
-
         let fileManager = FileManager.default
         var currentDirectory = URL(fileURLWithPath: sourceFilePath).deletingLastPathComponent()
 

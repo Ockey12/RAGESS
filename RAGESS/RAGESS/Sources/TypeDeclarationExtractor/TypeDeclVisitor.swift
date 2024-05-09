@@ -253,6 +253,18 @@ final class TypeDeclVisitor: SyntaxVisitor {
         enumDeclarations
     }
 
+    //MARK:
+    override func visit(_ node: VariableDeclSyntax) -> SyntaxVisitorContinueKind {
+#if DEBUG
+        print("\nvisit(VariableDeclSyntax(\(node)))")
+        print(node.debugDescription)
+        let array = Array(node.bindings)
+        print("array[0].pattern: \(array[0].pattern)")
+        print("array[0].pattern.children(viewMode: .fixedUp): \(array[0].pattern.children(viewMode: .fixedUp))")
+#endif
+        return .visitChildren
+    }
+
     // MARK: FunctionDeclSyntax
 
     override func visit(_ node: FunctionDeclSyntax) -> SyntaxVisitorContinueKind {

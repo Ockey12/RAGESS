@@ -253,15 +253,41 @@ final class TypeDeclVisitor: SyntaxVisitor {
         enumDeclarations
     }
 
-    //MARK:
+    //MARK: VariableDeclSyntax
+
     override func visit(_ node: VariableDeclSyntax) -> SyntaxVisitorContinueKind {
 #if DEBUG
         print("\nvisit(VariableDeclSyntax(\(node)))")
-        print(node.debugDescription)
-        let array = Array(node.bindings)
-        print("array[0].pattern: \(array[0].pattern)")
-        print("array[0].pattern.children(viewMode: .fixedUp): \(array[0].pattern.children(viewMode: .fixedUp))")
 #endif
+        let array = Array(node.bindings)
+        guard !array.isEmpty else {
+            #if DEBUG
+                print("The contents of the variable do not exist.")
+            #endif
+            return .visitChildren
+        }
+
+        let sourceRange = node.sourceRange(converter: locationConverter)
+
+        let currentVariable = VariableObject(
+            //FIXME: This element does not necessarily represent the name of the variable.
+            // For example, in the case of Tuple Decomposition, the tuple would be the name of the variable.
+            // When `let (a, b, c) = (0, 1, 2)`, the variable name becomes “(a, b, c)”.
+            name: array[0].pattern.description,
+            fullPath: fullPath,
+            sourceRange: Position(
+                line: sourceRange.start.line,
+                utf16index: sourceRange.start.column
+            )
+            ... Position(
+                line: sourceRange.end.line,
+                utf16index: sourceRange.end.column
+            )
+        )
+        dump(currentVariable)
+
+//        appendToBuffer(currentVariable)
+
         return .visitChildren
     }
 

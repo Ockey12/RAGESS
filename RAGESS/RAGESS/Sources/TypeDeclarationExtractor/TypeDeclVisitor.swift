@@ -258,8 +258,9 @@ final class TypeDeclVisitor: SyntaxVisitor {
 
     override func visit(_ node: VariableDeclSyntax) -> SyntaxVisitorContinueKind {
 #if DEBUG
-        print("\nvisit(VariableDeclSyntax(\(node)))")
+        print("\nvisit(VariableDeclSyntax(\n\(node)\n))")
 #endif
+
         let array = Array(node.bindings)
         guard !array.isEmpty else {
             #if DEBUG
@@ -274,7 +275,7 @@ final class TypeDeclVisitor: SyntaxVisitor {
             //FIXME: This element does not necessarily represent the name of the variable.
             // For example, in the case of Tuple Decomposition, the tuple would be the name of the variable.
             // When `let (a, b, c) = (0, 1, 2)`, the variable name becomes “(a, b, c)”.
-            name: array[0].pattern.description,
+            name: array[0].pattern.trimmed.description,
             fullPath: fullPath,
             sourceRange: Position(
                 line: sourceRange.start.line,

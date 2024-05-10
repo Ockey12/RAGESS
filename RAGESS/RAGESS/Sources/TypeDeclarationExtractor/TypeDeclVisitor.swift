@@ -14,6 +14,7 @@ final class TypeDeclVisitor: SyntaxVisitor {
     private var structDeclarations: [StructObject] = []
     private var classDeclarations: [ClassObject] = []
     private var enumDeclarations: [EnumObject] = []
+    private var variableDeclarations: [VariableObject] = []
     private var functionDeclarations: [FunctionObject] = []
     private var buffer: [any DeclarationObject] = []
 
@@ -286,9 +287,55 @@ final class TypeDeclVisitor: SyntaxVisitor {
         )
         dump(currentVariable)
 
-//        appendToBuffer(currentVariable)
+        appendToBuffer(currentVariable)
 
         return .visitChildren
+    }
+
+    override func visitPost(_ node: VariableDeclSyntax) {
+#if DEBUG
+        print("\nvisitPost(VariableDeclSyntax(\(node)))")
+#endif
+
+        guard !buffer.isEmpty else {
+            fatalError("The buffer is empty.")
+        }
+
+#if DEBUG
+        print("buffer.popLast()")
+        print("- \(buffer.map { $0.name })")
+#endif
+
+        guard let lastItem = buffer.popLast(),
+              let currentVariable = lastItem as? VariableObject else {
+            fatalError("The type of the last element of buffer is not a \(VariableObject.self).")
+        }
+
+#if DEBUG
+        print("+ \(buffer.map { $0.name })")
+#endif
+
+        if buffer.count >= 1 {
+            // If there is an element in the buffer, the last element in the buffer is the parent of this.
+            guard let owner = buffer.popLast(),
+                  var ownerObject = owner as? VariableOwner else {
+                fatalError("The type of the last element of buffer does not conform to \(VariableOwner.self).")
+            }
+#if DEBUG
+            print("buffer[\(buffer.count)].variables.append(\(currentVariable.name))")
+#endif
+            ownerObject.variables.append(currentVariable)
+            buffer.append(ownerObject)
+        } else {
+#if DEBUG
+            print("variableDeclarations.append(\(currentVariable.name))")
+            print("- \(variableDeclarations.map { $0.name })")
+#endif
+            variableDeclarations.append(currentVariable)
+#if DEBUG
+            print("+ \(variableDeclarations.map { $0.name })")
+#endif
+        }
     }
 
     // MARK: FunctionDeclSyntax

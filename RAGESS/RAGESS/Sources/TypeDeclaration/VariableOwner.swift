@@ -7,5 +7,5 @@
 //
 
 public protocol VariableOwner: DeclarationObject {
-    var properties: [VariableObject] { get set }
+    var variables: [VariableObject] { get set }
 }

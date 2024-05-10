@@ -13,7 +13,7 @@ public struct EnumObject: TypeDeclaration {
     public let sourceCode: String
     public let sourceRange: ClosedRange<Position>
 
-    public var properties: [VariableObject] = []
+    public var variables: [VariableObject] = []
     public var functions: [FunctionObject] = []
 
     public var nestingStructs: [StructObject] = []

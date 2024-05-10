@@ -8,13 +8,13 @@
 
 import LanguageServerProtocol
 
-public struct PropertyObject: DeclarationObject, PropertyOwner, FunctionOwner {
+public struct VariableObject: DeclarationObject, VariableOwner, FunctionOwner {
     public let name: String
     public var fullPath: String
     public let sourceCode: String
     public let sourceRange: ClosedRange<Position>
 
-    public var properties: [PropertyObject] = []
+    public var properties: [VariableObject] = []
     public var functions: [FunctionObject] = []
 
     public init(

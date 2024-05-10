@@ -1,5 +1,5 @@
 //
-//  PropertyOwner.swift
+//  VariableOwner.swift
 //
 //
 //  Created by Ockey12 on 2024/05/08

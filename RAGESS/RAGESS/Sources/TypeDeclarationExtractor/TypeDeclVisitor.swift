@@ -339,6 +339,10 @@ final class TypeDeclVisitor: SyntaxVisitor {
         }
     }
 
+    func getVariableDeclarations() -> [VariableObject] {
+        variableDeclarations
+    }
+
     // MARK: FunctionDeclSyntax
 
     override func visit(_ node: FunctionDeclSyntax) -> SyntaxVisitorContinueKind {

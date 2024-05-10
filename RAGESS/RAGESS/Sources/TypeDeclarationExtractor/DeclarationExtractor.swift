@@ -39,6 +39,7 @@ public struct DeclarationExtractor {
         result.append(contentsOf: visitor.getStructDeclarations())
         result.append(contentsOf: visitor.getClassDeclarations())
         result.append(contentsOf: visitor.getEnumDeclarations())
+        result.append(contentsOf: visitor.getVariableDeclarations())
         result.append(contentsOf: visitor.getFunctionDeclarations())
 
         return result

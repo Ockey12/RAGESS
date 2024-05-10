@@ -7,12 +7,13 @@
 
 import LanguageServerProtocol
 
-public struct StructObject: TypeDeclaration, FunctionOwner {
+public struct StructObject: TypeDeclaration {
     public let name: String
     public var fullPath: String
     public let sourceCode: String
     public let sourceRange: ClosedRange<Position>
 
+    public var variables: [VariableObject] = []
     public var functions: [FunctionObject] = []
 
     public var nestingStructs: [StructObject] = []

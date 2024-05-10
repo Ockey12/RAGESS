@@ -7,12 +7,13 @@
 
 import LanguageServerProtocol
 
-public struct FunctionObject: DeclarationObject, FunctionOwner {
+public struct FunctionObject: DeclarationObject, VariableOwner, FunctionOwner {
     public let name: String
     public var fullPath: String
     public let sourceCode: String
     public let sourceRange: ClosedRange<Position>
 
+    public var variables: [VariableObject] = []
     public var functions: [FunctionObject] = []
 
     public init(

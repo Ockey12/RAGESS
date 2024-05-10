@@ -7,12 +7,13 @@
 
 import LanguageServerProtocol
 
-public struct EnumObject: TypeDeclaration, FunctionOwner {
+public struct EnumObject: TypeDeclaration {
     public let name: String
     public var fullPath: String
     public let sourceCode: String
     public let sourceRange: ClosedRange<Position>
 
+    public var variables: [VariableObject] = []
     public var functions: [FunctionObject] = []
 
     public var nestingStructs: [StructObject] = []

@@ -14,6 +14,7 @@ final class TypeDeclVisitor: SyntaxVisitor {
     private var structDeclarations: [StructObject] = []
     private var classDeclarations: [ClassObject] = []
     private var enumDeclarations: [EnumObject] = []
+    private var variableDeclarations: [VariableObject] = []
     private var functionDeclarations: [FunctionObject] = []
     private var buffer: [any DeclarationObject] = []
 
@@ -251,6 +252,91 @@ final class TypeDeclVisitor: SyntaxVisitor {
 
     func getEnumDeclarations() -> [EnumObject] {
         enumDeclarations
+    }
+
+    // MARK: VariableDeclSyntax
+
+    override func visit(_ node: VariableDeclSyntax) -> SyntaxVisitorContinueKind {
+        #if DEBUG
+            print("\nvisit(VariableDeclSyntax(\n\(node)\n))")
+        #endif
+
+        let array = Array(node.bindings)
+        guard !array.isEmpty else {
+            #if DEBUG
+                print("The contents of the variable do not exist.")
+            #endif
+            return .visitChildren
+        }
+
+        let sourceRange = node.sourceRange(converter: locationConverter)
+
+        let currentVariable = VariableObject(
+            // FIXME: This element does not necessarily represent the name of the variable.
+            // For example, in the case of Tuple Decomposition, the tuple would be the name of the variable.
+            // When `let (a, b, c) = (0, 1, 2)`, the variable name becomes “(a, b, c)”.
+            name: array[0].pattern.trimmed.description,
+            fullPath: fullPath,
+            sourceRange: Position(
+                line: sourceRange.start.line,
+                utf16index: sourceRange.start.column
+            )
+                ... Position(
+                    line: sourceRange.end.line,
+                    utf16index: sourceRange.end.column
+                )
+        )
+        dump(currentVariable)
+
+        appendToBuffer(currentVariable)
+
+        return .visitChildren
+    }
+
+    override func visitPost(_ node: VariableDeclSyntax) {
+        #if DEBUG
+            print("\nvisitPost(VariableDeclSyntax(\(node)))")
+        #endif
+
+        guard !buffer.isEmpty else {
+            fatalError("The buffer is empty.")
+        }
+
+        #if DEBUG
+            print("buffer.popLast()")
+            print("- \(buffer.map { $0.name })")
+        #endif
+
+        guard let lastItem = buffer.popLast(),
+              let currentVariable = lastItem as? VariableObject else {
+            fatalError("The type of the last element of buffer is not a \(VariableObject.self).")
+        }
+
+        #if DEBUG
+            print("+ \(buffer.map { $0.name })")
+        #endif
+
+        if buffer.count >= 1 {
+            // If there is an element in the buffer, the last element in the buffer is the parent of this.
+            guard let owner = buffer.popLast(),
+                  var ownerObject = owner as? VariableOwner else {
+                fatalError("The type of the last element of buffer does not conform to \(VariableOwner.self).")
+            }
+            #if DEBUG
+                print("buffer[\(buffer.count)].variables.append(\(currentVariable.name))")
+            #endif
+            ownerObject.variables.append(currentVariable)
+            buffer.append(ownerObject)
+        } else {
+            #if DEBUG
+                print("variableDeclarations.append(\(currentVariable.name))")
+                print("- \(variableDeclarations.map { $0.name })")
+            #endif
+            variableDeclarations.append(currentVariable)
+            #if DEBUG
+                print("+ \(variableDeclarations.map { $0.name })")
+            #endif
+        }
     }
 
     // MARK: FunctionDeclSyntax

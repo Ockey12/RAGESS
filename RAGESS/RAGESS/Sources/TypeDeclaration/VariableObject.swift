@@ -1,13 +1,14 @@
 //
-//  ClassObject.swift
+//  VariableObject.swift
 //
 //
-//  Created by ockey12 on 2024/05/07.
+//  Created by Ockey12 on 2024/05/08
+//
 //
 
 import LanguageServerProtocol
 
-public struct ClassObject: TypeDeclaration {
+public struct VariableObject: DeclarationObject, VariableOwner, FunctionOwner {
     public let name: String
     public var fullPath: String
     public let sourceCode: String
@@ -15,13 +16,6 @@ public struct ClassObject: TypeDeclaration {
 
     public var variables: [VariableObject] = []
     public var functions: [FunctionObject] = []
-
-    public var nestingStructs: [StructObject] = []
-    public var nestingClasses: [ClassObject] = []
-    public var nestingEnums: [EnumObject] = []
-
-    public var dependsOn: [any TypeDeclaration] = []
-    public var dependsBy: [any TypeDeclaration] = []
 
     public init(
         name: String,

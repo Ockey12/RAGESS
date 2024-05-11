@@ -69,7 +69,7 @@ let package = Package(
             dependencies: [
                 "Dependency",
                 .product(name: "Dependencies", package: "swift-dependencies"),
-                .product(name: "DependenciesMacros", package: "swift-dependencies"),
+                .product(name: "DependenciesMacros", package: "swift-dependencies")
             ]
         ),
         .target(

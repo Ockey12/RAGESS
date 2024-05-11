@@ -73,8 +73,14 @@ let package = Package(
         .target(
             name: "DependenciesClient",
             dependencies: [
+                "Dependency",
                 .product(name: "Dependencies", package: "swift-dependencies"),
                 .product(name: "DependenciesMacros", package: "swift-dependencies"),
+            ]
+        ),
+        .target(
+            name: "Dependency",
+            dependencies: [
                 .product(name: "LSPBindings", package: "sourcekit-lsp")
             ]
         ),

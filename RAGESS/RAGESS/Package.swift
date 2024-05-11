@@ -70,7 +70,8 @@ let package = Package(
                 "Dependency",
                 "TypeDeclaration",
                 .product(name: "Dependencies", package: "swift-dependencies"),
-                .product(name: "DependenciesMacros", package: "swift-dependencies")
+                .product(name: "DependenciesMacros", package: "swift-dependencies"),
+                .product(name: "SwiftSyntax", package: "swift-syntax")
             ]
         ),
         .target(

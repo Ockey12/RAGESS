@@ -5,6 +5,7 @@
 //  Created by ockey12 on 2024/05/07.
 //
 
+import Dependency
 import LanguageServerProtocol
 
 public struct EnumObject: TypeDeclaration {
@@ -20,8 +21,8 @@ public struct EnumObject: TypeDeclaration {
     public var nestingClasses: [ClassObject] = []
     public var nestingEnums: [EnumObject] = []
 
-    public var dependsOn: [any TypeDeclaration] = []
-    public var dependsBy: [any TypeDeclaration] = []
+    public var objectsOnWhichThisObjectDepends: [Dependency] = []
+    public var objectsThatDependOnThisObject: [Dependency] = []
 
     public init(
         name: String,

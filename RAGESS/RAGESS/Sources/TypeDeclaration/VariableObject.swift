@@ -6,6 +6,7 @@
 //
 //
 
+import Dependency
 import LanguageServerProtocol
 
 public struct VariableObject: DeclarationObject, VariableOwner, FunctionOwner {
@@ -16,6 +17,9 @@ public struct VariableObject: DeclarationObject, VariableOwner, FunctionOwner {
 
     public var variables: [VariableObject] = []
     public var functions: [FunctionObject] = []
+
+    public var objectsOnWhichThisObjectDepends: [Dependency] = []
+    public var objectsThatDependOnThisObject: [Dependency] = []
 
     public init(
         name: String,

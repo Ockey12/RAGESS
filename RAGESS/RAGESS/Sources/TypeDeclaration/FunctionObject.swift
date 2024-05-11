@@ -5,6 +5,7 @@
 //  Created by ockey12 on 2024/05/06.
 //
 
+import Dependency
 import LanguageServerProtocol
 
 public struct FunctionObject: DeclarationObject, VariableOwner, FunctionOwner {
@@ -15,6 +16,9 @@ public struct FunctionObject: DeclarationObject, VariableOwner, FunctionOwner {
 
     public var variables: [VariableObject] = []
     public var functions: [FunctionObject] = []
+
+    public var objectsOnWhichThisObjectDepends: [Dependency] = []
+    public var objectsThatDependOnThisObject: [Dependency] = []
 
     public init(
         name: String,

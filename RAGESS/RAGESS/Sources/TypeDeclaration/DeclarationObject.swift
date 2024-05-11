@@ -6,6 +6,7 @@
 //
 //
 
+import Dependency
 import LanguageServerProtocol
 
 public protocol DeclarationObject {
@@ -13,4 +14,8 @@ public protocol DeclarationObject {
     var fullPath: String { get set }
     var sourceCode: String { get }
     var sourceRange: ClosedRange<Position> { get }
+
+    var objectsOnWhichThisObjectDepends: [Dependency] { get set }
+
+    var objectsThatDependOnThisObject: [Dependency] { get set }
 }

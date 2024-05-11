@@ -39,4 +39,8 @@ final class Visitor: SyntaxVisitor {
 
         return .visitChildren
     }
+
+    func getOffsets() -> [Int] {
+        offsets
+    }
 }

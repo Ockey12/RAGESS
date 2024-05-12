@@ -18,7 +18,7 @@ public struct DependenciesClient {
 }
 
 extension DependenciesClient: DependencyKey {
-    public static let liveValue: DependenciesClient = .init { projectRootPath, objects in
+    public static let liveValue: DependenciesClient = .init { _, objects in
         var declarationObjects = objects
         return declarationObjects
     }

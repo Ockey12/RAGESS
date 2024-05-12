@@ -1,9 +1,9 @@
 //
 //  Visitor.swift
 //
-//  
+//
 //  Created by Ockey12 on 2024/05/12
-//  
+//
 //
 
 import SwiftSyntax
@@ -19,10 +19,10 @@ final class Visitor: SyntaxVisitor {
     }
 
     override func visit(_ node: DeclReferenceExprSyntax) -> SyntaxVisitorContinueKind {
-#if DEBUG
-        print("\nvisit(DeclReferenceExprSyntax(\(node.baseName.text)))")
-        print("╰─node.trimmedByteRange.offset: \(node.trimmedByteRange.offset)")
-#endif
+        #if DEBUG
+            print("\nvisit(DeclReferenceExprSyntax(\(node.baseName.text)))")
+            print("╰─node.trimmedByteRange.offset: \(node.trimmedByteRange.offset)")
+        #endif
 
         offsets.append(node.trimmedByteRange.offset)
 
@@ -30,10 +30,10 @@ final class Visitor: SyntaxVisitor {
     }
 
     override func visit(_ node: IdentifierTypeSyntax) -> SyntaxVisitorContinueKind {
-#if DEBUG
-        print("\nvisit(IdentifierTypeSyntax(\(node.name.text)))")
-        print("╰─node.trimmedByteRange.offset: \(node.trimmedByteRange.offset)")
-#endif
+        #if DEBUG
+            print("\nvisit(IdentifierTypeSyntax(\(node.name.text)))")
+            print("╰─node.trimmedByteRange.offset: \(node.trimmedByteRange.offset)")
+        #endif
 
         offsets.append(node.trimmedByteRange.offset)
 

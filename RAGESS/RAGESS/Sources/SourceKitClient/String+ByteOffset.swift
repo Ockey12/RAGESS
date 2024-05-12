@@ -5,11 +5,11 @@
 //  Created by ockey12 on 2024/04/23.
 //
 
-//import Foundation
-//import LanguageServerProtocol
-//import LSPClient
+// import Foundation
+// import LanguageServerProtocol
+// import LSPClient
 //
-//public extension String {
+// public extension String {
 //    func getByteOffset(position: Position) throws -> Int {
 //        let lines = components(separatedBy: "\n")
 //        let row = position.line
@@ -43,4 +43,4 @@
 //            }
 //        }
 //    }
-//}
+// }

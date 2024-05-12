@@ -32,7 +32,7 @@ final class TypeDeclVisitor: SyntaxVisitor {
             print("\nvisit(StructDeclSyntax(\(node.name.text)))")
         #endif
         let positionRange = node.sourceRange(converter: locationConverter)
-        let offsetRange = node.trimmedByteRange.offset...node.trimmedByteRange.endOffset
+        let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
         let currentStruct = StructObject(
             name: node.name.text,
@@ -110,7 +110,7 @@ final class TypeDeclVisitor: SyntaxVisitor {
             print("\nvisit(ClassDeclSyntax(\(node.name.text)))")
         #endif
         let positionRange = node.sourceRange(converter: locationConverter)
-        let offsetRange = node.trimmedByteRange.offset...node.trimmedByteRange.endOffset
+        let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
         let currentClass = ClassObject(
             name: node.name.text,
@@ -188,7 +188,7 @@ final class TypeDeclVisitor: SyntaxVisitor {
             print("\nvisit(EnumDeclSyntax(\(node.name.text)))")
         #endif
         let positionRange = node.sourceRange(converter: locationConverter)
-        let offsetRange = node.trimmedByteRange.offset...node.trimmedByteRange.endOffset
+        let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
         let currentEnum = EnumObject(
             name: node.name.text,
@@ -274,7 +274,7 @@ final class TypeDeclVisitor: SyntaxVisitor {
         }
 
         let positionRange = node.sourceRange(converter: locationConverter)
-        let offsetRange = node.trimmedByteRange.offset...node.trimmedByteRange.endOffset
+        let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
         let currentVariable = VariableObject(
             // FIXME: This element does not necessarily represent the name of the variable.
@@ -356,7 +356,7 @@ final class TypeDeclVisitor: SyntaxVisitor {
             print("\nvisit(FunctionDeclSyntax(\(node.name.text)))")
         #endif
         let positionRange = node.sourceRange(converter: locationConverter)
-        let offsetRange = node.trimmedByteRange.offset...node.trimmedByteRange.endOffset
+        let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
         let currentFunction = FunctionObject(
             name: node.name.text,

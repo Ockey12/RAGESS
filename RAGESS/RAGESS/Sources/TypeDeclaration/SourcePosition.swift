@@ -1,9 +1,9 @@
 //
 //  SourcePosition.swift
 //
-//  
+//
 //  Created by Ockey12 on 2024/05/12
-//  
+//
 //
 
 public struct SourcePosition {

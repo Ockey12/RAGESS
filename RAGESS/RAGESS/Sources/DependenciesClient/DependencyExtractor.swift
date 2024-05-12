@@ -1,9 +1,9 @@
 //
 //  DependencyExtractor.swift
 //
-//  
+//
 //  Created by Ockey12 on 2024/05/11
-//  
+//
 //
 
 import Dependencies
@@ -16,7 +16,7 @@ import XcodeObject
 
 enum DependencyExtractor {
 //    func extract() -> [any DeclarationObject] {
-//        
+//
 //    }
 
     func extractDependencies(
@@ -38,8 +38,8 @@ enum DependencyExtractor {
                     arguments: sourceKitArguments
                 )
                 #if DEBUG
-                print("\(#filePath) - \(#function)")
-                dump(response)
+                    print("\(#filePath) - \(#function)")
+                    dump(response)
                 #endif
 
                 guard let definitionFilePath = response[CursorInfoResponseKeys.filePath.key] else {
@@ -62,14 +62,14 @@ enum DependencyExtractor {
                 let definitionPosition = Position(line: definitionLine, utf16index: definitionColumn)
                 guard let definitionObjectIndex = declarationObjects.firstIndex(where: {
                     $0.fullPath == definitionFilePath
-                    && $0.sourceRange.contains(definitionPosition)
+                        && $0.sourceRange.contains(definitionPosition)
                 }) else {
                     print("ERROR in \(#filePath) - \(#function): Cannot find definition object in [DeclarationObject].")
                     continue
                 }
                 guard let callerIndex = declarationObjects.firstIndex(where: {
                     $0.fullPath == sourceFile.path
-                    //TODO: Collate offsets.
+                    // TODO: Collate offsets.
                 }) else {
                     print("ERROR in \(#filePath) - \(#function): Cannot find caller object in [DeclarationObject].")
                     continue
@@ -84,12 +84,12 @@ enum DependencyExtractor {
 
     func extractOffset(from sourceFile: SourceFile) -> [Int] {
         let parsedFile = Parser.parse(source: sourceFile.content)
-#if DEBUG
-        print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
-        print(#function)
-        print("PATH: \(sourceFile.path)")
-        print(parsedFile.debugDescription)
-#endif
+        #if DEBUG
+            print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
+            print(#function)
+            print("PATH: \(sourceFile.path)")
+            print(parsedFile.debugDescription)
+        #endif
 
         let visitor = Visitor(
             locationConverter: SourceLocationConverter(
@@ -99,9 +99,9 @@ enum DependencyExtractor {
         )
         visitor.walk(Syntax(parsedFile))
 
-#if DEBUG
-        print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=\n")
-#endif
+        #if DEBUG
+            print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=\n")
+        #endif
 
         return visitor.getOffsets()
     }

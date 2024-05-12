@@ -6,7 +6,7 @@
 //
 //
 
-import Dependency
+import DependencyObject
 
 public protocol DeclarationObject {
     var name: String { get }
@@ -15,7 +15,7 @@ public protocol DeclarationObject {
     var positionRange: ClosedRange<SourcePosition> { get }
     var offsetRange: ClosedRange<Int> { get }
 
-    var objectsOnWhichThisObjectDepends: [Dependency] { get set }
+    var objectsOnWhichThisObjectDepends: [DependencyObject] { get set }
 
-    var objectsThatDependOnThisObject: [Dependency] { get set }
+    var objectsThatDependOnThisObject: [DependencyObject] { get set }
 }

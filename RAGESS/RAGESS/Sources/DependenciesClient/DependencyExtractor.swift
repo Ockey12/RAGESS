@@ -7,6 +7,7 @@
 //
 
 import Dependencies
+import Dependency
 import LanguageServerProtocol
 import SourceKitClient
 import SwiftParser
@@ -26,14 +27,14 @@ enum DependencyExtractor {
         sourceKitArguments: [String]
     ) -> [DeclarationObject] {
         var objects = declarationObjects
-        let offsets = extractOffset(from: sourceFile)
+        let callerOffsets = extractCallerOffsets(from: sourceFile)
 
         @Dependency(SourceKitClient.self) var sourceKitClient
-        for offset in offsets {
+        for callerOffset in callerOffsets {
             do {
                 let response = try await sourceKitClient.sendCursorInfoRequest(
                     file: sourceFile.path,
-                    offset: offset,
+                    offset: callerOffset,
                     sourceFilePaths: sourceFilePaths,
                     arguments: sourceKitArguments
                 )
@@ -59,21 +60,40 @@ enum DependencyExtractor {
                     continue
                 }
 
-                let definitionPosition = Position(line: definitionLine, utf16index: definitionColumn)
+                let definitionPosition = SourcePosition(line: definitionLine, utf8index: definitionColumn)
                 guard let definitionObjectIndex = declarationObjects.firstIndex(where: {
                     $0.fullPath == definitionFilePath
-                        && $0.sourceRange.contains(definitionPosition)
+                        && $0.positionRange.contains(definitionPosition)
                 }) else {
-                    print("ERROR in \(#filePath) - \(#function): Cannot find definition object in [DeclarationObject].")
+                    print("ERROR in \(#filePath) - \(#function): Cannot find definition object in [\(DeclarationObject)].")
                     continue
                 }
-                guard let callerIndex = declarationObjects.firstIndex(where: {
-                    $0.fullPath == sourceFile.path
-                    // TODO: Collate offsets.
-                }) else {
-                    print("ERROR in \(#filePath) - \(#function): Cannot find caller object in [DeclarationObject].")
+//                guard let callerIndex = declarationObjects.firstIndex(where: {
+//                    $0.fullPath == sourceFile.path
+//                    // TODO: Collate offsets.
+//                }) else {
+//                    print("ERROR in \(#filePath) - \(#function): Cannot find caller object in [DeclarationObject].")
+//                    continue
+//                }
+                let callerIndexes = declarationObjects.enumerated().compactMap{ (index, element) -> Int? in
+                    if element.fullPath == sourceFile.path && element.offsetRange.contains(callerOffset) {
+                        return index
+                    }
+                    return nil
+                }
+                guard var callerIndex = callerIndexes.first else {
+                    print("ERROR in \(#filePath) - \(#function): Cannot find caller object in [\(DeclarationObject)].")
                     continue
                 }
+                callerIndexes = callerIndexes.dropFirst()
+                for index in callerIndexes {
+                    if (callerOffset - declarationObjects[index].offsetRange.lowerBound)
+                        < (callerOffset - declarationObjects[callerIndex].offsetRange.lowerBound) {
+                        callerIndex = index
+                    }
+                }
+                let caller = declarationObjects[callerIndex]
+//                let dependency = depende
             } catch {
                 print("ERROR in \(#filePath) - \(#function): \(error)")
             }
@@ -82,7 +102,7 @@ enum DependencyExtractor {
         return objects
     }
 
-    func extractOffset(from sourceFile: SourceFile) -> [Int] {
+    func extractCallerOffsets(from sourceFile: SourceFile) -> [Int] {
         let parsedFile = Parser.parse(source: sourceFile.content)
         #if DEBUG
             print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")

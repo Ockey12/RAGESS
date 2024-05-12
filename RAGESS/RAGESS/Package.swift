@@ -67,7 +67,7 @@ let package = Package(
         .target(
             name: "DependenciesClient",
             dependencies: [
-                "Dependency",
+                "DependencyObject",
 //                "SourceKitClient",
                 "TypeDeclaration",
                 "XcodeObject",
@@ -77,7 +77,7 @@ let package = Package(
             ]
         ),
         .target(
-            name: "Dependency",
+            name: "DependencyObject",
             dependencies: [
                 .product(name: "LSPBindings", package: "sourcekit-lsp")
             ]
@@ -86,6 +86,7 @@ let package = Package(
             name: "DumpPackageClient",
             dependencies: [
                 "CommandClient",
+                "DependencyObject",
                 "XcodeObject",
                 .product(name: "Dependencies", package: "swift-dependencies"),
                 .product(name: "DependenciesMacros", package: "swift-dependencies")
@@ -134,7 +135,7 @@ let package = Package(
         .target(
             name: "TypeDeclaration",
             dependencies: [
-                "Dependency",
+                "DependencyObject",
                 .product(name: "LSPBindings", package: "sourcekit-lsp")
             ]
         ),

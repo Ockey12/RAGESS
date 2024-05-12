@@ -5,7 +5,7 @@
 //  Created by ockey12 on 2024/05/07.
 //
 
-import Dependency
+import DependencyObject
 
 public struct EnumObject: TypeDeclaration {
     public let name: String
@@ -21,8 +21,8 @@ public struct EnumObject: TypeDeclaration {
     public var nestingClasses: [ClassObject] = []
     public var nestingEnums: [EnumObject] = []
 
-    public var objectsOnWhichThisObjectDepends: [Dependency] = []
-    public var objectsThatDependOnThisObject: [Dependency] = []
+    public var objectsOnWhichThisObjectDepends: [DependencyObject] = []
+    public var objectsThatDependOnThisObject: [DependencyObject] = []
 
     public init(
         name: String,

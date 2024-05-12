@@ -5,7 +5,7 @@
 //  Created by ockey12 on 2024/05/06.
 //
 
-import Dependency
+import DependencyObject
 
 public struct FunctionObject: DeclarationObject, VariableOwner, FunctionOwner {
     public let name: String
@@ -17,8 +17,8 @@ public struct FunctionObject: DeclarationObject, VariableOwner, FunctionOwner {
     public var variables: [VariableObject] = []
     public var functions: [FunctionObject] = []
 
-    public var objectsOnWhichThisObjectDepends: [Dependency] = []
-    public var objectsThatDependOnThisObject: [Dependency] = []
+    public var objectsOnWhichThisObjectDepends: [DependencyObject] = []
+    public var objectsThatDependOnThisObject: [DependencyObject] = []
 
     public init(
         name: String,

@@ -6,7 +6,7 @@
 //
 //
 
-import Dependency
+import DependencyObject
 
 public struct VariableObject: DeclarationObject, VariableOwner, FunctionOwner {
     public let name: String
@@ -18,8 +18,8 @@ public struct VariableObject: DeclarationObject, VariableOwner, FunctionOwner {
     public var variables: [VariableObject] = []
     public var functions: [FunctionObject] = []
 
-    public var objectsOnWhichThisObjectDepends: [Dependency] = []
-    public var objectsThatDependOnThisObject: [Dependency] = []
+    public var objectsOnWhichThisObjectDepends: [DependencyObject] = []
+    public var objectsThatDependOnThisObject: [DependencyObject] = []
 
     public init(
         name: String,

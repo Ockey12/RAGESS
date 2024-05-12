@@ -1,5 +1,5 @@
 //
-//  Dependency.swift
+//  DependencyObject.swift
 //
 //
 //  Created by Ockey12 on 2024/05/11
@@ -8,7 +8,11 @@
 
 import LanguageServerProtocol
 
-public struct Dependency {
+public struct DependencyObject {
+    public init(dependingObject: Object, dependedObject: Object) {
+        self.dependingObject = dependingObject
+        self.dependedObject = dependedObject
+    }
     /// This object uses dependedObject as the type of a variable or a function argument.
     /// This object may be affected by changes in dependedObject.
     public var dependingObject: Object

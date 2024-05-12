@@ -36,7 +36,7 @@ public struct SourceKitClientDebugger {
         case dumpSymbolTapped
         case initializeResponse(Result<FileStructureDebugger, Error>)
         case getTrailingOffsetTapped
-        case offsetResponse(Result<Int, Error>)
+//        case offsetResponse(Result<Int, Error>)
         case cursorInfoTapped
         case compilerArgumentsResponse(Result<[String], Error>)
         case cursorInfoResponse(Result<[String: SourceKitRepresentable], Error>)
@@ -65,21 +65,22 @@ public struct SourceKitClientDebugger {
                 return .none
 
             case .getTrailingOffsetTapped:
-
-                return .run { [string = state.countedString] send in
-                    let position = string.lastPosition
-                    await send(.offsetResponse(Result {
-                        try string.getByteOffset(position: position)
-                    }))
-                }
-
-            case let .offsetResponse(.success(offset)):
-                state.offset = offset
+                state.offset = state.countedString.utf8.count
                 return .none
+//                return .run { [string = state.countedString] send in
+//                    let position = string.lastPosition
+//                    await send(.offsetResponse(Result {
+//                        try string.getByteOffset(position: position)
+//                    }))
+//                }
 
-            case let .offsetResponse(.failure(error)):
-                print(error)
-                return .none
+//            case let .offsetResponse(.success(offset)):
+//                state.offset = offset
+//                return .none
+//
+//            case let .offsetResponse(.failure(error)):
+//                print(error)
+//                return .none
 
             case .cursorInfoTapped:
                 state.cursorInfoResponse = CursorInfoResponse()

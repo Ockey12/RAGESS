@@ -5,7 +5,6 @@
 //  Created by ockey12 on 2024/05/05.
 //
 
-import LanguageServerProtocol
 import SwiftSyntax
 import TypeDeclaration
 
@@ -32,20 +31,21 @@ final class TypeDeclVisitor: SyntaxVisitor {
         #if DEBUG
             print("\nvisit(StructDeclSyntax(\(node.name.text)))")
         #endif
-        let sourceRange = node.sourceRange(converter: locationConverter)
+        let positionRange = node.sourceRange(converter: locationConverter)
+        let offsetRange = node.trimmedByteRange.offset...node.trimmedByteRange.endOffset
 
         let currentStruct = StructObject(
             name: node.name.text,
             fullPath: fullPath,
-            sourceRange:
-            Position(
-                line: sourceRange.start.line,
-                utf16index: sourceRange.start.column
+            positionRange: SourcePosition(
+                line: positionRange.start.line,
+                utf8index: positionRange.start.column
             )
-                ... Position(
-                    line: sourceRange.end.line,
-                    utf16index: sourceRange.end.column
-                )
+                ... SourcePosition(
+                    line: positionRange.end.line,
+                    utf8index: positionRange.end.column
+                ),
+            offsetRange: offsetRange
         )
 
         appendToBuffer(currentStruct)
@@ -109,19 +109,21 @@ final class TypeDeclVisitor: SyntaxVisitor {
         #if DEBUG
             print("\nvisit(ClassDeclSyntax(\(node.name.text)))")
         #endif
-        let sourceRange = node.sourceRange(converter: locationConverter)
+        let positionRange = node.sourceRange(converter: locationConverter)
+        let offsetRange = node.trimmedByteRange.offset...node.trimmedByteRange.endOffset
 
         let currentClass = ClassObject(
             name: node.name.text,
             fullPath: fullPath,
-            sourceRange: Position(
-                line: sourceRange.start.line,
-                utf16index: sourceRange.start.column
+            positionRange: SourcePosition(
+                line: positionRange.start.line,
+                utf8index: positionRange.start.column
             )
-                ... Position(
-                    line: sourceRange.end.line,
-                    utf16index: sourceRange.end.column
-                )
+                ... SourcePosition(
+                    line: positionRange.end.line,
+                    utf8index: positionRange.end.column
+                ),
+            offsetRange: offsetRange
         )
 
         appendToBuffer(currentClass)
@@ -185,19 +187,21 @@ final class TypeDeclVisitor: SyntaxVisitor {
         #if DEBUG
             print("\nvisit(EnumDeclSyntax(\(node.name.text)))")
         #endif
-        let sourceRange = node.sourceRange(converter: locationConverter)
+        let positionRange = node.sourceRange(converter: locationConverter)
+        let offsetRange = node.trimmedByteRange.offset...node.trimmedByteRange.endOffset
 
         let currentEnum = EnumObject(
             name: node.name.text,
             fullPath: fullPath,
-            sourceRange: Position(
-                line: sourceRange.start.line,
-                utf16index: sourceRange.start.column
+            positionRange: SourcePosition(
+                line: positionRange.start.line,
+                utf8index: positionRange.start.column
             )
-                ... Position(
-                    line: sourceRange.end.line,
-                    utf16index: sourceRange.end.column
-                )
+                ... SourcePosition(
+                    line: positionRange.end.line,
+                    utf8index: positionRange.end.column
+                ),
+            offsetRange: offsetRange
         )
 
         appendToBuffer(currentEnum)
@@ -269,7 +273,8 @@ final class TypeDeclVisitor: SyntaxVisitor {
             return .visitChildren
         }
 
-        let sourceRange = node.sourceRange(converter: locationConverter)
+        let positionRange = node.sourceRange(converter: locationConverter)
+        let offsetRange = node.trimmedByteRange.offset...node.trimmedByteRange.endOffset
 
         let currentVariable = VariableObject(
             // FIXME: This element does not necessarily represent the name of the variable.
@@ -277,14 +282,15 @@ final class TypeDeclVisitor: SyntaxVisitor {
             // When `let (a, b, c) = (0, 1, 2)`, the variable name becomes “(a, b, c)”.
             name: array[0].pattern.trimmed.description,
             fullPath: fullPath,
-            sourceRange: Position(
-                line: sourceRange.start.line,
-                utf16index: sourceRange.start.column
+            positionRange: SourcePosition(
+                line: positionRange.start.line,
+                utf8index: positionRange.start.column
             )
-                ... Position(
-                    line: sourceRange.end.line,
-                    utf16index: sourceRange.end.column
-                )
+                ... SourcePosition(
+                    line: positionRange.end.line,
+                    utf8index: positionRange.end.column
+                ),
+            offsetRange: offsetRange
         )
         dump(currentVariable)
 
@@ -349,19 +355,21 @@ final class TypeDeclVisitor: SyntaxVisitor {
         #if DEBUG
             print("\nvisit(FunctionDeclSyntax(\(node.name.text)))")
         #endif
-        let sourceRange = node.sourceRange(converter: locationConverter)
+        let positionRange = node.sourceRange(converter: locationConverter)
+        let offsetRange = node.trimmedByteRange.offset...node.trimmedByteRange.endOffset
 
         let currentFunction = FunctionObject(
             name: node.name.text,
             fullPath: fullPath,
-            sourceRange: Position(
-                line: sourceRange.start.line,
-                utf16index: sourceRange.start.column
+            positionRange: SourcePosition(
+                line: positionRange.start.line,
+                utf8index: positionRange.start.column
             )
-                ... Position(
-                    line: sourceRange.end.line,
-                    utf16index: sourceRange.end.column
-                )
+                ... SourcePosition(
+                    line: positionRange.end.line,
+                    utf8index: positionRange.end.column
+                ),
+            offsetRange: offsetRange
         )
 
         appendToBuffer(currentFunction)

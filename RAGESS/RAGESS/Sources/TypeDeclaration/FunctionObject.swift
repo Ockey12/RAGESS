@@ -6,13 +6,13 @@
 //
 
 import Dependency
-import LanguageServerProtocol
 
 public struct FunctionObject: DeclarationObject, VariableOwner, FunctionOwner {
     public let name: String
     public var fullPath: String
     public let sourceCode: String
-    public let sourceRange: ClosedRange<Position>
+    public let positionRange: ClosedRange<SourcePosition>
+    public let offsetRange: ClosedRange<Int>
 
     public var variables: [VariableObject] = []
     public var functions: [FunctionObject] = []
@@ -24,11 +24,13 @@ public struct FunctionObject: DeclarationObject, VariableOwner, FunctionOwner {
         name: String,
         fullPath: String,
         sourceCode: String = "",
-        sourceRange: ClosedRange<Position>
+        positionRange: ClosedRange<SourcePosition>,
+        offsetRange: ClosedRange<Int>
     ) {
         self.name = name
         self.fullPath = fullPath
         self.sourceCode = sourceCode
-        self.sourceRange = sourceRange
+        self.positionRange = positionRange
+        self.offsetRange = offsetRange
     }
 }

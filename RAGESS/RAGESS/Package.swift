@@ -129,7 +129,6 @@ let package = Package(
                 "XcodeObject",
                 .product(name: "Dependencies", package: "swift-dependencies"),
                 .product(name: "DependenciesMacros", package: "swift-dependencies"),
-                .product(name: "LSPBindings", package: "sourcekit-lsp")
             ]
         ),
         .target(

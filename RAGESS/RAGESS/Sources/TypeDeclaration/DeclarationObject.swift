@@ -7,13 +7,13 @@
 //
 
 import Dependency
-import LanguageServerProtocol
 
 public protocol DeclarationObject {
     var name: String { get }
     var fullPath: String { get set }
     var sourceCode: String { get }
-    var sourceRange: ClosedRange<Position> { get }
+    var positionRange: ClosedRange<SourcePosition> { get }
+    var offsetRange: ClosedRange<Int> { get }
 
     var objectsOnWhichThisObjectDepends: [Dependency] { get set }
 

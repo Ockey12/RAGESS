@@ -68,6 +68,7 @@ let package = Package(
             name: "DependenciesClient",
             dependencies: [
                 "Dependency",
+//                "SourceKitClient",
                 "TypeDeclaration",
                 "XcodeObject",
                 .product(name: "Dependencies", package: "swift-dependencies"),

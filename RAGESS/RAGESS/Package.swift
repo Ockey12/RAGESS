@@ -53,12 +53,13 @@ let package = Package(
             name: "DebugView",
             dependencies: [
                 "BuildSettingsClient",
-                "TypeDeclaration",
                 "DumpPackageClient",
+                "DependenciesClient",
                 "LSPClient",
                 "SourceFileClient",
                 "SourceKitClient",
                 "TypeAnnotationClient",
+                "TypeDeclaration",
                 "TypeDeclarationExtractor",
                 "XcodeObject",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
@@ -67,6 +68,7 @@ let package = Package(
         .target(
             name: "DependenciesClient",
             dependencies: [
+                "SourceKitClient",
                 "TypeDeclaration",
                 "XcodeObject",
                 .product(name: "Dependencies", package: "swift-dependencies"),

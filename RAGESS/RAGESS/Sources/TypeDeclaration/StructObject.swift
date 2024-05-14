@@ -5,8 +5,6 @@
 //  Created by ockey12 on 2024/05/06.
 //
 
-import DependencyObject
-
 public struct StructObject: TypeDeclaration {
     public let name: String
     public var fullPath: String

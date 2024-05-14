@@ -5,8 +5,6 @@
 //  Created by ockey12 on 2024/05/07.
 //
 
-import DependencyObject
-
 public struct EnumObject: TypeDeclaration {
     public let name: String
     public var fullPath: String

@@ -5,8 +5,6 @@
 //  Created by ockey12 on 2024/05/06.
 //
 
-import DependencyObject
-
 public struct FunctionObject: DeclarationObject, VariableOwner, FunctionOwner {
     public let name: String
     public var fullPath: String

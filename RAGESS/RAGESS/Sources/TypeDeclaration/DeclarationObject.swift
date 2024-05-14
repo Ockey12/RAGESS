@@ -6,8 +6,6 @@
 //
 //
 
-import DependencyObject
-
 public protocol DeclarationObject {
     var name: String { get }
     var fullPath: String { get set }

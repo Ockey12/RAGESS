@@ -20,15 +20,15 @@ public struct DependencyObject {
     public var dependedObject: Object
 
     public struct Object {
-        public init(kind: Kind, filePath: String, offset: Int) {
+        public init(kind: Kind, filePath: String, keyPath: PartialKeyPath<DeclarationObject>) {
             self.kind = kind
             self.filePath = filePath
-            self.offset = offset
+            self.keyPath = keyPath
         }
 
         public let kind: Kind
         public let filePath: String
-        public let offset: Int
+        public let keyPath: PartialKeyPath<DeclarationObject>
 
         public enum Kind {
             case `struct`

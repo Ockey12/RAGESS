@@ -212,7 +212,7 @@ public struct DebugView: View {
                         action: \.typeDeclarationExtractor
                     )
                 )
-                .tabItem { Text("TypeDeclarationExtractor") }
+                .tabItem { Text("DeclarationExtractor") }
                 .padding()
 
                 DependenciesClientDebugView(

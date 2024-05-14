@@ -11,6 +11,7 @@ import DependenciesClient
 import SourceKitClient
 import SwiftUI
 import TypeDeclaration
+import TypeDeclarationExtractor
 import XcodeObject
 
 @Reducer
@@ -48,9 +49,20 @@ public struct DependenciesClientDebugger {
         Reduce { state, action in
             switch action {
             case .getDependenciesTapped:
+                let extractor = DeclarationExtractor()
+                var declarationObjects: [any DeclarationObject] = []
+                for sourceFile in state.allSourceFiles {
+                    declarationObjects.append(
+                        contentsOf: extractor.extractDeclarations(from: sourceFile)
+                    )
+                }
+                print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
+                print("TypeDeclarationExtractorDebugger.Action.extractTapped")
+                dump(declarationObjects)
+                print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=\n")
                 return .run {
                     [
-                        declarationObjects = state.declarationObjects,
+                        declarationObjects = declarationObjects,
                         allSourceFiles = state.allSourceFiles,
                         buildSettings = state.buildSettings,
                         packages = state.packages

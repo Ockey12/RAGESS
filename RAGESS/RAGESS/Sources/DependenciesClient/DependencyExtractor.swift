@@ -14,50 +14,98 @@ import SwiftSyntax
 import TypeDeclaration
 import XcodeObject
 
-enum DependencyExtractor {
-//    func extract() -> [any DeclarationObject] {
-//
-//    }
+struct DependencyExtractor {
+    func extract(
+        declarationObjects: inout [DeclarationObject],
+        allSourceFiles: [SourceFile],
+        buildSettings: [String: String],
+        packages: [PackageObject]
+    ) async {
+        print("\(#filePath) - \(#function)")
+        
+        let allSourceFilePaths = allSourceFiles.map { $0.path }
+        print("--- allSourceFilePaths ---")
+        for path in allSourceFilePaths {
+            print("    \(path)")
+        }
 
-    func extractDependencies(
+        print("--- packages ---")
+        dump(packages)
+
+        for sourceFile in allSourceFiles {
+            let generator = CompilerArgumentsGenerator(
+                targetFilePath: sourceFile.path,
+                buildSettings: buildSettings,
+                sourceFilePaths: allSourceFilePaths,
+                packages: packages
+            )
+
+            guard let arguments = try? await generator.generateArguments() else {
+                print("\(#filePath) - \(#function)")
+                print("ERROR: Cannot generate compiler arguments about \(sourceFile.path).\n")
+                continue
+            }
+            await extractDependencies(
+                from: sourceFile,
+                declarationObjects: &declarationObjects,
+                allSourceFilePaths: allSourceFilePaths,
+                sourceKitArguments: arguments
+            )
+        }
+    }
+
+    private func extractDependencies(
         from sourceFile: SourceFile,
-        declarationObjects: [DeclarationObject],
-        sourceFilePaths: [String],
+        declarationObjects: inout [DeclarationObject],
+        allSourceFilePaths: [String],
         sourceKitArguments: [String]
-    ) async -> [DeclarationObject] {
-        var objects = declarationObjects
+    ) async {
         let callerOffsets = extractCallerOffsets(from: sourceFile)
+
+        #if DEBUG
+        print("\(#filePath) - \(#function)")
+        print("from \(sourceFile.path)")
+        #endif
 
         @Dependency(SourceKitClient.self) var sourceKitClient
         for callerOffset in callerOffsets {
+            print("callerOffset: \(callerOffset)")
             do {
                 let response = try await sourceKitClient.sendCursorInfoRequest(
                     file: sourceFile.path,
                     offset: callerOffset,
-                    sourceFilePaths: sourceFilePaths,
+                    sourceFilePaths: allSourceFilePaths,
                     arguments: sourceKitArguments
                 )
                 #if DEBUG
-                    print("\(#filePath) - \(#function)")
-                    dump(response)
+//                    print("\(#filePath) - \(#function)")
+                    print("sourceKitClient.sendCursorInfoRequest")
+//                    dump(response)
                 #endif
 
                 guard let definitionFilePath = response[CursorInfoResponseKeys.filePath.key] else {
                     print("ERROR in \(#filePath) - \(#function): Cannot find `key.filepath`.")
                     continue
                 }
+                print("definitionFilePath: \(definitionFilePath)")
+
                 guard let definitionLine = response[CursorInfoResponseKeys.line.key] else {
                     print("ERROR in \(#filePath) - \(#function): Cannot find `key.line`.")
                     continue
                 }
+                print("definitionLine: \(definitionLine)")
+
                 guard let definitionColumn = response[CursorInfoResponseKeys.column.key] else {
                     print("ERROR in \(#filePath) - \(#function): Cannot find `key.column`.")
                     continue
                 }
+                print("definitionColumn: \(definitionColumn)")
+
                 guard let definitionOffset = response[CursorInfoResponseKeys.offset.key] else {
                     print("ERROR in \(#filePath) - \(#function): Cannot find `key.offset`.")
                     continue
                 }
+                print("definitionOffset: \(definitionOffset)")
 
 //                let definitionPosition = SourcePosition(line: definitionLine, utf8index: definitionColumn)
 //                guard let definitionObjectIndex = declarationObjects.firstIndex(where: {
@@ -97,12 +145,11 @@ enum DependencyExtractor {
 //                    dependingObject: .init(kind: <#T##DependencyObject.Object.Kind#>, filePath: callerObject.fullPath, offset: callerOffset),
 //                    dependedObject: .init(kind: <#T##DependencyObject.Object.Kind#>, filePath: definitionObject.fullPath, offset: definitionOffset)
 //                )
+                print()
             } catch {
                 print("ERROR in \(#filePath) - \(#function): \(error)")
             }
         }
-
-        return objects
     }
 
     func extractCallerOffsets(from sourceFile: SourceFile) -> [Int] {

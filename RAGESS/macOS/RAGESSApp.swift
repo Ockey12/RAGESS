@@ -39,8 +39,10 @@ struct RAGESSApp: App {
                             )
                         ),
                         dependenciesClient: .init(
-                            projectRootPath: "",
-                            declarationObjects: []
+                            declarationObjects: [],
+                            allSourceFiles: [],
+                            buildSettings: [:],
+                            packages: []
                         )
                     ),
                     reducer: {

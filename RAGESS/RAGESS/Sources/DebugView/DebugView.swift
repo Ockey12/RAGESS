@@ -77,11 +77,13 @@ public struct DebugReducer {
 
             case .sourceFileClient(.getSourceFilesButtonTapped):
                 state.kittenClient.packages = []
+                state.dependenciesClient.packages = []
                 return .none
 
             case let .sourceFileClient(.sourceFileResponse(.success(directory))):
                 state.kittenClient.allFilePathsInProject = getAllSwiftFilePathsInProject(in: directory)
                 state.typeDeclarationExtractor.directory = directory
+                state.dependenciesClient.allSourceFiles = getAllSourceFilesInProject(in: directory)
                 state.buildSettingsLoading = true
                 return .none
 
@@ -99,6 +101,7 @@ public struct DebugReducer {
 
             case let .sourceFileClient(.buildSettingsResponse(.success(buildSettings))):
                 state.kittenClient.buildSettings = buildSettings
+                state.dependenciesClient.buildSettings = buildSettings
                 state.buildSettingsLoading = false
                 state.dumpPackageSwiftLoading = true
                 return .none
@@ -109,6 +112,7 @@ public struct DebugReducer {
 
             case let .sourceFileClient(.dumpPackageResponse(.success(packageObject))):
                 state.kittenClient.packages.append(packageObject)
+                state.dependenciesClient.packages.append(packageObject)
                 state.dumpPackageSwiftLoading = false
                 print("\nstate.kittenClient.packages.append(packageObject)")
                 dump(state.kittenClient.packages)
@@ -145,6 +149,14 @@ extension DebugReducer {
             swiftFilePaths.append(contentsOf: getAllSwiftFilePathsInProject(in: subDirectory))
         }
         return swiftFilePaths
+    }
+
+    func getAllSourceFilesInProject(in directory: Directory) -> [SourceFile] {
+        var files = directory.files
+        for subDirectory in directory.subDirectories {
+            files.append(contentsOf: getAllSourceFilesInProject(in: subDirectory))
+        }
+        return files
     }
 }
 

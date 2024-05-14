@@ -8,8 +8,10 @@
 
 import ComposableArchitecture
 import DependenciesClient
+import SourceKitClient
 import SwiftUI
 import TypeDeclaration
+import XcodeObject
 
 @Reducer
 public struct DependenciesClientDebugger {
@@ -17,12 +19,21 @@ public struct DependenciesClientDebugger {
 
     @ObservableState
     public struct State {
-        var projectRootPath: String
         var declarationObjects: [any DeclarationObject]
+        var allSourceFiles: [SourceFile]
+        var buildSettings: [String: String]
+        var packages: [PackageObject]
 
-        public init(projectRootPath: String, declarationObjects: [any DeclarationObject]) {
-            self.projectRootPath = projectRootPath
+        public init(
+            declarationObjects: [any DeclarationObject],
+            allSourceFiles: [SourceFile],
+            buildSettings: [String : String],
+            packages: [PackageObject]
+        ) {
             self.declarationObjects = declarationObjects
+            self.allSourceFiles = allSourceFiles
+            self.buildSettings = buildSettings
+            self.packages = packages
         }
     }
 
@@ -38,11 +49,18 @@ public struct DependenciesClientDebugger {
             switch action {
             case .getDependenciesTapped:
                 return .run {
-                    [projectRootPath = state.projectRootPath, declarationObjects = state.declarationObjects] send in
+                    [
+                        declarationObjects = state.declarationObjects,
+                        allSourceFiles = state.allSourceFiles,
+                        buildSettings = state.buildSettings,
+                        packages = state.packages
+                    ] send in
                     await send(.extractDependenciesResponse(Result {
                         try await dependenciesClient.extractDependencies(
-                            projectRootPath: projectRootPath,
-                            declarationObjects: declarationObjects
+                            declarationObjects: declarationObjects,
+                            allSourceFiles: allSourceFiles,
+                            buildSettings: buildSettings,
+                            packages: packages
                         )
                     }))
                 }
@@ -67,7 +85,6 @@ public struct DependenciesClientDebugView: View {
 
     public var body: some View {
         ScrollView {
-            Text("Project Root Path: \(store.projectRootPath)")
             Button("Extract Dependencies") {
                 store.send(.getDependenciesTapped)
             }

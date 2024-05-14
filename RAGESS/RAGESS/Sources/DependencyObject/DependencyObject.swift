@@ -6,8 +6,6 @@
 //
 //
 
-import LanguageServerProtocol
-
 public struct DependencyObject {
     public init(dependingObject: Object, dependedObject: Object) {
         self.dependingObject = dependingObject
@@ -22,9 +20,14 @@ public struct DependencyObject {
     public var dependedObject: Object
 
     public struct Object {
+        public init(kind: Kind, filePath: String, offset: Int) {
+            self.kind = kind
+            self.filePath = filePath
+            self.offset = offset
+        }
+
         public let kind: Kind
         public let filePath: String
-        public let position: Position
         public let offset: Int
 
         public enum Kind {

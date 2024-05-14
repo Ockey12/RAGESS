@@ -76,12 +76,7 @@ let package = Package(
                 .product(name: "SwiftSyntax", package: "swift-syntax")
             ]
         ),
-        .target(
-            name: "DependencyObject",
-            dependencies: [
-                .product(name: "LSPBindings", package: "sourcekit-lsp")
-            ]
-        ),
+        .target(name: "DependencyObject"),
         .target(
             name: "DumpPackageClient",
             dependencies: [

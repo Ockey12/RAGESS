@@ -20,6 +20,7 @@ public struct DebugReducer {
         var typeAnnotationClient: TypeAnnotationDebugger.State
         var kittenClient: SourceKitClientDebugger.State
         var typeDeclarationExtractor: TypeDeclarationExtractorDebugger.State
+        var dependenciesClient: DependenciesClientDebugger.State
 
         var buildSettingsLoading = false
         var dumpPackageSwiftLoading = false
@@ -29,13 +30,15 @@ public struct DebugReducer {
             sourceFileClient: SourceFileClientDebugger.State,
             typeAnnotationClient: TypeAnnotationDebugger.State,
             kittenClient: SourceKitClientDebugger.State,
-            typeDeclarationExtractor: TypeDeclarationExtractorDebugger.State
+            typeDeclarationExtractor: TypeDeclarationExtractorDebugger.State,
+            dependenciesClient: DependenciesClientDebugger.State
         ) {
             self.lspClient = lspClient
             self.sourceFileClient = sourceFileClient
             self.typeAnnotationClient = typeAnnotationClient
             self.kittenClient = kittenClient
             self.typeDeclarationExtractor = typeDeclarationExtractor
+            self.dependenciesClient = dependenciesClient
         }
     }
 
@@ -45,6 +48,7 @@ public struct DebugReducer {
         case typeAnnotationClient(TypeAnnotationDebugger.Action)
         case kittenClient(SourceKitClientDebugger.Action)
         case typeDeclarationExtractor(TypeDeclarationExtractorDebugger.Action)
+        case dependenciesClient(DependenciesClientDebugger.Action)
     }
 
     public var body: some ReducerOf<Self> {
@@ -62,6 +66,9 @@ public struct DebugReducer {
         }
         Scope(state: \.typeDeclarationExtractor, action: \.typeDeclarationExtractor) {
             TypeDeclarationExtractorDebugger()
+        }
+        Scope(state: \.dependenciesClient, action: \.dependenciesClient) {
+            DependenciesClientDebugger()
         }
         Reduce { state, action in
             switch action {
@@ -122,6 +129,9 @@ public struct DebugReducer {
                 return .none
 
             case .kittenClient:
+                return .none
+
+            case .dependenciesClient:
                 return .none
             }
         }
@@ -191,6 +201,15 @@ public struct DebugView: View {
                     )
                 )
                 .tabItem { Text("TypeDeclarationExtractor") }
+                .padding()
+
+                DependenciesClientDebugView(
+                    store: store.scope(
+                        state: \.dependenciesClient,
+                        action: \.dependenciesClient
+                    )
+                )
+                .tabItem { Text("DependenciesClient") }
                 .padding()
             }
             .frame(maxWidth: .infinity)

@@ -7,7 +7,6 @@
 //
 
 import Dependencies
-import Dependency
 import LanguageServerProtocol
 import SourceKitClient
 import SwiftParser
@@ -25,7 +24,7 @@ enum DependencyExtractor {
         declarationObjects: [DeclarationObject],
         sourceFilePaths: [String],
         sourceKitArguments: [String]
-    ) -> [DeclarationObject] {
+    ) async -> [DeclarationObject] {
         var objects = declarationObjects
         let callerOffsets = extractCallerOffsets(from: sourceFile)
 
@@ -60,14 +59,14 @@ enum DependencyExtractor {
                     continue
                 }
 
-                let definitionPosition = SourcePosition(line: definitionLine, utf8index: definitionColumn)
-                guard let definitionObjectIndex = declarationObjects.firstIndex(where: {
-                    $0.fullPath == definitionFilePath
-                        && $0.positionRange.contains(definitionPosition)
-                }) else {
-                    print("ERROR in \(#filePath) - \(#function): Cannot find definition object in [\(DeclarationObject)].")
-                    continue
-                }
+//                let definitionPosition = SourcePosition(line: definitionLine, utf8index: definitionColumn)
+//                guard let definitionObjectIndex = declarationObjects.firstIndex(where: {
+//                    $0.fullPath == definitionFilePath
+//                        && $0.positionRange.contains(definitionPosition)
+//                }) else {
+//                    print("ERROR in \(#filePath) - \(#function): Cannot find definition object in [\(DeclarationObject)].")
+//                    continue
+//                }
 //                guard let callerIndex = declarationObjects.firstIndex(where: {
 //                    $0.fullPath == sourceFile.path
 //                    // TODO: Collate offsets.
@@ -75,25 +74,29 @@ enum DependencyExtractor {
 //                    print("ERROR in \(#filePath) - \(#function): Cannot find caller object in [DeclarationObject].")
 //                    continue
 //                }
-                let callerIndexes = declarationObjects.enumerated().compactMap{ (index, element) -> Int? in
-                    if element.fullPath == sourceFile.path && element.offsetRange.contains(callerOffset) {
-                        return index
-                    }
-                    return nil
-                }
-                guard var callerIndex = callerIndexes.first else {
-                    print("ERROR in \(#filePath) - \(#function): Cannot find caller object in [\(DeclarationObject)].")
-                    continue
-                }
-                callerIndexes = callerIndexes.dropFirst()
-                for index in callerIndexes {
-                    if (callerOffset - declarationObjects[index].offsetRange.lowerBound)
-                        < (callerOffset - declarationObjects[callerIndex].offsetRange.lowerBound) {
-                        callerIndex = index
-                    }
-                }
-                let caller = declarationObjects[callerIndex]
-//                let dependency = depende
+//                var callerIndexes = declarationObjects.enumerated().compactMap{ (index, element) -> Int? in
+//                    if element.fullPath == sourceFile.path && element.offsetRange.contains(callerOffset) {
+//                        return index
+//                    }
+//                    return nil
+//                }
+//                guard var callerIndex = callerIndexes.first else {
+//                    print("ERROR in \(#filePath) - \(#function): Cannot find caller object in [\(DeclarationObject)].")
+//                    continue
+//                }
+//                callerIndexes = callerIndexes.dropFirst()
+//                for index in callerIndexes {
+//                    if (callerOffset - declarationObjects[index].offsetRange.lowerBound)
+//                        < (callerOffset - declarationObjects[callerIndex].offsetRange.lowerBound) {
+//                        callerIndex = index
+//                    }
+//                }
+//                let callerObject = declarationObjects[callerIndex]
+//                let definitionObject = declarationObjects[definitionObjectIndex]
+//                let dependency = DependencyObject(
+//                    dependingObject: .init(kind: <#T##DependencyObject.Object.Kind#>, filePath: callerObject.fullPath, offset: callerOffset),
+//                    dependedObject: .init(kind: <#T##DependencyObject.Object.Kind#>, filePath: definitionObject.fullPath, offset: definitionOffset)
+//                )
             } catch {
                 print("ERROR in \(#filePath) - \(#function): \(error)")
             }

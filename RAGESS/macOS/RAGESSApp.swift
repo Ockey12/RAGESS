@@ -37,6 +37,10 @@ struct RAGESSApp: App {
                                 subDirectories: [],
                                 files: []
                             )
+                        ),
+                        dependenciesClient: .init(
+                            projectRootPath: "",
+                            declarationObjects: []
                         )
                     ),
                     reducer: {

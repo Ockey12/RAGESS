@@ -11,6 +11,7 @@ public struct DependencyObject {
         self.dependingObject = dependingObject
         self.dependedObject = dependedObject
     }
+
     /// This object uses dependedObject as the type of a variable or a function argument.
     /// This object may be affected by changes in dependedObject.
     public var dependingObject: Object

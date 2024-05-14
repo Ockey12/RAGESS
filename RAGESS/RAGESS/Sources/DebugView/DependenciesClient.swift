@@ -1,9 +1,9 @@
 //
 //  DependenciesClient.swift
 //
-//  
+//
 //  Created by Ockey12 on 2024/05/15
-//  
+//
 //
 
 import ComposableArchitecture

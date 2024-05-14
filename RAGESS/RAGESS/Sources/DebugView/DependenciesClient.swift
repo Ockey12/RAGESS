@@ -28,7 +28,7 @@ public struct DependenciesClientDebugger {
         public init(
             declarationObjects: [any DeclarationObject],
             allSourceFiles: [SourceFile],
-            buildSettings: [String : String],
+            buildSettings: [String: String],
             packages: [PackageObject]
         ) {
             self.declarationObjects = declarationObjects

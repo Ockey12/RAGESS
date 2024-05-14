@@ -22,7 +22,7 @@ struct DependencyExtractor {
         packages: [PackageObject]
     ) async {
         print("\(#filePath) - \(#function)")
-        
+
         let allSourceFilePaths = allSourceFiles.map { $0.path }
         print("--- allSourceFilePaths ---")
         for path in allSourceFilePaths {
@@ -63,8 +63,8 @@ struct DependencyExtractor {
         let callerOffsets = extractCallerOffsets(from: sourceFile)
 
         #if DEBUG
-        print("\(#filePath) - \(#function)")
-        print("from \(sourceFile.path)")
+            print("\(#filePath) - \(#function)")
+            print("from \(sourceFile.path)")
         #endif
 
         @Dependency(SourceKitClient.self) var sourceKitClient
@@ -110,7 +110,7 @@ struct DependencyExtractor {
 //                let definitionPosition = SourcePosition(line: definitionLine, utf8index: definitionColumn)
                 guard let definitionObjectIndex = declarationObjects.firstIndex(where: {
                     $0.fullPath == definitionFilePath
-                    && $0.offsetRange.contains(Int(definitionOffset))
+                        && $0.offsetRange.contains(Int(definitionOffset))
                 }) else {
                     print("ERROR in \(#filePath) - \(#function): Cannot find definition object in [\(DeclarationObject.self)].\n")
                     continue
@@ -173,8 +173,7 @@ struct DependencyExtractor {
 
                 guard let callerObjectIndex = declarationObjects.firstIndex(where: {
                     $0.fullPath == sourceFile.path
-                    // TODO: Collate offsets.
-                    && $0.offsetRange.contains(callerOffset)
+                        && $0.offsetRange.contains(callerOffset)
                 }) else {
                     print("ERROR in \(#filePath) - \(#function): Cannot find caller object in [\(DeclarationObject.self)].\n")
                     continue

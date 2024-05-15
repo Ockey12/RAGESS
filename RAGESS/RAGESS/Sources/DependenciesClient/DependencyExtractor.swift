@@ -248,11 +248,11 @@ struct DependencyExtractor {
                     continue
                 }
                 let dependencyObject = DependencyObject(
-                    dependingObject: .init(
+                    callerObject: .init(
                         filePath: callerObject.fullPath,
                         keyPath: callerKeyPath
                     ),
-                    dependedObject: .init(
+                    definitionObject: .init(
                         filePath: definitionObject.fullPath,
                         keyPath: definitionKeyPath
                     )

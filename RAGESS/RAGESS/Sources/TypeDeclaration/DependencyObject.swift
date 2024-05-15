@@ -7,18 +7,18 @@
 //
 
 public struct DependencyObject {
-    public init(dependingObject: Object, dependedObject: Object) {
-        self.dependingObject = dependingObject
-        self.dependedObject = dependedObject
+    public init(callerObject: Object, definitionObject: Object) {
+        self.callerObject = callerObject
+        self.definitionObject = definitionObject
     }
 
-    /// This object uses dependedObject as the type of a variable or a function argument.
+    /// This object uses definitionObject as the type of a variable or a function argument.
     /// This object may be affected by changes in dependedObject.
-    public var dependingObject: Object
+    public var callerObject: Object
 
-    /// This object is used by dependingObject as the type of a variable or the type of a function argument.
+    /// This object is used by callerObject as the type of a variable or the type of a function argument.
     /// Changes to this object may affect the dependingObject.
-    public var dependedObject: Object
+    public var definitionObject: Object
 
     public struct Object {
         public init(filePath: String, keyPath: ObjectKeyPath) {

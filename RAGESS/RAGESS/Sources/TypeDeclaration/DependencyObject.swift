@@ -21,22 +21,20 @@ public struct DependencyObject {
     public var dependedObject: Object
 
     public struct Object {
-        public init(kind: Kind, filePath: String, keyPath: PartialKeyPath<DeclarationObject>) {
-            self.kind = kind
+        public init(filePath: String, keyPath: ObjectKeyPath) {
             self.filePath = filePath
             self.keyPath = keyPath
         }
 
-        public let kind: Kind
         public let filePath: String
-        public let keyPath: PartialKeyPath<DeclarationObject>
+        public let keyPath: ObjectKeyPath
 
-        public enum Kind {
-            case `struct`
-            case `class`
-            case `enum`
-            case variable
-            case function
+        public enum ObjectKeyPath {
+            case `struct`(PartialKeyPath<StructObject>)
+            case `class`(PartialKeyPath<ClassObject>)
+            case `enum`(PartialKeyPath<EnumObject>)
+            case variable(PartialKeyPath<VariableObject>)
+            case function(PartialKeyPath<FunctionObject>)
         }
     }
 }

@@ -116,11 +116,12 @@ struct DependencyExtractor {
                     continue
                 }
 
-                var definitionVariableKeyPath: PartialKeyPath<VariableObject>?
-                var definitionFunctionKeyPath: PartialKeyPath<FunctionObject>?
-                var definitionStructKeyPath: PartialKeyPath<StructObject>?
-                var definitionClassKeyPath: PartialKeyPath<ClassObject>?
-                var definitionEnumKeyPath: PartialKeyPath<EnumObject>?
+//                var definitionVariableKeyPath: PartialKeyPath<VariableObject>?
+//                var definitionFunctionKeyPath: PartialKeyPath<FunctionObject>?
+//                var definitionStructKeyPath: PartialKeyPath<StructObject>?
+//                var definitionClassKeyPath: PartialKeyPath<ClassObject>?
+//                var definitionEnumKeyPath: PartialKeyPath<EnumObject>?
+                var optionalDefinitionKeyPath: DependencyObject.Object.ObjectKeyPath?
                 if let variableObject = declarationObjects[definitionObjectIndex] as? VariableObject {
                     guard let keyPath = findProperty(in: variableObject, matching: {
                         $0.offsetRange.contains(Int(definitionOffset))
@@ -128,7 +129,8 @@ struct DependencyExtractor {
                         print("ERROR in \(#filePath) - \(#function): Cannot find property in \(variableObject.name)\n")
                         continue
                     }
-                    definitionVariableKeyPath = keyPath
+//                    definitionVariableKeyPath = keyPath
+                    optionalDefinitionKeyPath = .variable(keyPath)
                     print("definition: \(variableObject[keyPath: keyPath])")
                 } else if let functionObject = declarationObjects[definitionObjectIndex] as? FunctionObject {
                     guard let keyPath = findProperty(in: functionObject, matching: {
@@ -137,7 +139,7 @@ struct DependencyExtractor {
                         print("ERROR in \(#filePath) - \(#function): Cannot find property in \(functionObject.name)\n")
                         continue
                     }
-                    definitionFunctionKeyPath = keyPath
+                    optionalDefinitionKeyPath = .function(keyPath)
                     print("definition: \(functionObject[keyPath: keyPath])")
                 } else if let structObject = declarationObjects[definitionObjectIndex] as? StructObject {
                     guard let keyPath = findProperty(in: structObject, matching: {
@@ -146,7 +148,7 @@ struct DependencyExtractor {
                         print("ERROR in \(#filePath) - \(#function): Cannot find property in \(structObject.name)\n")
                         continue
                     }
-                    definitionStructKeyPath = keyPath
+                    optionalDefinitionKeyPath = .struct(keyPath)
                     print("definition: \(structObject[keyPath: keyPath])")
                 } else if let classObject = declarationObjects[definitionObjectIndex] as? ClassObject {
                     guard let keyPath = findProperty(in: classObject, matching: {
@@ -155,7 +157,7 @@ struct DependencyExtractor {
                         print("ERROR in \(#filePath) - \(#function): Cannot find property in \(classObject.name)\n")
                         continue
                     }
-                    definitionClassKeyPath = keyPath
+                    optionalDefinitionKeyPath = .class(keyPath)
                     print("definition: \(classObject[keyPath: keyPath])")
                 } else if let enumObject = declarationObjects[definitionObjectIndex] as? EnumObject {
                     guard let keyPath = findProperty(in: enumObject, matching: {
@@ -164,7 +166,7 @@ struct DependencyExtractor {
                         print("ERROR in \(#filePath) - \(#function): Cannot find property in \(enumObject.name)\n")
                         continue
                     }
-                    definitionEnumKeyPath = keyPath
+                    optionalDefinitionKeyPath = .enum(keyPath)
                     print("definition: \(enumObject[keyPath: keyPath])")
                 } else {
                     print("ERROR in \(#filePath) - \(#function): Cannot cast to any DeclarationObject.\n")
@@ -179,11 +181,12 @@ struct DependencyExtractor {
                     continue
                 }
 
-                var callerVariableKeyPath: PartialKeyPath<VariableObject>?
-                var callerFunctionKeyPath: PartialKeyPath<FunctionObject>?
-                var callerStructKeyPath: PartialKeyPath<StructObject>?
-                var callerClassKeyPath: PartialKeyPath<ClassObject>?
-                var callerEnumKeyPath: PartialKeyPath<EnumObject>?
+//                var callerVariableKeyPath: PartialKeyPath<VariableObject>?
+//                var callerFunctionKeyPath: PartialKeyPath<FunctionObject>?
+//                var callerStructKeyPath: PartialKeyPath<StructObject>?
+//                var callerClassKeyPath: PartialKeyPath<ClassObject>?
+//                var callerEnumKeyPath: PartialKeyPath<EnumObject>?
+                var optionalCallerKeyPath: DependencyObject.Object.ObjectKeyPath?
                 if let variableObject = declarationObjects[callerObjectIndex] as? VariableObject {
                     guard let keyPath = findProperty(in: variableObject, matching: {
                         $0.offsetRange.contains(Int(callerOffset))
@@ -191,7 +194,7 @@ struct DependencyExtractor {
                         print("ERROR in \(#filePath) - \(#function): Cannot find property in \(variableObject.name)\n")
                         continue
                     }
-                    callerVariableKeyPath = keyPath
+                    optionalCallerKeyPath = .variable(keyPath)
                     print("caller: \(variableObject[keyPath: keyPath])")
                 } else if let functionObject = declarationObjects[callerObjectIndex] as? FunctionObject {
                     guard let keyPath = findProperty(in: functionObject, matching: {
@@ -200,7 +203,7 @@ struct DependencyExtractor {
                         print("ERROR in \(#filePath) - \(#function): Cannot find property in \(functionObject.name)\n")
                         continue
                     }
-                    callerFunctionKeyPath = keyPath
+                    optionalCallerKeyPath = .function(keyPath)
                     print("caller: \(functionObject[keyPath: keyPath])")
                 } else if let structObject = declarationObjects[callerObjectIndex] as? StructObject {
                     guard let keyPath = findProperty(in: structObject, matching: {
@@ -209,7 +212,7 @@ struct DependencyExtractor {
                         print("ERROR in \(#filePath) - \(#function): Cannot find property in \(structObject.name)\n")
                         continue
                     }
-                    callerStructKeyPath = keyPath
+                    optionalCallerKeyPath = .struct(keyPath)
                     print("caller: \(structObject[keyPath: keyPath])")
                 } else if let classObject = declarationObjects[callerObjectIndex] as? ClassObject {
                     guard let keyPath = findProperty(in: classObject, matching: {
@@ -218,7 +221,7 @@ struct DependencyExtractor {
                         print("ERROR in \(#filePath) - \(#function): Cannot find property in \(classObject.name)\n")
                         continue
                     }
-                    callerClassKeyPath = keyPath
+                    optionalCallerKeyPath = .class(keyPath)
                     print("caller: \(classObject[keyPath: keyPath])")
                 } else if let enumObject = declarationObjects[callerObjectIndex] as? EnumObject {
                     guard let keyPath = findProperty(in: enumObject, matching: {
@@ -227,12 +230,33 @@ struct DependencyExtractor {
                         print("ERROR in \(#filePath) - \(#function): Cannot find property in \(enumObject.name)\n")
                         continue
                     }
-                    callerEnumKeyPath = keyPath
+                    optionalCallerKeyPath = .enum(keyPath)
                     print("caller: \(enumObject[keyPath: keyPath])")
                 } else {
                     print("ERROR in \(#filePath) - \(#function): Cannot cast to any DeclarationObject.\n")
                     continue
                 }
+
+                let callerObject = declarationObjects[callerObjectIndex]
+                let definitionObject = declarationObjects[definitionObjectIndex]
+                guard let callerKeyPath = optionalCallerKeyPath else {
+                    print("ERROR in \(#filePath) - \(#function): Cannot unwrap optionalCallerKeyPath.\n")
+                    continue
+                }
+                guard let definitionKeyPath = optionalDefinitionKeyPath else {
+                    print("ERROR in \(#filePath) - \(#function): Cannot unwrap optionalDefinitionKeyPath.\n")
+                    continue
+                }
+                let dependencyObject = DependencyObject(
+                    dependingObject: .init(
+                        filePath: callerObject.fullPath,
+                        keyPath: callerKeyPath
+                    ),
+                    dependedObject: .init(
+                        filePath: definitionObject.fullPath,
+                        keyPath: definitionKeyPath
+                    )
+                )
 
                 print()
             } catch {

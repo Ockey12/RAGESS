@@ -6,7 +6,11 @@
 //
 //
 
+import Dependencies
+import Foundation
+
 public struct VariableObject: DeclarationObject, VariableOwner, FunctionOwner {
+    public let id: UUID
     public let name: String
     public var fullPath: String
     public let sourceCode: String
@@ -26,6 +30,8 @@ public struct VariableObject: DeclarationObject, VariableOwner, FunctionOwner {
         positionRange: ClosedRange<SourcePosition>,
         offsetRange: ClosedRange<Int>
     ) {
+        @Dependency(\.uuid) var uuid
+        self.id = uuid()
         self.name = name
         self.fullPath = fullPath
         self.sourceCode = sourceCode

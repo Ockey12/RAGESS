@@ -6,7 +6,10 @@
 //
 //
 
-public protocol DeclarationObject {
+import Foundation
+
+public protocol DeclarationObject: Identifiable {
+    var id: UUID { get }
     var name: String { get }
     var fullPath: String { get set }
     var sourceCode: String { get }

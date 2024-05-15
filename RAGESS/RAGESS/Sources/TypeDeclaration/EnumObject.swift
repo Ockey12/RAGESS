@@ -5,7 +5,11 @@
 //  Created by ockey12 on 2024/05/07.
 //
 
+import Dependencies
+import Foundation
+
 public struct EnumObject: TypeDeclaration {
+    public let id: UUID
     public let name: String
     public var fullPath: String
     public let sourceCode: String
@@ -29,6 +33,8 @@ public struct EnumObject: TypeDeclaration {
         positionRange: ClosedRange<SourcePosition>,
         offsetRange: ClosedRange<Int>
     ) {
+        @Dependency(\.uuid) var uuid
+        self.id = uuid()
         self.name = name
         self.fullPath = fullPath
         self.sourceCode = sourceCode

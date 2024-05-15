@@ -79,8 +79,8 @@ final class TypeDeclVisitor: SyntaxVisitor {
         if buffer.count >= 1 {
             // If there is an element in the buffer, the last element in the buffer is the parent of this.
             guard let owner = buffer.popLast(),
-                  var ownerTypeObject = owner as? TypeDeclaration else {
-                fatalError("The type of the last element of buffer does not conform to \(TypeDeclaration.self).")
+                  var ownerTypeObject = owner as? any TypeDeclaration else {
+                fatalError("The type of the last element of buffer does not conform to TypeDeclaration.")
             }
             #if DEBUG
                 print("buffer[\(buffer.count)].nestingStructs.append(\(currentStruct.name))")
@@ -157,8 +157,8 @@ final class TypeDeclVisitor: SyntaxVisitor {
         if buffer.count >= 1 {
             // If there is an element in the buffer, the last element in the buffer is the parent of this.
             guard let owner = buffer.popLast(),
-                  var ownerTypeObject = owner as? TypeDeclaration else {
-                fatalError("The type of the last element of buffer does not conform to \(TypeDeclaration.self).")
+                  var ownerTypeObject = owner as? any TypeDeclaration else {
+                fatalError("The type of the last element of buffer does not conform to TypeDeclaration.")
             }
             #if DEBUG
                 print("buffer[\(buffer.count)].nestingClasses.append(\(currentClass.name))")
@@ -234,8 +234,8 @@ final class TypeDeclVisitor: SyntaxVisitor {
         if buffer.count >= 1 {
             // If there is an element in the buffer, the last element in the buffer is the parent of this.
             guard let owner = buffer.popLast(),
-                  var ownerTypeObject = owner as? TypeDeclaration else {
-                fatalError("The type of the last element of buffer does not conform to \(TypeDeclaration.self).")
+                  var ownerTypeObject = owner as? any TypeDeclaration else {
+                fatalError("The type of the last element of buffer does not conform to TypeDeclaration.")
             }
             #if DEBUG
                 print("buffer[\(buffer.count)].nestingEnums.append(\(currentEnum.name))")
@@ -325,8 +325,8 @@ final class TypeDeclVisitor: SyntaxVisitor {
         if buffer.count >= 1 {
             // If there is an element in the buffer, the last element in the buffer is the parent of this.
             guard let owner = buffer.popLast(),
-                  var ownerObject = owner as? VariableOwner else {
-                fatalError("The type of the last element of buffer does not conform to \(VariableOwner.self).")
+                  var ownerObject = owner as? any VariableOwner else {
+                fatalError("The type of the last element of buffer does not conform to VariableOwner.")
             }
             #if DEBUG
                 print("buffer[\(buffer.count)].variables.append(\(currentVariable.name))")
@@ -403,8 +403,8 @@ final class TypeDeclVisitor: SyntaxVisitor {
         if buffer.count >= 1 {
             // If there is an element in the buffer, the last element in the buffer is the parent of this.
             guard let owner = buffer.popLast(),
-                  var ownerObject = owner as? FunctionOwner else {
-                fatalError("The type of the last element of buffer does not conform to \(FunctionOwner.self).")
+                  var ownerObject = owner as? any FunctionOwner else {
+                fatalError("The type of the last element of buffer does not conform to TypeDeclaration.")
             }
             #if DEBUG
                 print("buffer[\(buffer.count)].functions.append(\(currentFunction.name))")

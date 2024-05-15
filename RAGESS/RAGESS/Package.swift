@@ -128,6 +128,7 @@ let package = Package(
         .target(
             name: "TypeDeclaration",
             dependencies: [
+                .product(name: "Dependencies", package: "swift-dependencies"),
                 .product(name: "LSPBindings", package: "sourcekit-lsp")
             ]
         ),

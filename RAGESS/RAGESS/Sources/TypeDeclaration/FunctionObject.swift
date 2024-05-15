@@ -5,7 +5,11 @@
 //  Created by ockey12 on 2024/05/06.
 //
 
+import Dependencies
+import Foundation
+
 public struct FunctionObject: DeclarationObject, VariableOwner, FunctionOwner {
+    public let id: UUID
     public let name: String
     public var fullPath: String
     public let sourceCode: String
@@ -25,6 +29,8 @@ public struct FunctionObject: DeclarationObject, VariableOwner, FunctionOwner {
         positionRange: ClosedRange<SourcePosition>,
         offsetRange: ClosedRange<Int>
     ) {
+        @Dependency(\.uuid) var uuid
+        self.id = uuid()
         self.name = name
         self.fullPath = fullPath
         self.sourceCode = sourceCode

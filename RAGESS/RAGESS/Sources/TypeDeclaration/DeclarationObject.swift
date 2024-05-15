@@ -13,7 +13,7 @@ public protocol DeclarationObject {
     var positionRange: ClosedRange<SourcePosition> { get }
     var offsetRange: ClosedRange<Int> { get }
 
-    var objectsOnWhichThisObjectDepends: [DependencyObject] { get set }
+    var objectsThatCallThisObject: [DependencyObject] { get set }
 
-    var objectsThatDependOnThisObject: [DependencyObject] { get set }
+    var objectsThatAreCalledByThisObject: [DependencyObject] { get set }
 }

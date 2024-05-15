@@ -19,8 +19,8 @@ public struct EnumObject: TypeDeclaration {
     public var nestingClasses: [ClassObject] = []
     public var nestingEnums: [EnumObject] = []
 
-    public var objectsOnWhichThisObjectDepends: [DependencyObject] = []
-    public var objectsThatDependOnThisObject: [DependencyObject] = []
+    public var objectsThatCallThisObject: [DependencyObject] = []
+    public var objectsThatAreCalledByThisObject: [DependencyObject] = []
 
     public init(
         name: String,

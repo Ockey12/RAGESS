@@ -16,8 +16,8 @@ public struct VariableObject: DeclarationObject, VariableOwner, FunctionOwner {
     public var variables: [VariableObject] = []
     public var functions: [FunctionObject] = []
 
-    public var objectsOnWhichThisObjectDepends: [DependencyObject] = []
-    public var objectsThatDependOnThisObject: [DependencyObject] = []
+    public var objectsThatCallThisObject: [DependencyObject] = []
+    public var objectsThatAreCalledByThisObject: [DependencyObject] = []
 
     public init(
         name: String,

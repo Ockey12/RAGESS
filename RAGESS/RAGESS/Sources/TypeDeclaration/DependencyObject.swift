@@ -6,6 +6,8 @@
 //
 //
 
+import Foundation
+
 public struct DependencyObject {
     public init(callerObject: Object, definitionObject: Object) {
         self.callerObject = callerObject
@@ -21,12 +23,12 @@ public struct DependencyObject {
     public var definitionObject: Object
 
     public struct Object {
-        public init(filePath: String, keyPath: ObjectKeyPath) {
-            self.filePath = filePath
+        public init(id: UUID, keyPath: ObjectKeyPath) {
+            self.id = id
             self.keyPath = keyPath
         }
 
-        public let filePath: String
+        public let id: UUID
         public let keyPath: ObjectKeyPath
 
         public enum ObjectKeyPath {

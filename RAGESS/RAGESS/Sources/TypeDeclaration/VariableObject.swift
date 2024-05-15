@@ -31,7 +31,7 @@ public struct VariableObject: DeclarationObject, VariableOwner, FunctionOwner {
         offsetRange: ClosedRange<Int>
     ) {
         @Dependency(\.uuid) var uuid
-        self.id = uuid()
+        id = uuid()
         self.name = name
         self.fullPath = fullPath
         self.sourceCode = sourceCode

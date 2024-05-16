@@ -12,7 +12,7 @@ public struct ClassObject: TypeDeclaration {
     public let id: UUID
     public let name: String
     public var fullPath: String
-    public var annotatedDecl: String = ""
+    public var annotatedDecl: String
     public let sourceCode: String
     public let positionRange: ClosedRange<SourcePosition>
     public let offsetRange: ClosedRange<Int>
@@ -38,6 +38,7 @@ public struct ClassObject: TypeDeclaration {
         id = uuid()
         self.name = name
         self.fullPath = fullPath
+        self.annotatedDecl = name
         self.sourceCode = sourceCode
         self.positionRange = positionRange
         self.offsetRange = offsetRange

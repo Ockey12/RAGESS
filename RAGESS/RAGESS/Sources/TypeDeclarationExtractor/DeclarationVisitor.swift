@@ -1,5 +1,5 @@
 //
-//  TypeDeclVisitor.swift
+//  DeclarationVisitor.swift
 //
 //
 //  Created by ockey12 on 2024/05/05.
@@ -8,7 +8,7 @@
 import SwiftSyntax
 import TypeDeclaration
 
-final class TypeDeclVisitor: SyntaxVisitor {
+final class DeclarationVisitor: SyntaxVisitor {
     let fullPath: String
     private var structDeclarations: [StructObject] = []
     private var classDeclarations: [ClassObject] = []
@@ -433,7 +433,7 @@ final class TypeDeclVisitor: SyntaxVisitor {
     }
 }
 
-extension TypeDeclVisitor {
+extension DeclarationVisitor {
     private func appendToBuffer(_ typeObject: any DeclarationObject) {
         #if DEBUG
             print("buffer.append(\(typeObject.name))")

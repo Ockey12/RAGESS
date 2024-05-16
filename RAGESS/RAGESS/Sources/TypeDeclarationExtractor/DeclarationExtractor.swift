@@ -22,7 +22,7 @@ public struct DeclarationExtractor {
             print(parsedFile.debugDescription)
         #endif
 
-        let visitor = TypeDeclVisitor(
+        let visitor = DeclarationVisitor(
             in: sourceFile.path,
             locatonConverter: SourceLocationConverter(
                 fileName: sourceFile.path,

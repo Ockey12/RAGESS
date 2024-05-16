@@ -11,7 +11,7 @@ import DependenciesClient
 import SourceKitClient
 import SwiftUI
 import TypeDeclaration
-import TypeDeclarationExtractor
+import DeclarationExtractor
 import XcodeObject
 
 @Reducer

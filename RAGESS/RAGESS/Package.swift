@@ -60,7 +60,7 @@ let package = Package(
                 "SourceKitClient",
                 "TypeAnnotationClient",
                 "TypeDeclaration",
-                "TypeDeclarationExtractor",
+                "DeclarationExtractor",
                 "XcodeObject",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ]
@@ -133,7 +133,7 @@ let package = Package(
             ]
         ),
         .target(
-            name: "TypeDeclarationExtractor",
+            name: "DeclarationExtractor",
             dependencies: [
                 "TypeDeclaration",
                 "XcodeObject",

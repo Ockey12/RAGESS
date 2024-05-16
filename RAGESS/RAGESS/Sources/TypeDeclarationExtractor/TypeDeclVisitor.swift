@@ -37,6 +37,7 @@ final class TypeDeclVisitor: SyntaxVisitor {
         let currentStruct = StructObject(
             name: node.name.text,
             fullPath: fullPath,
+            sourceCode: trimSourceCode(node.description),
             positionRange: SourcePosition(
                 line: positionRange.start.line,
                 utf8index: positionRange.start.column
@@ -115,6 +116,7 @@ final class TypeDeclVisitor: SyntaxVisitor {
         let currentClass = ClassObject(
             name: node.name.text,
             fullPath: fullPath,
+            sourceCode: trimSourceCode(node.description),
             positionRange: SourcePosition(
                 line: positionRange.start.line,
                 utf8index: positionRange.start.column
@@ -193,6 +195,7 @@ final class TypeDeclVisitor: SyntaxVisitor {
         let currentEnum = EnumObject(
             name: node.name.text,
             fullPath: fullPath,
+            sourceCode: trimSourceCode(node.description),
             positionRange: SourcePosition(
                 line: positionRange.start.line,
                 utf8index: positionRange.start.column
@@ -282,6 +285,7 @@ final class TypeDeclVisitor: SyntaxVisitor {
             // When `let (a, b, c) = (0, 1, 2)`, the variable name becomes “(a, b, c)”.
             name: array[0].pattern.trimmed.description,
             fullPath: fullPath,
+            sourceCode: trimSourceCode(node.description),
             positionRange: SourcePosition(
                 line: positionRange.start.line,
                 utf8index: positionRange.start.column
@@ -361,6 +365,7 @@ final class TypeDeclVisitor: SyntaxVisitor {
         let currentFunction = FunctionObject(
             name: node.name.text,
             fullPath: fullPath,
+            sourceCode: trimSourceCode(node.description),
             positionRange: SourcePosition(
                 line: positionRange.start.line,
                 utf8index: positionRange.start.column
@@ -440,6 +445,50 @@ extension TypeDeclVisitor {
         #if DEBUG
             print("+ \(buffer.map { $0.name })")
         #endif
+    }
+
+    //FIXME: If a String exists in the source code and “\n” exists in the String, a new line is broken.
+    private func trimSourceCode(_ sourceCode: String) -> String {
+        let lines = sourceCode.components(separatedBy: .newlines)
+        var trimmedHeadBlankLins = lines
+
+        for line in lines {
+            if line.trimmingCharacters(in: .whitespaces).isEmpty {
+                trimmedHeadBlankLins = Array(trimmedHeadBlankLins.dropFirst())
+                continue
+            }
+            break
+        }
+
+        let result = trimLeadingSpaces(trimmedHeadBlankLins.joined(separator: "\n"))
+
+        return result
+    }
+
+    //FIXME: If a String exists in the source code and “\n” exists in the String, a new line is broken.
+    private func trimLeadingSpaces(_ sourceCode: String) -> String {
+        let lines = sourceCode.components(separatedBy: .newlines)
+        var minSpaces = Int.max
+
+        for line in lines {
+            if line.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                continue
+            }
+            let spaces = line.prefix(while: \.isWhitespace).count
+            print(spaces)
+            minSpaces = min(minSpaces, spaces)
+        }
+        print("minSpaces: \(minSpaces)\n")
+
+        let result = lines.map { line in
+            if line.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                return line
+            } else {
+                return String(line.dropFirst(minSpaces))
+            }
+        }.joined(separator: "\n")
+
+        return result
     }
 }
 

@@ -36,6 +36,7 @@ final class DeclarationVisitor: SyntaxVisitor {
 
         let currentStruct = StructObject(
             name: node.name.text,
+            nameOffset: node.name.trimmedByteRange.offset,
             fullPath: fullPath,
             sourceCode: trimSourceCode(node.description),
             positionRange: SourcePosition(
@@ -115,6 +116,7 @@ final class DeclarationVisitor: SyntaxVisitor {
 
         let currentClass = ClassObject(
             name: node.name.text,
+            nameOffset: node.name.trimmedByteRange.offset,
             fullPath: fullPath,
             sourceCode: trimSourceCode(node.description),
             positionRange: SourcePosition(
@@ -194,6 +196,7 @@ final class DeclarationVisitor: SyntaxVisitor {
 
         let currentEnum = EnumObject(
             name: node.name.text,
+            nameOffset: node.name.trimmedByteRange.offset,
             fullPath: fullPath,
             sourceCode: trimSourceCode(node.description),
             positionRange: SourcePosition(
@@ -284,6 +287,7 @@ final class DeclarationVisitor: SyntaxVisitor {
             // For example, in the case of Tuple Decomposition, the tuple would be the name of the variable.
             // When `let (a, b, c) = (0, 1, 2)`, the variable name becomes “(a, b, c)”.
             name: array[0].pattern.trimmed.description,
+            nameOffset: array[0].pattern.trimmed.trimmedByteRange.offset,
             fullPath: fullPath,
             sourceCode: trimSourceCode(node.description),
             positionRange: SourcePosition(
@@ -364,6 +368,7 @@ final class DeclarationVisitor: SyntaxVisitor {
 
         let currentFunction = FunctionObject(
             name: node.name.text,
+            nameOffset: node.name.trimmedByteRange.offset,
             fullPath: fullPath,
             sourceCode: trimSourceCode(node.description),
             positionRange: SourcePosition(

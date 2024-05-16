@@ -11,6 +11,7 @@ import Foundation
 public struct ClassObject: TypeDeclaration {
     public let id: UUID
     public let name: String
+    public let nameOffset: Int
     public var fullPath: String
     public var annotatedDecl: String
     public let sourceCode: String
@@ -29,6 +30,7 @@ public struct ClassObject: TypeDeclaration {
 
     public init(
         name: String,
+        nameOffset: Int,
         fullPath: String,
         sourceCode: String = "",
         positionRange: ClosedRange<SourcePosition>,
@@ -37,6 +39,7 @@ public struct ClassObject: TypeDeclaration {
         @Dependency(\.uuid) var uuid
         id = uuid()
         self.name = name
+        self.nameOffset = nameOffset
         self.fullPath = fullPath
         self.annotatedDecl = name
         self.sourceCode = sourceCode

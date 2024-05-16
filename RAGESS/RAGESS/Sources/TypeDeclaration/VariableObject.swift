@@ -12,6 +12,7 @@ import Foundation
 public struct VariableObject: DeclarationObject, VariableOwner, FunctionOwner {
     public let id: UUID
     public let name: String
+    public let nameOffset: Int
     public var fullPath: String
     public var annotatedDecl: String
     public let sourceCode: String
@@ -26,6 +27,7 @@ public struct VariableObject: DeclarationObject, VariableOwner, FunctionOwner {
 
     public init(
         name: String,
+        nameOffset: Int,
         fullPath: String,
         sourceCode: String = "",
         positionRange: ClosedRange<SourcePosition>,
@@ -34,6 +36,7 @@ public struct VariableObject: DeclarationObject, VariableOwner, FunctionOwner {
         @Dependency(\.uuid) var uuid
         id = uuid()
         self.name = name
+        self.nameOffset = nameOffset
         self.fullPath = fullPath
         self.annotatedDecl = name
         self.sourceCode = sourceCode

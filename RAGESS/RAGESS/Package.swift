@@ -66,6 +66,18 @@ let package = Package(
             ]
         ),
         .target(
+            name: "DeclarationExtractor",
+            dependencies: [
+                "SourceKitClient",
+                "TypeDeclaration",
+                "XcodeObject",
+                .product(name: "Dependencies", package: "swift-dependencies"),
+                .product(name: "LSPBindings", package: "sourcekit-lsp"),
+                .product(name: "SwiftParser", package: "swift-syntax"),
+                .product(name: "SwiftSyntax", package: "swift-syntax")
+            ]
+        ),
+        .target(
             name: "DependenciesClient",
             dependencies: [
                 "SourceKitClient",
@@ -130,16 +142,6 @@ let package = Package(
             dependencies: [
                 .product(name: "Dependencies", package: "swift-dependencies"),
                 .product(name: "LSPBindings", package: "sourcekit-lsp")
-            ]
-        ),
-        .target(
-            name: "DeclarationExtractor",
-            dependencies: [
-                "TypeDeclaration",
-                "XcodeObject",
-                .product(name: "LSPBindings", package: "sourcekit-lsp"),
-                .product(name: "SwiftParser", package: "swift-syntax"),
-                .product(name: "SwiftSyntax", package: "swift-syntax")
             ]
         ),
         .target(name: "XcodeObject"),

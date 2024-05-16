@@ -12,6 +12,7 @@ public protocol DeclarationObject: Identifiable {
     var id: UUID { get }
     var name: String { get }
     var fullPath: String { get set }
+    var annotatedDecl: String { get set }
     var sourceCode: String { get }
     var positionRange: ClosedRange<SourcePosition> { get }
     var offsetRange: ClosedRange<Int> { get }

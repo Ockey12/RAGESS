@@ -12,6 +12,7 @@ public struct StructObject: TypeDeclaration {
     public let id: UUID
     public let name: String
     public var fullPath: String
+    public var annotatedDecl: String = ""
     public let sourceCode: String
     public let positionRange: ClosedRange<SourcePosition>
     public let offsetRange: ClosedRange<Int>

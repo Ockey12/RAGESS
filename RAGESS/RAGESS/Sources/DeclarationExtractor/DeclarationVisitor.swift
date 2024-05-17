@@ -478,10 +478,8 @@ extension DeclarationVisitor {
                 continue
             }
             let spaces = line.prefix(while: \.isWhitespace).count
-            print(spaces)
             minSpaces = min(minSpaces, spaces)
         }
-        print("minSpaces: \(minSpaces)\n")
 
         let result = lines.map { line in
             if line.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {

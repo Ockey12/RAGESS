@@ -77,6 +77,7 @@ public struct DebugReducer {
 
             case .sourceFileClient(.getSourceFilesButtonTapped):
                 state.kittenClient.packages = []
+                state.typeDeclarationExtractor.packages = []
                 state.dependenciesClient.packages = []
                 return .none
 
@@ -101,6 +102,7 @@ public struct DebugReducer {
 
             case let .sourceFileClient(.buildSettingsResponse(.success(buildSettings))):
                 state.kittenClient.buildSettings = buildSettings
+                state.typeDeclarationExtractor.buildSettings = buildSettings
                 state.dependenciesClient.buildSettings = buildSettings
                 state.buildSettingsLoading = false
                 state.dumpPackageSwiftLoading = true
@@ -112,6 +114,7 @@ public struct DebugReducer {
 
             case let .sourceFileClient(.dumpPackageResponse(.success(packageObject))):
                 state.kittenClient.packages.append(packageObject)
+                state.typeDeclarationExtractor.packages.append(packageObject)
                 state.dependenciesClient.packages.append(packageObject)
                 state.dumpPackageSwiftLoading = false
                 print("\nstate.kittenClient.packages.append(packageObject)")

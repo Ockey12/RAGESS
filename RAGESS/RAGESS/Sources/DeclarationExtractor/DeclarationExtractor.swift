@@ -15,7 +15,12 @@ import XcodeObject
 public struct DeclarationExtractor {
     public init() {}
 
-    public func extractDeclarations(from sourceFile: SourceFile) -> [any DeclarationObject] {
+    public func extractDeclarations(
+        from sourceFile: SourceFile,
+        buildSettings: [String: String],
+        sourceFilePaths: [String],
+        packages: [PackageObject]
+    ) async -> [any DeclarationObject] {
         let parsedFile = Parser.parse(source: sourceFile.content)
 
         #if DEBUG
@@ -44,6 +49,16 @@ public struct DeclarationExtractor {
         result.append(contentsOf: visitor.getVariableDeclarations())
         result.append(contentsOf: visitor.getFunctionDeclarations())
 
+        for (index,object) in result.enumerated() {
+            let annotatedObject = await getAnnotatedDeclaration(
+                object,
+                buildSettings: buildSettings,
+                sourceFilePaths: sourceFilePaths,
+                packages: packages
+            )
+            result[index] = annotatedObject
+        }
+
         return result
     }
 
@@ -60,12 +75,13 @@ public struct DeclarationExtractor {
             sourceFilePaths: sourceFilePaths,
             packages: packages
         )
-        guard let arguments = try? argumentsGenerator.generateArguments() else {
-            print("ERROR: \(#file) - \(#function): Cannot generate compiler arguments about \(typeObject.name).")
-            return typeObject
-        }
+//        guard let arguments = try? argumentsGenerator.generateArguments() else {
+//            print("ERROR: \(#file) - \(#function): Cannot generate compiler arguments about \(typeObject.name).")
+//            return typeObject
+//        }
 
         do {
+            let arguments = try argumentsGenerator.generateArguments()
             let response = try await sourceKitClient.sendCursorInfoRequest(
                 file: typeObject.fullPath,
                 offset: typeObject.nameOffset,
@@ -128,10 +144,13 @@ public struct DeclarationExtractor {
                     sourceFilePaths: sourceFilePaths,
                     packages: packages
                 )
+                resultObject.nestingEnums[index] = annotatedEnum
             }
 
             return resultObject
         } catch {
+            print("ERROR: \(#file) - \(#function): Cannot get annotated declaration about \(typeObject.name).")
+            print(error)
             return typeObject
         }
     }
@@ -149,12 +168,13 @@ public struct DeclarationExtractor {
             sourceFilePaths: sourceFilePaths,
             packages: packages
         )
-        guard let arguments = try? argumentsGenerator.generateArguments() else {
-            print("ERROR: \(#file) - \(#function): Cannot generate compiler arguments about \(inputObject.name).")
-            return inputObject
-        }
+//        guard let arguments = try? argumentsGenerator.generateArguments() else {
+//            print("ERROR: \(#file) - \(#function): Cannot generate compiler arguments about \(inputObject.name).")
+//            return inputObject
+//        }
 
         do {
+            let arguments = try argumentsGenerator.generateArguments()
             let response = try await sourceKitClient.sendCursorInfoRequest(
                 file: inputObject.fullPath,
                 offset: inputObject.nameOffset,
@@ -168,7 +188,7 @@ public struct DeclarationExtractor {
             }
 
             var resultObject = inputObject
-            resultObject.annotatedDecl = annotatedDecl
+            resultObject.annotatedDecl = annotatedDecl.removedTags
 
             for (index, variable) in inputObject.variables.enumerated() {
                 let annotatedVariable = await getAnnotatedDeclaration(
@@ -192,13 +212,15 @@ public struct DeclarationExtractor {
 
             return resultObject
         } catch {
+            print("ERROR: \(#file) - \(#function): Cannot get annotated declaration about \(inputObject.name).")
+            print(error)
             return inputObject
         }
     }
 }
 
 private extension String {
-    var annotatedDecl: String {
+    var removedTags: String {
         var decl = self
         while let startIndex = decl.firstIndex(of: "<"),
               let endIndex = decl[startIndex...].firstIndex(of: ">") {

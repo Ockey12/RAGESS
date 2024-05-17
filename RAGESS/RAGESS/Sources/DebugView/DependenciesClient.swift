@@ -20,18 +20,16 @@ public struct DependenciesClientDebugger {
 
     @ObservableState
     public struct State {
-        var declarationObjects: [any DeclarationObject]
         var allSourceFiles: [SourceFile]
         var buildSettings: [String: String]
         var packages: [PackageObject]
+        var declarationObjects: [any DeclarationObject] = []
 
         public init(
-            declarationObjects: [any DeclarationObject],
             allSourceFiles: [SourceFile],
             buildSettings: [String: String],
             packages: [PackageObject]
         ) {
-            self.declarationObjects = declarationObjects
             self.allSourceFiles = allSourceFiles
             self.buildSettings = buildSettings
             self.packages = packages
@@ -40,6 +38,8 @@ public struct DependenciesClientDebugger {
 
     public enum Action {
         case getDependenciesTapped
+        case extractDeclarationResponse([any DeclarationObject])
+        case extractionCompleted
         case extractDependenciesResponse(Result<[any DeclarationObject], Error>)
     }
 
@@ -49,20 +49,46 @@ public struct DependenciesClientDebugger {
         Reduce { state, action in
             switch action {
             case .getDependenciesTapped:
+                state.declarationObjects = []
+//                let extractor = DeclarationExtractor()
+//                var declarationObjects: [any DeclarationObject] = []
+//                for sourceFile in state.allSourceFiles {
+//                    declarationObjects.append(
+//                        contentsOf: extractor.extractDeclarations(from: sourceFile)
+//                    )
+//                }
+//                print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
+//                print("TypeDeclarationExtractorDebugger.Action.extractTapped")
+//                dump(declarationObjects)
+//                print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=\n")
                 let extractor = DeclarationExtractor()
-                var declarationObjects: [any DeclarationObject] = []
-                for sourceFile in state.allSourceFiles {
-                    declarationObjects.append(
-                        contentsOf: extractor.extractDeclarations(from: sourceFile)
-                    )
-                }
-                print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
-                print("TypeDeclarationExtractorDebugger.Action.extractTapped")
-                dump(declarationObjects)
-                print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=\n")
+                let allSourceFilePaths = state.allSourceFiles.map { $0.path }
                 return .run {
                     [
-                        declarationObjects = declarationObjects,
+                        allSourceFiles = state.allSourceFiles,
+                        buildSettings = state.buildSettings,
+                        packages = state.packages
+                    ] send in
+                    for sourceFile in allSourceFiles {
+                        await send(.extractDeclarationResponse(
+                            extractor.extractDeclarations(
+                                from: sourceFile,
+                                buildSettings: buildSettings,
+                                sourceFilePaths: allSourceFilePaths,
+                                packages: packages)
+                        ))
+                    }
+                    await send(.extractionCompleted)
+                }
+
+            case let .extractDeclarationResponse(objects):
+                state.declarationObjects.append(contentsOf: objects)
+                return .none
+
+            case .extractionCompleted:
+                return .run {
+                    [
+                        declarationObjects = state.declarationObjects,
                         allSourceFiles = state.allSourceFiles,
                         buildSettings = state.buildSettings,
                         packages = state.packages

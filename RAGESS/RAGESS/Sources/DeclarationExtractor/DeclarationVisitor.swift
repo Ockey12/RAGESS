@@ -332,9 +332,8 @@ final class DeclarationVisitor: SyntaxVisitor {
 
         if buffer.count >= 1 {
             // If there is an element in the buffer, the last element in the buffer is the parent of this.
-            guard let owner = buffer.popLast(),
-                  var ownerObject = owner as? any VariableOwner else {
-                fatalError("The type of the last element of buffer does not conform to VariableOwner.")
+            guard var ownerObject = buffer.popLast() else {
+                fatalError("The type of the last element of buffer does not conform to DeclarationObject.")
             }
             #if DEBUG
                 print("buffer[\(buffer.count)].variables.append(\(currentVariable.name))")
@@ -412,9 +411,8 @@ final class DeclarationVisitor: SyntaxVisitor {
 
         if buffer.count >= 1 {
             // If there is an element in the buffer, the last element in the buffer is the parent of this.
-            guard let owner = buffer.popLast(),
-                  var ownerObject = owner as? any FunctionOwner else {
-                fatalError("The type of the last element of buffer does not conform to TypeDeclaration.")
+            guard var ownerObject = buffer.popLast() else {
+                fatalError("The type of the last element of buffer does not conform to DeclarationObject.")
             }
             #if DEBUG
                 print("buffer[\(buffer.count)].functions.append(\(currentFunction.name))")

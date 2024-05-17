@@ -347,7 +347,7 @@ struct DependencyExtractor {
         return keyPath
     }
 
-    private func findProperty<T>(in object: T, matching: (any DeclarationObject) -> Bool) -> PartialKeyPath<T>? where T: VariableOwner, T: FunctionOwner {
+    private func findProperty<T: DeclarationObject>(in object: T, matching: (any DeclarationObject) -> Bool) -> PartialKeyPath<T>? {
         guard matching(object) else {
             return nil
         }

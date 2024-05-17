@@ -136,12 +136,12 @@ public struct DeclarationExtractor {
         }
     }
 
-    private func getAnnotatedDeclaration<T>(
+    private func getAnnotatedDeclaration<T: DeclarationObject>(
         _ inputObject: T,
         buildSettings: [String: String],
         sourceFilePaths: [String],
         packages: [PackageObject]
-    ) async -> T where T: VariableOwner, T: FunctionOwner {
+    ) async -> T {
         @Dependency(SourceKitClient.self) var sourceKitClient
         let argumentsGenerator = CompilerArgumentsGenerator(
             targetFilePath: inputObject.fullPath,

@@ -9,7 +9,7 @@
 import Dependencies
 import Foundation
 
-public struct VariableObject: DeclarationObject, VariableOwner, FunctionOwner {
+public struct VariableObject: DeclarationObject {
     public let id: UUID
     public let name: String
     public let nameOffset: Int

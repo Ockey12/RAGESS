@@ -551,7 +551,7 @@ public struct CompilerArgumentsGenerator {
     let sourceFilePaths: [String]
     let packages: [PackageObject]
 
-    public func generateArguments() async throws -> [String] {
+    public func generateArguments() throws -> [String] {
         guard let packageName = getPackageName(sourceFilePath: targetFilePath, buildSettings: buildSettings) else {
             throw CompilerArgumentGenerationError.notFoundPackageName
         }

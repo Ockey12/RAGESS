@@ -450,7 +450,7 @@ extension DeclarationVisitor {
         #endif
     }
 
-    //FIXME: If a String exists in the source code and “\n” exists in the String, a new line is broken.
+    // FIXME: If a String exists in the source code and “\n” exists in the String, a new line is broken.
     private func trimSourceCode(_ sourceCode: String) -> String {
         let lines = sourceCode.components(separatedBy: .newlines)
         var trimmedHeadBlankLins = lines
@@ -468,7 +468,7 @@ extension DeclarationVisitor {
         return result
     }
 
-    //FIXME: If a String exists in the source code and “\n” exists in the String, a new line is broken.
+    // FIXME: If a String exists in the source code and “\n” exists in the String, a new line is broken.
     private func trimLeadingSpaces(_ sourceCode: String) -> String {
         let lines = sourceCode.components(separatedBy: .newlines)
         var minSpaces = Int.max

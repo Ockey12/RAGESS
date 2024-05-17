@@ -6,6 +6,6 @@
 //
 //
 
-//public protocol FunctionOwner: DeclarationObject {
+// public protocol FunctionOwner: DeclarationObject {
 //    var functions: [FunctionObject] { get set }
-//}
+// }

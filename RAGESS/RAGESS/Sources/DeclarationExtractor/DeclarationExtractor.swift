@@ -5,8 +5,8 @@
 //  Created by ockey12 on 2024/05/05.
 //
 
-import SourceKitClient
 import Dependencies
+import SourceKitClient
 import SwiftParser
 import SwiftSyntax
 import TypeDeclaration
@@ -202,7 +202,7 @@ private extension String {
         var decl = self
         while let startIndex = decl.firstIndex(of: "<"),
               let endIndex = decl[startIndex...].firstIndex(of: ">") {
-            decl.removeSubrange(startIndex...endIndex)
+            decl.removeSubrange(startIndex ... endIndex)
         }
 
         decl = decl.replacingOccurrences(of: "&gt;", with: ">")

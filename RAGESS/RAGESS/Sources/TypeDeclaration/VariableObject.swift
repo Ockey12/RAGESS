@@ -38,7 +38,7 @@ public struct VariableObject: DeclarationObject {
         self.name = name
         self.nameOffset = nameOffset
         self.fullPath = fullPath
-        self.annotatedDecl = name
+        annotatedDecl = name
         self.sourceCode = sourceCode
         self.positionRange = positionRange
         self.offsetRange = offsetRange

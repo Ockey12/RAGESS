@@ -23,7 +23,6 @@ public struct CompilerArgumentsClient {
 
 extension CompilerArgumentsClient: DependencyKey {
     public static var liveValue: CompilerArgumentsClient {
-
         var sharedArguments: [String]?
 
         @Sendable func getPackageName(sourceFilePath: String, buildSettings: [String: String]) -> String? {

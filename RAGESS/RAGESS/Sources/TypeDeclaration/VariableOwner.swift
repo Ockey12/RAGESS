@@ -6,6 +6,6 @@
 //
 //
 
-//public protocol VariableOwner: DeclarationObject {
+// public protocol VariableOwner: DeclarationObject {
 //    var variables: [VariableObject] { get set }
-//}
+// }

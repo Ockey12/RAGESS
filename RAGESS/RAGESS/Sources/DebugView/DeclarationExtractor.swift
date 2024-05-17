@@ -6,9 +6,9 @@
 //
 
 import ComposableArchitecture
+import DeclarationExtractor
 import SwiftUI
 import TypeDeclaration
-import DeclarationExtractor
 import XcodeObject
 
 @Reducer

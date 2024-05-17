@@ -7,11 +7,11 @@
 //
 
 import ComposableArchitecture
+import DeclarationExtractor
 import DependenciesClient
 import SourceKitClient
 import SwiftUI
 import TypeDeclaration
-import DeclarationExtractor
 import XcodeObject
 
 @Reducer

@@ -75,7 +75,8 @@ public struct DependenciesClientDebugger {
                                 from: sourceFile,
                                 buildSettings: buildSettings,
                                 sourceFilePaths: allSourceFilePaths,
-                                packages: packages)
+                                packages: packages
+                            )
                         ))
                     }
                     await send(.extractionCompleted)

@@ -22,7 +22,7 @@ public struct TypeDeclarationExtractorDebugger {
 
         public init(
             directory: Directory,
-            buildSettings: [String : String],
+            buildSettings: [String: String],
             packages: [PackageObject],
             declarationObjects: [any DeclarationObject]
         ) {
@@ -69,12 +69,12 @@ public struct TypeDeclarationExtractorDebugger {
                                 from: sourceFile,
                                 buildSettings: buildSettings,
                                 sourceFilePaths: allSourceFilePaths,
-                                packages: packages)
+                                packages: packages
+                            )
                         ))
                     }
                     await send(.extractionCompleted)
                 }
-
 
             case let .extractResponse(objects):
                 state.declarationObjects.append(contentsOf: objects)

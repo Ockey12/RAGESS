@@ -49,7 +49,7 @@ public struct DeclarationExtractor {
         result.append(contentsOf: visitor.getVariableDeclarations())
         result.append(contentsOf: visitor.getFunctionDeclarations())
 
-        for (index,object) in result.enumerated() {
+        for (index, object) in result.enumerated() {
             let annotatedObject = await getAnnotatedDeclaration(
                 object,
                 buildSettings: buildSettings,

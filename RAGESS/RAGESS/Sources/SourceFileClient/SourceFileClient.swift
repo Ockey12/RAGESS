@@ -107,11 +107,11 @@ extension SourceFileClient: DependencyKey {
 
                     return directory
                 #else
-                    let sourceFiles = getFilesContent(
-                        path: rootDirectoryPath,
+                    let directory = getDirectories(
+                        rootPath: rootDirectoryPath,
                         ignoredDirectories: ignoredDirectories
                     )
-                    return sourceFiles
+                    return directory
                 #endif
             }
         )

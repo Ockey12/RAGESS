@@ -300,7 +300,6 @@ final class DeclarationVisitor: SyntaxVisitor {
                 ),
             offsetRange: offsetRange
         )
-        dump(currentVariable)
 
         appendToBuffer(currentVariable)
 

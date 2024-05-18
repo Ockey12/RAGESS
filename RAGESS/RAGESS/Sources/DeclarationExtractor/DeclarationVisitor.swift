@@ -494,9 +494,9 @@ final class DeclarationVisitor: SyntaxVisitor {
     // MARK: InheritedTypeSyntax
 
 //    override func visit(_ node: InheritedTypeSyntax) -> SyntaxVisitorContinueKind {
-//#if DEBUG
+    // #if DEBUG
 //        print("\nvisit(InheritedTypeSyntax(\(node)))")
-//#endif
+    // #endif
 //
 //        print("node.type.children(viewMode: .fixedUp)")
 //        dump(node.type.children(viewMode: .fixedUp))

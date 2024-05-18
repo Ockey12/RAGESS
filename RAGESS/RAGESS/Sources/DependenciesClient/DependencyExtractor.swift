@@ -26,10 +26,10 @@ struct DependencyExtractor {
         let allSourceFilePaths = allSourceFiles.map { $0.path }
 
         #if DEBUG
-        print("--- allSourceFilePaths ---")
-        for path in allSourceFilePaths {
-            print("    \(path)")
-        }
+            print("--- allSourceFilePaths ---")
+            for path in allSourceFilePaths {
+                print("    \(path)")
+            }
         #endif
 
         for sourceFile in allSourceFiles {
@@ -75,14 +75,14 @@ struct DependencyExtractor {
         visitor.walk(Syntax(parsedFile))
 
         #if DEBUG
-        print("referenceOffsets: \(visitor.referenceOffsets)")
-        print("identifierTypeOffsets: \(visitor.identifierTypeOffsets)")
-        print("inheritOffset: \(visitor.inheritOffsets)")
+            print("referenceOffsets: \(visitor.referenceOffsets)")
+            print("identifierTypeOffsets: \(visitor.identifierTypeOffsets)")
+            print("inheritOffset: \(visitor.inheritOffsets)")
         #endif
 
         for referenceOffset in visitor.referenceOffsets {
             #if DEBUG
-            print("referenceOffset: \(referenceOffset)")
+                print("referenceOffset: \(referenceOffset)")
             #endif
             await extractDependencyObject(
                 sourceFilePath: sourceFile.path,
@@ -95,7 +95,7 @@ struct DependencyExtractor {
 
         for identifierTypeOffset in visitor.identifierTypeOffsets {
             #if DEBUG
-            print("identifierTypeOffset: \(identifierTypeOffset)")
+                print("identifierTypeOffset: \(identifierTypeOffset)")
             #endif
             await extractDependencyObject(
                 sourceFilePath: sourceFile.path,
@@ -108,7 +108,7 @@ struct DependencyExtractor {
 
         for inheritOffset in visitor.inheritOffsets {
             #if DEBUG
-            print("inheritOffset: \(inheritOffset)")
+                print("inheritOffset: \(inheritOffset)")
             #endif
             await extractDependencyObject(
                 sourceFilePath: sourceFile.path,
@@ -137,9 +137,9 @@ struct DependencyExtractor {
                 arguments: sourceKitArguments
             )
 
-#if DEBUG
-            print("sourceKitClient.sendCursorInfoRequest")
-#endif
+            #if DEBUG
+                print("sourceKitClient.sendCursorInfoRequest")
+            #endif
 
             // MARK: Definition object
 
@@ -148,7 +148,7 @@ struct DependencyExtractor {
                 return
             }
             #if DEBUG
-            print("definitionFilePath: \(definitionFilePath)")
+                print("definitionFilePath: \(definitionFilePath)")
             #endif
 
             guard let definitionOffset = response[CursorInfoResponseKeys.offset.key] as? Int64 else {
@@ -156,12 +156,12 @@ struct DependencyExtractor {
                 return
             }
             #if DEBUG
-            print("definitionOffset: \(definitionOffset)")
+                print("definitionOffset: \(definitionOffset)")
             #endif
 
             guard let definitionObjectIndex = declarationObjects.firstIndex(where: {
                 $0.fullPath == definitionFilePath
-                && $0.offsetRange.contains(Int(definitionOffset))
+                    && $0.offsetRange.contains(Int(definitionOffset))
             }) else {
                 print("ERROR in \(#filePath) - \(#function): Cannot find definition object in [DeclarationObject].\n")
                 return
@@ -232,7 +232,7 @@ struct DependencyExtractor {
 
             guard let callerObjectIndex = declarationObjects.firstIndex(where: {
                 $0.fullPath == sourceFilePath
-                && $0.offsetRange.contains(callerOffset)
+                    && $0.offsetRange.contains(callerOffset)
             }) else {
                 print("ERROR in \(#filePath) - \(#function): Cannot find caller object in [DeclarationObject].\n")
                 return
@@ -341,10 +341,10 @@ struct DependencyExtractor {
 //    ) async {
 //        @Dependency(SourceKitClient.self) var sourceKitClient
 //
-//#if DEBUG
+    // #if DEBUG
 //        print("\(#filePath) - \(#function)")
 //        print("by \(inheritableObject.name)")
-//#endif
+    // #endif
 //
 //        let argumentsGenerator = CompilerArgumentsGenerator(
 //            targetFilePath: inheritableObject.fullPath,

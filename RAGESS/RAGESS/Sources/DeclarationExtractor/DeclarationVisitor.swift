@@ -25,6 +25,36 @@ final class DeclarationVisitor: SyntaxVisitor {
         super.init(viewMode: .fixedUp)
     }
 
+    // MARK: ProtocolDeclSyntax
+
+    override func visit(_ node: ProtocolDeclSyntax) -> SyntaxVisitorContinueKind {
+#if DEBUG
+        print("\nvisit(ProtocolDeclSyntax(\(node.name.text)))")
+#endif
+        let positionRange = node.sourceRange(converter: locationConverter)
+        let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
+
+        let currentProtocol = ProtocolObject(
+            name: node.name.text,
+            nameOffset: node.name.trimmedByteRange.offset,
+            fullPath: fullPath,
+            sourceCode: trimSourceCode(node.description),
+            positionRange: SourcePosition(
+                line: positionRange.start.line,
+                utf8index: positionRange.start.column
+            )
+            ... SourcePosition(
+                line: positionRange.end.line,
+                utf8index: positionRange.end.column
+            ),
+            offsetRange: offsetRange
+        )
+
+        appendToBuffer(currentProtocol)
+
+        return .visitChildren
+    }
+
     // MARK: StructDeclSyntax
 
     override func visit(_ node: StructDeclSyntax) -> SyntaxVisitorContinueKind {

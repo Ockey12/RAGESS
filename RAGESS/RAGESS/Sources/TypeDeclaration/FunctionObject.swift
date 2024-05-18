@@ -21,6 +21,8 @@ public struct FunctionObject: DeclarationObject {
     public var variables: [VariableObject] = []
     public var functions: [FunctionObject] = []
 
+    public var nestingProtocols: [ProtocolObject] = []
+
     public var objectsThatCallThisObject: [DependencyObject] = []
     public var objectsThatAreCalledByThisObject: [DependencyObject] = []
 

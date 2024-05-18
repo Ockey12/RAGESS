@@ -82,15 +82,14 @@ final class DeclarationVisitor: SyntaxVisitor {
 
         if buffer.count >= 1 {
             // If there is an element in the buffer, the last element in the buffer is the parent of this.
-            guard let owner = buffer.popLast(),
-                  var ownerTypeObject = owner as? any TypeDeclaration else {
-                fatalError("The type of the last element of buffer does not conform to TypeDeclaration.")
+            guard var ownerObject = buffer.popLast() else {
+                fatalError("The type of the last element of buffer does not conform to DeclarationObject.")
             }
             #if DEBUG
                 print("buffer[\(buffer.count)].nestingProtocols.append(\(currentProtocol.name))")
             #endif
-            ownerTypeObject.nestingProtocols.append(currentProtocol)
-            buffer.append(ownerTypeObject)
+            ownerObject.nestingProtocols.append(currentProtocol)
+            buffer.append(ownerObject)
         } else {
             #if DEBUG
                 print("protocolDeclarations.append(\(currentProtocol.name))")

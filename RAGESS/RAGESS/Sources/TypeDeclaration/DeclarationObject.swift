@@ -21,6 +21,8 @@ public protocol DeclarationObject: Identifiable {
     var variables: [VariableObject] { get set }
     var functions: [FunctionObject] { get set }
 
+    var nestingProtocols: [ProtocolObject] { get set }
+
     var objectsThatCallThisObject: [DependencyObject] { get set }
 
     var objectsThatAreCalledByThisObject: [DependencyObject] { get set }

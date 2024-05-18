@@ -22,6 +22,9 @@ public struct ProtocolObject: DeclarationObject {
     public var variables: [VariableObject] = []
     public var functions: [FunctionObject] = []
 
+    // FIXME: Protocol cannot nest Protocols.
+    public var nestingProtocols: [ProtocolObject] = []
+
     public var objectsThatCallThisObject: [DependencyObject] = []
     public var objectsThatAreCalledByThisObject: [DependencyObject] = []
 

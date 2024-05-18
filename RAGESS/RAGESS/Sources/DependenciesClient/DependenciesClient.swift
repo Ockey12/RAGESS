@@ -114,6 +114,17 @@ private func printDependencies(
         var debugText = ""
 
         switch dependencyObject.callerObject.keyPath {
+        case let .protocol(partialKeyPath):
+            guard let protocolObject = callerObject as? ProtocolObject else {
+                print("ERROR in \(#filePath) - \(#function): Cannot cast `callerObject` to `ProtocolObject`.\n")
+                return
+            }
+            guard let component = protocolObject[keyPath: partialKeyPath] as? any DeclarationObject else {
+                print("ERROR in \(#filePath) - \(#function): Cannot cast `protocolObject[keyPath: partialKeyPath]` to `any DeclarationObject`.\n")
+                return
+            }
+            debugText += "\(component.fullPath)\n╰─\(component.name)\n"
+
         case let .struct(partialKeyPath):
             guard let structObject = callerObject as? StructObject else {
                 print("ERROR in \(#filePath) - \(#function): Cannot cast `callerObject` to `StructObject`.\n")
@@ -124,6 +135,7 @@ private func printDependencies(
                 return
             }
             debugText += "\(component.fullPath)\n╰─\(component.name)\n"
+
         case let .class(partialKeyPath):
             guard let classObject = callerObject as? ClassObject else {
                 print("ERROR in \(#filePath) - \(#function): Cannot cast `callerObject` to `ClassObject`.\n")
@@ -134,6 +146,7 @@ private func printDependencies(
                 return
             }
             debugText += "\(component.fullPath)\n╰─\(component.name)\n"
+
         case let .enum(partialKeyPath):
             guard let enumObject = callerObject as? EnumObject else {
                 print("ERROR in \(#filePath) - \(#function): Cannot cast `callerObject` `EnumObject`.\n")
@@ -154,6 +167,7 @@ private func printDependencies(
                 return
             }
             debugText += "\(component.fullPath)\n╰─\(component.name)\n"
+
         case let .function(partialKeyPath):
             guard let functionObject = callerObject as? FunctionObject else {
                 print("ERROR in \(#filePath) - \(#function): Cannot cast `callerObject` `FunctionObject`.\n")
@@ -169,6 +183,17 @@ private func printDependencies(
         debugText += "  ↓ calls\n"
 
         switch dependencyObject.definitionObject.keyPath {
+        case let .protocol(partialKeyPath):
+            guard let protocolObject = definitionObject as? ProtocolObject else {
+                print("ERROR in \(#filePath) - \(#function): Cannot cast `definitionObject` to `ProtocolObject`.\n")
+                return
+            }
+            guard let component = protocolObject[keyPath: partialKeyPath] as? any DeclarationObject else {
+                print("ERROR in \(#filePath) - \(#function): Cannot cast `protocolObject[keyPath: partialKeyPath]` to `any DeclarationObject`.\n")
+                return
+            }
+            debugText += "\(component.fullPath)\n╰─\(component.name)\n"
+
         case let .struct(partialKeyPath):
             guard let structObject = definitionObject as? StructObject else {
                 print("ERROR in \(#filePath) - \(#function): Cannot cast `callerObject` to `StructObject`.\n")

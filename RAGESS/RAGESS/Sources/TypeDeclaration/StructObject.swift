@@ -21,7 +21,7 @@ public struct StructObject: TypeDeclaration {
     public var variables: [VariableObject] = []
     public var functions: [FunctionObject] = []
 
-    public var inheritOffset: [Int] = []
+    public var inheritOffsets: [Int] = []
 
     public var nestingProtocols: [ProtocolObject] = []
     public var nestingStructs: [StructObject] = []

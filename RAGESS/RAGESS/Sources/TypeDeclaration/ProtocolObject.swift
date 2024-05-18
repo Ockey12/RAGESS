@@ -22,7 +22,7 @@ public struct ProtocolObject: Inheritable {
     public var variables: [VariableObject] = []
     public var functions: [FunctionObject] = []
 
-    public var inheritOffset: [Int] = []
+    public var inheritOffsets: [Int] = []
 
     // FIXME: Protocol cannot nest Protocols.
     public var nestingProtocols: [ProtocolObject] = []

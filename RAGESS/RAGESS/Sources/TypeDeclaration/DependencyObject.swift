@@ -32,6 +32,7 @@ public struct DependencyObject {
         public let keyPath: ObjectKeyPath
 
         public enum ObjectKeyPath {
+            case `protocol`(PartialKeyPath<ProtocolObject>)
             case `struct`(PartialKeyPath<StructObject>)
             case `class`(PartialKeyPath<ClassObject>)
             case `enum`(PartialKeyPath<EnumObject>)

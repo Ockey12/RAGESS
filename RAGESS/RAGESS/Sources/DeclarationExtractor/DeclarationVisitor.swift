@@ -511,7 +511,7 @@ final class DeclarationVisitor: SyntaxVisitor {
             fatalError("The type of the last element of buffer does not conform to `Inheritable`.")
         }
 
-        inheritableObject.inheritOffset.append(trailingOffset)
+        inheritableObject.inheritOffsets.append(trailingOffset)
 
         buffer.append(inheritableObject)
 

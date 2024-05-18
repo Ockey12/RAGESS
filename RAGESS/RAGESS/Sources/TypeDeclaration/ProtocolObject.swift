@@ -9,7 +9,7 @@
 import Dependencies
 import Foundation
 
-public struct ProtocolObject: DeclarationObject {
+public struct ProtocolObject: DeclarationObject, Inheritable {
     public var id: UUID
     public var name: String
     public var nameOffset: Int
@@ -21,6 +21,8 @@ public struct ProtocolObject: DeclarationObject {
 
     public var variables: [VariableObject] = []
     public var functions: [FunctionObject] = []
+
+    public var inheritOffset: [Int] = []
 
     // FIXME: Protocol cannot nest Protocols.
     public var nestingProtocols: [ProtocolObject] = []

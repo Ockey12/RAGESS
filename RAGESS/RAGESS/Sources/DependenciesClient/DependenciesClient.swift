@@ -170,7 +170,7 @@ private func printDependencies(
             debugText += "\(component.fullPath)\n╰─\(component.name)\n"
         }
 
-        debugText += "  ↓ calls\n"
+        debugText += " calls ↓ \(dependencyObject.callerObject.kind)\n"
 
         switch dependencyObject.definitionObject.keyPath {
         case let .protocol(partialKeyPath):

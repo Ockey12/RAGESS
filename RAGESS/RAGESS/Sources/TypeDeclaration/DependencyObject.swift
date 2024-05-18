@@ -23,13 +23,15 @@ public struct DependencyObject {
     public var definitionObject: Object
 
     public struct Object {
-        public init(id: UUID, keyPath: ObjectKeyPath) {
+        public init(id: UUID, keyPath: ObjectKeyPath, kind: Kind) {
             self.id = id
             self.keyPath = keyPath
+            self.kind = kind
         }
 
         public let id: UUID
         public let keyPath: ObjectKeyPath
+        public let kind: Kind
 
         public enum ObjectKeyPath {
             case `protocol`(PartialKeyPath<ProtocolObject>)
@@ -38,6 +40,18 @@ public struct DependencyObject {
             case `enum`(PartialKeyPath<EnumObject>)
             case variable(PartialKeyPath<VariableObject>)
             case function(PartialKeyPath<FunctionObject>)
+        }
+
+        public enum Kind {
+            case protocolInheritance
+            case classInheritance
+            case protocolConformance
+
+            /// Call a property or method.
+            case declarationReference
+
+            /// Use as types of properties, arguments, etc.
+            case identifierType
         }
     }
 }

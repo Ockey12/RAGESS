@@ -87,6 +87,7 @@ struct DependencyExtractor {
             await extractDependencyObject(
                 sourceFilePath: sourceFile.path,
                 callerOffset: referenceOffset,
+                offsetKind: .reference,
                 declarationObjects: &declarationObjects,
                 allSourceFilePaths: allSourceFilePaths,
                 sourceKitArguments: sourceKitArguments
@@ -100,6 +101,7 @@ struct DependencyExtractor {
             await extractDependencyObject(
                 sourceFilePath: sourceFile.path,
                 callerOffset: identifierTypeOffset,
+                offsetKind: .identifierType,
                 declarationObjects: &declarationObjects,
                 allSourceFilePaths: allSourceFilePaths,
                 sourceKitArguments: sourceKitArguments
@@ -113,6 +115,7 @@ struct DependencyExtractor {
             await extractDependencyObject(
                 sourceFilePath: sourceFile.path,
                 callerOffset: inheritOffset,
+                offsetKind: .inherit,
                 declarationObjects: &declarationObjects,
                 allSourceFilePaths: allSourceFilePaths,
                 sourceKitArguments: sourceKitArguments
@@ -123,6 +126,7 @@ struct DependencyExtractor {
     private func extractDependencyObject(
         sourceFilePath: String,
         callerOffset: Int,
+        offsetKind: OffsetKind,
         declarationObjects: inout [any DeclarationObject],
         allSourceFilePaths: [String],
         sourceKitArguments: [String]
@@ -168,6 +172,7 @@ struct DependencyExtractor {
             }
 
             var optionalDefinitionKeyPath: DependencyObject.Object.ObjectKeyPath?
+            var definitionObjectKind = ObjectKind.other
 
             if let protocolObject = declarationObjects[definitionObjectIndex] as? ProtocolObject {
                 guard let keyPath = findProperty(in: protocolObject, matching: {
@@ -177,6 +182,19 @@ struct DependencyExtractor {
                     return
                 }
                 optionalDefinitionKeyPath = .protocol(keyPath)
+//                definitionObjectKind = .protocol
+                let definitionObject = protocolObject[keyPath: keyPath]
+
+                switch definitionObject {
+                case is ProtocolObject:
+                    definitionObjectKind = .protocol
+
+                case is ClassObject:
+                    definitionObjectKind = .class
+
+                default:
+                    break
+                }
 
             } else if let structObject = declarationObjects[definitionObjectIndex] as? StructObject {
                 guard let keyPath = findProperty(in: structObject, matching: {
@@ -187,6 +205,19 @@ struct DependencyExtractor {
                 }
                 optionalDefinitionKeyPath = .struct(keyPath)
 
+                let definitionObject = structObject[keyPath: keyPath]
+
+                switch definitionObject {
+                case is ProtocolObject:
+                    definitionObjectKind = .protocol
+
+                case is ClassObject:
+                    definitionObjectKind = .class
+
+                default:
+                    break
+                }
+
             } else if let classObject = declarationObjects[definitionObjectIndex] as? ClassObject {
                 guard let keyPath = findProperty(in: classObject, matching: {
                     $0.offsetRange.contains(Int(definitionOffset))
@@ -195,6 +226,20 @@ struct DependencyExtractor {
                     return
                 }
                 optionalDefinitionKeyPath = .class(keyPath)
+//                definitionObjectKind = .class
+
+                let definitionObject = classObject[keyPath: keyPath]
+
+                switch definitionObject {
+                case is ProtocolObject:
+                    definitionObjectKind = .protocol
+
+                case is ClassObject:
+                    definitionObjectKind = .class
+
+                default:
+                    break
+                }
 
             } else if let enumObject = declarationObjects[definitionObjectIndex] as? EnumObject {
                 guard let keyPath = findProperty(in: enumObject, matching: {
@@ -205,6 +250,19 @@ struct DependencyExtractor {
                 }
                 optionalDefinitionKeyPath = .enum(keyPath)
 
+                let definitionObject = enumObject[keyPath: keyPath]
+
+                switch definitionObject {
+                case is ProtocolObject:
+                    definitionObjectKind = .protocol
+
+                case is ClassObject:
+                    definitionObjectKind = .class
+
+                default:
+                    break
+                }
+
             } else if let variableObject = declarationObjects[definitionObjectIndex] as? VariableObject {
                 guard let keyPath = findProperty(in: variableObject, matching: {
                     $0.offsetRange.contains(Int(definitionOffset))
@@ -214,6 +272,19 @@ struct DependencyExtractor {
                 }
                 optionalDefinitionKeyPath = .variable(keyPath)
 
+                let definitionObject = variableObject[keyPath: keyPath]
+
+                switch definitionObject {
+                case is ProtocolObject:
+                    definitionObjectKind = .protocol
+
+                case is ClassObject:
+                    definitionObjectKind = .class
+
+                default:
+                    break
+                }
+
             } else if let functionObject = declarationObjects[definitionObjectIndex] as? FunctionObject {
                 guard let keyPath = findProperty(in: functionObject, matching: {
                     $0.offsetRange.contains(Int(definitionOffset))
@@ -222,6 +293,19 @@ struct DependencyExtractor {
                     return
                 }
                 optionalDefinitionKeyPath = .function(keyPath)
+
+                let definitionObject = functionObject[keyPath: keyPath]
+
+                switch definitionObject {
+                case is ProtocolObject:
+                    definitionObjectKind = .protocol
+
+                case is ClassObject:
+                    definitionObjectKind = .class
+
+                default:
+                    break
+                }
 
             } else {
                 print("ERROR in \(#filePath) - \(#function): Cannot cast to any DeclarationObject.\n")
@@ -239,6 +323,7 @@ struct DependencyExtractor {
             }
 
             var optionalCallerKeyPath: DependencyObject.Object.ObjectKeyPath?
+            var callerObjectKind = ObjectKind.other
 
             if let protocolObject = declarationObjects[callerObjectIndex] as? ProtocolObject {
                 guard let keyPath = findProperty(in: protocolObject, matching: {
@@ -248,6 +333,20 @@ struct DependencyExtractor {
                     return
                 }
                 optionalCallerKeyPath = .protocol(keyPath)
+//                callerObjectKind = .protocol
+
+                let callerObject = protocolObject[keyPath: keyPath]
+
+                switch callerObject {
+                case is ProtocolObject:
+                    callerObjectKind = .protocol
+
+                case is ClassObject:
+                    callerObjectKind = .class
+
+                default:
+                    break
+                }
 
             } else if let structObject = declarationObjects[callerObjectIndex] as? StructObject {
                 guard let keyPath = findProperty(in: structObject, matching: {
@@ -258,6 +357,19 @@ struct DependencyExtractor {
                 }
                 optionalCallerKeyPath = .struct(keyPath)
 
+                let callerObject = structObject[keyPath: keyPath]
+
+                switch callerObject {
+                case is ProtocolObject:
+                    callerObjectKind = .protocol
+
+                case is ClassObject:
+                    callerObjectKind = .class
+
+                default:
+                    break
+                }
+
             } else if let classObject = declarationObjects[callerObjectIndex] as? ClassObject {
                 guard let keyPath = findProperty(in: classObject, matching: {
                     $0.offsetRange.contains(Int(callerOffset))
@@ -266,6 +378,20 @@ struct DependencyExtractor {
                     return
                 }
                 optionalCallerKeyPath = .class(keyPath)
+//                callerObjectKind = .class
+
+                let callerObject = classObject[keyPath: keyPath]
+
+                switch callerObject {
+                case is ProtocolObject:
+                    callerObjectKind = .protocol
+
+                case is ClassObject:
+                    callerObjectKind = .class
+
+                default:
+                    break
+                }
 
             } else if let enumObject = declarationObjects[callerObjectIndex] as? EnumObject {
                 guard let keyPath = findProperty(in: enumObject, matching: {
@@ -276,6 +402,19 @@ struct DependencyExtractor {
                 }
                 optionalCallerKeyPath = .enum(keyPath)
 
+                let callerObject = enumObject[keyPath: keyPath]
+
+                switch callerObject {
+                case is ProtocolObject:
+                    callerObjectKind = .protocol
+
+                case is ClassObject:
+                    callerObjectKind = .class
+
+                default:
+                    break
+                }
+
             } else if let variableObject = declarationObjects[callerObjectIndex] as? VariableObject {
                 guard let keyPath = findProperty(in: variableObject, matching: {
                     $0.offsetRange.contains(Int(callerOffset))
@@ -284,6 +423,19 @@ struct DependencyExtractor {
                     return
                 }
                 optionalCallerKeyPath = .variable(keyPath)
+
+                let callerObject = variableObject[keyPath: keyPath]
+
+                switch callerObject {
+                case is ProtocolObject:
+                    callerObjectKind = .protocol
+
+                case is ClassObject:
+                    callerObjectKind = .class
+
+                default:
+                    break
+                }
 
             } else if let functionObject = declarationObjects[callerObjectIndex] as? FunctionObject {
                 guard let keyPath = findProperty(in: functionObject, matching: {
@@ -294,6 +446,19 @@ struct DependencyExtractor {
                 }
                 optionalCallerKeyPath = .function(keyPath)
 
+                let callerObject = functionObject[keyPath: keyPath]
+
+                switch callerObject {
+                case is ProtocolObject:
+                    callerObjectKind = .protocol
+
+                case is ClassObject:
+                    callerObjectKind = .class
+
+                default:
+                    break
+                }
+
             } else {
                 print("ERROR in \(#filePath) - \(#function): Cannot cast to any DeclarationObject.\n")
                 return
@@ -301,25 +466,46 @@ struct DependencyExtractor {
 
             // MARK: Result
 
-            let callerObject = declarationObjects[callerObjectIndex]
             let definitionObject = declarationObjects[definitionObjectIndex]
+            let callerObject = declarationObjects[callerObjectIndex]
+            guard let definitionKeyPath = optionalDefinitionKeyPath else {
+                print("ERROR in \(#filePath) - \(#function): Cannot unwrap optionalDefinitionKeyPath.\n")
+                return
+            }
             guard let callerKeyPath = optionalCallerKeyPath else {
                 print("ERROR in \(#filePath) - \(#function): Cannot unwrap optionalCallerKeyPath.\n")
                 return
             }
-            guard let definitionKeyPath = optionalDefinitionKeyPath else {
-                print("ERROR in \(#filePath) - \(#function): Cannot unwrap optionalDefinitionKeyPath.\n")
-                return
+
+            var dependencyKind = DependencyObject.Object.Kind.declarationReference
+
+            switch (offsetKind, definitionObjectKind, callerObjectKind) {
+            case (.inherit, .protocol, .protocol):
+                dependencyKind = .protocolInheritance
+
+            case (.inherit, .class, .class):
+                dependencyKind = .classInheritance
+
+            case (.inherit, _, _):
+                dependencyKind = .protocolConformance
+
+            case (.reference, _, _):
+                dependencyKind = .declarationReference
+
+            case (.identifierType, _, _):
+                dependencyKind = .identifierType
             }
 
             let dependencyObject = DependencyObject(
                 callerObject: .init(
                     id: callerObject.id,
-                    keyPath: callerKeyPath
+                    keyPath: callerKeyPath,
+                    kind: dependencyKind
                 ),
                 definitionObject: .init(
                     id: definitionObject.id,
-                    keyPath: definitionKeyPath
+                    keyPath: definitionKeyPath,
+                    kind: dependencyKind
                 )
             )
 
@@ -441,4 +627,16 @@ struct DependencyExtractor {
         let keyPath: PartialKeyPath<T> = \T.self
         return keyPath
     }
+}
+
+private enum OffsetKind {
+    case reference
+    case identifierType
+    case inherit
+}
+
+private enum ObjectKind {
+    case `protocol`
+    case `class`
+    case other
 }

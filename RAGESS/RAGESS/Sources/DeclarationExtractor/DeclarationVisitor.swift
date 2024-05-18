@@ -30,9 +30,9 @@ final class DeclarationVisitor: SyntaxVisitor {
     // MARK: ProtocolDeclSyntax
 
     override func visit(_ node: ProtocolDeclSyntax) -> SyntaxVisitorContinueKind {
-#if DEBUG
-        print("\nvisit(ProtocolDeclSyntax(\(node.name.text)))")
-#endif
+        #if DEBUG
+            print("\nvisit(ProtocolDeclSyntax(\(node.name.text)))")
+        #endif
         let positionRange = node.sourceRange(converter: locationConverter)
         let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
@@ -45,10 +45,10 @@ final class DeclarationVisitor: SyntaxVisitor {
                 line: positionRange.start.line,
                 utf8index: positionRange.start.column
             )
-            ... SourcePosition(
-                line: positionRange.end.line,
-                utf8index: positionRange.end.column
-            ),
+                ... SourcePosition(
+                    line: positionRange.end.line,
+                    utf8index: positionRange.end.column
+                ),
             offsetRange: offsetRange
         )
 
@@ -58,27 +58,27 @@ final class DeclarationVisitor: SyntaxVisitor {
     }
 
     override func visitPost(_ node: ProtocolDeclSyntax) {
-#if DEBUG
-        print("\nvisitPost(ProtocolDeclSyntax(\(node.name.text)))")
-#endif
+        #if DEBUG
+            print("\nvisitPost(ProtocolDeclSyntax(\(node.name.text)))")
+        #endif
 
         guard !buffer.isEmpty else {
             fatalError("The buffer is empty.")
         }
 
-#if DEBUG
-        print("buffer.popLast()")
-        print("- \(buffer.map { $0.name })")
-#endif
+        #if DEBUG
+            print("buffer.popLast()")
+            print("- \(buffer.map { $0.name })")
+        #endif
 
         guard let lastItem = buffer.popLast(),
               let currentProtocol = lastItem as? ProtocolObject else {
             fatalError("The type of the last element of buffer is not a \(ProtocolObject.self).")
         }
 
-#if DEBUG
-        print("+ \(buffer.map { $0.name })")
-#endif
+        #if DEBUG
+            print("+ \(buffer.map { $0.name })")
+        #endif
 
         if buffer.count >= 1 {
             // If there is an element in the buffer, the last element in the buffer is the parent of this.
@@ -86,20 +86,20 @@ final class DeclarationVisitor: SyntaxVisitor {
                   var ownerTypeObject = owner as? any TypeDeclaration else {
                 fatalError("The type of the last element of buffer does not conform to TypeDeclaration.")
             }
-#if DEBUG
-            print("buffer[\(buffer.count)].nestingProtocols.append(\(currentProtocol.name))")
-#endif
+            #if DEBUG
+                print("buffer[\(buffer.count)].nestingProtocols.append(\(currentProtocol.name))")
+            #endif
             ownerTypeObject.nestingProtocols.append(currentProtocol)
             buffer.append(ownerTypeObject)
         } else {
-#if DEBUG
-            print("protocolDeclarations.append(\(currentProtocol.name))")
-            print("- \(extractedDeclarations.map { $0.name })")
-#endif
+            #if DEBUG
+                print("protocolDeclarations.append(\(currentProtocol.name))")
+                print("- \(extractedDeclarations.map { $0.name })")
+            #endif
             extractedDeclarations.append(currentProtocol)
-#if DEBUG
-            print("+ \(extractedDeclarations.map { $0.name })")
-#endif
+            #if DEBUG
+                print("+ \(extractedDeclarations.map { $0.name })")
+            #endif
         }
     }
 

@@ -1,9 +1,9 @@
 //
 //  ProtocolObject.swift
 //
-//  
+//
 //  Created by Ockey12 on 2024/05/18
-//  
+//
 //
 
 import Dependencies
@@ -18,7 +18,7 @@ public struct ProtocolObject: DeclarationObject {
     public var sourceCode: String
     public var positionRange: ClosedRange<SourcePosition>
     public var offsetRange: ClosedRange<Int>
-    
+
     public var variables: [VariableObject] = []
     public var functions: [FunctionObject] = []
 

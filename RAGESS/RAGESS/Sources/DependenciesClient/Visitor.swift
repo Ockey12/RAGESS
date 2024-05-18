@@ -45,12 +45,8 @@ final class Visitor: SyntaxVisitor {
     override func visit(_ node: InheritedTypeSyntax) -> SyntaxVisitorContinueKind {
 #if DEBUG
         print("\nvisit(InheritedTypeSyntax(\(node)))")
+        print("╰─node.trimmedByteRange.offset: \(node.trimmedByteRange.offset)")
 #endif
-
-        print("node.type.children(viewMode: .fixedUp)")
-        dump(node.type.children(viewMode: .fixedUp))
-
-        let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
         let trailingOffset = node.type.trimmedByteRange.endOffset - 1
 

@@ -24,13 +24,13 @@ struct DependencyExtractor {
         print("\(#filePath) - \(#function)")
 
         let allSourceFilePaths = allSourceFiles.map { $0.path }
+
+        #if DEBUG
         print("--- allSourceFilePaths ---")
         for path in allSourceFilePaths {
             print("    \(path)")
         }
-
-        print("--- packages ---")
-        dump(packages)
+        #endif
 
         for sourceFile in allSourceFiles {
             let generator = CompilerArgumentsGenerator(
@@ -74,230 +74,45 @@ struct DependencyExtractor {
         )
         visitor.walk(Syntax(parsedFile))
 
-        @Dependency(SourceKitClient.self) var sourceKitClient
-        for callerOffset in callerOffsets {
-            print("callerOffset: \(callerOffset)")
-            do {
-                let response = try await sourceKitClient.sendCursorInfoRequest(
-                    file: sourceFile.path,
-                    offset: callerOffset,
-                    sourceFilePaths: allSourceFilePaths,
-                    arguments: sourceKitArguments
-                )
-                #if DEBUG
-//                    print("\(#filePath) - \(#function)")
-                    print("sourceKitClient.sendCursorInfoRequest")
-//                    dump(response)
-                #endif
+        for referenceOffset in visitor.referenceOffsets {
+            #if DEBUG
+            print("referenceOffset: \(referenceOffset)")
+            #endif
+            await extractDependencyObject(
+                sourceFilePath: sourceFile.path,
+                callerOffset: referenceOffset,
+                declarationObjects: &declarationObjects,
+                allSourceFilePaths: allSourceFilePaths,
+                sourceKitArguments: sourceKitArguments
+            )
+        }
 
-                guard let definitionFilePath = response[CursorInfoResponseKeys.filePath.key] as? String else {
-                    print("ERROR in \(#filePath) - \(#function): Cannot find `key.filepath`.\n")
-                    continue
-                }
-                print("definitionFilePath: \(definitionFilePath)")
+        for identifierTypeOffset in visitor.identifierTypeOffsets {
+            #if DEBUG
+            print("identifierTypeOffset: \(identifierTypeOffset)")
+            #endif
+            await extractDependencyObject(
+                sourceFilePath: sourceFile.path,
+                callerOffset: identifierTypeOffset,
+                declarationObjects: &declarationObjects,
+                allSourceFilePaths: allSourceFilePaths,
+                sourceKitArguments: sourceKitArguments
+            )
+        }
 
-                guard let definitionLine = response[CursorInfoResponseKeys.line.key] as? Int64 else {
-                    print("ERROR in \(#filePath) - \(#function): Cannot find `key.line`.\n")
-                    continue
-                }
-                print("definitionLine: \(definitionLine)")
-
-                guard let definitionColumn = response[CursorInfoResponseKeys.column.key] as? Int64 else {
-                    print("ERROR in \(#filePath) - \(#function): Cannot find `key.column`.\n")
-                    continue
-                }
-                print("definitionColumn: \(definitionColumn)")
-
-                guard let definitionOffset = response[CursorInfoResponseKeys.offset.key] as? Int64 else {
-                    print("ERROR in \(#filePath) - \(#function): Cannot find `key.offset`.\n")
-                    continue
-                }
-                print("definitionOffset: \(definitionOffset)")
-
-//                let definitionPosition = SourcePosition(line: definitionLine, utf8index: definitionColumn)
-                guard let definitionObjectIndex = declarationObjects.firstIndex(where: {
-                    $0.fullPath == definitionFilePath
-                        && $0.offsetRange.contains(Int(definitionOffset))
-                }) else {
-                    print("ERROR in \(#filePath) - \(#function): Cannot find definition object in [DeclarationObject].\n")
-                    continue
-                }
-
-//                var definitionVariableKeyPath: PartialKeyPath<VariableObject>?
-//                var definitionFunctionKeyPath: PartialKeyPath<FunctionObject>?
-//                var definitionStructKeyPath: PartialKeyPath<StructObject>?
-//                var definitionClassKeyPath: PartialKeyPath<ClassObject>?
-//                var definitionEnumKeyPath: PartialKeyPath<EnumObject>?
-                var optionalDefinitionKeyPath: DependencyObject.Object.ObjectKeyPath?
-                if let variableObject = declarationObjects[definitionObjectIndex] as? VariableObject {
-                    guard let keyPath = findProperty(in: variableObject, matching: {
-                        $0.offsetRange.contains(Int(definitionOffset))
-                    }) else {
-                        print("ERROR in \(#filePath) - \(#function): Cannot find property in \(variableObject.name)\n")
-                        continue
-                    }
-//                    definitionVariableKeyPath = keyPath
-                    optionalDefinitionKeyPath = .variable(keyPath)
-//                    print("definition: \(variableObject[keyPath: keyPath])")
-                } else if let functionObject = declarationObjects[definitionObjectIndex] as? FunctionObject {
-                    guard let keyPath = findProperty(in: functionObject, matching: {
-                        $0.offsetRange.contains(Int(definitionOffset))
-                    }) else {
-                        print("ERROR in \(#filePath) - \(#function): Cannot find property in \(functionObject.name)\n")
-                        continue
-                    }
-                    optionalDefinitionKeyPath = .function(keyPath)
-//                    print("definition: \(functionObject[keyPath: keyPath])")
-                } else if let structObject = declarationObjects[definitionObjectIndex] as? StructObject {
-                    guard let keyPath = findProperty(in: structObject, matching: {
-                        $0.offsetRange.contains(Int(definitionOffset))
-                    }) else {
-                        print("ERROR in \(#filePath) - \(#function): Cannot find property in \(structObject.name)\n")
-                        continue
-                    }
-                    optionalDefinitionKeyPath = .struct(keyPath)
-//                    print("definition: \(structObject[keyPath: keyPath])")
-                } else if let classObject = declarationObjects[definitionObjectIndex] as? ClassObject {
-                    guard let keyPath = findProperty(in: classObject, matching: {
-                        $0.offsetRange.contains(Int(definitionOffset))
-                    }) else {
-                        print("ERROR in \(#filePath) - \(#function): Cannot find property in \(classObject.name)\n")
-                        continue
-                    }
-                    optionalDefinitionKeyPath = .class(keyPath)
-//                    print("definition: \(classObject[keyPath: keyPath])")
-                } else if let enumObject = declarationObjects[definitionObjectIndex] as? EnumObject {
-                    guard let keyPath = findProperty(in: enumObject, matching: {
-                        $0.offsetRange.contains(Int(definitionOffset))
-                    }) else {
-                        print("ERROR in \(#filePath) - \(#function): Cannot find property in \(enumObject.name)\n")
-                        continue
-                    }
-                    optionalDefinitionKeyPath = .enum(keyPath)
-//                    print("definition: \(enumObject[keyPath: keyPath])")
-                } else {
-                    print("ERROR in \(#filePath) - \(#function): Cannot cast to any DeclarationObject.\n")
-                    continue
-                }
-
-                guard let callerObjectIndex = declarationObjects.firstIndex(where: {
-                    $0.fullPath == sourceFile.path
-                        && $0.offsetRange.contains(callerOffset)
-                }) else {
-                    print("ERROR in \(#filePath) - \(#function): Cannot find caller object in [DeclarationObject].\n")
-                    continue
-                }
-
-//                var callerVariableKeyPath: PartialKeyPath<VariableObject>?
-//                var callerFunctionKeyPath: PartialKeyPath<FunctionObject>?
-//                var callerStructKeyPath: PartialKeyPath<StructObject>?
-//                var callerClassKeyPath: PartialKeyPath<ClassObject>?
-//                var callerEnumKeyPath: PartialKeyPath<EnumObject>?
-                var optionalCallerKeyPath: DependencyObject.Object.ObjectKeyPath?
-                if let variableObject = declarationObjects[callerObjectIndex] as? VariableObject {
-                    guard let keyPath = findProperty(in: variableObject, matching: {
-                        $0.offsetRange.contains(Int(callerOffset))
-                    }) else {
-                        print("ERROR in \(#filePath) - \(#function): Cannot find property in \(variableObject.name)\n")
-                        continue
-                    }
-                    optionalCallerKeyPath = .variable(keyPath)
-//                    print("caller: \(variableObject[keyPath: keyPath])")
-                } else if let functionObject = declarationObjects[callerObjectIndex] as? FunctionObject {
-                    guard let keyPath = findProperty(in: functionObject, matching: {
-                        $0.offsetRange.contains(Int(callerOffset))
-                    }) else {
-                        print("ERROR in \(#filePath) - \(#function): Cannot find property in \(functionObject.name)\n")
-                        continue
-                    }
-                    optionalCallerKeyPath = .function(keyPath)
-//                    print("caller: \(functionObject[keyPath: keyPath])")
-                } else if let structObject = declarationObjects[callerObjectIndex] as? StructObject {
-                    guard let keyPath = findProperty(in: structObject, matching: {
-                        $0.offsetRange.contains(Int(callerOffset))
-                    }) else {
-                        print("ERROR in \(#filePath) - \(#function): Cannot find property in \(structObject.name)\n")
-                        continue
-                    }
-                    optionalCallerKeyPath = .struct(keyPath)
-//                    print("caller: \(structObject[keyPath: keyPath])")
-                } else if let classObject = declarationObjects[callerObjectIndex] as? ClassObject {
-                    guard let keyPath = findProperty(in: classObject, matching: {
-                        $0.offsetRange.contains(Int(callerOffset))
-                    }) else {
-                        print("ERROR in \(#filePath) - \(#function): Cannot find property in \(classObject.name)\n")
-                        continue
-                    }
-                    optionalCallerKeyPath = .class(keyPath)
-//                    print("caller: \(classObject[keyPath: keyPath])")
-                } else if let enumObject = declarationObjects[callerObjectIndex] as? EnumObject {
-                    guard let keyPath = findProperty(in: enumObject, matching: {
-                        $0.offsetRange.contains(Int(callerOffset))
-                    }) else {
-                        print("ERROR in \(#filePath) - \(#function): Cannot find property in \(enumObject.name)\n")
-                        continue
-                    }
-                    optionalCallerKeyPath = .enum(keyPath)
-//                    print("caller: \(enumObject[keyPath: keyPath])")
-                } else {
-                    print("ERROR in \(#filePath) - \(#function): Cannot cast to any DeclarationObject.\n")
-                    continue
-                }
-
-                let callerObject = declarationObjects[callerObjectIndex]
-                let definitionObject = declarationObjects[definitionObjectIndex]
-                guard let callerKeyPath = optionalCallerKeyPath else {
-                    print("ERROR in \(#filePath) - \(#function): Cannot unwrap optionalCallerKeyPath.\n")
-                    continue
-                }
-                guard let definitionKeyPath = optionalDefinitionKeyPath else {
-                    print("ERROR in \(#filePath) - \(#function): Cannot unwrap optionalDefinitionKeyPath.\n")
-                    continue
-                }
-                let dependencyObject = DependencyObject(
-                    callerObject: .init(
-                        id: callerObject.id,
-                        keyPath: callerKeyPath
-                    ),
-                    definitionObject: .init(
-                        id: definitionObject.id,
-                        keyPath: definitionKeyPath
-                    )
-                )
-
-                declarationObjects[callerObjectIndex].objectsThatAreCalledByThisObject.append(dependencyObject)
-                declarationObjects[definitionObjectIndex].objectsThatCallThisObject.append(dependencyObject)
-
-                print()
-            } catch {
-                print("ERROR in \(#filePath) - \(#function): \(error)")
-            }
-        } // for callerOffset in callerOffsets
+        for inheritOffset in visitor.inheritOffsets {
+            #if DEBUG
+            print("inheritOffset: \(inheritOffset)")
+            #endif
+            await extractDependencyObject(
+                sourceFilePath: sourceFile.path,
+                callerOffset: inheritOffset,
+                declarationObjects: &declarationObjects,
+                allSourceFilePaths: allSourceFilePaths,
+                sourceKitArguments: sourceKitArguments
+            )
+        }
     }
-
-//    private func extractCallerOffsets(from sourceFile: SourceFile) -> [Int] {
-//        let parsedFile = Parser.parse(source: sourceFile.content)
-//        #if DEBUG
-//            print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
-//            print(#function)
-//            print("PATH: \(sourceFile.path)")
-//            print(parsedFile.debugDescription)
-//        #endif
-//
-//        let visitor = Visitor(
-//            locationConverter: SourceLocationConverter(
-//                fileName: sourceFile.path,
-//                tree: parsedFile
-//            )
-//        )
-//        visitor.walk(Syntax(parsedFile))
-//
-//        #if DEBUG
-//            print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=\n")
-//        #endif
-//
-//        return visitor.getOffsets()
-//    }
 
     private func extractDependencyObject(
         sourceFilePath: String,
@@ -421,7 +236,7 @@ struct DependencyExtractor {
 
             if let protocolObject = declarationObjects[callerObjectIndex] as? ProtocolObject {
                 guard let keyPath = findProperty(in: protocolObject, matching: {
-                    $0.offsetRange.contains(Int(definitionOffset))
+                    $0.offsetRange.contains(Int(callerOffset))
                 }) else {
                     print("ERROR in \(#filePath) - \(#function): Cannot find property in \(protocolObject.name)\n")
                     return
@@ -430,7 +245,7 @@ struct DependencyExtractor {
 
             } else if let structObject = declarationObjects[callerObjectIndex] as? StructObject {
                 guard let keyPath = findProperty(in: structObject, matching: {
-                    $0.offsetRange.contains(Int(definitionOffset))
+                    $0.offsetRange.contains(Int(callerOffset))
                 }) else {
                     print("ERROR in \(#filePath) - \(#function): Cannot find property in \(structObject.name)\n")
                     return
@@ -439,7 +254,7 @@ struct DependencyExtractor {
 
             } else if let classObject = declarationObjects[callerObjectIndex] as? ClassObject {
                 guard let keyPath = findProperty(in: classObject, matching: {
-                    $0.offsetRange.contains(Int(definitionOffset))
+                    $0.offsetRange.contains(Int(callerOffset))
                 }) else {
                     print("ERROR in \(#filePath) - \(#function): Cannot find property in \(classObject.name)\n")
                     return
@@ -448,7 +263,7 @@ struct DependencyExtractor {
 
             } else if let enumObject = declarationObjects[callerObjectIndex] as? EnumObject {
                 guard let keyPath = findProperty(in: enumObject, matching: {
-                    $0.offsetRange.contains(Int(definitionOffset))
+                    $0.offsetRange.contains(Int(callerOffset))
                 }) else {
                     print("ERROR in \(#filePath) - \(#function): Cannot find property in \(enumObject.name)\n")
                     return
@@ -457,7 +272,7 @@ struct DependencyExtractor {
 
             } else if let variableObject = declarationObjects[callerObjectIndex] as? VariableObject {
                 guard let keyPath = findProperty(in: variableObject, matching: {
-                    $0.offsetRange.contains(Int(definitionOffset))
+                    $0.offsetRange.contains(Int(callerOffset))
                 }) else {
                     print("ERROR in \(#filePath) - \(#function): Cannot find property in \(variableObject.name)\n")
                     return
@@ -466,7 +281,7 @@ struct DependencyExtractor {
 
             } else if let functionObject = declarationObjects[callerObjectIndex] as? FunctionObject {
                 guard let keyPath = findProperty(in: functionObject, matching: {
-                    $0.offsetRange.contains(Int(definitionOffset))
+                    $0.offsetRange.contains(Int(callerOffset))
                 }) else {
                     print("ERROR in \(#filePath) - \(#function): Cannot find property in \(functionObject.name)\n")
                     return
@@ -633,7 +448,48 @@ struct DependencyExtractor {
 
     private func findProperty<T: TypeDeclaration>(in typeObject: T, matching: (any DeclarationObject) -> Bool) -> PartialKeyPath<T>? {
         guard matching(typeObject) else {
+            print("ERROR in \(#filePath) - \(#function): \(typeObject.name) does not match `matching(typeObject)`\n")
             return nil
+        }
+
+        for (index, nestProtocol) in typeObject.nestingProtocols.enumerated() {
+            if matching(nestProtocol) {
+                let keyPath: PartialKeyPath<T> = \T.nestingProtocols[index]
+                if let childKeyPath = findProperty(in: nestProtocol, matching: matching) {
+                    return keyPath.appending(path: childKeyPath)
+                }
+                return keyPath
+            }
+        }
+
+        for (index, nestStruct) in typeObject.nestingStructs.enumerated() {
+            if matching(nestStruct) {
+                let keyPath: PartialKeyPath<T> = \T.nestingStructs[index]
+                if let childKeyPath = findProperty(in: nestStruct, matching: matching) {
+                    return keyPath.appending(path: childKeyPath)
+                }
+                return keyPath
+            }
+        }
+
+        for (index, nestClass) in typeObject.nestingClasses.enumerated() {
+            if matching(nestClass) {
+                let keyPath: PartialKeyPath<T> = \T.nestingClasses[index]
+                if let childKeyPath = findProperty(in: nestClass, matching: matching) {
+                    return keyPath.appending(path: childKeyPath)
+                }
+                return keyPath
+            }
+        }
+
+        for (index, nestEnum) in typeObject.nestingEnums.enumerated() {
+            if matching(nestEnum) {
+                let keyPath: PartialKeyPath<T> = \T.nestingEnums[index]
+                if let childKeyPath = findProperty(in: nestEnum, matching: matching) {
+                    return keyPath.appending(path: childKeyPath)
+                }
+                return keyPath
+            }
         }
 
         for (index, variable) in typeObject.variables.enumerated() {
@@ -645,37 +501,11 @@ struct DependencyExtractor {
                 return keyPath
             }
         }
+
         for (index, function) in typeObject.functions.enumerated() {
             if matching(function) {
                 let keyPath: PartialKeyPath<T> = \T.functions[index]
                 if let childKeyPath = findProperty(in: function, matching: matching) {
-                    return keyPath.appending(path: childKeyPath)
-                }
-                return keyPath
-            }
-        }
-        for (index, nestStruct) in typeObject.nestingStructs.enumerated() {
-            if matching(nestStruct) {
-                let keyPath: PartialKeyPath<T> = \T.nestingStructs[index]
-                if let childKeyPath = findProperty(in: nestStruct, matching: matching) {
-                    return keyPath.appending(path: childKeyPath)
-                }
-                return keyPath
-            }
-        }
-        for (index, nestClass) in typeObject.nestingClasses.enumerated() {
-            if matching(nestClass) {
-                let keyPath: PartialKeyPath<T> = \T.nestingClasses[index]
-                if let childKeyPath = findProperty(in: nestClass, matching: matching) {
-                    return keyPath.appending(path: childKeyPath)
-                }
-                return keyPath
-            }
-        }
-        for (index, nestEnum) in typeObject.nestingEnums.enumerated() {
-            if matching(nestEnum) {
-                let keyPath: PartialKeyPath<T> = \T.nestingEnums[index]
-                if let childKeyPath = findProperty(in: nestEnum, matching: matching) {
                     return keyPath.appending(path: childKeyPath)
                 }
                 return keyPath
@@ -688,7 +518,18 @@ struct DependencyExtractor {
 
     private func findProperty<T: DeclarationObject>(in object: T, matching: (any DeclarationObject) -> Bool) -> PartialKeyPath<T>? {
         guard matching(object) else {
+            print("ERROR in \(#filePath) - \(#function): \(object.name) does not match `matching(object)`\n")
             return nil
+        }
+
+        for (index, nestProtocol) in object.nestingProtocols.enumerated() {
+            if matching(nestProtocol) {
+                let keyPath: PartialKeyPath<T> = \T.nestingProtocols[index]
+                if let childKeyPath = findProperty(in: nestProtocol, matching: matching) {
+                    return keyPath.appending(path: childKeyPath)
+                }
+                return keyPath
+            }
         }
 
         for (index, variable) in object.variables.enumerated() {
@@ -700,6 +541,7 @@ struct DependencyExtractor {
                 return keyPath
             }
         }
+
         for (index, function) in object.functions.enumerated() {
             if matching(function) {
                 let keyPath: PartialKeyPath<T> = \T.functions[index]

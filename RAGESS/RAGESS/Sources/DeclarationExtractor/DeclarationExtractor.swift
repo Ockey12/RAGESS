@@ -42,13 +42,7 @@ public struct DeclarationExtractor {
             print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=\n")
         #endif
 
-        var result: [any DeclarationObject] = []
-        result.append(contentsOf: visitor.getProtocolDeclarations())
-        result.append(contentsOf: visitor.getStructDeclarations())
-        result.append(contentsOf: visitor.getClassDeclarations())
-        result.append(contentsOf: visitor.getEnumDeclarations())
-        result.append(contentsOf: visitor.getVariableDeclarations())
-        result.append(contentsOf: visitor.getFunctionDeclarations())
+        var result: [any DeclarationObject] = visitor.extractedDeclarations
 
         for (index, object) in result.enumerated() {
             let annotatedObject = await getAnnotatedDeclaration(

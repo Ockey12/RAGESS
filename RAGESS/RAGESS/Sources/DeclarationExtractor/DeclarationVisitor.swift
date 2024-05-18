@@ -10,12 +10,13 @@ import TypeDeclaration
 
 final class DeclarationVisitor: SyntaxVisitor {
     let fullPath: String
-    private var protocolDeclarations: [ProtocolObject] = []
-    private var structDeclarations: [StructObject] = []
-    private var classDeclarations: [ClassObject] = []
-    private var enumDeclarations: [EnumObject] = []
-    private var variableDeclarations: [VariableObject] = []
-    private var functionDeclarations: [FunctionObject] = []
+//    private var protocolDeclarations: [ProtocolObject] = []
+//    private var structDeclarations: [StructObject] = []
+//    private var classDeclarations: [ClassObject] = []
+//    private var enumDeclarations: [EnumObject] = []
+//    private var variableDeclarations: [VariableObject] = []
+//    private var functionDeclarations: [FunctionObject] = []
+    private(set) var extractedDeclarations: [any DeclarationObject] = []
     private var buffer: [any DeclarationObject] = []
 
     private let locationConverter: SourceLocationConverter
@@ -93,17 +94,13 @@ final class DeclarationVisitor: SyntaxVisitor {
         } else {
 #if DEBUG
             print("protocolDeclarations.append(\(currentProtocol.name))")
-            print("- \(protocolDeclarations.map { $0.name })")
+            print("- \(extractedDeclarations.map { $0.name })")
 #endif
-            protocolDeclarations.append(currentProtocol)
+            extractedDeclarations.append(currentProtocol)
 #if DEBUG
-            print("+ \(protocolDeclarations.map { $0.name })")
+            print("+ \(extractedDeclarations.map { $0.name })")
 #endif
         }
-    }
-
-    func getProtocolDeclarations() -> [ProtocolObject] {
-        protocolDeclarations
     }
 
     // MARK: StructDeclSyntax
@@ -173,17 +170,13 @@ final class DeclarationVisitor: SyntaxVisitor {
         } else {
             #if DEBUG
                 print("structDeclarations.append(\(currentStruct.name))")
-                print("- \(structDeclarations.map { $0.name })")
+                print("- \(extractedDeclarations.map { $0.name })")
             #endif
-            structDeclarations.append(currentStruct)
+            extractedDeclarations.append(currentStruct)
             #if DEBUG
-                print("+ \(structDeclarations.map { $0.name })")
+                print("+ \(extractedDeclarations.map { $0.name })")
             #endif
         }
-    }
-
-    func getStructDeclarations() -> [StructObject] {
-        structDeclarations
     }
 
     // MARK: ClassDeclSyntax
@@ -253,17 +246,13 @@ final class DeclarationVisitor: SyntaxVisitor {
         } else {
             #if DEBUG
                 print("classDeclarations.append(\(currentClass.name))")
-                print("- \(classDeclarations.map { $0.name })")
+                print("- \(extractedDeclarations.map { $0.name })")
             #endif
-            classDeclarations.append(currentClass)
+            extractedDeclarations.append(currentClass)
             #if DEBUG
-                print("+ \(classDeclarations.map { $0.name })")
+                print("+ \(extractedDeclarations.map { $0.name })")
             #endif
         }
-    }
-
-    func getClassDeclarations() -> [ClassObject] {
-        classDeclarations
     }
 
     // MARK: EnumDeclSyntax
@@ -332,17 +321,13 @@ final class DeclarationVisitor: SyntaxVisitor {
         } else {
             #if DEBUG
                 print("classDeclarations.append(\(currentEnum.name))")
-                print("- \(enumDeclarations.map { $0.name })")
+                print("- \(extractedDeclarations.map { $0.name })")
             #endif
-            enumDeclarations.append(currentEnum)
+            extractedDeclarations.append(currentEnum)
             #if DEBUG
-                print("+ \(enumDeclarations.map { $0.name })")
+                print("+ \(extractedDeclarations.map { $0.name })")
             #endif
         }
-    }
-
-    func getEnumDeclarations() -> [EnumObject] {
-        enumDeclarations
     }
 
     // MARK: VariableDeclSyntax
@@ -423,17 +408,13 @@ final class DeclarationVisitor: SyntaxVisitor {
         } else {
             #if DEBUG
                 print("variableDeclarations.append(\(currentVariable.name))")
-                print("- \(variableDeclarations.map { $0.name })")
+                print("- \(extractedDeclarations.map { $0.name })")
             #endif
-            variableDeclarations.append(currentVariable)
+            extractedDeclarations.append(currentVariable)
             #if DEBUG
-                print("+ \(variableDeclarations.map { $0.name })")
+                print("+ \(extractedDeclarations.map { $0.name })")
             #endif
         }
-    }
-
-    func getVariableDeclarations() -> [VariableObject] {
-        variableDeclarations
     }
 
     // MARK: FunctionDeclSyntax
@@ -502,17 +483,13 @@ final class DeclarationVisitor: SyntaxVisitor {
         } else {
             #if DEBUG
                 print("functionDeclarations.append(\(currentFunction.name))")
-                print("- \(functionDeclarations.map { $0.name })")
+                print("- \(extractedDeclarations.map { $0.name })")
             #endif
-            functionDeclarations.append(currentFunction)
+            extractedDeclarations.append(currentFunction)
             #if DEBUG
-                print("+ \(functionDeclarations.map { $0.name })")
+                print("+ \(extractedDeclarations.map { $0.name })")
             #endif
         }
-    }
-
-    func getFunctionDeclarations() -> [FunctionObject] {
-        functionDeclarations
     }
 }
 

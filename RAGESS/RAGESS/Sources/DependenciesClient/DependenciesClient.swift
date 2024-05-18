@@ -71,21 +71,11 @@ private func printDependencies(
     for variable in object.variables {
         printDependencies(of: variable, declarationObjects: declarationObjects, numberOfDependencyObjects: &numberOfDependencyObjects)
     }
-//        if let variableObject = object as? any VariableOwner {
-//            for variable in variableObject.variables {
-//                printDependencies(of: variable, declarationObjects: declarationObjects, numberOfDependencyObjects: &numberOfDependencyObjects)
-//            }
-//        }
 
     for function in object.functions {
         printDependencies(of: function, declarationObjects: declarationObjects, numberOfDependencyObjects: &numberOfDependencyObjects)
     }
 
-//        if let functionObject = object as? any FunctionOwner {
-//            for function in functionObject.functions {
-//                printDependencies(of: function, declarationObjects: declarationObjects, numberOfDependencyObjects: &numberOfDependencyObjects)
-//            }
-//        }
     if let typeDeclaration = object as? any TypeDeclaration {
         for nestingStruct in typeDeclaration.nestingStructs {
             printDependencies(of: nestingStruct, declarationObjects: declarationObjects, numberOfDependencyObjects: &numberOfDependencyObjects)

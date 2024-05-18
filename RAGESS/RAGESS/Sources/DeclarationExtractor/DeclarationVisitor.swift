@@ -490,6 +490,33 @@ final class DeclarationVisitor: SyntaxVisitor {
             #endif
         }
     }
+
+    // MARK: InheritedTypeSyntax
+
+    override func visit(_ node: InheritedTypeSyntax) -> SyntaxVisitorContinueKind {
+#if DEBUG
+        print("\nvisit(InheritedTypeSyntax(\(node)))")
+#endif
+
+        print("node.type.children(viewMode: .fixedUp)")
+        dump(node.type.children(viewMode: .fixedUp))
+
+        let positionRange = node.sourceRange(converter: locationConverter)
+        let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
+
+        let trailingOffset = node.type.trimmedByteRange.endOffset - 1
+
+        guard let lastItem = buffer.popLast(),
+              var inheritableObject = lastItem as? any Inheritable else {
+            fatalError("The type of the last element of buffer does not conform to `Inheritable`.")
+        }
+
+        inheritableObject.inheritOffset.append(trailingOffset)
+
+        buffer.append(inheritableObject)
+
+        return .visitChildren
+    }
 }
 
 extension DeclarationVisitor {

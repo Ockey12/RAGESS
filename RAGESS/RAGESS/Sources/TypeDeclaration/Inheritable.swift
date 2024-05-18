@@ -6,7 +6,7 @@
 //  
 //
 
-public protocol Inheritable {
+public protocol Inheritable: DeclarationObject {
     // Used to perform `cursorinfo` requests for protocols and classes that this type inherits.
     var inheritOffset: [Int] { get set }
 }

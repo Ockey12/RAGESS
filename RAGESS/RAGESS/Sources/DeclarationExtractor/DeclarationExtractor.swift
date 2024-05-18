@@ -212,6 +212,36 @@ public struct DeclarationExtractor {
             return inputObject
         }
     }
+
+//    private func getInheritedObjectID(
+//        _ inheritableObject: any Inheritable,
+//        buildSettings: [String: String],
+//        sourceFilePaths: [String],
+//        packages: [PackageObject]
+//    ) async -> any Inheritable {
+//        @Dependency(SourceKitClient.self) var sourceKitClient
+//        let argumentsGenerator = CompilerArgumentsGenerator(
+//            targetFilePath: inheritableObject.fullPath,
+//            buildSettings: buildSettings,
+//            sourceFilePaths: sourceFilePaths,
+//            packages: packages
+//        )
+//
+//        do {
+//            let arguments = try argumentsGenerator.generateArguments()
+//
+//            for offset in inheritableObject.inheritOffsets {
+//                let response = try await sourceKitClient.sendCursorInfoRequest(
+//                    file: inheritableObject.fullPath,
+//                    offset: offset,
+//                    sourceFilePaths: sourceFilePaths,
+//                    arguments: arguments
+//                )
+//            }
+//        } catch {
+//
+//        }
+//    }
 }
 
 private extension String {

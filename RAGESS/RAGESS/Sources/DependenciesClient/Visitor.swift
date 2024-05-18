@@ -11,7 +11,9 @@ import TypeDeclaration
 
 final class Visitor: SyntaxVisitor {
     private let locationConverter: SourceLocationConverter
-    private var offsets: [Int] = []
+    private(set) var referenceOffsets: [Int] = []
+    private(set) var identifierTypeOffsets: [Int] = []
+    private(set) var inheritOffsets: [Int] = []
 
     init(locationConverter: SourceLocationConverter) {
         self.locationConverter = locationConverter
@@ -24,7 +26,7 @@ final class Visitor: SyntaxVisitor {
             print("╰─node.trimmedByteRange.offset: \(node.trimmedByteRange.offset)")
         #endif
 
-        offsets.append(node.trimmedByteRange.offset)
+        referenceOffsets.append(node.trimmedByteRange.offset)
 
         return .visitChildren
     }
@@ -35,12 +37,25 @@ final class Visitor: SyntaxVisitor {
             print("╰─node.trimmedByteRange.offset: \(node.trimmedByteRange.offset)")
         #endif
 
-        offsets.append(node.trimmedByteRange.offset)
+        identifierTypeOffsets.append(node.trimmedByteRange.offset)
 
         return .visitChildren
     }
 
-    func getOffsets() -> [Int] {
-        offsets
+    override func visit(_ node: InheritedTypeSyntax) -> SyntaxVisitorContinueKind {
+#if DEBUG
+        print("\nvisit(InheritedTypeSyntax(\(node)))")
+#endif
+
+        print("node.type.children(viewMode: .fixedUp)")
+        dump(node.type.children(viewMode: .fixedUp))
+
+        let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
+
+        let trailingOffset = node.type.trimmedByteRange.endOffset - 1
+
+        inheritOffsets.append(trailingOffset)
+
+        return .visitChildren
     }
 }

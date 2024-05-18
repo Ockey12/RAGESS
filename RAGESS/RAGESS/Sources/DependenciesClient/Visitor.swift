@@ -52,6 +52,6 @@ final class Visitor: SyntaxVisitor {
 
         inheritOffsets.append(trailingOffset)
 
-        return .visitChildren
+        return .skipChildren
     }
 }

@@ -74,6 +74,12 @@ struct DependencyExtractor {
         )
         visitor.walk(Syntax(parsedFile))
 
+        #if DEBUG
+        print("referenceOffsets: \(visitor.referenceOffsets)")
+        print("identifierTypeOffsets: \(visitor.identifierTypeOffsets)")
+        print("inheritOffset: \(visitor.inheritOffsets)")
+        #endif
+
         for referenceOffset in visitor.referenceOffsets {
             #if DEBUG
             print("referenceOffset: \(referenceOffset)")

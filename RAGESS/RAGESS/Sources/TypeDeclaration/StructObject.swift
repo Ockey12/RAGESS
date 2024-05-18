@@ -21,6 +21,7 @@ public struct StructObject: TypeDeclaration {
     public var variables: [VariableObject] = []
     public var functions: [FunctionObject] = []
 
+    public var nestingProtocols: [ProtocolObject] = []
     public var nestingStructs: [StructObject] = []
     public var nestingClasses: [ClassObject] = []
     public var nestingEnums: [EnumObject] = []

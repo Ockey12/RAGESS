@@ -82,7 +82,7 @@ public struct TypeDeclarationExtractorDebugger {
 
             case .extractionCompleted:
                 print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
-                print("EXTRACT DEPENDENCIES COMPLETED")
+                print("EXTRACT DECLARATIONS COMPLETED")
                 dump(state.declarationObjects)
                 print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=\n")
                 return .none

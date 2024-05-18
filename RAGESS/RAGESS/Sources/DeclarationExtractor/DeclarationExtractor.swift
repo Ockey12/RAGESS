@@ -43,6 +43,7 @@ public struct DeclarationExtractor {
         #endif
 
         var result: [any DeclarationObject] = []
+        result.append(contentsOf: visitor.getProtocolDeclarations())
         result.append(contentsOf: visitor.getStructDeclarations())
         result.append(contentsOf: visitor.getClassDeclarations())
         result.append(contentsOf: visitor.getEnumDeclarations())

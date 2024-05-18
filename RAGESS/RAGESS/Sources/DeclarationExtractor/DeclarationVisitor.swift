@@ -10,6 +10,7 @@ import TypeDeclaration
 
 final class DeclarationVisitor: SyntaxVisitor {
     let fullPath: String
+    private var protocolDeclarations: [ProtocolObject] = []
     private var structDeclarations: [StructObject] = []
     private var classDeclarations: [ClassObject] = []
     private var enumDeclarations: [EnumObject] = []
@@ -53,6 +54,56 @@ final class DeclarationVisitor: SyntaxVisitor {
         appendToBuffer(currentProtocol)
 
         return .visitChildren
+    }
+
+    override func visitPost(_ node: ProtocolDeclSyntax) {
+#if DEBUG
+        print("\nvisitPost(ProtocolDeclSyntax(\(node.name.text)))")
+#endif
+
+        guard !buffer.isEmpty else {
+            fatalError("The buffer is empty.")
+        }
+
+#if DEBUG
+        print("buffer.popLast()")
+        print("- \(buffer.map { $0.name })")
+#endif
+
+        guard let lastItem = buffer.popLast(),
+              let currentProtocol = lastItem as? ProtocolObject else {
+            fatalError("The type of the last element of buffer is not a \(ProtocolObject.self).")
+        }
+
+#if DEBUG
+        print("+ \(buffer.map { $0.name })")
+#endif
+
+        if buffer.count >= 1 {
+            // If there is an element in the buffer, the last element in the buffer is the parent of this.
+            guard let owner = buffer.popLast(),
+                  var ownerTypeObject = owner as? any TypeDeclaration else {
+                fatalError("The type of the last element of buffer does not conform to TypeDeclaration.")
+            }
+#if DEBUG
+            print("buffer[\(buffer.count)].nestingProtocols.append(\(currentProtocol.name))")
+#endif
+            ownerTypeObject.nestingProtocols.append(currentProtocol)
+            buffer.append(ownerTypeObject)
+        } else {
+#if DEBUG
+            print("protocolDeclarations.append(\(currentProtocol.name))")
+            print("- \(protocolDeclarations.map { $0.name })")
+#endif
+            protocolDeclarations.append(currentProtocol)
+#if DEBUG
+            print("+ \(protocolDeclarations.map { $0.name })")
+#endif
+        }
+    }
+
+    func getProtocolDeclarations() -> [ProtocolObject] {
+        protocolDeclarations
     }
 
     // MARK: StructDeclSyntax

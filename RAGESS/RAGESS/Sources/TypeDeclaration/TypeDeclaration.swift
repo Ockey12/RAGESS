@@ -8,6 +8,7 @@
 import LanguageServerProtocol
 
 public protocol TypeDeclaration: DeclarationObject {
+    var nestingProtocols: [ProtocolObject] { get set }
     var nestingStructs: [StructObject] { get set }
     var nestingClasses: [ClassObject] { get set }
     var nestingEnums: [EnumObject] { get set }

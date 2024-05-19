@@ -1,9 +1,9 @@
 //
 //  InitializerObject.swift
 //
-//  
+//
 //  Created by Ockey12 on 2024/05/19
-//  
+//
 //
 
 import Dependencies

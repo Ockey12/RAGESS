@@ -333,9 +333,9 @@ final class DeclarationVisitor: SyntaxVisitor {
     // MARK: InitializerDeclSyntax
 
     override func visit(_ node: InitializerDeclSyntax) -> SyntaxVisitorContinueKind {
-#if DEBUG
-        print("\nvisit(InitializerDeclSyntax(\(node.description)))")
-#endif
+        #if DEBUG
+            print("\nvisit(InitializerDeclSyntax(\(node.description)))")
+        #endif
         let positionRange = node.sourceRange(converter: locationConverter)
         let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
@@ -348,10 +348,10 @@ final class DeclarationVisitor: SyntaxVisitor {
                 line: positionRange.start.line,
                 utf8index: positionRange.start.column
             )
-            ... SourcePosition(
-                line: positionRange.end.line,
-                utf8index: positionRange.end.column
-            ),
+                ... SourcePosition(
+                    line: positionRange.end.line,
+                    utf8index: positionRange.end.column
+                ),
             offsetRange: offsetRange
         )
 
@@ -361,27 +361,27 @@ final class DeclarationVisitor: SyntaxVisitor {
     }
 
     override func visitPost(_ node: InitializerDeclSyntax) {
-#if DEBUG
-        print("\nvisitPost(InitializerDeclSyntax(\(node.description)))")
-#endif
+        #if DEBUG
+            print("\nvisitPost(InitializerDeclSyntax(\(node.description)))")
+        #endif
 
         guard !buffer.isEmpty else {
             fatalError("The buffer is empty.")
         }
 
-#if DEBUG
-        print("buffer.popLast()")
-        print("- \(buffer.map { $0.name })")
-#endif
+        #if DEBUG
+            print("buffer.popLast()")
+            print("- \(buffer.map { $0.name })")
+        #endif
 
         guard let lastItem = buffer.popLast(),
               let currentInitializer = lastItem as? InitializerObject else {
             fatalError("The type of the last element of buffer is not a \(InitializerObject.self).")
         }
 
-#if DEBUG
-        print("+ \(buffer.map { $0.name })")
-#endif
+        #if DEBUG
+            print("+ \(buffer.map { $0.name })")
+        #endif
 
         if buffer.count >= 1 {
             // If there is an element in the buffer, the last element in the buffer is the parent of this.
@@ -389,9 +389,9 @@ final class DeclarationVisitor: SyntaxVisitor {
                   var ownerObject = lastItem as? any Initializable else {
                 fatalError("The type of the last element of buffer does not conform to Initializable.")
             }
-#if DEBUG
-            print("buffer[\(buffer.count)].functions.append(\(currentInitializer.name))")
-#endif
+            #if DEBUG
+                print("buffer[\(buffer.count)].functions.append(\(currentInitializer.name))")
+            #endif
             ownerObject.initializerObjects.append(currentInitializer)
             buffer.append(ownerObject)
         } else {

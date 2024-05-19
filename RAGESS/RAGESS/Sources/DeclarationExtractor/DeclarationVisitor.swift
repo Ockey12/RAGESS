@@ -93,7 +93,7 @@ final class DeclarationVisitor: SyntaxVisitor {
             buffer.append(protocolOwner)
         } else {
             #if DEBUG
-                print("protocolDeclarations.append(\(currentProtocol.name))")
+                print("extractedDeclarations.append(\(currentProtocol.name))")
                 print("- \(extractedDeclarations.map { $0.name })")
             #endif
             extractedDeclarations.append(currentProtocol)
@@ -169,7 +169,7 @@ final class DeclarationVisitor: SyntaxVisitor {
             buffer.append(ownerTypeObject)
         } else {
             #if DEBUG
-                print("structDeclarations.append(\(currentStruct.name))")
+                print("extractedDeclarations.append(\(currentStruct.name))")
                 print("- \(extractedDeclarations.map { $0.name })")
             #endif
             extractedDeclarations.append(currentStruct)
@@ -245,7 +245,7 @@ final class DeclarationVisitor: SyntaxVisitor {
             buffer.append(ownerTypeObject)
         } else {
             #if DEBUG
-                print("classDeclarations.append(\(currentClass.name))")
+                print("extractedDeclarations.append(\(currentClass.name))")
                 print("- \(extractedDeclarations.map { $0.name })")
             #endif
             extractedDeclarations.append(currentClass)
@@ -320,7 +320,7 @@ final class DeclarationVisitor: SyntaxVisitor {
             buffer.append(ownerTypeObject)
         } else {
             #if DEBUG
-                print("classDeclarations.append(\(currentEnum.name))")
+                print("extractedDeclarations.append(\(currentEnum.name))")
                 print("- \(extractedDeclarations.map { $0.name })")
             #endif
             extractedDeclarations.append(currentEnum)
@@ -476,7 +476,7 @@ final class DeclarationVisitor: SyntaxVisitor {
             buffer.append(ownerObject)
         } else {
             #if DEBUG
-                print("variableDeclarations.append(\(currentVariable.name))")
+                print("extractedDeclarations.append(\(currentVariable.name))")
                 print("- \(extractedDeclarations.map { $0.name })")
             #endif
             extractedDeclarations.append(currentVariable)
@@ -551,7 +551,7 @@ final class DeclarationVisitor: SyntaxVisitor {
             buffer.append(ownerObject)
         } else {
             #if DEBUG
-                print("functionDeclarations.append(\(currentFunction.name))")
+                print("extractedDeclarations.append(\(currentFunction.name))")
                 print("- \(extractedDeclarations.map { $0.name })")
             #endif
             extractedDeclarations.append(currentFunction)

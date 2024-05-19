@@ -518,7 +518,7 @@ struct DependencyExtractor {
         }
     }
 
-    // Used for `StructObject`, `ClassObject`, `EnumObject`.
+    // Used for `StructObject`, `ClassObject`.
     private func findProperty<T: TypeDeclaration>(in typeObject: T, matching: (any DeclarationObject) -> Bool) -> PartialKeyPath<T>? {
         guard matching(typeObject) else {
             print("ERROR in \(#filePath) - \(#function): \(typeObject.name) does not match `matching(typeObject)`\n")
@@ -596,6 +596,94 @@ struct DependencyExtractor {
         }
 
         let keyPath: PartialKeyPath<T> = \T.self
+        return keyPath
+    }
+
+    // Used for `EnumObject`.
+    private func findProperty(in enumObject: EnumObject, matching: (any DeclarationObject) -> Bool) -> PartialKeyPath<EnumObject>? {
+        guard matching(enumObject) else {
+            print("ERROR in \(#filePath) - \(#function): \(enumObject.name) does not match `matching(typeObject)`\n")
+            return nil
+        }
+
+        for (index, caseObject) in enumObject.cases.enumerated() {
+            if matching(caseObject) {
+                let keyPath: PartialKeyPath<EnumObject> = \EnumObject.cases[index]
+                return keyPath
+            }
+        }
+
+        for (index, nestProtocol) in enumObject.nestingProtocols.enumerated() {
+            if matching(nestProtocol) {
+                let keyPath: PartialKeyPath<EnumObject> = \EnumObject.nestingProtocols[index]
+                if let childKeyPath = findProperty(in: nestProtocol, matching: matching) {
+                    return keyPath.appending(path: childKeyPath)
+                }
+                return keyPath
+            }
+        }
+
+        for (index, nestStruct) in enumObject.nestingStructs.enumerated() {
+            if matching(nestStruct) {
+                let keyPath: PartialKeyPath<EnumObject> = \EnumObject.nestingStructs[index]
+                if let childKeyPath = findProperty(in: nestStruct, matching: matching) {
+                    return keyPath.appending(path: childKeyPath)
+                }
+                return keyPath
+            }
+        }
+
+        for (index, nestClass) in enumObject.nestingClasses.enumerated() {
+            if matching(nestClass) {
+                let keyPath: PartialKeyPath<EnumObject> = \EnumObject.nestingClasses[index]
+                if let childKeyPath = findProperty(in: nestClass, matching: matching) {
+                    return keyPath.appending(path: childKeyPath)
+                }
+                return keyPath
+            }
+        }
+
+        for (index, nestEnum) in enumObject.nestingEnums.enumerated() {
+            if matching(nestEnum) {
+                let keyPath: PartialKeyPath<EnumObject> = \EnumObject.nestingEnums[index]
+                if let childKeyPath = findProperty(in: nestEnum, matching: matching) {
+                    return keyPath.appending(path: childKeyPath)
+                }
+                return keyPath
+            }
+        }
+
+        for (index, initializer) in enumObject.initializers.enumerated() {
+            if matching(initializer) {
+                let keyPath: PartialKeyPath<EnumObject> = \EnumObject.initializers[index]
+                if let childKeyPath = findProperty(in: initializer, matching: matching) {
+                    return keyPath.appending(path: childKeyPath)
+                }
+                return keyPath
+            }
+        }
+
+        for (index, variable) in enumObject.variables.enumerated() {
+            if matching(variable) {
+                let keyPath: PartialKeyPath<EnumObject> = \EnumObject.variables[index]
+                if let childKeyPath = findProperty(in: variable, matching: matching) {
+                    return keyPath.appending(path: childKeyPath)
+                }
+                return keyPath
+            }
+        }
+
+        for (index, function) in enumObject.functions.enumerated() {
+            if matching(function) {
+                let keyPath: PartialKeyPath<EnumObject> = \EnumObject.functions[index]
+                if let childKeyPath = findProperty(in: function, matching: matching) {
+                    return keyPath.appending(path: childKeyPath)
+                }
+                return keyPath
+            }
+        }
+
+        let keyPath: PartialKeyPath<EnumObject> = \EnumObject.self
         return keyPath
     }
 

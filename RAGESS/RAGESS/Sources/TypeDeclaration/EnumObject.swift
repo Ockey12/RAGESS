@@ -21,8 +21,6 @@ public struct EnumObject: TypeDeclaration {
     public var variables: [VariableObject] = []
     public var functions: [FunctionObject] = []
 
-    public var inheritOffsets: [Int] = []
-
     public var nestingProtocols: [ProtocolObject] = []
     public var nestingStructs: [StructObject] = []
     public var nestingClasses: [ClassObject] = []

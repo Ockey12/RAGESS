@@ -18,6 +18,8 @@ public struct EnumObject: TypeDeclaration {
     public let positionRange: ClosedRange<SourcePosition>
     public let offsetRange: ClosedRange<Int>
 
+    public var cases: [CaseObject] = []
+
     public var initializerObjects: [InitializerObject] = []
     public var variables: [VariableObject] = []
     public var functions: [FunctionObject] = []
@@ -47,5 +49,17 @@ public struct EnumObject: TypeDeclaration {
         self.sourceCode = sourceCode
         self.positionRange = positionRange
         self.offsetRange = offsetRange
+    }
+
+    public struct CaseObject {
+        public let nameOffset: Int
+        public var fullPath: String
+        public var annotatedDecl: String
+        public let sourceCode: String
+        public let positionRange: ClosedRange<SourcePosition>
+        public let offsetRange: ClosedRange<Int>
+
+        public var objectsThatCallThisObject: [DependencyObject] = []
+        public var objectsThatAreCalledByThisObject: [DependencyObject] = []
     }
 }

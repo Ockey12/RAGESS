@@ -518,6 +518,7 @@ struct DependencyExtractor {
         }
     }
 
+    // Used for `StructObject`, `ClassObject`, `EnumObject`.
     private func findProperty<T: TypeDeclaration>(in typeObject: T, matching: (any DeclarationObject) -> Bool) -> PartialKeyPath<T>? {
         guard matching(typeObject) else {
             print("ERROR in \(#filePath) - \(#function): \(typeObject.name) does not match `matching(typeObject)`\n")
@@ -564,6 +565,16 @@ struct DependencyExtractor {
             }
         }
 
+        for (index, initializer) in typeObject.initializerObjects.enumerated() {
+            if matching(initializer) {
+                let keyPath: PartialKeyPath<T> = \T.initializerObjects[index]
+                if let childKeyPath = findProperty(in: initializer, matching: matching) {
+                    return keyPath.appending(path: childKeyPath)
+                }
+                return keyPath
+            }
+        }
+
         for (index, variable) in typeObject.variables.enumerated() {
             if matching(variable) {
                 let keyPath: PartialKeyPath<T> = \T.variables[index]
@@ -588,9 +599,10 @@ struct DependencyExtractor {
         return keyPath
     }
 
-    private func findProperty<T: DeclarationObject>(in object: T, matching: (any DeclarationObject) -> Bool) -> PartialKeyPath<T>? {
+    // Used for `InitializerObject`, `VariableObject`, `FunctionObject`.
+    private func findProperty<T: TypeNestable>(in object: T, matching: (any DeclarationObject) -> Bool) -> PartialKeyPath<T>? {
         guard matching(object) else {
-            print("ERROR in \(#filePath) - \(#function): \(object.name) does not match `matching(object)`\n")
+            print("ERROR in \(#filePath) - \(#function): \(object.name) does not match `matching(typeObject)`\n")
             return nil
         }
 
@@ -598,6 +610,36 @@ struct DependencyExtractor {
             if matching(nestProtocol) {
                 let keyPath: PartialKeyPath<T> = \T.nestingProtocols[index]
                 if let childKeyPath = findProperty(in: nestProtocol, matching: matching) {
+                    return keyPath.appending(path: childKeyPath)
+                }
+                return keyPath
+            }
+        }
+
+        for (index, nestStruct) in object.nestingStructs.enumerated() {
+            if matching(nestStruct) {
+                let keyPath: PartialKeyPath<T> = \T.nestingStructs[index]
+                if let childKeyPath = findProperty(in: nestStruct, matching: matching) {
+                    return keyPath.appending(path: childKeyPath)
+                }
+                return keyPath
+            }
+        }
+
+        for (index, nestClass) in object.nestingClasses.enumerated() {
+            if matching(nestClass) {
+                let keyPath: PartialKeyPath<T> = \T.nestingClasses[index]
+                if let childKeyPath = findProperty(in: nestClass, matching: matching) {
+                    return keyPath.appending(path: childKeyPath)
+                }
+                return keyPath
+            }
+        }
+
+        for (index, nestEnum) in object.nestingEnums.enumerated() {
+            if matching(nestEnum) {
+                let keyPath: PartialKeyPath<T> = \T.nestingEnums[index]
+                if let childKeyPath = findProperty(in: nestEnum, matching: matching) {
                     return keyPath.appending(path: childKeyPath)
                 }
                 return keyPath
@@ -625,6 +667,46 @@ struct DependencyExtractor {
         }
 
         let keyPath: PartialKeyPath<T> = \T.self
+        return keyPath
+    }
+
+    private func findProperty(in protocolObject: ProtocolObject, matching: (any DeclarationObject) -> Bool) -> PartialKeyPath<ProtocolObject>? {
+        guard matching(protocolObject) else {
+            print("ERROR in \(#filePath) - \(#function): \(protocolObject.name) does not match `matching(typeObject)`\n")
+            return nil
+        }
+
+        for (index, initializer) in protocolObject.initializerObjects.enumerated() {
+            if matching(initializer) {
+                let keyPath: PartialKeyPath<ProtocolObject> = \ProtocolObject.initializerObjects[index]
+                if let childKeyPath = findProperty(in: initializer, matching: matching) {
+                    return keyPath.appending(path: childKeyPath)
+                }
+                return keyPath
+            }
+        }
+
+        for (index, variable) in protocolObject.variables.enumerated() {
+            if matching(variable) {
+                let keyPath: PartialKeyPath<ProtocolObject> = \ProtocolObject.variables[index]
+                if let childKeyPath = findProperty(in: variable, matching: matching) {
+                    return keyPath.appending(path: childKeyPath)
+                }
+                return keyPath
+            }
+        }
+
+        for (index, function) in protocolObject.functions.enumerated() {
+            if matching(function) {
+                let keyPath: PartialKeyPath<ProtocolObject> = \ProtocolObject.functions[index]
+                if let childKeyPath = findProperty(in: function, matching: matching) {
+                    return keyPath.appending(path: childKeyPath)
+                }
+                return keyPath
+            }
+        }
+
+        let keyPath: PartialKeyPath<ProtocolObject> = \ProtocolObject.self
         return keyPath
     }
 }

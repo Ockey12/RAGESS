@@ -9,7 +9,7 @@
 import Dependencies
 import Foundation
 
-public struct InitializerObject: DeclarationObject {
+public struct InitializerObject: TypeNestable {
     public let id: UUID
     public let name: String
     public let nameOffset: Int
@@ -23,6 +23,9 @@ public struct InitializerObject: DeclarationObject {
     public var functions: [FunctionObject] = []
 
     public var nestingProtocols: [ProtocolObject] = []
+    public var nestingStructs: [StructObject] = []
+    public var nestingClasses: [ClassObject] = []
+    public var nestingEnums: [EnumObject] = []
 
     public var objectsThatCallThisObject: [DependencyObject] = []
     public var objectsThatAreCalledByThisObject: [DependencyObject] = []

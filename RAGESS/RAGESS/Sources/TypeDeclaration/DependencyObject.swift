@@ -29,7 +29,9 @@ public struct DependencyObject {
             self.kind = kind
         }
 
+        /// ID of the parent object with the shallowest hierarchy
         public let id: UUID
+
         public let keyPath: ObjectKeyPath
         public let kind: Kind
 

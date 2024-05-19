@@ -82,14 +82,15 @@ final class DeclarationVisitor: SyntaxVisitor {
 
         if buffer.count >= 1 {
             // If there is an element in the buffer, the last element in the buffer is the parent of this.
-            guard var ownerObject = buffer.popLast() else {
-                fatalError("The type of the last element of buffer does not conform to DeclarationObject.")
+            guard let lastItem = buffer.popLast(),
+                  var protocolOwner = lastItem as? any TypeNestable else {
+                fatalError("The type of the last element of buffer does not conform to TypeNestable.")
             }
             #if DEBUG
                 print("buffer[\(buffer.count)].nestingProtocols.append(\(currentProtocol.name))")
             #endif
-            ownerObject.nestingProtocols.append(currentProtocol)
-            buffer.append(ownerObject)
+            protocolOwner.nestingProtocols.append(currentProtocol)
+            buffer.append(protocolOwner)
         } else {
             #if DEBUG
                 print("protocolDeclarations.append(\(currentProtocol.name))")
@@ -327,6 +328,36 @@ final class DeclarationVisitor: SyntaxVisitor {
                 print("+ \(extractedDeclarations.map { $0.name })")
             #endif
         }
+    }
+
+    // MARK: InitializerDeclSyntax
+
+    override func visit(_ node: InitializerDeclSyntax) -> SyntaxVisitorContinueKind {
+#if DEBUG
+        print("\nvisit(InitializerDeclSyntax(\(node.description)))")
+#endif
+        let positionRange = node.sourceRange(converter: locationConverter)
+        let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
+
+        let currentInitializer = InitializerObject(
+            name: "init",
+            nameOffset: node.initKeyword.trimmedByteRange.offset,
+            fullPath: fullPath,
+            sourceCode: trimSourceCode(node.description),
+            positionRange: SourcePosition(
+                line: positionRange.start.line,
+                utf8index: positionRange.start.column
+            )
+            ... SourcePosition(
+                line: positionRange.end.line,
+                utf8index: positionRange.end.column
+            ),
+            offsetRange: offsetRange
+        )
+
+        appendToBuffer(currentInitializer)
+
+        return .visitChildren
     }
 
     // MARK: VariableDeclSyntax

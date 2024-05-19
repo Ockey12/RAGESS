@@ -19,7 +19,7 @@ public struct ProtocolObject: Inheritable, Initializable {
     public var positionRange: ClosedRange<SourcePosition>
     public var offsetRange: ClosedRange<Int>
 
-    public var initializerObjects: [InitializerObject] = []
+    public var initializers: [InitializerObject] = []
     public var variables: [VariableObject] = []
     public var functions: [FunctionObject] = []
 

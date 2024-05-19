@@ -20,7 +20,7 @@ public struct EnumObject: TypeDeclaration {
 
     public var cases: [CaseObject] = []
 
-    public var initializerObjects: [InitializerObject] = []
+    public var initializers: [InitializerObject] = []
     public var variables: [VariableObject] = []
     public var functions: [FunctionObject] = []
 

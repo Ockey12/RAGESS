@@ -7,5 +7,5 @@
 //
 
 public protocol Initializable: DeclarationObject {
-    var initializerObjects: [InitializerObject] { get set }
+    var initializers: [InitializerObject] { get set }
 }

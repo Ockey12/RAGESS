@@ -119,14 +119,14 @@ public struct DeclarationExtractor {
             var resultObject = typeObject
             resultObject.annotatedDecl = annotatedDecl.removedTags
 
-            for (index, initializer) in typeObject.initializerObjects.enumerated() {
+            for (index, initializer) in typeObject.initializers.enumerated() {
                 let annotatedInit = await getAnnotatedDeclaration(
                     initializer,
                     buildSettings: buildSettings,
                     sourceFilePaths: sourceFilePaths,
                     packages: packages
                 )
-                resultObject.initializerObjects[index] = annotatedInit
+                resultObject.initializers[index] = annotatedInit
             }
 
             for (index, variable) in typeObject.variables.enumerated() {
@@ -328,14 +328,14 @@ public struct DeclarationExtractor {
             var resultObject = protocolObject
             resultObject.annotatedDecl = annotatedDecl.removedTags
 
-            for (index, initializer) in protocolObject.initializerObjects.enumerated() {
+            for (index, initializer) in protocolObject.initializers.enumerated() {
                 let annotatedInit = await getAnnotatedDeclaration(
                     initializer,
                     buildSettings: buildSettings,
                     sourceFilePaths: sourceFilePaths,
                     packages: packages
                 )
-                resultObject.initializerObjects[index] = annotatedInit
+                resultObject.initializers[index] = annotatedInit
             }
 
             for (index, variable) in protocolObject.variables.enumerated() {

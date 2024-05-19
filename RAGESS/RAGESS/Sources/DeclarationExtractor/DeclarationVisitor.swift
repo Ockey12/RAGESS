@@ -392,7 +392,7 @@ final class DeclarationVisitor: SyntaxVisitor {
             #if DEBUG
                 print("buffer[\(buffer.count)].functions.append(\(currentInitializer.name))")
             #endif
-            ownerObject.initializerObjects.append(currentInitializer)
+            ownerObject.initializers.append(currentInitializer)
             buffer.append(ownerObject)
         } else {
             fatalError("Cannot find the holder of the initializer.")

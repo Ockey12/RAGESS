@@ -565,9 +565,9 @@ struct DependencyExtractor {
             }
         }
 
-        for (index, initializer) in typeObject.initializerObjects.enumerated() {
+        for (index, initializer) in typeObject.initializers.enumerated() {
             if matching(initializer) {
-                let keyPath: PartialKeyPath<T> = \T.initializerObjects[index]
+                let keyPath: PartialKeyPath<T> = \T.initializers[index]
                 if let childKeyPath = findProperty(in: initializer, matching: matching) {
                     return keyPath.appending(path: childKeyPath)
                 }
@@ -676,9 +676,9 @@ struct DependencyExtractor {
             return nil
         }
 
-        for (index, initializer) in protocolObject.initializerObjects.enumerated() {
+        for (index, initializer) in protocolObject.initializers.enumerated() {
             if matching(initializer) {
-                let keyPath: PartialKeyPath<ProtocolObject> = \ProtocolObject.initializerObjects[index]
+                let keyPath: PartialKeyPath<ProtocolObject> = \ProtocolObject.initializers[index]
                 if let childKeyPath = findProperty(in: initializer, matching: matching) {
                     return keyPath.appending(path: childKeyPath)
                 }

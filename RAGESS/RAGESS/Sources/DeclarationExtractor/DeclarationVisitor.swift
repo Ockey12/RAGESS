@@ -360,6 +360,45 @@ final class DeclarationVisitor: SyntaxVisitor {
         return .visitChildren
     }
 
+    override func visitPost(_ node: InitializerDeclSyntax) {
+#if DEBUG
+        print("\nvisitPost(InitializerDeclSyntax(\(node.description)))")
+#endif
+
+        guard !buffer.isEmpty else {
+            fatalError("The buffer is empty.")
+        }
+
+#if DEBUG
+        print("buffer.popLast()")
+        print("- \(buffer.map { $0.name })")
+#endif
+
+        guard let lastItem = buffer.popLast(),
+              let currentInitializer = lastItem as? InitializerObject else {
+            fatalError("The type of the last element of buffer is not a \(InitializerObject.self).")
+        }
+
+#if DEBUG
+        print("+ \(buffer.map { $0.name })")
+#endif
+
+        if buffer.count >= 1 {
+            // If there is an element in the buffer, the last element in the buffer is the parent of this.
+            guard let lastItem = buffer.popLast(),
+                  var ownerObject = lastItem as? any Initializable else {
+                fatalError("The type of the last element of buffer does not conform to Initializable.")
+            }
+#if DEBUG
+            print("buffer[\(buffer.count)].functions.append(\(currentInitializer.name))")
+#endif
+            ownerObject.initializerObjects.append(currentInitializer)
+            buffer.append(ownerObject)
+        } else {
+            fatalError("Cannot find the holder of the initializer.")
+        }
+    }
+
     // MARK: VariableDeclSyntax
 
     override func visit(_ node: VariableDeclSyntax) -> SyntaxVisitorContinueKind {

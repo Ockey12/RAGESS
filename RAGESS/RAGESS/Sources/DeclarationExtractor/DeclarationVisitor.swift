@@ -524,13 +524,13 @@ final class DeclarationVisitor: SyntaxVisitor {
 }
 
 extension DeclarationVisitor {
-    private func appendToBuffer(_ typeObject: any DeclarationObject) {
+    private func appendToBuffer(_ object: any DeclarationObject) {
         #if DEBUG
-            print("buffer.append(\(typeObject.name))")
+            print("buffer.append(\(object.name))")
             print("- \(buffer.map { $0.name })")
         #endif
 
-        buffer.append(typeObject)
+        buffer.append(object)
 
         #if DEBUG
             print("+ \(buffer.map { $0.name })")

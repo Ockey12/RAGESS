@@ -20,6 +20,7 @@ public struct DebugReducer {
         var typeAnnotationClient: TypeAnnotationDebugger.State
         var kittenClient: SourceKitClientDebugger.State
         var typeDeclarationExtractor: TypeDeclarationExtractorDebugger.State
+        var dependenciesClient: DependenciesClientDebugger.State
 
         var buildSettingsLoading = false
         var dumpPackageSwiftLoading = false
@@ -29,13 +30,15 @@ public struct DebugReducer {
             sourceFileClient: SourceFileClientDebugger.State,
             typeAnnotationClient: TypeAnnotationDebugger.State,
             kittenClient: SourceKitClientDebugger.State,
-            typeDeclarationExtractor: TypeDeclarationExtractorDebugger.State
+            typeDeclarationExtractor: TypeDeclarationExtractorDebugger.State,
+            dependenciesClient: DependenciesClientDebugger.State
         ) {
             self.lspClient = lspClient
             self.sourceFileClient = sourceFileClient
             self.typeAnnotationClient = typeAnnotationClient
             self.kittenClient = kittenClient
             self.typeDeclarationExtractor = typeDeclarationExtractor
+            self.dependenciesClient = dependenciesClient
         }
     }
 
@@ -45,6 +48,7 @@ public struct DebugReducer {
         case typeAnnotationClient(TypeAnnotationDebugger.Action)
         case kittenClient(SourceKitClientDebugger.Action)
         case typeDeclarationExtractor(TypeDeclarationExtractorDebugger.Action)
+        case dependenciesClient(DependenciesClientDebugger.Action)
     }
 
     public var body: some ReducerOf<Self> {
@@ -63,6 +67,9 @@ public struct DebugReducer {
         Scope(state: \.typeDeclarationExtractor, action: \.typeDeclarationExtractor) {
             TypeDeclarationExtractorDebugger()
         }
+        Scope(state: \.dependenciesClient, action: \.dependenciesClient) {
+            DependenciesClientDebugger()
+        }
         Reduce { state, action in
             switch action {
             case .lspClient:
@@ -70,11 +77,14 @@ public struct DebugReducer {
 
             case .sourceFileClient(.getSourceFilesButtonTapped):
                 state.kittenClient.packages = []
+                state.typeDeclarationExtractor.packages = []
+                state.dependenciesClient.packages = []
                 return .none
 
             case let .sourceFileClient(.sourceFileResponse(.success(directory))):
                 state.kittenClient.allFilePathsInProject = getAllSwiftFilePathsInProject(in: directory)
                 state.typeDeclarationExtractor.directory = directory
+                state.dependenciesClient.allSourceFiles = getAllSourceFilesInProject(in: directory)
                 state.buildSettingsLoading = true
                 return .none
 
@@ -92,6 +102,8 @@ public struct DebugReducer {
 
             case let .sourceFileClient(.buildSettingsResponse(.success(buildSettings))):
                 state.kittenClient.buildSettings = buildSettings
+                state.typeDeclarationExtractor.buildSettings = buildSettings
+                state.dependenciesClient.buildSettings = buildSettings
                 state.buildSettingsLoading = false
                 state.dumpPackageSwiftLoading = true
                 return .none
@@ -102,6 +114,8 @@ public struct DebugReducer {
 
             case let .sourceFileClient(.dumpPackageResponse(.success(packageObject))):
                 state.kittenClient.packages.append(packageObject)
+                state.typeDeclarationExtractor.packages.append(packageObject)
+                state.dependenciesClient.packages.append(packageObject)
                 state.dumpPackageSwiftLoading = false
                 print("\nstate.kittenClient.packages.append(packageObject)")
                 dump(state.kittenClient.packages)
@@ -123,6 +137,9 @@ public struct DebugReducer {
 
             case .kittenClient:
                 return .none
+
+            case .dependenciesClient:
+                return .none
             }
         }
     }
@@ -135,6 +152,14 @@ extension DebugReducer {
             swiftFilePaths.append(contentsOf: getAllSwiftFilePathsInProject(in: subDirectory))
         }
         return swiftFilePaths
+    }
+
+    func getAllSourceFilesInProject(in directory: Directory) -> [SourceFile] {
+        var files = directory.files
+        for subDirectory in directory.subDirectories {
+            files.append(contentsOf: getAllSourceFilesInProject(in: subDirectory))
+        }
+        return files
     }
 }
 
@@ -190,7 +215,16 @@ public struct DebugView: View {
                         action: \.typeDeclarationExtractor
                     )
                 )
-                .tabItem { Text("TypeDeclarationExtractor") }
+                .tabItem { Text("DeclarationExtractor") }
+                .padding()
+
+                DependenciesClientDebugView(
+                    store: store.scope(
+                        state: \.dependenciesClient,
+                        action: \.dependenciesClient
+                    )
+                )
+                .tabItem { Text("DependenciesClient") }
                 .padding()
             }
             .frame(maxWidth: .infinity)

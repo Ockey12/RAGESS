@@ -27,7 +27,6 @@ extension SourceFileClient: DependencyKey {
             var subDirectories: [Directory] = []
             var files: [SourceFile] = []
             var xcodeprojPaths: [String] = []
-//            var descriptionJSONString: String?
             var packageSwiftPath: String?
             let ignoredDirectoriesSet = Set(ignoredDirectories)
             var isDirectory: ObjCBool = false
@@ -61,12 +60,6 @@ extension SourceFileClient: DependencyKey {
                     files.append(file)
 
                     if file.name == "Package.swift" {
-//                        let packagePath = NSString(string: fullPath).deletingLastPathComponent
-//                        let descriptionJSONPath = packagePath + "/.build/arm64-apple-macosx/debug/description.json"
-//                        guard let jsonString = try? String(contentsOfFile: descriptionJSONPath) else {
-//                            continue
-//                        }
-//                        descriptionJSONString = jsonString
                         packageSwiftPath = fullPath
                     }
                 }
@@ -78,7 +71,6 @@ extension SourceFileClient: DependencyKey {
                 files: files.sorted { $0.name < $1.name },
                 xcodeprojPaths: xcodeprojPaths,
                 packageSwiftPath: packageSwiftPath
-//                descriptionJSONString: descriptionJSONString
             )
         }
 
@@ -107,11 +99,11 @@ extension SourceFileClient: DependencyKey {
 
                     return directory
                 #else
-                    let sourceFiles = getFilesContent(
-                        path: rootDirectoryPath,
+                    let directory = getDirectories(
+                        rootPath: rootDirectoryPath,
                         ignoredDirectories: ignoredDirectories
                     )
-                    return sourceFiles
+                    return directory
                 #endif
             }
         )

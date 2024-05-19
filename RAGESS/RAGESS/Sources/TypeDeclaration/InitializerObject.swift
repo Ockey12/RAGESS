@@ -1,15 +1,15 @@
 //
-//  VariableObject.swift
+//  InitializerObject.swift
 //
 //
-//  Created by Ockey12 on 2024/05/08
+//  Created by Ockey12 on 2024/05/19
 //
 //
 
 import Dependencies
 import Foundation
 
-public struct VariableObject: TypeNestable {
+public struct InitializerObject: TypeNestable {
     public let id: UUID
     public let name: String
     public let nameOffset: Int

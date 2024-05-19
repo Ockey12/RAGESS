@@ -1,31 +1,27 @@
 //
-//  VariableObject.swift
+//  ProtocolObject.swift
 //
 //
-//  Created by Ockey12 on 2024/05/08
+//  Created by Ockey12 on 2024/05/18
 //
 //
 
 import Dependencies
 import Foundation
 
-public struct VariableObject: TypeNestable {
-    public let id: UUID
-    public let name: String
-    public let nameOffset: Int
+public struct ProtocolObject: Inheritable, Initializable {
+    public var id: UUID
+    public var name: String
+    public var nameOffset: Int
     public var fullPath: String
     public var annotatedDecl: String
-    public let sourceCode: String
-    public let positionRange: ClosedRange<SourcePosition>
-    public let offsetRange: ClosedRange<Int>
+    public var sourceCode: String
+    public var positionRange: ClosedRange<SourcePosition>
+    public var offsetRange: ClosedRange<Int>
 
+    public var initializers: [InitializerObject] = []
     public var variables: [VariableObject] = []
     public var functions: [FunctionObject] = []
-
-    public var nestingProtocols: [ProtocolObject] = []
-    public var nestingStructs: [StructObject] = []
-    public var nestingClasses: [ClassObject] = []
-    public var nestingEnums: [EnumObject] = []
 
     public var objectsThatCallThisObject: [DependencyObject] = []
     public var objectsThatAreCalledByThisObject: [DependencyObject] = []
@@ -34,7 +30,7 @@ public struct VariableObject: TypeNestable {
         name: String,
         nameOffset: Int,
         fullPath: String,
-        sourceCode: String = "",
+        sourceCode: String,
         positionRange: ClosedRange<SourcePosition>,
         offsetRange: ClosedRange<Int>
     ) {

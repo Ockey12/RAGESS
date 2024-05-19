@@ -53,28 +53,39 @@ let package = Package(
             name: "DebugView",
             dependencies: [
                 "BuildSettingsClient",
-                "TypeDeclaration",
                 "DumpPackageClient",
+                "DependenciesClient",
                 "LSPClient",
                 "SourceFileClient",
                 "SourceKitClient",
                 "TypeAnnotationClient",
-                "TypeDeclarationExtractor",
+                "TypeDeclaration",
+                "DeclarationExtractor",
                 "XcodeObject",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ]
         ),
         .target(
-            name: "TypeDeclaration",
+            name: "DeclarationExtractor",
             dependencies: [
-                .product(name: "LSPBindings", package: "sourcekit-lsp")
+                "SourceKitClient",
+                "TypeDeclaration",
+                "XcodeObject",
+                .product(name: "Dependencies", package: "swift-dependencies"),
+                .product(name: "LSPBindings", package: "sourcekit-lsp"),
+                .product(name: "SwiftParser", package: "swift-syntax"),
+                .product(name: "SwiftSyntax", package: "swift-syntax")
             ]
         ),
         .target(
             name: "DependenciesClient",
             dependencies: [
+                "SourceKitClient",
+                "TypeDeclaration",
+                "XcodeObject",
                 .product(name: "Dependencies", package: "swift-dependencies"),
-                .product(name: "DependenciesMacros", package: "swift-dependencies")
+                .product(name: "DependenciesMacros", package: "swift-dependencies"),
+                .product(name: "SwiftSyntax", package: "swift-syntax")
             ]
         ),
         .target(
@@ -123,18 +134,14 @@ let package = Package(
                 "SourceFileClient",
                 "XcodeObject",
                 .product(name: "Dependencies", package: "swift-dependencies"),
-                .product(name: "DependenciesMacros", package: "swift-dependencies"),
-                .product(name: "LSPBindings", package: "sourcekit-lsp")
+                .product(name: "DependenciesMacros", package: "swift-dependencies")
             ]
         ),
         .target(
-            name: "TypeDeclarationExtractor",
+            name: "TypeDeclaration",
             dependencies: [
-                "TypeDeclaration",
-                "XcodeObject",
-                .product(name: "LSPBindings", package: "sourcekit-lsp"),
-                .product(name: "SwiftParser", package: "swift-syntax"),
-                .product(name: "SwiftSyntax", package: "swift-syntax")
+                .product(name: "Dependencies", package: "swift-dependencies"),
+                .product(name: "LSPBindings", package: "sourcekit-lsp")
             ]
         ),
         .target(name: "XcodeObject"),

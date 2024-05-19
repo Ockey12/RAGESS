@@ -42,14 +42,12 @@ public struct Directory: Identifiable {
         subDirectories: [Self],
         files: [SourceFile],
         xcodeprojPaths: [String] = [],
-//        descriptionJSONString: String? = nil
         packageSwiftPath: String? = nil
     ) {
         self.path = path
         self.subDirectories = subDirectories
         self.files = files
         self.xcodeprojPaths = xcodeprojPaths
-//        self.descriptionJSONString = descriptionJSONString
         self.packageSwiftPath = packageSwiftPath
     }
 }

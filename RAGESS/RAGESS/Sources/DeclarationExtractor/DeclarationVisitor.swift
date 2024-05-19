@@ -564,13 +564,13 @@ final class DeclarationVisitor: SyntaxVisitor {
     // MARK: EnumCaseDeclSyntax
 
     override func visit(_ node: EnumCaseDeclSyntax) -> SyntaxVisitorContinueKind {
-#if DEBUG
-        print("\nvisit(EnumCaseDeclSyntax(\(node.description)))")
-        print("node.elements")
-        print("    \(node.elements)")
-        print("node.elements.trimmedByteRange.offset: \(node.elements.trimmedByteRange.offset)")
+        #if DEBUG
+            print("\nvisit(EnumCaseDeclSyntax(\(node.description)))")
+            print("node.elements")
+            print("    \(node.elements)")
+            print("node.elements.trimmedByteRange.offset: \(node.elements.trimmedByteRange.offset)")
 
-#endif
+        #endif
 
         let positionRange = node.sourceRange(converter: locationConverter)
         let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
@@ -583,10 +583,10 @@ final class DeclarationVisitor: SyntaxVisitor {
                 line: positionRange.start.line,
                 utf8index: positionRange.start.column
             )
-            ... SourcePosition(
-                line: positionRange.end.line,
-                utf8index: positionRange.end.column
-            ),
+                ... SourcePosition(
+                    line: positionRange.end.line,
+                    utf8index: positionRange.end.column
+                ),
             offsetRange: offsetRange
         )
 
@@ -602,9 +602,9 @@ final class DeclarationVisitor: SyntaxVisitor {
         enumObject.cases.append(currentCase)
         buffer.append(enumObject)
 
-#if DEBUG
-        print("buffer[\(buffer.count)].cases.append(currentCase)")
-#endif
+        #if DEBUG
+            print("buffer[\(buffer.count)].cases.append(currentCase)")
+        #endif
 
         return .visitChildren
     }

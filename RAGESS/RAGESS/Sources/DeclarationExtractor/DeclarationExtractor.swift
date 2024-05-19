@@ -112,6 +112,16 @@ public struct DeclarationExtractor {
                 resultObject.functions[index] = annotatedFunction
             }
 
+            for (index, nestingProtocol) in resultObject.nestingProtocols.enumerated() {
+                let annotatedProtocol = await getAnnotatedDeclaration(
+                    nestingProtocol,
+                    buildSettings: buildSettings,
+                    sourceFilePaths: sourceFilePaths,
+                    packages: packages
+                )
+                resultObject.nestingProtocols[index] = annotatedProtocol
+            }
+
             for (index, nestingStruct) in resultObject.nestingStructs.enumerated() {
                 let annotatedStruct = await getAnnotatedDeclaration(
                     nestingStruct,
@@ -203,6 +213,16 @@ public struct DeclarationExtractor {
                     packages: packages
                 )
                 resultObject.functions[index] = annotatedFunction
+            }
+
+            for (index, nestingProtocol) in inputObject.nestingProtocols.enumerated() {
+                let annotatedProtocol = await getAnnotatedDeclaration(
+                    nestingProtocol,
+                    buildSettings: buildSettings,
+                    sourceFilePaths: sourceFilePaths,
+                    packages: packages
+                )
+                resultObject.nestingProtocols[index] = annotatedProtocol
             }
 
             return resultObject

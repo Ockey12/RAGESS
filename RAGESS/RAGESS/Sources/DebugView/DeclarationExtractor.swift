@@ -45,17 +45,6 @@ public struct TypeDeclarationExtractorDebugger {
             case .extractTapped:
                 state.declarationObjects = []
                 let extractor = DeclarationExtractor()
-//                var declarationObjects: [any DeclarationObject] = []
-//                for sourceFile in getAllSourceFiles(in: state.directory) {
-//                    declarationObjects.append(
-//                        contentsOf: extractor.extra
-//                    )
-//                }
-//                print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
-//                print("TypeDeclarationExtractorDebugger.Action.extractTapped")
-//                dump(declarationObjects)
-//                print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=\n")
-//                return .none
                 let allSourceFiles = getAllSourceFiles(in: state.directory)
                 let allSourceFilePaths = allSourceFiles.map { $0.path }
                 return .run {

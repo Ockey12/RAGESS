@@ -50,17 +50,6 @@ public struct DependenciesClientDebugger {
             switch action {
             case .getDependenciesTapped:
                 state.declarationObjects = []
-//                let extractor = DeclarationExtractor()
-//                var declarationObjects: [any DeclarationObject] = []
-//                for sourceFile in state.allSourceFiles {
-//                    declarationObjects.append(
-//                        contentsOf: extractor.extractDeclarations(from: sourceFile)
-//                    )
-//                }
-//                print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
-//                print("TypeDeclarationExtractorDebugger.Action.extractTapped")
-//                dump(declarationObjects)
-//                print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=\n")
                 let extractor = DeclarationExtractor()
                 let allSourceFilePaths = state.allSourceFiles.map { $0.path }
                 return .run {

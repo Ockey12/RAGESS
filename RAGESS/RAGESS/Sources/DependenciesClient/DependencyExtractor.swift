@@ -182,7 +182,6 @@ struct DependencyExtractor {
                     return
                 }
                 optionalDefinitionKeyPath = .protocol(keyPath)
-//                definitionObjectKind = .protocol
                 let definitionObject = protocolObject[keyPath: keyPath]
 
                 switch definitionObject {
@@ -226,7 +225,6 @@ struct DependencyExtractor {
                     return
                 }
                 optionalDefinitionKeyPath = .class(keyPath)
-//                definitionObjectKind = .class
 
                 let definitionObject = classObject[keyPath: keyPath]
 
@@ -333,7 +331,6 @@ struct DependencyExtractor {
                     return
                 }
                 optionalCallerKeyPath = .protocol(keyPath)
-//                callerObjectKind = .protocol
 
                 let callerObject = protocolObject[keyPath: keyPath]
 
@@ -378,7 +375,6 @@ struct DependencyExtractor {
                     return
                 }
                 optionalCallerKeyPath = .class(keyPath)
-//                callerObjectKind = .class
 
                 let callerObject = classObject[keyPath: keyPath]
 

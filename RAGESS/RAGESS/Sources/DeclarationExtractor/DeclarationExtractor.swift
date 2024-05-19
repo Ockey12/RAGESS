@@ -89,16 +89,6 @@ public struct DeclarationExtractor {
         return result
     }
 
-//    private func getAnnotatedDeclaration<T: DeclarationObject>(
-//        _ object: T,
-//        buildSettings: [String: String],
-//        sourceFilePaths: [String],
-//        packages: [PackageObject]
-//    ) async -> T {
-//        print("WARNING: \(#file) - \(#function): \(object.name) cannot be applied to any generic function, so the default function was called.")
-//        return object
-//    }
-
     // Used for `StructObject`, `ClassObject`.
     private func getAnnotatedDeclaration<T: TypeDeclaration>(
         _ typeObject: T,
@@ -503,66 +493,6 @@ public struct DeclarationExtractor {
             return protocolObject
         }
     }
-
-    // Used for `InitializerObject`.
-//    private func getAnnotatedDeclaration<T: DeclarationObject>(
-//        _ inputObject: T,
-//        buildSettings: [String: String],
-//        sourceFilePaths: [String],
-//        packages: [PackageObject]
-//    ) async -> T {
-//        @Dependency(SourceKitClient.self) var sourceKitClient
-//        let argumentsGenerator = CompilerArgumentsGenerator(
-//            targetFilePath: inputObject.fullPath,
-//            buildSettings: buildSettings,
-//            sourceFilePaths: sourceFilePaths,
-//            packages: packages
-//        )
-//
-//        do {
-//            let arguments = try argumentsGenerator.generateArguments()
-//            let response = try await sourceKitClient.sendCursorInfoRequest(
-//                file: inputObject.fullPath,
-//                offset: inputObject.nameOffset,
-//                sourceFilePaths: sourceFilePaths,
-//                arguments: arguments
-//            )
-//
-//            guard let annotatedDecl = response[CursorInfoResponseKeys.fullyAnnotatedDecl.key] as? String else {
-//                print("ERROR: \(#file) - \(#function): Cannot find `key.fully_annotated_decl` about \(inputObject.name).")
-//                return inputObject
-//            }
-//
-//            var resultObject = inputObject
-//            resultObject.annotatedDecl = annotatedDecl
-//
-//            for (index, variable) in inputObject.variables.enumerated() {
-//                let annotatedVariable = await getAnnotatedDeclaration(
-//                    variable,
-//                    buildSettings: buildSettings,
-//                    sourceFilePaths: sourceFilePaths,
-//                    packages: packages
-//                )
-//                resultObject.variables[index] = annotatedVariable
-//            }
-//
-//            for (index, function) in inputObject.functions.enumerated() {
-//                let annotatedFunction = await getAnnotatedDeclaration(
-//                    function,
-//                    buildSettings: buildSettings,
-//                    sourceFilePaths: sourceFilePaths,
-//                    packages: packages
-//                )
-//                resultObject.functions[index] = annotatedFunction
-//            }
-//
-//            return resultObject
-//        } catch {
-//            print("ERROR: \(#file) - \(#function): Cannot get annotated declaration about \(inputObject.name).")
-//            print(error)
-//            return inputObject
-//        }
-//    }
 }
 
 private extension String {

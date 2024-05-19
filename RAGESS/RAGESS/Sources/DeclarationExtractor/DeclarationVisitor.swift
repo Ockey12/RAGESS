@@ -10,12 +10,6 @@ import TypeDeclaration
 
 final class DeclarationVisitor: SyntaxVisitor {
     let fullPath: String
-//    private var protocolDeclarations: [ProtocolObject] = []
-//    private var structDeclarations: [StructObject] = []
-//    private var classDeclarations: [ClassObject] = []
-//    private var enumDeclarations: [EnumObject] = []
-//    private var variableDeclarations: [VariableObject] = []
-//    private var functionDeclarations: [FunctionObject] = []
     private(set) var extractedDeclarations: [any DeclarationObject] = []
     private var buffer: [any DeclarationObject] = []
 

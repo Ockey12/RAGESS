@@ -45,27 +45,47 @@ public struct DeclarationExtractor {
         var result: [any DeclarationObject] = visitor.extractedDeclarations
 
         for (index, object) in result.enumerated() {
-            let annotatedObject = await getAnnotatedDeclaration(
-                object,
-                buildSettings: buildSettings,
-                sourceFilePaths: sourceFilePaths,
-                packages: packages
-            )
-            result[index] = annotatedObject
+            if let typeObject = object as? any TypeDeclaration {
+                let annotatedTypeObject = await getAnnotatedDeclaration(
+                    typeObject,
+                    buildSettings: buildSettings,
+                    sourceFilePaths: sourceFilePaths,
+                    packages: packages
+                )
+                result[index] = annotatedTypeObject
+            } else if let typeNestableObject = object as? any TypeNestable {
+                let annotatedTypeNestableObject = await getAnnotatedDeclaration(
+                    typeNestableObject,
+                    buildSettings: buildSettings,
+                    sourceFilePaths: sourceFilePaths,
+                    packages: packages
+                )
+                result[index] = annotatedTypeNestableObject
+            } else if let protocolObject = object as? ProtocolObject {
+                let annotatedProtocolObject = await getAnnotatedDeclaration(
+                    protocolObject,
+                    buildSettings: buildSettings,
+                    sourceFilePaths: sourceFilePaths,
+                    packages: packages
+                )
+                result[index] = annotatedProtocolObject
+            } else {
+                print("WARNING: \(#file) - \(#function): \(object.name) cannot be applied to any generic `getAnnotatedDeclaration` function.")
+            }
         }
 
         return result
     }
 
-    private func getAnnotatedDeclaration<T: DeclarationObject>(
-        _ object: T,
-        buildSettings: [String: String],
-        sourceFilePaths: [String],
-        packages: [PackageObject]
-    ) async -> T {
-        print("WARNING: \(#file) - \(#function): \(object.name) cannot be applied to any generic function, so the default function was called.")
-        return object
-    }
+//    private func getAnnotatedDeclaration<T: DeclarationObject>(
+//        _ object: T,
+//        buildSettings: [String: String],
+//        sourceFilePaths: [String],
+//        packages: [PackageObject]
+//    ) async -> T {
+//        print("WARNING: \(#file) - \(#function): \(object.name) cannot be applied to any generic function, so the default function was called.")
+//        return object
+//    }
 
     // Used for `StructObject`, `ClassObject`, `EnumObject`.
     private func getAnnotatedDeclaration<T: TypeDeclaration>(
@@ -97,7 +117,7 @@ public struct DeclarationExtractor {
             }
 
             var resultObject = typeObject
-            resultObject.annotatedDecl = annotatedDecl
+            resultObject.annotatedDecl = annotatedDecl.removedTags
 
             for (index, initializer) in typeObject.initializerObjects.enumerated() {
                 let annotatedInit = await getAnnotatedDeclaration(
@@ -179,14 +199,14 @@ public struct DeclarationExtractor {
 
     // Used for `InitializerObject`, `VariableObject`, `FunctionObject`.
     private func getAnnotatedDeclaration<T: TypeNestable>(
-        _ typeObject: T,
+        _ typeNestableObject: T,
         buildSettings: [String: String],
         sourceFilePaths: [String],
         packages: [PackageObject]
     ) async -> T {
         @Dependency(SourceKitClient.self) var sourceKitClient
         let argumentsGenerator = CompilerArgumentsGenerator(
-            targetFilePath: typeObject.fullPath,
+            targetFilePath: typeNestableObject.fullPath,
             buildSettings: buildSettings,
             sourceFilePaths: sourceFilePaths,
             packages: packages
@@ -195,21 +215,21 @@ public struct DeclarationExtractor {
         do {
             let arguments = try argumentsGenerator.generateArguments()
             let response = try await sourceKitClient.sendCursorInfoRequest(
-                file: typeObject.fullPath,
-                offset: typeObject.nameOffset,
+                file: typeNestableObject.fullPath,
+                offset: typeNestableObject.nameOffset,
                 sourceFilePaths: sourceFilePaths,
                 arguments: arguments
             )
 
             guard let annotatedDecl = response[CursorInfoResponseKeys.fullyAnnotatedDecl.key] as? String else {
-                print("ERROR: \(#file) - \(#function): Cannot find `key.fully_annotated_decl` about \(typeObject.name).")
-                return typeObject
+                print("ERROR: \(#file) - \(#function): Cannot find `key.fully_annotated_decl` about \(typeNestableObject.name).")
+                return typeNestableObject
             }
 
-            var resultObject = typeObject
-            resultObject.annotatedDecl = annotatedDecl
+            var resultObject = typeNestableObject
+            resultObject.annotatedDecl = annotatedDecl.removedTags
 
-            for (index, variable) in typeObject.variables.enumerated() {
+            for (index, variable) in typeNestableObject.variables.enumerated() {
                 let annotatedVariable = await getAnnotatedDeclaration(
                     variable,
                     buildSettings: buildSettings,
@@ -219,7 +239,7 @@ public struct DeclarationExtractor {
                 resultObject.variables[index] = annotatedVariable
             }
 
-            for (index, function) in typeObject.functions.enumerated() {
+            for (index, function) in typeNestableObject.functions.enumerated() {
                 let annotatedFunction = await getAnnotatedDeclaration(
                     function,
                     buildSettings: buildSettings,
@@ -271,9 +291,9 @@ public struct DeclarationExtractor {
 
             return resultObject
         } catch {
-            print("ERROR: \(#file) - \(#function): Cannot get annotated declaration about \(typeObject.name).")
+            print("ERROR: \(#file) - \(#function): Cannot get annotated declaration about \(typeNestableObject.name).")
             print(error)
-            return typeObject
+            return typeNestableObject
         }
     }
 

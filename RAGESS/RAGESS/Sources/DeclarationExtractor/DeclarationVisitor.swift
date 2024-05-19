@@ -560,6 +560,54 @@ final class DeclarationVisitor: SyntaxVisitor {
             #endif
         }
     }
+
+    // MARK: EnumCaseDeclSyntax
+
+    override func visit(_ node: EnumCaseDeclSyntax) -> SyntaxVisitorContinueKind {
+#if DEBUG
+        print("\nvisit(EnumCaseDeclSyntax(\(node.description)))")
+        print("node.elements")
+        print("    \(node.elements)")
+        print("node.elements.trimmedByteRange.offset: \(node.elements.trimmedByteRange.offset)")
+
+#endif
+
+        let positionRange = node.sourceRange(converter: locationConverter)
+        let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
+
+        let currentCase = EnumObject.CaseObject(
+            nameOffset: node.elements.trimmedByteRange.offset,
+            fullPath: fullPath,
+            sourceCode: trimSourceCode(node.description),
+            positionRange: SourcePosition(
+                line: positionRange.start.line,
+                utf8index: positionRange.start.column
+            )
+            ... SourcePosition(
+                line: positionRange.end.line,
+                utf8index: positionRange.end.column
+            ),
+            offsetRange: offsetRange
+        )
+
+        guard !buffer.isEmpty else {
+            fatalError("The buffer is empty.")
+        }
+
+        guard let lastItem = buffer.popLast(),
+              var enumObject = lastItem as? EnumObject else {
+            fatalError("The type of the last element of buffer is not a \(EnumObject.self).")
+        }
+
+        enumObject.cases.append(currentCase)
+        buffer.append(enumObject)
+
+#if DEBUG
+        print("buffer[\(buffer.count)].cases.append(currentCase)")
+#endif
+
+        return .visitChildren
+    }
 }
 
 extension DeclarationVisitor {

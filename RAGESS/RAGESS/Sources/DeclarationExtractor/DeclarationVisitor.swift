@@ -159,8 +159,8 @@ final class DeclarationVisitor: SyntaxVisitor {
         if buffer.count >= 1 {
             // If there is an element in the buffer, the last element in the buffer is the parent of this.
             guard let owner = buffer.popLast(),
-                  var ownerTypeObject = owner as? any TypeDeclaration else {
-                fatalError("The type of the last element of buffer does not conform to TypeDeclaration.")
+                  var ownerTypeObject = owner as? any TypeNestable else {
+                fatalError("The type of the last element of buffer does not conform to TypeNestable.")
             }
             #if DEBUG
                 print("buffer[\(buffer.count)].nestingStructs.append(\(currentStruct.name))")
@@ -235,8 +235,8 @@ final class DeclarationVisitor: SyntaxVisitor {
         if buffer.count >= 1 {
             // If there is an element in the buffer, the last element in the buffer is the parent of this.
             guard let owner = buffer.popLast(),
-                  var ownerTypeObject = owner as? any TypeDeclaration else {
-                fatalError("The type of the last element of buffer does not conform to TypeDeclaration.")
+                  var ownerTypeObject = owner as? any TypeNestable else {
+                fatalError("The type of the last element of buffer does not conform to TypeNestable.")
             }
             #if DEBUG
                 print("buffer[\(buffer.count)].nestingClasses.append(\(currentClass.name))")
@@ -310,8 +310,8 @@ final class DeclarationVisitor: SyntaxVisitor {
         if buffer.count >= 1 {
             // If there is an element in the buffer, the last element in the buffer is the parent of this.
             guard let owner = buffer.popLast(),
-                  var ownerTypeObject = owner as? any TypeDeclaration else {
-                fatalError("The type of the last element of buffer does not conform to TypeDeclaration.")
+                  var ownerTypeObject = owner as? any TypeNestable else {
+                fatalError("The type of the last element of buffer does not conform to TypeNestable.")
             }
             #if DEBUG
                 print("buffer[\(buffer.count)].nestingEnums.append(\(currentEnum.name))")

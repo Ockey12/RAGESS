@@ -7,7 +7,7 @@
 
 import LanguageServerProtocol
 
-public protocol TypeDeclaration: Inheritable {
+public protocol TypeDeclaration: Inheritable, Initializable {
     var nestingStructs: [StructObject] { get set }
     var nestingClasses: [ClassObject] { get set }
     var nestingEnums: [EnumObject] { get set }

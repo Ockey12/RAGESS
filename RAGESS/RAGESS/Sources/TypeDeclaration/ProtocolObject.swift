@@ -9,7 +9,7 @@
 import Dependencies
 import Foundation
 
-public struct ProtocolObject: Inheritable {
+public struct ProtocolObject: Inheritable, Initializable {
     public var id: UUID
     public var name: String
     public var nameOffset: Int
@@ -19,6 +19,7 @@ public struct ProtocolObject: Inheritable {
     public var positionRange: ClosedRange<SourcePosition>
     public var offsetRange: ClosedRange<Int>
 
+    public var initializerObjects: [InitializerObject] = []
     public var variables: [VariableObject] = []
     public var functions: [FunctionObject] = []
 

@@ -18,6 +18,7 @@ public struct EnumObject: TypeDeclaration {
     public let positionRange: ClosedRange<SourcePosition>
     public let offsetRange: ClosedRange<Int>
 
+    public var initializerObjects: [InitializerObject] = []
     public var variables: [VariableObject] = []
     public var functions: [FunctionObject] = []
 

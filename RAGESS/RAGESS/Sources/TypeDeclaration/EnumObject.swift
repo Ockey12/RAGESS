@@ -61,5 +61,20 @@ public struct EnumObject: TypeDeclaration {
 
         public var objectsThatCallThisObject: [DependencyObject] = []
         public var objectsThatAreCalledByThisObject: [DependencyObject] = []
+
+        public init(
+            nameOffset: Int,
+            fullPath: String,
+            sourceCode: String,
+            positionRange: ClosedRange<SourcePosition>,
+            offsetRange: ClosedRange<Int>
+        ) {
+            self.nameOffset = nameOffset
+            self.fullPath = fullPath
+            annotatedDecl = "case"
+            self.sourceCode = sourceCode
+            self.positionRange = positionRange
+            self.offsetRange = offsetRange
+        }
     }
 }

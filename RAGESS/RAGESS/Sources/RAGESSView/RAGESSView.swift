@@ -6,33 +6,30 @@
 //
 //
 
+import ComposableArchitecture
 import SwiftUI
 
 public struct RAGESSView: View {
-    @State private var isShowFileImporter = false
+    @Bindable private var store: StoreOf<RAGESSReducer>
 
-    public init() {}
+    public init(store: StoreOf<RAGESSReducer>) {
+        self.store = store
+    }
 
     public var body: some View {
         Button(
             action: {
-                isShowFileImporter = true
+                store.send(.projectDirectorySelectorButtonTapped)
             },
             label: {
                 Image(systemName: "folder.badge.plus")
             }
         )
         .fileImporter(
-            isPresented: $isShowFileImporter,
+            isPresented: $store.isShowRootDirectorySelector,
             allowedContentTypes: [.directory],
             allowsMultipleSelection: false) { result in
-                switch result {
-                case .success(let urls):
-                    guard let url = urls.first else { return }
-                    print("File import succeeded: \(url.path())")
-                case .failure(let error):
-                    print("File import error")
-                }
+                store.send(.projectDirectorySelectorResponse(result))
             }
     }
 }

@@ -120,7 +120,12 @@ let package = Package(
                 .product(name: "LSPBindings", package: "sourcekit-lsp")
             ]
         ),
-        .target(name: "RAGESSView"),
+        .target(
+            name: "RAGESSView",
+            dependencies: [
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+            ]
+        ),
         .target(
             name: "SourceFileClient",
             dependencies: [

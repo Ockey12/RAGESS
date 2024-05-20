@@ -12,7 +12,14 @@ import SwiftUI
 struct RAGESSApp: App {
     var body: some Scene {
         WindowGroup {
-            RAGESSView()
+            RAGESSView(
+                store: .init(
+                    initialState: .init(projectRootDirectoryPath: ""),
+                    reducer: {
+                        RAGESSReducer()
+                    }
+                )
+            )
         }
     }
 }

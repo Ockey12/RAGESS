@@ -25,10 +25,10 @@ struct FileTreeView: View {
                 if directory.files.isEmpty,
                    directory.subDirectories.isEmpty {
                     Image(systemName: "folder")
-                        .foregroundStyle(Color(red: 39/255, green: 185/255, blue: 1))
+                        .foregroundStyle(Color(red: 39 / 255, green: 185 / 255, blue: 1))
                 } else {
                     Image(systemName: "folder.fill")
-                        .foregroundStyle(Color(red: 39/255, green: 185/255, blue: 1))
+                        .foregroundStyle(Color(red: 39 / 255, green: 185 / 255, blue: 1))
                 }
                 Text(directory.name)
                 Spacer()
@@ -44,7 +44,7 @@ struct FileTreeView: View {
                             label: {
                                 HStack {
                                     Image(systemName: "swift")
-                                        .foregroundStyle(Color(red: 1, green: 120/255, blue: 67/255))
+                                        .foregroundStyle(Color(red: 1, green: 120 / 255, blue: 67 / 255))
                                     Text(file.name)
                                 }
                             }

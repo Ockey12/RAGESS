@@ -23,6 +23,7 @@ public struct RAGESSReducer {
         var projectRootDirectoryPath: String
         var rootDirectory: Directory?
         var buildSettings: [String: String] = [:]
+        var loadingTaskKindBuffer: [LoadingTaskKind] = []
 
         public init(projectRootDirectoryPath: String) {
             self.projectRootDirectoryPath = projectRootDirectoryPath
@@ -56,6 +57,7 @@ public struct RAGESSReducer {
                 #endif
 
                 state.projectRootDirectoryPath = url.path()
+                state.loadingTaskKindBuffer.append(.sourceFiles)
 
                 return .run { [projectRootDirectoryPath = state.projectRootDirectoryPath] send in
                     await send(.sourceFileResponse(Result {
@@ -71,14 +73,20 @@ public struct RAGESSReducer {
                 return .none
 
             case let .sourceFileResponse(.success(rootDirectory)):
+                #if DEBUG
                 print(".sourceFileResponse(.success(rootDirectory))")
                 dump(rootDirectory)
+                #endif
+
                 state.rootDirectory = rootDirectory
+                state.loadingTaskKindBuffer.removeFirst()
 
                 guard !rootDirectory.allXcodeprojPathsUnderDirectory.isEmpty else {
                     print("ERROR in \(#file) - \(#line): Cannot find `**.xcodeproj`")
                     return .none
                 }
+
+                state.loadingTaskKindBuffer.append(.buildSettings)
 
                 return .run { send in
                     await send(.buildSettingsResponse(Result {
@@ -97,6 +105,7 @@ public struct RAGESSReducer {
 
             case let .buildSettingsResponse(.success(buildSettings)):
                 state.buildSettings = buildSettings
+                state.loadingTaskKindBuffer.removeFirst()
 
                 #if DEBUG
                     print("Successfully get buildsettings.")

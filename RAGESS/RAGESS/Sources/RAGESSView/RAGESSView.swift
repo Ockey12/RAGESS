@@ -20,47 +20,63 @@ public struct RAGESSView: View {
     }
 
     public var body: some View {
-        NavigationSplitView(
-            sidebar: {
-                Divider()
+        ZStack {
+            NavigationSplitView(
+                sidebar: {
+                    Divider()
 
-                if let rootDirectory = store.rootDirectory {
-                    ScrollView {
-                        FileTreeView(store: store, directory: rootDirectory)
+                    if let rootDirectory = store.rootDirectory {
+                        ScrollView {
+                            FileTreeView(store: store, directory: rootDirectory)
+                        }
+                        .padding(.leading, 20)
                     }
-                    .padding(.leading, 20)
-                }
 
-                Spacer()
-            },
-            detail: {
-                VStack(spacing: 0) {
-                    HStack(spacing: 0) {
-                        Button(
-                            action: {
-                                isShowRootDirectorySelector = true
-                            },
-                            label: {
-                                Image(systemName: "folder")
-                            }
-                        )
-                        .padding()
+                    Spacer()
+                },
+                detail: {
+                    VStack(spacing: 0) {
+                        HStack(spacing: 0) {
+                            Button(
+                                action: {
+                                    isShowRootDirectorySelector = true
+                                },
+                                label: {
+                                    Image(systemName: "folder")
+                                }
+                            )
+                            .padding()
+
+                            Divider()
+
+                            Text(store.projectRootDirectoryPath)
+                                .padding()
+
+                            Spacer()
+                        } // HStack
+                        .frame(height: 40)
 
                         Divider()
 
-                        Text(store.projectRootDirectoryPath)
-                            .padding()
-
                         Spacer()
-                    } // HStack
-                    .frame(height: 40)
+                    } // VStack
+                }
+            )
 
-                    Divider()
+            if let currentLoadingTask = store.loadingTaskKindBuffer.first {
+                    switch currentLoadingTask {
+                    case .sourceFiles:
+                        ProgressView {
+                            Text("In the process of extracting the source files.")
+                        }
 
-                    Spacer()
-                } // VStack
+                    case .buildSettings:
+                        ProgressView {
+                            Text("In the process of getting build settings.")
+                        }
+                    }
             }
-        )
+        } // ZStack
         .fileImporter(
             isPresented: $isShowRootDirectorySelector,
             allowedContentTypes: [.directory],

@@ -1,9 +1,9 @@
 //
 //  DerivedDataMonitor.swift
 //
-//  
+//
 //  Created by Ockey12 on 2024/05/20
-//  
+//
 //
 
 import ComposableArchitecture
@@ -32,7 +32,7 @@ public struct DerivedDataMonitorDebugger {
     @Dependency(DerivedDataMonitorClient.self) var monitorClient
 
     public var body: some ReducerOf<Self> {
-        Reduce { state, action in
+        Reduce { _, action in
             switch action {
             case .startMonitoringTapped:
                 return .none

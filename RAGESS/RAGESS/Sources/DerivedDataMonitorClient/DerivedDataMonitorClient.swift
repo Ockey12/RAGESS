@@ -16,7 +16,7 @@ public struct DerivedDataMonitorClient {
 }
 
 extension DerivedDataMonitorClient: DependencyKey {
-    public static let liveValue: DerivedDataMonitorClient = DerivedDataMonitorClient(
+    public static let liveValue: DerivedDataMonitorClient = .init(
         start: { directoryPath in
             AsyncStream { continuation in
                 let monitor = DerivedDataMonitor(
@@ -32,5 +32,4 @@ extension DerivedDataMonitorClient: DependencyKey {
             }
         }
     )
-
 }

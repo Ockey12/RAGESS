@@ -31,6 +31,7 @@ public struct RAGESSReducer {
         case projectDirectorySelectorButtonTapped
         case projectDirectorySelectorResponse(Result<[URL], Error>)
         case sourceFileResponse(Result<Directory, Error>)
+        case sourceFileSelected(SourceFile)
         case binding(BindingAction<State>)
     }
 
@@ -83,6 +84,9 @@ public struct RAGESSReducer {
                 #if DEBUG
                     print(error)
                 #endif
+                return .none
+
+            case let .sourceFileSelected(sourceFile):
                 return .none
 
             case .binding:

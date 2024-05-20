@@ -28,7 +28,7 @@ public struct DerivedDataMonitorDebugger {
     public enum Action: BindableAction {
         case startMonitoringTapped
         case stopMonitoringTapped
-        case detectedDirectoryChange
+        case detectedDirectoryChange(String)
         case binding(BindingAction<State>)
     }
 
@@ -45,29 +45,68 @@ public struct DerivedDataMonitorDebugger {
                     return .none
                 }
 
-                let derivedDataPath = URL(filePath: buildDirectory)
-                    .deletingLastPathComponent()
-                    .deletingLastPathComponent()
-                    .path()
-                state.derivedDataPath = derivedDataPath
+                let appPaths = findAppPaths(in: buildDirectory)
 
                 return .run { send in
-                    for await _ in monitorClient.start(directoryPath: derivedDataPath) {
-                        await send(.detectedDirectoryChange)
+                    for appPath in appPaths {
+#if DEBUG
+                        print("Start monitoring \(appPath)")
+#endif
+                        for await _ in monitorClient.start(directoryPath: appPath) {
+                            await send(.detectedDirectoryChange(appPath))
+                        }
                     }
                 }
 
             case .stopMonitoringTapped:
                 return .none
 
-            case .detectedDirectoryChange:
+            case let .detectedDirectoryChange(appPath):
                 #if DEBUG
-                    print("DerivedDataMonitorClient detected a change in \(state.derivedDataPath).")
+                    print("DerivedDataMonitorClient detected a change in \(appPath).")
                 #endif
                 return .none
 
             case .binding:
                 return .none
+            }
+        }
+    }
+}
+
+extension DerivedDataMonitorDebugger {
+    func findAppPaths(in directoryPath: String) -> [String] {
+        let fileManager = FileManager.default
+        let directoryURL = URL(filePath: directoryPath)
+
+        guard let enumerator = fileManager.enumerator(at: directoryURL, includingPropertiesForKeys: nil) else {
+            return []
+        }
+
+        var appPaths: [String] = []
+
+        while let url = enumerator.nextObject() as? URL {
+            if url.pathExtension == "app" {
+                appPaths.append(url.path())
+            }
+        }
+
+        return appPaths
+    }
+}
+
+public struct DerivedDataMonitorDebugView: View {
+    @Bindable public var store: StoreOf<DerivedDataMonitorDebugger>
+
+    public init(store: StoreOf<DerivedDataMonitorDebugger>) {
+        self.store = store
+    }
+
+    public var body: some View {
+        Form {
+            TextField("DerivedData Directory Path", text: $store.derivedDataPath)
+            Button("Start Monitoring") {
+                store.send(.startMonitoringTapped)
             }
         }
     }

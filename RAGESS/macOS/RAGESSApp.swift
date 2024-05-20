@@ -45,6 +45,10 @@ struct RAGESSApp: App {
                             allSourceFiles: [],
                             buildSettings: [:],
                             packages: []
+                        ),
+                        derivedDataMonitor: .init(
+                            derivedDataPath: "",
+                            buildSettings: [:]
                         )
                     ),
                     reducer: {

@@ -12,6 +12,9 @@ import SwiftUI
 public struct RAGESSView: View {
     @Bindable private var store: StoreOf<RAGESSReducer>
 
+    // FIXME: If Reducer manages this state, the `.fileImporter` will be opened only once.
+    @State private var isShowRootDirectorySelector = false
+
     public init(store: StoreOf<RAGESSReducer>) {
         self.store = store
     }
@@ -35,20 +38,13 @@ public struct RAGESSView: View {
                     HStack(spacing: 0) {
                         Button(
                             action: {
-                                store.send(.projectDirectorySelectorButtonTapped)
+                                isShowRootDirectorySelector = true
                             },
                             label: {
                                 Image(systemName: "folder")
                             }
                         )
                         .padding()
-                        .fileImporter(
-                            isPresented: $store.isShowRootDirectorySelector,
-                            allowedContentTypes: [.directory],
-                            allowsMultipleSelection: false
-                        ) { result in
-                            store.send(.projectDirectorySelectorResponse(result))
-                        }
 
                         Divider()
 
@@ -65,5 +61,12 @@ public struct RAGESSView: View {
                 } // VStack
             }
         )
+        .fileImporter(
+            isPresented: $isShowRootDirectorySelector,
+            allowedContentTypes: [.directory],
+            allowsMultipleSelection: false
+        ) { result in
+            store.send(.projectDirectorySelectorResponse(result))
+        }
     }
 }

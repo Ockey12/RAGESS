@@ -20,7 +20,6 @@ public struct RAGESSReducer {
     @ObservableState
     public struct State {
         var projectRootDirectoryPath: String
-        var isShowRootDirectorySelector = false
         var rootDirectory: Directory?
 
         public init(projectRootDirectoryPath: String) {
@@ -29,7 +28,6 @@ public struct RAGESSReducer {
     }
 
     public enum Action: BindableAction {
-        case projectDirectorySelectorButtonTapped
         case projectDirectorySelectorResponse(Result<[URL], Error>)
         case sourceFileResponse(Result<Directory, Error>)
         case sourceFileSelected(SourceFile)
@@ -42,10 +40,6 @@ public struct RAGESSReducer {
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .projectDirectorySelectorButtonTapped:
-                state.isShowRootDirectorySelector = true
-                return .none
-
             case let .projectDirectorySelectorResponse(.success(urls)):
                 guard let url = urls.first else {
                     #if DEBUG

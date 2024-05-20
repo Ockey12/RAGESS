@@ -17,37 +17,53 @@ public struct RAGESSView: View {
     }
 
     public var body: some View {
-        VStack(spacing: 0) {
-            HStack(spacing: 0) {
-                Button(
-                    action: {
-                        store.send(.projectDirectorySelectorButtonTapped)
-                    },
-                    label: {
-                        Image(systemName: "folder")
-                    }
-                )
-                .padding()
-                .fileImporter(
-                    isPresented: $store.isShowRootDirectorySelector,
-                    allowedContentTypes: [.directory],
-                    allowsMultipleSelection: false
-                ) { result in
-                    store.send(.projectDirectorySelectorResponse(result))
-                }
-
+        NavigationSplitView(
+            sidebar: {
                 Divider()
 
-                Text(store.projectRootDirectoryPath)
-                    .padding()
+                if let rootDirectory = store.rootDirectory {
+                    ScrollView {
+                        FileTreeView(store: store, directory: rootDirectory)
+                    }
+                    .padding(.leading, 20)
+                }
 
                 Spacer()
-            } // HStack
-            .frame(height: 40)
+            },
+            detail: {
+                VStack(spacing: 0) {
+                    HStack(spacing: 0) {
+                        Button(
+                            action: {
+                                store.send(.projectDirectorySelectorButtonTapped)
+                            },
+                            label: {
+                                Image(systemName: "folder")
+                            }
+                        )
+                        .padding()
+                        .fileImporter(
+                            isPresented: $store.isShowRootDirectorySelector,
+                            allowedContentTypes: [.directory],
+                            allowsMultipleSelection: false
+                        ) { result in
+                            store.send(.projectDirectorySelectorResponse(result))
+                        }
 
-            Divider()
+                        Divider()
 
-            Spacer()
-        } // VStack
+                        Text(store.projectRootDirectoryPath)
+                            .padding()
+
+                        Spacer()
+                    } // HStack
+                    .frame(height: 40)
+
+                    Divider()
+
+                    Spacer()
+                } // VStack
+            }
+        )
     }
 }

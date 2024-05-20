@@ -21,6 +21,7 @@ public struct RAGESSReducer {
     public struct State {
         var projectRootDirectoryPath: String
         var isShowRootDirectorySelector = false
+        var rootDirectory: Directory?
 
         public init(projectRootDirectoryPath: String) {
             self.projectRootDirectoryPath = projectRootDirectoryPath
@@ -78,6 +79,7 @@ public struct RAGESSReducer {
             case let .sourceFileResponse(.success(rootDirectory)):
                 print(".sourceFileResponse(.success(rootDirectory))")
                 dump(rootDirectory)
+                state.rootDirectory = rootDirectory
                 return .none
 
             case let .sourceFileResponse(.failure(error)):

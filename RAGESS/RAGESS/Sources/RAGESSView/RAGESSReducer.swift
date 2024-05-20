@@ -1,9 +1,9 @@
 //
 //  RAGESSReducer.swift
-//  
-//  
+//
+//
 //  Created by Ockey12 on 2024/05/21
-//  
+//
 //
 
 import ComposableArchitecture

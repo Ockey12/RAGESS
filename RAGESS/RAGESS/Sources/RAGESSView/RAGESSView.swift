@@ -31,9 +31,10 @@ public struct RAGESSView: View {
                 .fileImporter(
                     isPresented: $store.isShowRootDirectorySelector,
                     allowedContentTypes: [.directory],
-                    allowsMultipleSelection: false) { result in
-                        store.send(.projectDirectorySelectorResponse(result))
-                    }
+                    allowsMultipleSelection: false
+                ) { result in
+                    store.send(.projectDirectorySelectorResponse(result))
+                }
 
                 Divider()
 

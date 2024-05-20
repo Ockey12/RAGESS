@@ -47,7 +47,7 @@ public struct RAGESSReducer {
             switch action {
             case let .projectDirectorySelectorResponse(.success(urls)):
                 guard let url = urls.first else {
-                        print("ERROR in \(#file) - \(#line): Cannot find `urls.first`")
+                    print("ERROR in \(#file) - \(#line): Cannot find `urls.first`")
                     return .none
                 }
 
@@ -69,13 +69,13 @@ public struct RAGESSReducer {
                 }
 
             case let .projectDirectorySelectorResponse(.failure(error)):
-                    print(error)
+                print(error)
                 return .none
 
             case let .sourceFileResponse(.success(rootDirectory)):
                 #if DEBUG
-                print(".sourceFileResponse(.success(rootDirectory))")
-                dump(rootDirectory)
+                    print(".sourceFileResponse(.success(rootDirectory))")
+                    dump(rootDirectory)
                 #endif
 
                 state.rootDirectory = rootDirectory
@@ -97,7 +97,7 @@ public struct RAGESSReducer {
                 }
 
             case let .sourceFileResponse(.failure(error)):
-                    print(error)
+                print(error)
                 return .none
 
             case let .sourceFileSelected(sourceFile):

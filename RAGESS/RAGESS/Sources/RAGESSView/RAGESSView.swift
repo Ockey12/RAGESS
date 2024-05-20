@@ -64,17 +64,17 @@ public struct RAGESSView: View {
             )
 
             if let currentLoadingTask = store.loadingTaskKindBuffer.first {
-                    switch currentLoadingTask {
-                    case .sourceFiles:
-                        ProgressView {
-                            Text("In the process of extracting the source files.")
-                        }
-
-                    case .buildSettings:
-                        ProgressView {
-                            Text("In the process of getting build settings.")
-                        }
+                switch currentLoadingTask {
+                case .sourceFiles:
+                    ProgressView {
+                        Text("In the process of extracting the source files.")
                     }
+
+                case .buildSettings:
+                    ProgressView {
+                        Text("In the process of getting build settings.")
+                    }
+                }
             }
         } // ZStack
         .fileImporter(

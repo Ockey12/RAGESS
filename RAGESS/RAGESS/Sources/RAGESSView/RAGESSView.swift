@@ -74,6 +74,11 @@ public struct RAGESSView: View {
                     ProgressView {
                         Text("In the process of getting build settings.")
                     }
+
+                case .dumpPackage:
+                    ProgressView {
+                        Text("In the process of analyzing the package.")
+                    }
                 }
             }
         } // ZStack

@@ -124,6 +124,7 @@ let package = Package(
             name: "RAGESSView",
             dependencies: [
                 "BuildSettingsClient",
+                "DumpPackageClient",
                 "MonitorClient",
                 "SourceFileClient",
                 "XcodeObject",

@@ -28,7 +28,7 @@ public struct Directory: Identifiable {
 
     public let packageSwiftPath: String?
     public var allPackageSwiftPath: [String] {
-        var allPaths = subDirectories.compactMap { $0.packageSwiftPath }
+        var allPaths = subDirectories.compactMap { $0.allPackageSwiftPath }.flatMap { $0 }
         if let path = packageSwiftPath {
             allPaths.append(path)
         }

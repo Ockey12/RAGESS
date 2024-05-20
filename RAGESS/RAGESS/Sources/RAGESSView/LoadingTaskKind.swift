@@ -11,4 +11,5 @@ import Foundation
 enum LoadingTaskKind {
     case sourceFiles
     case buildSettings
+    case dumpPackage
 }

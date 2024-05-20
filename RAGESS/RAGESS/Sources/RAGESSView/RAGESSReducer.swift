@@ -9,6 +9,7 @@
 import BuildSettingsClient
 import ComposableArchitecture
 import Dependencies
+import DumpPackageClient
 import Foundation
 import MonitorClient
 import SourceFileClient
@@ -23,6 +24,7 @@ public struct RAGESSReducer {
         var projectRootDirectoryPath: String
         var rootDirectory: Directory?
         var buildSettings: [String: String] = [:]
+        var packages: [PackageObject] = []
         var loadingTaskKindBuffer: [LoadingTaskKind] = []
 
         public init(projectRootDirectoryPath: String) {
@@ -35,12 +37,14 @@ public struct RAGESSReducer {
         case sourceFileResponse(Result<Directory, Error>)
         case sourceFileSelected(SourceFile)
         case buildSettingsResponse(Result<[String: String], Error>)
+        case dumpPackageResponse(Result<PackageObject, Error>)
         case binding(BindingAction<State>)
     }
 
     @Dependency(MonitorClient.self) var monitorClient
     @Dependency(SourceFileClient.self) var sourceFileClient
     @Dependency(BuildSettingsClient.self) var buildSettingsClient
+    @Dependency(DumpPackageClient.self) var dumpPackageClient
 
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
@@ -87,6 +91,12 @@ public struct RAGESSReducer {
                 }
 
                 state.loadingTaskKindBuffer.append(.buildSettings)
+                state.loadingTaskKindBuffer.append(
+                    contentsOf: Array(
+                        repeating: .dumpPackage,
+                        count: rootDirectory.allPackageSwiftPath.count
+                    )
+                )
 
                 return .run { send in
                     await send(.buildSettingsResponse(Result {
@@ -94,6 +104,14 @@ public struct RAGESSReducer {
                             xcodeprojPath: rootDirectory.allXcodeprojPathsUnderDirectory[0]
                         )
                     }))
+
+                    for packageSwiftPath in rootDirectory.allPackageSwiftPath {
+                        let packageDirectoryPath = NSString(string: packageSwiftPath)
+                            .deletingLastPathComponent
+                        await send(.dumpPackageResponse(Result {
+                            try await dumpPackageClient.dumpPackage(currentDirectory: packageDirectoryPath)
+                        }))
+                    }
                 }
 
             case let .sourceFileResponse(.failure(error)):
@@ -114,6 +132,21 @@ public struct RAGESSReducer {
                 return .none
 
             case let .buildSettingsResponse(.failure(error)):
+                print(error)
+                return .none
+
+            case let .dumpPackageResponse(.success(packageObject)):
+                state.packages.append(packageObject)
+                state.loadingTaskKindBuffer.removeFirst()
+
+                #if DEBUG
+                    print("Successfully dump `PackageObject`.")
+                    dump(packageObject)
+                #endif
+
+                return .none
+
+            case let .dumpPackageResponse(.failure(error)):
                 print(error)
                 return .none
 

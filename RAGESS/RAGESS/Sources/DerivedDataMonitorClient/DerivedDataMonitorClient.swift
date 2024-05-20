@@ -12,7 +12,7 @@ import Foundation
 
 @DependencyClient
 public struct DerivedDataMonitorClient {
-    public var start: @Sendable (_ directoryPath: String) async -> AsyncStream<Void> = { _ in .finished }
+    public var start: @Sendable (_ directoryPath: String) -> AsyncStream<Void> = { _ in .finished }
 }
 
 extension DerivedDataMonitorClient: DependencyKey {

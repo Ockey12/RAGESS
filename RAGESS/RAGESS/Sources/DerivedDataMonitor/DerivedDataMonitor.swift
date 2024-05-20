@@ -7,54 +7,43 @@
 //
 
 import Foundation
-import Cocoa
 
-public class DerivedDataMonitor {
+class DerivedDataMonitor {
     let directoryPath: String
-    private var watchTask: Task<Void, Never>?
-    private var changeStream: AsyncStream<Void>?
+    var eventHandler: (() -> Void)?
+    private var source: DispatchSourceFileSystemObject?
 
-    public init(directoryPath: String) {
+    init(directoryPath: String, eventHandler: (() -> Void)?) {
         self.directoryPath = directoryPath
+        self.eventHandler = eventHandler
     }
 
-    public func startMonitoring() -> AsyncStream<Void> {
-        let stream = AsyncStream<Void> { continuation in
-            watchTask = Task {
-                let fileDescriptor = open(directoryPath, O_EVTONLY)
-                guard fileDescriptor != -1 else {
-                    print("Failed to open directory: \(directoryPath)")
-                    continuation.finish()
-                    return
-                }
-
-                let source = DispatchSource.makeFileSystemObjectSource(
-                    fileDescriptor: fileDescriptor,
-                    eventMask: .write,
-                    queue: .global()
-                )
-
-                source.setEventHandler {
-                    print("Directory content changed.")
-                    continuation.yield()
-                }
-
-                source.setCancelHandler {
-                    close(fileDescriptor)
-                    continuation.finish()
-                }
-
-                source.resume()
-            }
+    func startMonitoring() {
+        let fileDescriptor = open(directoryPath, O_EVTONLY)
+        guard fileDescriptor != -1 else {
+            print("ERROR in \(#file) - \(#function): Failed to open directory in \(directoryPath).")
+            return
         }
 
-        changeStream = stream
-        return stream
+        source = DispatchSource.makeFileSystemObjectSource(
+            fileDescriptor: fileDescriptor,
+            eventMask: .write,
+            queue: .global()
+        )
+
+        source?.setEventHandler { [weak self] in
+            self?.eventHandler?()
+        }
+
+        source?.setCancelHandler {
+            close(fileDescriptor)
+        }
+
+        source?.resume()
     }
 
-    public func stopMonitoring() {
-        watchTask?.cancel()
-        watchTask = nil
-        changeStream = nil
+    func stopMonitoring() {
+        source?.cancel()
+        source = nil
     }
 }

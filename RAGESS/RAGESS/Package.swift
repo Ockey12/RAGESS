@@ -94,13 +94,6 @@ let package = Package(
             ]
         ),
         .target(
-            name: "MonitorClient",
-            dependencies: [
-                .product(name: "Dependencies", package: "swift-dependencies"),
-                .product(name: "DependenciesMacros", package: "swift-dependencies")
-            ]
-        ),
-        .target(
             name: "DumpPackageClient",
             dependencies: [
                 "CommandClient",
@@ -121,9 +114,20 @@ let package = Package(
             ]
         ),
         .target(
+            name: "MonitorClient",
+            dependencies: [
+                .product(name: "Dependencies", package: "swift-dependencies"),
+                .product(name: "DependenciesMacros", package: "swift-dependencies")
+            ]
+        ),
+        .target(
             name: "RAGESSView",
             dependencies: [
-                .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+                "MonitorClient",
+                "SourceFileClient",
+                "XcodeObject",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                .product(name: "Dependencies", package: "swift-dependencies")
             ]
         ),
         .target(

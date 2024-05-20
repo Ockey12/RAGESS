@@ -7,7 +7,11 @@
 //
 
 import ComposableArchitecture
+import Dependencies
 import Foundation
+import MonitorClient
+import SourceFileClient
+import XcodeObject
 
 @Reducer
 public struct RAGESSReducer {
@@ -26,8 +30,12 @@ public struct RAGESSReducer {
     public enum Action: BindableAction {
         case projectDirectorySelectorButtonTapped
         case projectDirectorySelectorResponse(Result<[URL], Error>)
+        case sourceFileResponse(Result<Directory, Error>)
         case binding(BindingAction<State>)
     }
+
+    @Dependency(MonitorClient.self) var monitorClient
+    @Dependency(SourceFileClient.self) var sourceFileClient
 
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
@@ -50,9 +58,28 @@ public struct RAGESSReducer {
                 #endif
 
                 state.projectRootDirectoryPath = url.path()
-                return .none
+
+                return .run { [projectRootDirectoryPath = state.projectRootDirectoryPath] send in
+                    await send(.sourceFileResponse(Result {
+                        try await sourceFileClient.getXcodeObjects(
+                            rootDirectoryPath: projectRootDirectoryPath,
+                            ignoredDirectories: [".build", "DerivedData", ".git"]
+                        )
+                    }))
+                }
 
             case let .projectDirectorySelectorResponse(.failure(error)):
+                #if DEBUG
+                    print(error)
+                #endif
+                return .none
+
+            case let .sourceFileResponse(.success(rootDirectory)):
+                print(".sourceFileResponse(.success(rootDirectory))")
+                dump(rootDirectory)
+                return .none
+
+            case let .sourceFileResponse(.failure(error)):
                 #if DEBUG
                     print(error)
                 #endif

@@ -19,7 +19,7 @@ public struct DerivedDataMonitorDebugger {
         var derivedDataPath: String
         var buildSettings: [String: String]
 
-        public init(derivedDataPath: String, buildSettings: [String : String]) {
+        public init(derivedDataPath: String, buildSettings: [String: String]) {
             self.derivedDataPath = derivedDataPath
             self.buildSettings = buildSettings
         }
@@ -49,9 +49,9 @@ public struct DerivedDataMonitorDebugger {
 
                 return .run { send in
                     for appPath in appPaths {
-#if DEBUG
-                        print("Start monitoring \(appPath)")
-#endif
+                        #if DEBUG
+                            print("Start monitoring \(appPath)")
+                        #endif
                         for await _ in monitorClient.start(directoryPath: appPath) {
                             await send(.detectedDirectoryChange(appPath))
                         }

@@ -9,6 +9,10 @@ let package = Package(
         .library(
             name: "DebugView",
             targets: ["DebugView"]
+        ),
+        .library(
+            name: "RAGESSView",
+            targets: ["RAGESSView"]
         )
     ],
     dependencies: [
@@ -116,6 +120,7 @@ let package = Package(
                 .product(name: "LSPBindings", package: "sourcekit-lsp")
             ]
         ),
+        .target(name: "RAGESSView"),
         .target(
             name: "SourceFileClient",
             dependencies: [

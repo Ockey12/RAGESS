@@ -21,6 +21,7 @@ public struct DebugReducer {
         var kittenClient: SourceKitClientDebugger.State
         var typeDeclarationExtractor: TypeDeclarationExtractorDebugger.State
         var dependenciesClient: DependenciesClientDebugger.State
+        var derivedDataMonitor: DerivedDataMonitorDebugger.State
 
         var buildSettingsLoading = false
         var dumpPackageSwiftLoading = false
@@ -31,7 +32,8 @@ public struct DebugReducer {
             typeAnnotationClient: TypeAnnotationDebugger.State,
             kittenClient: SourceKitClientDebugger.State,
             typeDeclarationExtractor: TypeDeclarationExtractorDebugger.State,
-            dependenciesClient: DependenciesClientDebugger.State
+            dependenciesClient: DependenciesClientDebugger.State,
+            derivedDataMonitor: DerivedDataMonitorDebugger.State
         ) {
             self.lspClient = lspClient
             self.sourceFileClient = sourceFileClient
@@ -39,6 +41,7 @@ public struct DebugReducer {
             self.kittenClient = kittenClient
             self.typeDeclarationExtractor = typeDeclarationExtractor
             self.dependenciesClient = dependenciesClient
+            self.derivedDataMonitor = derivedDataMonitor
         }
     }
 
@@ -49,6 +52,7 @@ public struct DebugReducer {
         case kittenClient(SourceKitClientDebugger.Action)
         case typeDeclarationExtractor(TypeDeclarationExtractorDebugger.Action)
         case dependenciesClient(DependenciesClientDebugger.Action)
+        case derivedDataMonitor(DerivedDataMonitorDebugger.Action)
     }
 
     public var body: some ReducerOf<Self> {
@@ -69,6 +73,9 @@ public struct DebugReducer {
         }
         Scope(state: \.dependenciesClient, action: \.dependenciesClient) {
             DependenciesClientDebugger()
+        }
+        Scope(state: \.derivedDataMonitor, action: \.derivedDataMonitor) {
+            DerivedDataMonitorDebugger()
         }
         Reduce { state, action in
             switch action {
@@ -104,6 +111,7 @@ public struct DebugReducer {
                 state.kittenClient.buildSettings = buildSettings
                 state.typeDeclarationExtractor.buildSettings = buildSettings
                 state.dependenciesClient.buildSettings = buildSettings
+                state.derivedDataMonitor.buildSettings = buildSettings
                 state.buildSettingsLoading = false
                 state.dumpPackageSwiftLoading = true
                 return .none
@@ -139,6 +147,9 @@ public struct DebugReducer {
                 return .none
 
             case .dependenciesClient:
+                return .none
+
+            case .derivedDataMonitor:
                 return .none
             }
         }
@@ -225,6 +236,15 @@ public struct DebugView: View {
                     )
                 )
                 .tabItem { Text("DependenciesClient") }
+                .padding()
+
+                DerivedDataMonitorDebugView(
+                    store: store.scope(
+                        state: \.derivedDataMonitor,
+                        action: \.derivedDataMonitor
+                    )
+                )
+                .tabItem { Text("DerivedDataMonitorClient") }
                 .padding()
             }
             .frame(maxWidth: .infinity)

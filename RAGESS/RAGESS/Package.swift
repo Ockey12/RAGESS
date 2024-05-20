@@ -55,6 +55,7 @@ let package = Package(
                 "BuildSettingsClient",
                 "DumpPackageClient",
                 "DependenciesClient",
+                "DerivedDataMonitorClient",
                 "LSPClient",
                 "SourceFileClient",
                 "SourceKitClient",
@@ -86,6 +87,13 @@ let package = Package(
                 .product(name: "Dependencies", package: "swift-dependencies"),
                 .product(name: "DependenciesMacros", package: "swift-dependencies"),
                 .product(name: "SwiftSyntax", package: "swift-syntax")
+            ]
+        ),
+        .target(
+            name: "DerivedDataMonitorClient",
+            dependencies: [
+                .product(name: "Dependencies", package: "swift-dependencies"),
+                .product(name: "DependenciesMacros", package: "swift-dependencies")
             ]
         ),
         .target(

@@ -88,7 +88,13 @@ let package = Package(
                 .product(name: "SwiftSyntax", package: "swift-syntax")
             ]
         ),
-        .target(name: "DerivedDataMonitor"),
+        .target(
+            name: "DerivedDataMonitor",
+            dependencies: [
+                .product(name: "Dependencies", package: "swift-dependencies"),
+                .product(name: "DependenciesMacros", package: "swift-dependencies")
+            ]
+        ),
         .target(
             name: "DumpPackageClient",
             dependencies: [

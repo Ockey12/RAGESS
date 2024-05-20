@@ -123,6 +123,7 @@ let package = Package(
         .target(
             name: "RAGESSView",
             dependencies: [
+                "BuildSettingsClient",
                 "MonitorClient",
                 "SourceFileClient",
                 "XcodeObject",

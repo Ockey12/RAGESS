@@ -9,6 +9,8 @@
 import Foundation
 
 enum ComponentSizeValues {
+    static let bodyMinWidth: CGFloat = 800
+
     static let fontSize: CGFloat = 50
     static let itemHeight: CGFloat = 90
     static let borderWidth: CGFloat = 5
@@ -23,6 +25,7 @@ enum ComponentSizeValues {
     }
 
     static let bottomPaddingForLastText: CGFloat = 30
+    static let textLeadingPadding: CGFloat = 30
 
     static let headerIndexWidth: CGFloat = 300
 }

@@ -6,4 +6,4 @@
 //
 //
 
-public protocol HasHeader {}
+public protocol HasHeader: DeclarationObject {}

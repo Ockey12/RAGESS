@@ -168,9 +168,9 @@ public struct RAGESSReducer {
                 return .none
 
             case .dumpPackageCompleted:
-#if DEBUG
-                print("Successfully dump all `PackageObject`.")
-#endif
+                #if DEBUG
+                    print("Successfully dump all `PackageObject`.")
+                #endif
 
                 guard let rootDirectory = state.rootDirectory else {
                     print("ERROR in \(#file) - \(#line): Cannot find `State.rootDirectory`")
@@ -187,22 +187,22 @@ public struct RAGESSReducer {
                     let declarationObjects = await extractDeclarations(
                         allSourceFiles: allSourceFiles,
                         buildSettings: buildSettings,
-                        packages: packages)
+                        packages: packages
+                    )
 
                     await send(.extractDeclarationsCompleted(declarationObjects))
                 }
 
             case let .extractDeclarationsCompleted(declarationObjects):
-#if DEBUG
-                print("Successfully extract declaration objects.")
-#endif
+                #if DEBUG
+                    print("Successfully extract declaration objects.")
+                #endif
 
                 guard let rootDirectory = state.rootDirectory else {
                     print("ERROR in \(#file) - \(#line): Cannot find `State.rootDirectory`")
                     return .none
                 }
                 let allSourceFiles = getAllSourceFiles(in: rootDirectory)
-
 
                 return .run {
                     [
@@ -221,9 +221,9 @@ public struct RAGESSReducer {
                 }
 
             case let .extractDependenciesResponse(.success(hasDependenciesObjects)):
-#if DEBUG
-                print("Successfully extract dependencies.")
-#endif
+                #if DEBUG
+                    print("Successfully extract dependencies.")
+                #endif
 
                 state.declarationObjects = hasDependenciesObjects
                 dump(state.declarationObjects)

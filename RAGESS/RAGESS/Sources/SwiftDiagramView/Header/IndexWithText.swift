@@ -1,9 +1,9 @@
 //
 //  IndexWithText.swift
 //
-//  
+//
 //  Created by Ockey12 on 2024/05/22
-//  
+//
 //
 
 import SwiftUI
@@ -71,8 +71,8 @@ struct IndexWithText: View {
                 nameOffset: 0,
                 fullPath: "",
                 sourceCode: "",
-                positionRange: SourcePosition(line: 0, utf8index: 0)...SourcePosition(line: 1, utf8index: 1),
-                offsetRange: 0...1
+                positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
+                offsetRange: 0 ... 1
             )
         )
         .frame(width: 350, height: 140)
@@ -83,8 +83,8 @@ struct IndexWithText: View {
                 nameOffset: 0,
                 fullPath: "",
                 sourceCode: "",
-                positionRange: SourcePosition(line: 0, utf8index: 0)...SourcePosition(line: 1, utf8index: 1),
-                offsetRange: 0...1
+                positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
+                offsetRange: 0 ... 1
             )
         )
         .frame(width: 350, height: 140)
@@ -95,8 +95,8 @@ struct IndexWithText: View {
                 nameOffset: 0,
                 fullPath: "",
                 sourceCode: "",
-                positionRange: SourcePosition(line: 0, utf8index: 0)...SourcePosition(line: 1, utf8index: 1),
-                offsetRange: 0...1
+                positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
+                offsetRange: 0 ... 1
             )
         )
         .frame(width: 350, height: 140)
@@ -107,8 +107,8 @@ struct IndexWithText: View {
                 nameOffset: 0,
                 fullPath: "",
                 sourceCode: "",
-                positionRange: SourcePosition(line: 0, utf8index: 0)...SourcePosition(line: 1, utf8index: 1),
-                offsetRange: 0...1
+                positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
+                offsetRange: 0 ... 1
             )
         )
         .frame(width: 350, height: 140)

@@ -1,9 +1,9 @@
 //
 //  Character+systemSize50Width.swift
 //
-//  
+//
 //  Created by Ockey12 on 2024/05/22
-//  
+//
 //
 
 import Foundation
@@ -11,7 +11,7 @@ import Foundation
 extension Character {
     var systemSize50Width: CGFloat {
         switch self {
-            // lower case letters
+        // lower case letters
         case "a":
             return 26
         case "b":
@@ -65,7 +65,7 @@ extension Character {
         case "z":
             return 24
 
-            // upper case letters
+        // upper case letters
         case "A":
             return 33
         case "B":
@@ -119,7 +119,7 @@ extension Character {
         case "Z":
             return 32
 
-            // figure
+        // figure
         case "0":
             return 31
         case "1":
@@ -141,7 +141,7 @@ extension Character {
         case "9":
             return 32
 
-            // symbol
+        // symbol
         case "`":
             return 26
         case "~":

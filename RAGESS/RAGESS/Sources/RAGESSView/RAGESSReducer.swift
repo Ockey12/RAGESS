@@ -179,8 +179,6 @@ public struct RAGESSReducer {
                     print("state.loadingTaskKindBuffer.removeFirst(): \(state.loadingTaskKindBuffer)")
                 #endif
 
-
-
                 guard let rootDirectory = state.rootDirectory else {
                     print("ERROR in \(#file) - \(#line): Cannot find `State.rootDirectory`")
                     return .none

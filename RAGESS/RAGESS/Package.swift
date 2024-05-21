@@ -158,7 +158,12 @@ let package = Package(
                 .product(name: "SourceKittenFramework", package: "SourceKitten")
             ]
         ),
-        .target(name: "SwiftDiagramView"),
+        .target(
+            name: "SwiftDiagramView",
+            dependencies: [
+                "TypeDeclaration"
+            ]
+        ),
         .target(
             name: "TypeAnnotationClient",
             dependencies: [

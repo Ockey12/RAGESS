@@ -29,6 +29,14 @@ public struct RAGESSReducer {
         var buildSettings: [String: String] = [:]
         var packages: [PackageObject] = []
         var declarationObjects: [any DeclarationObject] = []
+        let ignoredDirectories = [
+            "build",
+            ".build",
+            "DerivedData",
+            ".git",
+            ".github",
+            ".swiftpm"
+        ]
         var loadingTaskKindBuffer: [LoadingTaskKind] = []
 
         public init(projectRootDirectoryPath: String) {
@@ -38,6 +46,7 @@ public struct RAGESSReducer {
 
     public enum Action: BindableAction {
         case projectDirectorySelectorResponse(Result<[URL], Error>)
+        case extractSourceFiles
         case sourceFileResponse(Result<Directory, Error>)
         case sourceFileSelected(SourceFile)
         case buildSettingsResponse(Result<[String: String], Error>)
@@ -45,6 +54,8 @@ public struct RAGESSReducer {
         case dumpPackageCompleted
         case extractDeclarationsCompleted([any DeclarationObject])
         case extractDependenciesResponse(Result<[any DeclarationObject], Error>)
+        case startMonitoring
+        case detectedDirectoryChange
         case binding(BindingAction<State>)
     }
 
@@ -53,6 +64,11 @@ public struct RAGESSReducer {
     @Dependency(BuildSettingsClient.self) var buildSettingsClient
     @Dependency(DumpPackageClient.self) var dumpPackageClient
     @Dependency(DependenciesClient.self) var dependenciesClient
+    @Dependency(\.mainQueue) var mainQueue
+
+    enum CancelID {
+        case detectedBuildSucceeded
+    }
 
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
@@ -69,27 +85,39 @@ public struct RAGESSReducer {
                 #endif
 
                 state.projectRootDirectoryPath = url.path()
-                state.loadingTaskKindBuffer.append(.sourceFiles)
+//                state.loadingTaskKindBuffer.append(.sourceFiles)
 
-                return .run { [projectRootDirectoryPath = state.projectRootDirectoryPath] send in
-                    await send(.sourceFileResponse(Result {
-                        try await sourceFileClient.getXcodeObjects(
-                            rootDirectoryPath: projectRootDirectoryPath,
-                            ignoredDirectories: [
-                                "build",
-                                ".build",
-                                "DerivedData",
-                                ".git",
-                                ".github",
-                                ".swiftpm"
-                            ]
-                        )
-                    }))
-                }
+//                return .run { [
+//                    projectRootDirectoryPath = state.projectRootDirectoryPath,
+//                    ignoredDirectories = state.ignoredDirectories
+//                ] send in
+//                    await send(.sourceFileResponse(Result {
+//                        try await sourceFileClient.getXcodeObjects(
+//                            rootDirectoryPath: projectRootDirectoryPath,
+//                            ignoredDirectories: ignoredDirectories
+//                        )
+//                    }))
+//                }
+                return .send(.extractSourceFiles)
 
             case let .projectDirectorySelectorResponse(.failure(error)):
                 print(error)
                 return .none
+
+            case .extractSourceFiles:
+                state.loadingTaskKindBuffer.append(.sourceFiles)
+
+                return .run { [
+                    projectRootDirectoryPath = state.projectRootDirectoryPath,
+                    ignoredDirectories = state.ignoredDirectories
+                ] send in
+                    await send(.sourceFileResponse(Result {
+                        try await sourceFileClient.getXcodeObjects(
+                            rootDirectoryPath: projectRootDirectoryPath,
+                            ignoredDirectories: ignoredDirectories
+                        )
+                    }))
+                }
 
             case let .sourceFileResponse(.success(rootDirectory)):
                 state.loadingTaskKindBuffer.removeFirst()
@@ -243,11 +271,50 @@ public struct RAGESSReducer {
                 #endif
 
                 state.declarationObjects = hasDependenciesObjects
-                return .none
+                return .send(.startMonitoring)
 
             case let .extractDependenciesResponse(.failure(error)):
                 print(error)
                 return .none
+
+            case .startMonitoring:
+                guard let buildDirectoryPath = state.buildSettings["BUILD_DIR"] else {
+#if DEBUG
+                    print("ERROR in \(#file) - \(#line): Cannot \"BUILD_DIR\" key.")
+#endif
+                    return .none
+                }
+                let appPaths = findAppPaths(in: buildDirectoryPath)
+
+                return .run { send in
+                    for appPath in appPaths {
+//                        #if DEBUG
+//                        print("Start monitoring \(appPath)")
+//                        #endif
+
+                        for await _ in monitorClient.start(directoryPath: appPath) {
+                            await send(.detectedDirectoryChange)
+                        }
+                    }
+                }
+
+            case .detectedDirectoryChange:
+//                return .run { [
+//                    projectRootDirectoryPath = state.projectRootDirectoryPath,
+//                    ignoredDirectories = state.ignoredDirectories
+//                ] send in
+//                    await send(.sourceFileResponse(Result {
+//                        try await sourceFileClient.getXcodeObjects(
+//                            rootDirectoryPath: projectRootDirectoryPath,
+//                            ignoredDirectories: ignoredDirectories
+//                        )
+//                    }))
+//                }
+                return .send(.extractSourceFiles)
+                    .debounce(id: CancelID.detectedBuildSucceeded,
+                              for: 1.0,
+                              scheduler: self.mainQueue
+                    )
 
             case .binding:
                 return .none

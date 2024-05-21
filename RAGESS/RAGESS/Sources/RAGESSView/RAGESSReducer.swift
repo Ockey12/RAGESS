@@ -67,7 +67,14 @@ public struct RAGESSReducer {
                     await send(.sourceFileResponse(Result {
                         try await sourceFileClient.getXcodeObjects(
                             rootDirectoryPath: projectRootDirectoryPath,
-                            ignoredDirectories: [".build", "DerivedData", ".git"]
+                            ignoredDirectories: [
+                                "build",
+                                ".build",
+                                "DerivedData",
+                                ".git",
+                                ".github",
+                                ".swiftpm"
+                            ]
                         )
                     }))
                 }

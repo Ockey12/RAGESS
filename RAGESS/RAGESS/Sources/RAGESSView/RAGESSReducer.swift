@@ -295,4 +295,23 @@ extension RAGESSReducer {
 
         return declarationObjects
     }
+
+    func findAppPaths(in directoryPath: String) -> [String] {
+        let fileManager = FileManager.default
+        let directoryURL = URL(filePath: directoryPath)
+
+        guard let enumerator = fileManager.enumerator(at: directoryURL, includingPropertiesForKeys: nil) else {
+            return []
+        }
+
+        var appPaths: [String] = []
+
+        while let url = enumerator.nextObject() as? URL {
+            if url.pathExtension == "app" {
+                appPaths.append(url.path())
+            }
+        }
+
+        return appPaths
+    }
 }

@@ -85,19 +85,7 @@ public struct RAGESSReducer {
                 #endif
 
                 state.projectRootDirectoryPath = url.path()
-//                state.loadingTaskKindBuffer.append(.sourceFiles)
 
-//                return .run { [
-//                    projectRootDirectoryPath = state.projectRootDirectoryPath,
-//                    ignoredDirectories = state.ignoredDirectories
-//                ] send in
-//                    await send(.sourceFileResponse(Result {
-//                        try await sourceFileClient.getXcodeObjects(
-//                            rootDirectoryPath: projectRootDirectoryPath,
-//                            ignoredDirectories: ignoredDirectories
-//                        )
-//                    }))
-//                }
                 return .send(.extractSourceFiles)
 
             case let .projectDirectorySelectorResponse(.failure(error)):
@@ -288,10 +276,6 @@ public struct RAGESSReducer {
 
                 return .run { send in
                     for appPath in appPaths {
-//                        #if DEBUG
-//                        print("Start monitoring \(appPath)")
-//                        #endif
-
                         for await _ in monitorClient.start(directoryPath: appPath) {
                             await send(.detectedDirectoryChange)
                         }
@@ -299,17 +283,6 @@ public struct RAGESSReducer {
                 }
 
             case .detectedDirectoryChange:
-//                return .run { [
-//                    projectRootDirectoryPath = state.projectRootDirectoryPath,
-//                    ignoredDirectories = state.ignoredDirectories
-//                ] send in
-//                    await send(.sourceFileResponse(Result {
-//                        try await sourceFileClient.getXcodeObjects(
-//                            rootDirectoryPath: projectRootDirectoryPath,
-//                            ignoredDirectories: ignoredDirectories
-//                        )
-//                    }))
-//                }
                 return .send(.extractSourceFiles)
                     .debounce(id: CancelID.detectedBuildSucceeded,
                               for: 1.0,

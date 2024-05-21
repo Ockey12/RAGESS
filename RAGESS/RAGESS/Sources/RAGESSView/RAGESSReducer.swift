@@ -8,11 +8,14 @@
 
 import BuildSettingsClient
 import ComposableArchitecture
+import DeclarationExtractor
 import Dependencies
+import DependenciesClient
 import DumpPackageClient
 import Foundation
 import MonitorClient
 import SourceFileClient
+import TypeDeclaration
 import XcodeObject
 
 @Reducer
@@ -25,6 +28,7 @@ public struct RAGESSReducer {
         var rootDirectory: Directory?
         var buildSettings: [String: String] = [:]
         var packages: [PackageObject] = []
+        var declarationObjects: [any DeclarationObject] = []
         var loadingTaskKindBuffer: [LoadingTaskKind] = []
 
         public init(projectRootDirectoryPath: String) {
@@ -38,6 +42,9 @@ public struct RAGESSReducer {
         case sourceFileSelected(SourceFile)
         case buildSettingsResponse(Result<[String: String], Error>)
         case dumpPackageResponse(Result<PackageObject, Error>)
+        case dumpPackageCompleted
+        case extractDeclarationsCompleted([any DeclarationObject])
+        case extractDependenciesResponse(Result<[any DeclarationObject], Error>)
         case binding(BindingAction<State>)
     }
 
@@ -45,6 +52,7 @@ public struct RAGESSReducer {
     @Dependency(SourceFileClient.self) var sourceFileClient
     @Dependency(BuildSettingsClient.self) var buildSettingsClient
     @Dependency(DumpPackageClient.self) var dumpPackageClient
+    @Dependency(DependenciesClient.self) var dependenciesClient
 
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
@@ -119,6 +127,8 @@ public struct RAGESSReducer {
                             try await dumpPackageClient.dumpPackage(currentDirectory: packageDirectoryPath)
                         }))
                     }
+
+                    await send(.dumpPackageCompleted)
                 }
 
             case let .sourceFileResponse(.failure(error)):
@@ -157,9 +167,116 @@ public struct RAGESSReducer {
                 print(error)
                 return .none
 
+            case .dumpPackageCompleted:
+#if DEBUG
+                print("Successfully dump all `PackageObject`.")
+#endif
+
+                guard let rootDirectory = state.rootDirectory else {
+                    print("ERROR in \(#file) - \(#line): Cannot find `State.rootDirectory`")
+                    return .none
+                }
+                let allSourceFiles = getAllSourceFiles(in: rootDirectory)
+
+                return .run {
+                    [
+                        buildSettings = state.buildSettings,
+                        packages = state.packages
+                    ] send in
+
+                    let declarationObjects = await extractDeclarations(
+                        allSourceFiles: allSourceFiles,
+                        buildSettings: buildSettings,
+                        packages: packages)
+
+                    await send(.extractDeclarationsCompleted(declarationObjects))
+                }
+
+            case let .extractDeclarationsCompleted(declarationObjects):
+#if DEBUG
+                print("Successfully extract declaration objects.")
+#endif
+
+                guard let rootDirectory = state.rootDirectory else {
+                    print("ERROR in \(#file) - \(#line): Cannot find `State.rootDirectory`")
+                    return .none
+                }
+                let allSourceFiles = getAllSourceFiles(in: rootDirectory)
+
+
+                return .run {
+                    [
+                        buildSettings = state.buildSettings,
+                        packages = state.packages
+                    ] send in
+
+                    await send(.extractDependenciesResponse(Result {
+                        try await dependenciesClient.extractDependencies(
+                            declarationObjects: declarationObjects,
+                            allSourceFiles: allSourceFiles,
+                            buildSettings: buildSettings,
+                            packages: packages
+                        )
+                    }))
+                }
+
+            case let .extractDependenciesResponse(.success(hasDependenciesObjects)):
+#if DEBUG
+                print("Successfully extract dependencies.")
+#endif
+
+                state.declarationObjects = hasDependenciesObjects
+                dump(state.declarationObjects)
+                return .none
+
+            case let .extractDependenciesResponse(.failure(error)):
+                print(error)
+                return .none
+
             case .binding:
                 return .none
             }
         }
+    }
+}
+
+extension RAGESSReducer {
+    func getAllSourceFiles(in directory: Directory) -> [SourceFile] {
+        var files = directory.files
+        for subDirectory in directory.subDirectories {
+            files.append(contentsOf: getAllSourceFiles(in: subDirectory))
+        }
+        return files
+    }
+
+    func getAllSwiftFilePaths(in directory: Directory) -> [String] {
+        var swiftFilePaths: [String] = directory.files.map { $0.path }
+        for subDirectory in directory.subDirectories {
+            swiftFilePaths.append(contentsOf: getAllSwiftFilePaths(in: subDirectory))
+        }
+        return swiftFilePaths
+    }
+
+    func extractDeclarations(
+        allSourceFiles: [SourceFile],
+        buildSettings: [String: String],
+        packages: [PackageObject]
+    ) async -> [any DeclarationObject] {
+        var declarationObjects: [any DeclarationObject] = []
+        let allSourceFilePaths = allSourceFiles.map { $0.path }
+        let extractor = DeclarationExtractor()
+
+        for sourceFile in allSourceFiles {
+            let declarations = await extractor.extractDeclarations(
+                from: sourceFile,
+                buildSettings: buildSettings,
+                sourceFilePaths: allSourceFilePaths,
+                packages: packages
+            )
+
+            declarationObjects.append(contentsOf: declarations)
+        }
+
+        return declarationObjects
     }
 }

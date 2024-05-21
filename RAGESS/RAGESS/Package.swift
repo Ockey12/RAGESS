@@ -124,9 +124,12 @@ let package = Package(
             name: "RAGESSView",
             dependencies: [
                 "BuildSettingsClient",
+                "DeclarationExtractor",
+                "DependenciesClient",
                 "DumpPackageClient",
                 "MonitorClient",
                 "SourceFileClient",
+                "TypeDeclaration",
                 "XcodeObject",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "Dependencies", package: "swift-dependencies")

@@ -40,10 +40,17 @@ class Monitor {
         }
 
         source?.resume()
+
+        #if DEBUG
+            print("\(#file) - \(#function): Start monitoring \(directoryPath)")
+        #endif
     }
 
     func stopMonitoring() {
         source?.cancel()
         source = nil
+        #if DEBUG
+            print("\(#file) - \(#function): Stop monitoring \(directoryPath)")
+        #endif
     }
 }

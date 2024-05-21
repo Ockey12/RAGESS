@@ -13,6 +13,10 @@ let package = Package(
         .library(
             name: "RAGESSView",
             targets: ["RAGESSView"]
+        ),
+        .library(
+            name: "SwiftDiagramView",
+            targets: ["SwiftDiagramView"]
         )
     ],
     dependencies: [
@@ -154,6 +158,7 @@ let package = Package(
                 .product(name: "SourceKittenFramework", package: "SourceKitten")
             ]
         ),
+        .target(name: "SwiftDiagramView"),
         .target(
             name: "TypeAnnotationClient",
             dependencies: [

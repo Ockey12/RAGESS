@@ -79,6 +79,16 @@ public struct RAGESSView: View {
                     ProgressView {
                         Text("In the process of analyzing the package.")
                     }
+
+                case .extractDeclarations:
+                    ProgressView {
+                        Text("In the process of extracting declarations.")
+                    }
+
+                case .extractDependencies:
+                    ProgressView {
+                        Text("In the process of extracting dependencies.")
+                    }
                 }
             }
         } // ZStack

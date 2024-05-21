@@ -12,4 +12,6 @@ enum LoadingTaskKind {
     case sourceFiles
     case buildSettings
     case dumpPackage
+    case extractDeclarations
+    case extractDependencies
 }

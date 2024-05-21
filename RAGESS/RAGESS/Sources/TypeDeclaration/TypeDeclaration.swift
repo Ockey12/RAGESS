@@ -7,4 +7,4 @@
 
 import LanguageServerProtocol
 
-public protocol TypeDeclaration: Inheritable, Initializable, TypeNestable {}
+public protocol TypeDeclaration: Inheritable, Initializable, TypeNestable, HasHeader {}

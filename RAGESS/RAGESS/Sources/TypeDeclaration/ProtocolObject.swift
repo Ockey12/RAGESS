@@ -9,7 +9,7 @@
 import Dependencies
 import Foundation
 
-public struct ProtocolObject: Inheritable, Initializable {
+public struct ProtocolObject: Inheritable, Initializable, HasHeader {
     public var id: UUID
     public var name: String
     public var nameOffset: Int

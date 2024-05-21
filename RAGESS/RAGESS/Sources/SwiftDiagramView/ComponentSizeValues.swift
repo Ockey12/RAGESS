@@ -1,9 +1,9 @@
 //
 //  ComponentSizeValues.swift
 //
-//  
+//
 //  Created by Ockey12 on 2024/05/22
-//  
+//
 //
 
 import Foundation
@@ -21,7 +21,7 @@ enum ComponentSizeValues {
     static let arrowTerminalWidth: CGFloat = 15
     static let arrowTerminalHeight: CGFloat = 30
     static var oneVerticalLineWithoutArrow: CGFloat {
-        (self.itemHeight - self.arrowTerminalHeight)/2
+        (itemHeight - arrowTerminalHeight) / 2
     }
 
     static let bottomPaddingForLastText: CGFloat = 30

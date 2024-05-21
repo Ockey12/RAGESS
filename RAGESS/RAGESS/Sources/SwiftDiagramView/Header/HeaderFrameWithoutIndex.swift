@@ -1,9 +1,9 @@
 //
 //  HeaderFrameWithoutIndex.swift
 //
-//  
+//
 //  Created by Ockey12 on 2024/05/22
-//  
+//
 //
 
 import SwiftUI
@@ -30,21 +30,21 @@ struct HeaderFrameWithoutIndex: Shape {
             path.addLine(to: CGPoint(x: 0, y: oneVerticalLineWithoutArrow))
             path.addLine(to: CGPoint(x: 0, y: oneVerticalLineWithoutArrow + arrowTerminalHeight))
             path.addLine(to: CGPoint(x: arrowTerminalWidth, y: oneVerticalLineWithoutArrow + arrowTerminalHeight))
-            path.addLine(to: CGPoint(x: arrowTerminalWidth, y: oneVerticalLineWithoutArrow*2 + arrowTerminalHeight + bottomPaddingForLastText + connectionHeight))
+            path.addLine(to: CGPoint(x: arrowTerminalWidth, y: oneVerticalLineWithoutArrow * 2 + arrowTerminalHeight + bottomPaddingForLastText + connectionHeight))
 
             // bottom
             // from left to right
-            path.addLine(to: CGPoint(x: widthFromLeftEdgeToConnection, y: oneVerticalLineWithoutArrow*2 + arrowTerminalHeight + bottomPaddingForLastText + connectionHeight))
-            path.addLine(to: CGPoint(x: widthFromLeftEdgeToConnection, y: oneVerticalLineWithoutArrow*2 + arrowTerminalHeight + bottomPaddingForLastText))
-            path.addLine(to: CGPoint(x: widthFromLeftEdgeToConnection + connectionWidth, y: oneVerticalLineWithoutArrow*2 + arrowTerminalHeight + bottomPaddingForLastText))
-            path.addLine(to: CGPoint(x: widthFromLeftEdgeToConnection + connectionWidth, y: oneVerticalLineWithoutArrow*2 + arrowTerminalHeight + bottomPaddingForLastText + connectionHeight))
-            path.addLine(to: CGPoint(x: bodyWidth + arrowTerminalWidth, y: oneVerticalLineWithoutArrow*2 + arrowTerminalHeight + bottomPaddingForLastText + connectionHeight))
+            path.addLine(to: CGPoint(x: widthFromLeftEdgeToConnection, y: oneVerticalLineWithoutArrow * 2 + arrowTerminalHeight + bottomPaddingForLastText + connectionHeight))
+            path.addLine(to: CGPoint(x: widthFromLeftEdgeToConnection, y: oneVerticalLineWithoutArrow * 2 + arrowTerminalHeight + bottomPaddingForLastText))
+            path.addLine(to: CGPoint(x: widthFromLeftEdgeToConnection + connectionWidth, y: oneVerticalLineWithoutArrow * 2 + arrowTerminalHeight + bottomPaddingForLastText))
+            path.addLine(to: CGPoint(x: widthFromLeftEdgeToConnection + connectionWidth, y: oneVerticalLineWithoutArrow * 2 + arrowTerminalHeight + bottomPaddingForLastText + connectionHeight))
+            path.addLine(to: CGPoint(x: bodyWidth + arrowTerminalWidth, y: oneVerticalLineWithoutArrow * 2 + arrowTerminalHeight + bottomPaddingForLastText + connectionHeight))
 
             // right side
             // from bottom to top
             path.addLine(to: CGPoint(x: bodyWidth + arrowTerminalWidth, y: oneVerticalLineWithoutArrow + arrowTerminalHeight))
-            path.addLine(to: CGPoint(x: bodyWidth + arrowTerminalWidth*2, y: oneVerticalLineWithoutArrow + arrowTerminalHeight))
-            path.addLine(to: CGPoint(x: bodyWidth + arrowTerminalWidth*2, y: oneVerticalLineWithoutArrow))
+            path.addLine(to: CGPoint(x: bodyWidth + arrowTerminalWidth * 2, y: oneVerticalLineWithoutArrow + arrowTerminalHeight))
+            path.addLine(to: CGPoint(x: bodyWidth + arrowTerminalWidth * 2, y: oneVerticalLineWithoutArrow))
             path.addLine(to: CGPoint(x: bodyWidth + arrowTerminalWidth, y: oneVerticalLineWithoutArrow))
             path.addLine(to: CGPoint(x: bodyWidth + arrowTerminalWidth, y: 0))
             path.closeSubpath()
@@ -53,7 +53,7 @@ struct HeaderFrameWithoutIndex: Shape {
 }
 
 #Preview {
-        HeaderFrameWithoutIndex(bodyWidth: 500)
-            .stroke(lineWidth: ComponentSizeValues.borderWidth)
-            .padding()
+    HeaderFrameWithoutIndex(bodyWidth: 500)
+        .stroke(lineWidth: ComponentSizeValues.borderWidth)
+        .padding()
 }

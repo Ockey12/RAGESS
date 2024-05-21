@@ -1,9 +1,9 @@
 //
 //  HeaderViewWithoutIndex.swift
-//  
-//  
+//
+//
 //  Created by Ockey12 on 2024/05/22
-//  
+//
 //
 
 import SwiftUI
@@ -32,7 +32,7 @@ struct HeaderViewWithoutIndex: View {
                 .font(.system(size: fontSize))
                 .foregroundStyle(.black)
                 .frame(width: bodyWidth, alignment: .leading)
-                .position(x: (bodyWidth + textLeadingPadding)/2 + arrowTerminalWidth, y: itemHeight/2)
+                .position(x: (bodyWidth + textLeadingPadding) / 2 + arrowTerminalWidth, y: itemHeight / 2)
         } // ZStack
     }
 }

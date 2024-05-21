@@ -267,18 +267,21 @@ public struct RAGESSReducer {
 
             case .startMonitoring:
                 guard let buildDirectoryPath = state.buildSettings["BUILD_DIR"] else {
-                    #if DEBUG
-                        print("ERROR in \(#file) - \(#line): Cannot \"BUILD_DIR\" key.")
-                    #endif
+                    print("ERROR in \(#file) - \(#line): Cannot find \"BUILD_DIR\" key.")
                     return .none
                 }
                 let appPaths = findAppPaths(in: buildDirectoryPath)
 
+                guard !appPaths.isEmpty else {
+                    print("ERROR in \(#file) - \(#line): Cannot find \".app\" directory.")
+                    return .none
+                }
+
                 return .run { send in
-                    for appPath in appPaths {
-                        for await _ in monitorClient.start(directoryPath: appPath) {
-                            await send(.detectedDirectoryChange)
-                        }
+                    // FIXME: Monitoring multiple `.app` directories.
+                    // FIXME: Reset monitoring if project root directory changes.
+                    for await _ in monitorClient.start(directoryPath: appPaths[0]) {
+                        await send(.detectedDirectoryChange)
                     }
                 }
 

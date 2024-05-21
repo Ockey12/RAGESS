@@ -243,7 +243,6 @@ public struct RAGESSReducer {
                 #endif
 
                 state.declarationObjects = hasDependenciesObjects
-                dump(state.declarationObjects)
                 return .none
 
             case let .extractDependenciesResponse(.failure(error)):

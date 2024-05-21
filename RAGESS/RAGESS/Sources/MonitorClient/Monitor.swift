@@ -1,5 +1,5 @@
 //
-//  DerivedDataMonitor.swift
+//  Monitor.swift
 //
 //
 //  Created by Ockey12 on 2024/05/20
@@ -8,7 +8,7 @@
 
 import Foundation
 
-class DerivedDataMonitor {
+class Monitor {
     let directoryPath: String
     var eventHandler: (() -> Void)?
     private var source: DispatchSourceFileSystemObject?

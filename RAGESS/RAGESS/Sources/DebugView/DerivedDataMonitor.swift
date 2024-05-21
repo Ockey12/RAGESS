@@ -7,11 +7,11 @@
 //
 
 import ComposableArchitecture
-import DerivedDataMonitorClient
+import MonitorClient
 import SwiftUI
 
 @Reducer
-public struct DerivedDataMonitorDebugger {
+public struct MonitorClientDebugger {
     public init() {}
 
     @ObservableState
@@ -32,7 +32,7 @@ public struct DerivedDataMonitorDebugger {
         case binding(BindingAction<State>)
     }
 
-    @Dependency(DerivedDataMonitorClient.self) var monitorClient
+    @Dependency(MonitorClient.self) var monitorClient
 
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
@@ -40,7 +40,7 @@ public struct DerivedDataMonitorDebugger {
             case .startMonitoringTapped:
                 guard let buildDirectory = state.buildSettings["BUILD_DIR"] else {
                     #if DEBUG
-                        print("ERROR in \(#file): Cannot \"BUILD_DIR\" key in \(DerivedDataMonitorDebugger.State.self).")
+                        print("ERROR in \(#file): Cannot \"BUILD_DIR\" key in \(MonitorClientDebugger.State.self).")
                     #endif
                     return .none
                 }
@@ -74,7 +74,7 @@ public struct DerivedDataMonitorDebugger {
     }
 }
 
-extension DerivedDataMonitorDebugger {
+extension MonitorClientDebugger {
     func findAppPaths(in directoryPath: String) -> [String] {
         let fileManager = FileManager.default
         let directoryURL = URL(filePath: directoryPath)
@@ -95,10 +95,10 @@ extension DerivedDataMonitorDebugger {
     }
 }
 
-public struct DerivedDataMonitorDebugView: View {
-    @Bindable public var store: StoreOf<DerivedDataMonitorDebugger>
+public struct MonitorClientDebugView: View {
+    @Bindable public var store: StoreOf<MonitorClientDebugger>
 
-    public init(store: StoreOf<DerivedDataMonitorDebugger>) {
+    public init(store: StoreOf<MonitorClientDebugger>) {
         self.store = store
     }
 

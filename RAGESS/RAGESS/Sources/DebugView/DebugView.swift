@@ -21,7 +21,7 @@ public struct DebugReducer {
         var kittenClient: SourceKitClientDebugger.State
         var typeDeclarationExtractor: TypeDeclarationExtractorDebugger.State
         var dependenciesClient: DependenciesClientDebugger.State
-        var derivedDataMonitor: DerivedDataMonitorDebugger.State
+        var derivedDataMonitor: MonitorClientDebugger.State
 
         var buildSettingsLoading = false
         var dumpPackageSwiftLoading = false
@@ -33,7 +33,7 @@ public struct DebugReducer {
             kittenClient: SourceKitClientDebugger.State,
             typeDeclarationExtractor: TypeDeclarationExtractorDebugger.State,
             dependenciesClient: DependenciesClientDebugger.State,
-            derivedDataMonitor: DerivedDataMonitorDebugger.State
+            derivedDataMonitor: MonitorClientDebugger.State
         ) {
             self.lspClient = lspClient
             self.sourceFileClient = sourceFileClient
@@ -52,7 +52,7 @@ public struct DebugReducer {
         case kittenClient(SourceKitClientDebugger.Action)
         case typeDeclarationExtractor(TypeDeclarationExtractorDebugger.Action)
         case dependenciesClient(DependenciesClientDebugger.Action)
-        case derivedDataMonitor(DerivedDataMonitorDebugger.Action)
+        case derivedDataMonitor(MonitorClientDebugger.Action)
     }
 
     public var body: some ReducerOf<Self> {
@@ -75,7 +75,7 @@ public struct DebugReducer {
             DependenciesClientDebugger()
         }
         Scope(state: \.derivedDataMonitor, action: \.derivedDataMonitor) {
-            DerivedDataMonitorDebugger()
+            MonitorClientDebugger()
         }
         Reduce { state, action in
             switch action {
@@ -238,7 +238,7 @@ public struct DebugView: View {
                 .tabItem { Text("DependenciesClient") }
                 .padding()
 
-                DerivedDataMonitorDebugView(
+                MonitorClientDebugView(
                     store: store.scope(
                         state: \.derivedDataMonitor,
                         action: \.derivedDataMonitor

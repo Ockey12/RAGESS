@@ -9,6 +9,10 @@ let package = Package(
         .library(
             name: "DebugView",
             targets: ["DebugView"]
+        ),
+        .library(
+            name: "RAGESSView",
+            targets: ["RAGESSView"]
         )
     ],
     dependencies: [
@@ -55,7 +59,7 @@ let package = Package(
                 "BuildSettingsClient",
                 "DumpPackageClient",
                 "DependenciesClient",
-                "DerivedDataMonitorClient",
+                "MonitorClient",
                 "LSPClient",
                 "SourceFileClient",
                 "SourceKitClient",
@@ -90,13 +94,6 @@ let package = Package(
             ]
         ),
         .target(
-            name: "DerivedDataMonitorClient",
-            dependencies: [
-                .product(name: "Dependencies", package: "swift-dependencies"),
-                .product(name: "DependenciesMacros", package: "swift-dependencies")
-            ]
-        ),
-        .target(
             name: "DumpPackageClient",
             dependencies: [
                 "CommandClient",
@@ -114,6 +111,28 @@ let package = Package(
                 .product(name: "Dependencies", package: "swift-dependencies"),
                 .product(name: "DependenciesMacros", package: "swift-dependencies"),
                 .product(name: "LSPBindings", package: "sourcekit-lsp")
+            ]
+        ),
+        .target(
+            name: "MonitorClient",
+            dependencies: [
+                .product(name: "Dependencies", package: "swift-dependencies"),
+                .product(name: "DependenciesMacros", package: "swift-dependencies")
+            ]
+        ),
+        .target(
+            name: "RAGESSView",
+            dependencies: [
+                "BuildSettingsClient",
+                "DeclarationExtractor",
+                "DependenciesClient",
+                "DumpPackageClient",
+                "MonitorClient",
+                "SourceFileClient",
+                "TypeDeclaration",
+                "XcodeObject",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                .product(name: "Dependencies", package: "swift-dependencies")
             ]
         ),
         .target(

@@ -1,5 +1,5 @@
 //
-//  IndexWithText.swift
+//  IndexView.swift
 //
 //
 //  Created by Ockey12 on 2024/05/22
@@ -9,7 +9,7 @@
 import SwiftUI
 import TypeDeclaration
 
-struct IndexWithText: View {
+struct IndexView: View {
     let object: any HasHeader
 
     var indexColor: Color {
@@ -71,7 +71,7 @@ struct IndexWithText: View {
 
 #Preview {
     Group {
-        IndexWithText(
+        IndexView(
             object: ProtocolObject(
                 name: "SampleProtocol",
                 nameOffset: 0,
@@ -83,7 +83,7 @@ struct IndexWithText: View {
         )
         .frame(width: 350, height: 140)
 
-        IndexWithText(
+        IndexView(
             object: StructObject(
                 name: "SampleStruct",
                 nameOffset: 0,
@@ -95,7 +95,7 @@ struct IndexWithText: View {
         )
         .frame(width: 350, height: 140)
 
-        IndexWithText(
+        IndexView(
             object: ClassObject(
                 name: "SampleClass",
                 nameOffset: 0,
@@ -107,7 +107,7 @@ struct IndexWithText: View {
         )
         .frame(width: 350, height: 140)
 
-        IndexWithText(
+        IndexView(
             object: EnumObject(
                 name: "SampleEnum",
                 nameOffset: 0,

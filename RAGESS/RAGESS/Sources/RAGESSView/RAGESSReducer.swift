@@ -267,9 +267,9 @@ public struct RAGESSReducer {
 
             case .startMonitoring:
                 guard let buildDirectoryPath = state.buildSettings["BUILD_DIR"] else {
-#if DEBUG
-                    print("ERROR in \(#file) - \(#line): Cannot \"BUILD_DIR\" key.")
-#endif
+                    #if DEBUG
+                        print("ERROR in \(#file) - \(#line): Cannot \"BUILD_DIR\" key.")
+                    #endif
                     return .none
                 }
                 let appPaths = findAppPaths(in: buildDirectoryPath)
@@ -284,9 +284,10 @@ public struct RAGESSReducer {
 
             case .detectedDirectoryChange:
                 return .send(.extractSourceFiles)
-                    .debounce(id: CancelID.detectedBuildSucceeded,
-                              for: 1.0,
-                              scheduler: self.mainQueue
+                    .debounce(
+                        id: CancelID.detectedBuildSucceeded,
+                        for: 1.0,
+                        scheduler: self.mainQueue
                     )
 
             case .binding:

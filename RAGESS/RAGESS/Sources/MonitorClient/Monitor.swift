@@ -41,9 +41,9 @@ class Monitor {
 
         source?.resume()
 
-#if DEBUG
-        print("\(#file) - \(#function): Start monitoring \(directoryPath)")
-#endif
+        #if DEBUG
+            print("\(#file) - \(#function): Start monitoring \(directoryPath)")
+        #endif
     }
 
     func stopMonitoring() {

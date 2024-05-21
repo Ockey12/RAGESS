@@ -12,9 +12,6 @@ import TypeDeclaration
 struct IndexWithText: View {
     let object: any HasHeader
 
-    let width: CGFloat = 300
-    let height: CGFloat = 90
-
     var indexColor: Color {
         switch object {
         case is ProtocolObject:
@@ -49,16 +46,25 @@ struct IndexWithText: View {
         ZStack {
             IndexFrameShape()
                 .fill(indexColor)
-                .frame(width: width, height: height)
+                .frame(
+                    width: ComponentSizeValues.headerIndexWidth,
+                    height: ComponentSizeValues.itemHeight
+                )
 
             IndexFrameShape()
-                .stroke(lineWidth: 5)
+                .stroke(lineWidth: ComponentSizeValues.borderWidth)
                 .fill(.black)
-                .frame(width: width, height: height)
+                .frame(
+                    width: ComponentSizeValues.headerIndexWidth,
+                    height: ComponentSizeValues.itemHeight
+                )
 
             Text(text)
-                .frame(width: width, height: height)
-                .font(.system(size: 50))
+                .font(.system(size: ComponentSizeValues.fontSize))
+                .frame(
+                    width: ComponentSizeValues.headerIndexWidth,
+                    height: ComponentSizeValues.itemHeight
+                )
         } // ZStack
     }
 }

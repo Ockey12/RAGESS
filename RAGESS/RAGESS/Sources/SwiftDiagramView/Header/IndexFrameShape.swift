@@ -52,4 +52,6 @@ struct IndexFrameShape: Shape {
 
 #Preview {
     IndexFrameShape()
+        .stroke(lineWidth: ComponentSizeValues.borderWidth)
+        .padding()
 }

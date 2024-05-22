@@ -9,7 +9,7 @@
 import TypeDeclaration
 
 func extractSuperClassObjects(
-    by subClassObject: any Inheritable,
+    by subClassObject: ClassObject,
     allDeclarationObjects: [any DeclarationObject]
 ) -> ClassObject? {
     let classInheritanceDependency = subClassObject.objectsThatAreCalledByThisObject.first(where: { $0.kind == .classInheritance })

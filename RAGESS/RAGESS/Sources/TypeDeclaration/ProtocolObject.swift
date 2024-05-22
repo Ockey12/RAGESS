@@ -30,6 +30,7 @@ public struct ProtocolObject: Inheritable, Initializable, HasHeader {
         name: String,
         nameOffset: Int,
         fullPath: String,
+        annotatedDecl: String = "",
         sourceCode: String,
         positionRange: ClosedRange<SourcePosition>,
         offsetRange: ClosedRange<Int>
@@ -39,7 +40,13 @@ public struct ProtocolObject: Inheritable, Initializable, HasHeader {
         self.name = name
         self.nameOffset = nameOffset
         self.fullPath = fullPath
-        annotatedDecl = name
+
+        if annotatedDecl == "" {
+            self.annotatedDecl = name
+        } else {
+            self.annotatedDecl = annotatedDecl
+        }
+
         self.sourceCode = sourceCode
         self.positionRange = positionRange
         self.offsetRange = offsetRange

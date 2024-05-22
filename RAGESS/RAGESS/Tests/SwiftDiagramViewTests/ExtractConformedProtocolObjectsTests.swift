@@ -62,15 +62,6 @@ final class ExtractConformedProtocolObjectsTests: XCTestCase {
 
             let protocolConformDependencies = structObject.objectsThatAreCalledByThisObject.filter { $0.kind == .protocolConformance }
             XCTAssertEqual(protocolConformDependencies, [conformDependency])
-
-            _ = protocolConformDependencies.compactMap { dependency in
-                allDeclarationObjects.first(where: { object in
-                    print("object.id: \(object.id)")
-                    print("dependency.definitionObject.id: \(dependency.definitionObject.id)")
-                    return object.id == dependency.definitionObject.id
-                }) as? ProtocolObject
-            }
-
             XCTAssertEqual(conformedProtocolObjects, [protocolObject])
         })
     }

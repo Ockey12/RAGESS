@@ -26,13 +26,13 @@ public struct HeaderReducer {
     }
 
     public enum Action {
-        case clicked
+        case nameClicked
     }
 
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .clicked:
+            case .nameClicked:
                 print("\(state.object.name) clicked!")
                 return .none
             }

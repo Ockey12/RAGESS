@@ -21,16 +21,13 @@ struct HeaderView: View {
             IndexView(object: store.object)
                 .offset(x: arrowTerminalWidth, y: 0)
 
-            HeaderViewWithoutIndex(object: store.object, bodyWidth: store.bodyWidth)
+            HeaderViewWithoutIndex(store: store)
                 .offset(x: 0, y: itemHeight)
         } // ZStack
         .frame(
             width: store.bodyWidth + ComponentSizeValues.arrowTerminalWidth*2,
             height: 300
         )
-        .onTapGesture {
-            store.send(.clicked)
-        }
     }
 }
 
@@ -72,7 +69,7 @@ struct HeaderView: View {
         offsetRange: 0 ... 1
     )
 
-    return Group {
+    return VStack(spacing: 50) {
         HeaderView(
             store: .init(
                 initialState: HeaderReducer.State(
@@ -129,5 +126,6 @@ struct HeaderView: View {
         )
         .border(.pink)
     }
-    .frame(width: 1000, height: 400)
+    .frame(width: 1000, height: 1600)
+    .padding()
 }

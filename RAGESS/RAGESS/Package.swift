@@ -140,6 +140,7 @@ let package = Package(
                 "DumpPackageClient",
                 "MonitorClient",
                 "SourceFileClient",
+                "SwiftDiagramView",
                 "TypeDeclaration",
                 "XcodeObject",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),

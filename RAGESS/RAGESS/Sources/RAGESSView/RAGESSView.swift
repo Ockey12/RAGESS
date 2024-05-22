@@ -7,6 +7,7 @@
 //
 
 import ComposableArchitecture
+import SwiftDiagramView
 import SwiftUI
 
 public struct RAGESSView: View {
@@ -57,6 +58,8 @@ public struct RAGESSView: View {
                         .frame(height: 40)
 
                         Divider()
+
+                        SwiftDiagramView(store: store.scope(state: \.swiftDiagram, action: \.swiftDiagram))
 
                         Spacer()
                     } // VStack

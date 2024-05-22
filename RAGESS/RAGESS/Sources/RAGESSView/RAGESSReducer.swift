@@ -15,6 +15,7 @@ import DumpPackageClient
 import Foundation
 import MonitorClient
 import SourceFileClient
+import SwiftDiagramView
 import TypeDeclaration
 import XcodeObject
 
@@ -38,6 +39,7 @@ public struct RAGESSReducer {
             ".swiftpm"
         ]
         var loadingTaskKindBuffer: [LoadingTaskKind] = []
+        var swiftDiagram: SwiftDiagramReducer.State = .init(allDeclarationObjects: [])
 
         public init(projectRootDirectoryPath: String) {
             self.projectRootDirectoryPath = projectRootDirectoryPath
@@ -56,6 +58,7 @@ public struct RAGESSReducer {
         case extractDependenciesResponse(Result<[any DeclarationObject], Error>)
         case startMonitoring
         case detectedDirectoryChange
+        case swiftDiagram(SwiftDiagramReducer.Action)
         case binding(BindingAction<State>)
     }
 
@@ -259,6 +262,9 @@ public struct RAGESSReducer {
                 #endif
 
                 state.declarationObjects = hasDependenciesObjects
+
+                state.swiftDiagram = .init(allDeclarationObjects: hasDependenciesObjects)
+
                 return .send(.startMonitoring)
 
             case let .extractDependenciesResponse(.failure(error)):
@@ -292,6 +298,9 @@ public struct RAGESSReducer {
                         for: 1.0,
                         scheduler: self.mainQueue
                     )
+
+            case .swiftDiagram:
+                return .none
 
             case .binding:
                 return .none

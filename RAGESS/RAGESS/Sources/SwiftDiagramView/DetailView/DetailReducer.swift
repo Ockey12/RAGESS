@@ -7,17 +7,23 @@
 //
 
 import ComposableArchitecture
+import Dependencies
 import Foundation
 import TypeDeclaration
 
 @Reducer
-struct DetailReducer {
+public struct DetailReducer {
+    public init() {}
+
     @ObservableState
-    struct State {
+    public struct State: Identifiable {
+        public let id: UUID
         var items: IdentifiedArrayOf<TextCellReducer.State>
         let bodyWidth: CGFloat
 
-        init(objects: [any DeclarationObject], bodyWidth: CGFloat) {
+        public init(objects: [any DeclarationObject], bodyWidth: CGFloat) {
+            @Dependency(\.uuid) var uuid
+            id = uuid()
             items = .init(uniqueElements: objects.map {
                 TextCellReducer.State(object: $0, bodyWidth: bodyWidth)
             })
@@ -25,11 +31,11 @@ struct DetailReducer {
         }
     }
 
-    enum Action {
+    public enum Action {
         case items(IdentifiedActionOf<TextCellReducer>)
     }
 
-    var body: some ReducerOf<Self> {
+    public var body: some ReducerOf<Self> {
         Reduce { _, action in
             switch action {
             case .items:

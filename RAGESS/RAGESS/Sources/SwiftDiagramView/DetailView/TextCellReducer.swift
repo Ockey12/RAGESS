@@ -11,10 +11,10 @@ import Foundation
 import TypeDeclaration
 
 @Reducer
-struct TextCellReducer {
+public struct TextCellReducer {
     @ObservableState
-    struct State: Identifiable {
-        var id: UUID {
+    public struct State: Identifiable {
+        public var id: UUID {
             object.id
         }
 
@@ -22,11 +22,11 @@ struct TextCellReducer {
         let bodyWidth: CGFloat
     }
 
-    enum Action {
+    public enum Action {
         case clicked
     }
 
-    var body: some ReducerOf<Self> {
+    public var body: some ReducerOf<Self> {
         Reduce { _, action in
             switch action {
             case .clicked:

@@ -1,9 +1,9 @@
 //
 //  ExtractSuperClassObjectsTests.swift
 //
-//  
+//
 //  Created by Ockey12 on 2024/05/23
-//  
+//
 //
 
 import Dependencies
@@ -14,56 +14,58 @@ import XCTest
 
 final class ExtractSuperClassObjectsTests: XCTestCase {
     func test_extractSuperClassObject() async {
-        withDependencies({
-            $0.uuid = .incrementing
-        },
-    operation: {
-            var superClassObject = ClassObject(
-                name: "SuperClass",
-                nameOffset: 0,
-                fullPath: "",
-                annotatedDecl: "",
-                positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
-                offsetRange: 0 ... 1
-            )
-
-            var subClassObject = ClassObject(
-                name: "SubClass",
-                nameOffset: 0,
-                fullPath: "",
-                annotatedDecl: "",
-                positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
-                offsetRange: 0 ... 1
-            )
-
-            let inheritDependency = DependencyObject(
-                kind: .classInheritance,
-                callerObject: .init(
-                    id: subClassObject.id,
-                    keyPath: .class(\.self)
-                ),
-                definitionObject: .init(
-                    id: superClassObject.id,
-                    keyPath: .class(\.self)
+        withDependencies(
+            {
+                $0.uuid = .incrementing
+            },
+            operation: {
+                var superClassObject = ClassObject(
+                    name: "SuperClass",
+                    nameOffset: 0,
+                    fullPath: "",
+                    annotatedDecl: "",
+                    positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
+                    offsetRange: 0 ... 1
                 )
-            )
 
-            superClassObject.objectsThatCallThisObject.append(inheritDependency)
-            subClassObject.objectsThatAreCalledByThisObject.append(inheritDependency)
+                var subClassObject = ClassObject(
+                    name: "SubClass",
+                    nameOffset: 0,
+                    fullPath: "",
+                    annotatedDecl: "",
+                    positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
+                    offsetRange: 0 ... 1
+                )
 
-            let allDeclarationObjects: [any DeclarationObject] = [
-                superClassObject,
-                subClassObject
-            ]
+                let inheritDependency = DependencyObject(
+                    kind: .classInheritance,
+                    callerObject: .init(
+                        id: subClassObject.id,
+                        keyPath: .class(\.self)
+                    ),
+                    definitionObject: .init(
+                        id: superClassObject.id,
+                        keyPath: .class(\.self)
+                    )
+                )
 
-            guard let extractedSuperClassObject = extractSuperClassObjects(
-                by: subClassObject,
-                allDeclarationObjects: allDeclarationObjects
-            ) else {
-                return XCTFail()
+                superClassObject.objectsThatCallThisObject.append(inheritDependency)
+                subClassObject.objectsThatAreCalledByThisObject.append(inheritDependency)
+
+                let allDeclarationObjects: [any DeclarationObject] = [
+                    superClassObject,
+                    subClassObject
+                ]
+
+                guard let extractedSuperClassObject = extractSuperClassObjects(
+                    by: subClassObject,
+                    allDeclarationObjects: allDeclarationObjects
+                ) else {
+                    return XCTFail()
+                }
+
+                XCTAssertEqual(superClassObject, extractedSuperClassObject)
             }
-
-            XCTAssertEqual(superClassObject, extractedSuperClassObject)
-        })
+        )
     }
 }

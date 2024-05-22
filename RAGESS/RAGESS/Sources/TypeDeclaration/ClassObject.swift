@@ -44,7 +44,7 @@ public struct ClassObject: TypeDeclaration {
         self.name = name
         self.nameOffset = nameOffset
         self.fullPath = fullPath
-        
+
         if annotatedDecl == "" {
             self.annotatedDecl = name
         } else {

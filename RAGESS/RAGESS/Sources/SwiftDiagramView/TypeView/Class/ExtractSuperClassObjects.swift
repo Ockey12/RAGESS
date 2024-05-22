@@ -1,9 +1,9 @@
 //
 //  ExtractSuperClassObjects.swift
 //
-//  
+//
 //  Created by Ockey12 on 2024/05/23
-//  
+//
 //
 
 import TypeDeclaration
@@ -18,5 +18,4 @@ func extractSuperClassObjects(
         return nil
     }
     return allDeclarationObjects.first(where: { $0.id == classInheritanceDependency.definitionObject.id }) as? ClassObject
-
 }

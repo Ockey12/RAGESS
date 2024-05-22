@@ -15,7 +15,10 @@ public struct StructViewReducer {
     public init() {}
 
     @ObservableState
-    public struct State {
+    public struct State: Identifiable {
+        public var id: UUID {
+            object.id
+        }
         let object: StructObject
         let header: HeaderReducer.State
         var details: IdentifiedArrayOf<DetailReducer.State>

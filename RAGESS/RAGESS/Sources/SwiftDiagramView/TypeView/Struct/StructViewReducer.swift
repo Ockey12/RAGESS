@@ -19,6 +19,7 @@ public struct StructViewReducer {
         public var id: UUID {
             object.id
         }
+
         let object: StructObject
         let header: HeaderReducer.State
         var details: IdentifiedArrayOf<DetailReducer.State>

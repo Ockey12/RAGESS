@@ -1,9 +1,9 @@
 //
 //  SwiftDiagramReducer.swift
 //
-//  
+//
 //  Created by Ockey12 on 2024/05/23
-//  
+//
 //
 
 import ComposableArchitecture
@@ -37,8 +37,8 @@ public struct SwiftDiagramReducer {
     }
 
     public var body: some ReducerOf<Self> {
-        Reduce { state, action in
-            return .none
+        Reduce { _, _ in
+            .none
         }
         .forEach(\.structs, action: \.structs) {
             StructViewReducer()

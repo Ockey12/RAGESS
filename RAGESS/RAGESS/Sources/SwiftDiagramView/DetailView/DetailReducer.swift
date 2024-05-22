@@ -19,14 +19,16 @@ public struct DetailReducer {
     public struct State: Identifiable {
         public let id: UUID
         var items: IdentifiedArrayOf<TextCellReducer.State>
+        let kind: DetailKind
         let bodyWidth: CGFloat
 
-        public init(objects: [any DeclarationObject], bodyWidth: CGFloat) {
+        public init(objects: [any DeclarationObject], kind: DetailKind, bodyWidth: CGFloat) {
             @Dependency(\.uuid) var uuid
             id = uuid()
             items = .init(uniqueElements: objects.map {
                 TextCellReducer.State(object: $0, bodyWidth: bodyWidth)
             })
+            self.kind = kind
             self.bodyWidth = bodyWidth
         }
     }

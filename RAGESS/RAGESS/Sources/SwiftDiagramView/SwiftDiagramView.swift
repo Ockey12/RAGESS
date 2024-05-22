@@ -18,12 +18,13 @@ public struct SwiftDiagramView: View {
     }
 
     public var body: some View {
-        ScrollView(.horizontal) {
+        ScrollView([.horizontal, .vertical]) {
             HStack(alignment: .top, spacing: 100) {
                 ForEach(store.scope(state: \.structs, action: \.structs)) { structStore in
                     StructView(store: structStore)
                 }
             }
+            .padding()
         }
     }
 }

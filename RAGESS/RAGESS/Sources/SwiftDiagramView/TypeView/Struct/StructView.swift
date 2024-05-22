@@ -1,9 +1,9 @@
 //
 //  StructView.swift
 //
-//  
+//
 //  Created by Ockey12 on 2024/05/22
-//  
+//
 //
 
 import ComposableArchitecture
@@ -29,8 +29,8 @@ public struct StructView: View {
         name: "DebugStruct",
         nameOffset: 0,
         fullPath: "",
-        positionRange: SourcePosition(line: 0, utf8index: 0)...SourcePosition(line: 1, utf8index: 1),
-        offsetRange: 0...1
+        positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
+        offsetRange: 0 ... 1
     )
 
     structObject.annotatedDecl = "public struct DebugStruct"

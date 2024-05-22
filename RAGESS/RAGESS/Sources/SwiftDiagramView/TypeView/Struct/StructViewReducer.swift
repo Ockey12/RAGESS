@@ -1,9 +1,9 @@
 //
 //  StructViewReducer.swift
 //
-//  
+//
 //  Created by Ockey12 on 2024/05/22
-//  
+//
 //
 
 import ComposableArchitecture
@@ -36,7 +36,7 @@ public struct StructViewReducer {
             details = [
                 DetailReducer.State(objects: object.initializers, bodyWidth: maxWidth),
                 DetailReducer.State(objects: object.variables, bodyWidth: maxWidth),
-                DetailReducer.State(objects: object.functions, bodyWidth: maxWidth),
+                DetailReducer.State(objects: object.functions, bodyWidth: maxWidth)
             ]
         }
     }
@@ -47,7 +47,7 @@ public struct StructViewReducer {
     }
 
     public var body: some ReducerOf<Self> {
-        Reduce { state, action in
+        Reduce { _, action in
             switch action {
             case .header:
                 return .none

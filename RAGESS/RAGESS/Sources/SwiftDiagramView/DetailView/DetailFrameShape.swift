@@ -1,9 +1,9 @@
 //
 //  DetailFrameShape.swift
 //
-//  
+//
 //  Created by Ockey12 on 2024/05/22
-//  
+//
 //
 
 import SwiftUI
@@ -38,34 +38,34 @@ struct DetailFrameShape: Shape {
             // items
             // left side
             // from top to bottom
-            for numberOfItem in 0..<numberOfItems {
-                path.addLine(to: CGPoint(x: arrowTerminalWidth, y: headerHeight + itemHeight*CGFloat(numberOfItem) + oneVerticalLineWithoutArrow))
-                path.addLine(to: CGPoint(x: 0, y: headerHeight + itemHeight*CGFloat(numberOfItem) + oneVerticalLineWithoutArrow))
-                path.addLine(to: CGPoint(x: 0, y: headerHeight + itemHeight*CGFloat(numberOfItem) + oneVerticalLineWithoutArrow + arrowTerminalHeight))
-                path.addLine(to: CGPoint(x: arrowTerminalWidth, y: headerHeight + itemHeight*CGFloat(numberOfItem) + oneVerticalLineWithoutArrow + arrowTerminalHeight))
-                path.addLine(to: CGPoint(x: arrowTerminalWidth, y: headerHeight + itemHeight*CGFloat(numberOfItem) + oneVerticalLineWithoutArrow*2 + arrowTerminalHeight))
+            for numberOfItem in 0 ..< numberOfItems {
+                path.addLine(to: CGPoint(x: arrowTerminalWidth, y: headerHeight + itemHeight * CGFloat(numberOfItem) + oneVerticalLineWithoutArrow))
+                path.addLine(to: CGPoint(x: 0, y: headerHeight + itemHeight * CGFloat(numberOfItem) + oneVerticalLineWithoutArrow))
+                path.addLine(to: CGPoint(x: 0, y: headerHeight + itemHeight * CGFloat(numberOfItem) + oneVerticalLineWithoutArrow + arrowTerminalHeight))
+                path.addLine(to: CGPoint(x: arrowTerminalWidth, y: headerHeight + itemHeight * CGFloat(numberOfItem) + oneVerticalLineWithoutArrow + arrowTerminalHeight))
+                path.addLine(to: CGPoint(x: arrowTerminalWidth, y: headerHeight + itemHeight * CGFloat(numberOfItem) + oneVerticalLineWithoutArrow * 2 + arrowTerminalHeight))
             }
 
             // footer
             // from left to right
-            path.addLine(to: CGPoint(x: arrowTerminalWidth, y: bottomPaddingForLastText + headerHeight*2 + itemHeight*CGFloat(numberOfItems)))
-            path.addLine(to: CGPoint(x: widthFromLeftEdgeToConnection, y: bottomPaddingForLastText + headerHeight*2 + itemHeight*CGFloat(numberOfItems)))
-            path.addLine(to: CGPoint(x: widthFromLeftEdgeToConnection, y: bottomPaddingForLastText + headerHeight + itemHeight*CGFloat(numberOfItems)))
-            path.addLine(to: CGPoint(x: widthFromLeftEdgeToConnection + headerWidth, y: bottomPaddingForLastText + headerHeight + itemHeight*CGFloat(numberOfItems)))
-            path.addLine(to: CGPoint(x: widthFromLeftEdgeToConnection + headerWidth, y: bottomPaddingForLastText + headerHeight*2 + itemHeight*CGFloat(numberOfItems)))
-            path.addLine(to: CGPoint(x: bodyWidth + arrowTerminalWidth, y: bottomPaddingForLastText + headerHeight*2 + itemHeight*CGFloat(numberOfItems)))
-            path.addLine(to: CGPoint(x: bodyWidth + arrowTerminalWidth, y: headerHeight + itemHeight*CGFloat(numberOfItems)))
+            path.addLine(to: CGPoint(x: arrowTerminalWidth, y: bottomPaddingForLastText + headerHeight * 2 + itemHeight * CGFloat(numberOfItems)))
+            path.addLine(to: CGPoint(x: widthFromLeftEdgeToConnection, y: bottomPaddingForLastText + headerHeight * 2 + itemHeight * CGFloat(numberOfItems)))
+            path.addLine(to: CGPoint(x: widthFromLeftEdgeToConnection, y: bottomPaddingForLastText + headerHeight + itemHeight * CGFloat(numberOfItems)))
+            path.addLine(to: CGPoint(x: widthFromLeftEdgeToConnection + headerWidth, y: bottomPaddingForLastText + headerHeight + itemHeight * CGFloat(numberOfItems)))
+            path.addLine(to: CGPoint(x: widthFromLeftEdgeToConnection + headerWidth, y: bottomPaddingForLastText + headerHeight * 2 + itemHeight * CGFloat(numberOfItems)))
+            path.addLine(to: CGPoint(x: bodyWidth + arrowTerminalWidth, y: bottomPaddingForLastText + headerHeight * 2 + itemHeight * CGFloat(numberOfItems)))
+            path.addLine(to: CGPoint(x: bodyWidth + arrowTerminalWidth, y: headerHeight + itemHeight * CGFloat(numberOfItems)))
 
             // items
             // right side
             // from bottom to top
-            for numberOfItem in 0..<numberOfItems {
+            for numberOfItem in 0 ..< numberOfItems {
                 let numberOfItemFromBottom = numberOfItems - (numberOfItem + 1)
-                path.addLine(to: CGPoint(x: arrowTerminalWidth + bodyWidth, y: headerHeight + itemHeight*CGFloat(numberOfItemFromBottom) + oneVerticalLineWithoutArrow + arrowTerminalHeight))
-                path.addLine(to: CGPoint(x: arrowTerminalWidth*2 + bodyWidth, y: headerHeight + itemHeight*CGFloat(numberOfItemFromBottom) + oneVerticalLineWithoutArrow + arrowTerminalHeight))
-                path.addLine(to: CGPoint(x: arrowTerminalWidth*2 + bodyWidth, y: headerHeight + itemHeight*CGFloat(numberOfItemFromBottom) + oneVerticalLineWithoutArrow))
-                path.addLine(to: CGPoint(x: arrowTerminalWidth + bodyWidth, y: headerHeight + itemHeight*CGFloat(numberOfItemFromBottom) + oneVerticalLineWithoutArrow))
-                path.addLine(to: CGPoint(x: arrowTerminalWidth + bodyWidth, y: headerHeight + itemHeight*CGFloat(numberOfItemFromBottom)))
+                path.addLine(to: CGPoint(x: arrowTerminalWidth + bodyWidth, y: headerHeight + itemHeight * CGFloat(numberOfItemFromBottom) + oneVerticalLineWithoutArrow + arrowTerminalHeight))
+                path.addLine(to: CGPoint(x: arrowTerminalWidth * 2 + bodyWidth, y: headerHeight + itemHeight * CGFloat(numberOfItemFromBottom) + oneVerticalLineWithoutArrow + arrowTerminalHeight))
+                path.addLine(to: CGPoint(x: arrowTerminalWidth * 2 + bodyWidth, y: headerHeight + itemHeight * CGFloat(numberOfItemFromBottom) + oneVerticalLineWithoutArrow))
+                path.addLine(to: CGPoint(x: arrowTerminalWidth + bodyWidth, y: headerHeight + itemHeight * CGFloat(numberOfItemFromBottom) + oneVerticalLineWithoutArrow))
+                path.addLine(to: CGPoint(x: arrowTerminalWidth + bodyWidth, y: headerHeight + itemHeight * CGFloat(numberOfItemFromBottom)))
             }
         } // Path
     } // func path(in rect: CGRect) -> Path

@@ -25,14 +25,13 @@ struct HeaderView: View {
                 .offset(x: 0, y: itemHeight)
         } // ZStack
         .frame(
-            width: store.bodyWidth + ComponentSizeValues.arrowTerminalWidth*2,
+            width: store.bodyWidth + ComponentSizeValues.arrowTerminalWidth * 2,
             height: 300
         )
     }
 }
 
 #Preview {
-
     let protocolObject = ProtocolObject(
         name: "SampleProtocol",
         nameOffset: 0,

@@ -135,12 +135,41 @@ public struct StructView: View {
     ]
     structObject.functions = functionObjects
 
+    let protocolObject = ProtocolObject(
+        name: "ConformedProtocol",
+        nameOffset: 0,
+        fullPath: "",
+        annotatedDecl: "public protocol ConformedProtocol",
+        sourceCode: "",
+        positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
+        offsetRange: 0 ... 1
+    )
+
+    let conformDependency = DependencyObject(
+        kind: .protocolConformance,
+        callerObject: .init(
+            id: structObject.id,
+            keyPath: .struct(\.self)
+        ),
+        definitionObject: .init(
+            id: protocolObject.id,
+            keyPath: .protocol(\.self)
+        )
+    )
+
+    structObject.objectsThatAreCalledByThisObject.append(conformDependency)
+
+    let allDeclarationObjects: [any DeclarationObject] = [
+        structObject,
+        protocolObject
+    ]
+
     return VStack {
         StructView(
             store: .init(
                 initialState: StructViewReducer.State(
                     object: structObject,
-                    allDeclarationObjects: []
+                    allDeclarationObjects: allDeclarationObjects
                 ),
                 reducer: {
                     StructViewReducer()

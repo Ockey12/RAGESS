@@ -130,16 +130,3 @@ public struct StructViewReducer {
         }
     }
 }
-
-func calculateMaxTextWidth(_ strings: [String]) -> CGFloat {
-    var maxWidth: CGFloat = 0
-
-    for string in strings {
-        let width = string.systemSize50Width
-        if maxWidth < width {
-            maxWidth = width
-        }
-    }
-
-    return maxWidth
-}

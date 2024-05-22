@@ -138,8 +138,13 @@ public struct StructView: View {
     return VStack {
         StructView(
             store: .init(
-                initialState: StructViewReducer.State(object: structObject),
-                reducer: { StructViewReducer() }
+                initialState: StructViewReducer.State(
+                    object: structObject,
+                    allDeclarationObjects: []
+                ),
+                reducer: {
+                    StructViewReducer()
+                }
             )
         )
         .border(.pink)

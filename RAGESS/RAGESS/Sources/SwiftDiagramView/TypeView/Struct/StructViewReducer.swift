@@ -20,12 +20,20 @@ public struct StructViewReducer {
         let header: HeaderReducer.State
         var details: IdentifiedArrayOf<DetailReducer.State>
         let bodyWidth: CGFloat
+        private let conformedProtocolObjects: [ProtocolObject]
         var height: CGFloat {
             let itemHeight = ComponentSizeValues.itemHeight
             let bottomPadding = ComponentSizeValues.bottomPaddingForLastText
             let connectionHeight = ComponentSizeValues.connectionHeight
 
             let header = itemHeight * 2 + bottomPadding
+
+            let conformances: CGFloat
+            if conformedProtocolObjects.isEmpty {
+                conformances = 0
+            } else {
+                conformances = connectionHeight + itemHeight * CGFloat(conformedProtocolObjects.count) + bottomPadding
+            }
 
             let initializers: CGFloat
             if object.initializers.isEmpty {
@@ -48,10 +56,10 @@ public struct StructViewReducer {
                 functions = connectionHeight + itemHeight * CGFloat(object.functions.count) + bottomPadding
             }
 
-            return header + initializers + variables + functions + connectionHeight
+            return header + conformances + initializers + variables + functions + connectionHeight
         }
 
-        public init(object: StructObject) {
+        public init(object: StructObject, allDeclarationObjects: [any DeclarationObject]) {
             self.object = object
 
             var allAnnotatedDecl = [object.annotatedDecl]
@@ -67,7 +75,18 @@ public struct StructViewReducer {
 
             header = HeaderReducer.State(object: object, bodyWidth: maxWidth)
 
+            let protocolConformDependencies = object.objectsThatAreCalledByThisObject.filter { $0.kind == .protocolConformance }
+            let conformedProtocolObjects = protocolConformDependencies.compactMap { dependency in
+                allDeclarationObjects.first(where: { $0.id == dependency.definitionObject.id }) as? ProtocolObject
+            }
+            self.conformedProtocolObjects = conformedProtocolObjects
+
             details = [
+                DetailReducer.State(
+                    objects: conformedProtocolObjects,
+                    kind: .protocolConformance,
+                    bodyWidth: maxWidth
+                ),
                 DetailReducer.State(
                     objects: object.initializers,
                     kind: .initializers,

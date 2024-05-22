@@ -7,6 +7,7 @@
 //
 
 public enum DetailKind {
+    case protocolConformance
     case initializers
     case variables
     case functions
@@ -15,6 +16,8 @@ public enum DetailKind {
 
     var text: String {
         switch self {
+        case .protocolConformance:
+            "Conform"
         case .initializers:
             "Initializer"
         case .variables:

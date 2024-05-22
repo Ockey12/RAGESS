@@ -20,6 +20,36 @@ public struct StructViewReducer {
         let header: HeaderReducer.State
         var details: IdentifiedArrayOf<DetailReducer.State>
         let bodyWidth: CGFloat
+        var height: CGFloat {
+            let itemHeight = ComponentSizeValues.itemHeight
+            let bottomPadding = ComponentSizeValues.bottomPaddingForLastText
+            let connectionHeight = ComponentSizeValues.connectionHeight
+
+            let header = itemHeight*2 + bottomPadding
+
+            let initializers: CGFloat
+            if object.initializers.isEmpty {
+                initializers = 0
+            } else {
+                initializers = connectionHeight + itemHeight*CGFloat(object.initializers.count) + bottomPadding
+            }
+
+            let variables: CGFloat
+            if object.variables.isEmpty {
+                variables = 0
+            } else {
+                variables = connectionHeight + itemHeight*CGFloat(object.variables.count) + bottomPadding
+            }
+
+            let functions: CGFloat
+            if object.functions.isEmpty {
+                functions = 0
+            } else {
+                functions = connectionHeight + itemHeight*CGFloat(object.functions.count) + bottomPadding
+            }
+
+            return header + initializers + variables + functions + connectionHeight
+        }
 
         public init(object: StructObject) {
             self.object = object

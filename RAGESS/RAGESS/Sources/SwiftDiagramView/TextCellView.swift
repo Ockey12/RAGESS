@@ -8,12 +8,13 @@
 
 import ComposableArchitecture
 import SwiftUI
+import TypeDeclaration
 
 struct TextCellView: View {
     let store: StoreOf<TextCellReducer>
 
     var body: some View {
-        Text(store.text)
+        Text(store.object.annotatedDecl)
             .font(.system(size: ComponentSizeValues.fontSize))
             .foregroundStyle(.black)
             .padding(.leading, ComponentSizeValues.textLeadingPadding)
@@ -30,10 +31,19 @@ struct TextCellView: View {
 }
 
 #Preview {
-    TextCellView(
+    let protocolObject = ProtocolObject(
+        name: "SampleProtocol",
+        nameOffset: 0,
+        fullPath: "",
+        sourceCode: "",
+        positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
+        offsetRange: 0 ... 1
+    )
+
+    return TextCellView(
         store: .init(
             initialState: TextCellReducer.State(
-                text: "TEXT",
+                object: protocolObject,
                 bodyWidth: 800
             ),
             reducer: { TextCellReducer() }

@@ -8,12 +8,13 @@
 
 import ComposableArchitecture
 import Foundation
+import TypeDeclaration
 
 @Reducer
 struct TextCellReducer {
     @ObservableState
     struct State {
-        let text: String
+        let object: any DeclarationObject
         let bodyWidth: CGFloat
     }
 

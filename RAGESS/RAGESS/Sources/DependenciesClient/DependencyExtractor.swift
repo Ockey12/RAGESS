@@ -473,7 +473,7 @@ struct DependencyExtractor {
                 return
             }
 
-            var dependencyKind = DependencyObject.Object.Kind.declarationReference
+            var dependencyKind = DependencyObject.Kind.declarationReference
 
             switch (offsetKind, definitionObjectKind, callerObjectKind) {
             case (.inherit, .protocol, .protocol):
@@ -493,15 +493,14 @@ struct DependencyExtractor {
             }
 
             let dependencyObject = DependencyObject(
+                kind: dependencyKind,
                 callerObject: .init(
                     id: callerObject.id,
-                    keyPath: callerKeyPath,
-                    kind: dependencyKind
+                    keyPath: callerKeyPath
                 ),
                 definitionObject: .init(
                     id: definitionObject.id,
-                    keyPath: definitionKeyPath,
-                    kind: dependencyKind
+                    keyPath: definitionKeyPath
                 )
             )
 

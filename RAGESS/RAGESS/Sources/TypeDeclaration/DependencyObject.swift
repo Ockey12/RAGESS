@@ -9,10 +9,13 @@
 import Foundation
 
 public struct DependencyObject {
-    public init(callerObject: Object, definitionObject: Object) {
+    public init(kind: Kind, callerObject: Object, definitionObject: Object) {
+        self.kind = kind
         self.callerObject = callerObject
         self.definitionObject = definitionObject
     }
+
+    public let kind: Kind
 
     /// This object uses definitionObject as the type of a variable or a function argument.
     /// This object may be affected by changes in dependedObject.
@@ -23,17 +26,15 @@ public struct DependencyObject {
     public var definitionObject: Object
 
     public struct Object {
-        public init(id: UUID, keyPath: ObjectKeyPath, kind: Kind) {
+        public init(id: UUID, keyPath: ObjectKeyPath) {
             self.id = id
             self.keyPath = keyPath
-            self.kind = kind
         }
 
         /// ID of the parent object with the shallowest hierarchy
         public let id: UUID
 
         public let keyPath: ObjectKeyPath
-        public let kind: Kind
 
         public enum ObjectKeyPath {
             case `protocol`(PartialKeyPath<ProtocolObject>)
@@ -43,17 +44,17 @@ public struct DependencyObject {
             case variable(PartialKeyPath<VariableObject>)
             case function(PartialKeyPath<FunctionObject>)
         }
+    }
 
-        public enum Kind {
-            case protocolInheritance
-            case classInheritance
-            case protocolConformance
+    public enum Kind {
+        case protocolInheritance
+        case classInheritance
+        case protocolConformance
 
-            /// Call a property or method.
-            case declarationReference
+        /// Call a property or method.
+        case declarationReference
 
-            /// Use as types of properties, arguments, etc.
-            case identifierType
-        }
+        /// Use as types of properties, arguments, etc.
+        case identifierType
     }
 }

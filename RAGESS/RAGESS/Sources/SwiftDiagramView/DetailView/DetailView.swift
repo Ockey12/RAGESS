@@ -42,6 +42,10 @@ struct DetailView: View {
             } // VStack
             .padding(.top, ComponentSizeValues.itemHeight)
         } // ZStack
+        .frame(
+            width: store.bodyWidth + ComponentSizeValues.arrowTerminalWidth * 2,
+            height: store.height
+        )
     }
 }
 
@@ -81,6 +85,7 @@ struct DetailView: View {
                 reducer: { DetailReducer() }
             )
         )
+        .border(.pink)
         .padding()
     }
     .frame(width: 900, height: 800)

@@ -66,7 +66,14 @@ public struct StructViewReducer {
         public init(object: StructObject, allDeclarationObjects: [any DeclarationObject]) {
             self.object = object
 
+            let conformedProtocolObjects = extractConformedProtocolObjects(
+                by: object,
+                allDeclarationObjects: allDeclarationObjects
+            )
+            self.conformedProtocolObjects = conformedProtocolObjects
+
             var allAnnotatedDecl = [object.annotatedDecl]
+            allAnnotatedDecl.append(contentsOf: conformedProtocolObjects.map { $0.annotatedDecl })
             allAnnotatedDecl.append(contentsOf: object.initializers.map { $0.annotatedDecl })
             allAnnotatedDecl.append(contentsOf: object.variables.map { $0.annotatedDecl })
             allAnnotatedDecl.append(contentsOf: object.functions.map { $0.annotatedDecl })
@@ -78,12 +85,6 @@ public struct StructViewReducer {
             bodyWidth = max(calculateMaxTextWidth(allAnnotatedDecl), ComponentSizeValues.bodyMinWidth)
 
             header = HeaderReducer.State(object: object, bodyWidth: maxWidth)
-
-            let conformedProtocolObjects = extractConformedProtocolObjects(
-                by: object,
-                allDeclarationObjects: allDeclarationObjects
-            )
-            self.conformedProtocolObjects = conformedProtocolObjects
 
             details = [
                 DetailReducer.State(

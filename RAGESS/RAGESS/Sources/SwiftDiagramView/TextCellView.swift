@@ -6,29 +6,37 @@
 //  
 //
 
+import ComposableArchitecture
 import SwiftUI
 
 struct TextCellView: View {
-    let text: String
-    let bodyWidth: CGFloat
+    let store: StoreOf<TextCellReducer>
 
     var body: some View {
-        Text(text)
+        Text(store.text)
             .font(.system(size: ComponentSizeValues.fontSize))
             .foregroundStyle(.black)
             .padding(.leading, ComponentSizeValues.textLeadingPadding)
             .offset(x: ComponentSizeValues.arrowTerminalWidth)
             .frame(
-                width: bodyWidth + ComponentSizeValues.arrowTerminalWidth * 2,
+                width: store.bodyWidth + ComponentSizeValues.arrowTerminalWidth * 2,
                 height: ComponentSizeValues.itemHeight,
                 alignment: .leading
             )
             .onTapGesture {
-
+                store.send(.clicked)
             }
     }
 }
 
 #Preview {
-    TextCellView(text: "Title", bodyWidth: 800)
+    TextCellView(
+        store: .init(
+            initialState: TextCellReducer.State(
+                text: "TEXT",
+                bodyWidth: 800
+            ),
+            reducer: { TextCellReducer() }
+        )
+    )
 }

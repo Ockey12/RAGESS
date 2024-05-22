@@ -13,7 +13,10 @@ import TypeDeclaration
 @Reducer
 struct TextCellReducer {
     @ObservableState
-    struct State {
+    struct State: Identifiable {
+        var id: UUID {
+            object.id
+        }
         let object: any DeclarationObject
         let bodyWidth: CGFloat
     }

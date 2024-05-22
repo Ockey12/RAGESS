@@ -8,7 +8,7 @@
 
 import Foundation
 
-public protocol DeclarationObject: Identifiable {
+public protocol DeclarationObject: Identifiable, Equatable {
     var id: UUID { get }
     var name: String { get }
     var nameOffset: Int { get }

@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct DependencyObject {
+public struct DependencyObject: Equatable {
     public init(kind: Kind, callerObject: Object, definitionObject: Object) {
         self.kind = kind
         self.callerObject = callerObject
@@ -25,7 +25,7 @@ public struct DependencyObject {
     /// Changes to this object may affect the dependingObject.
     public var definitionObject: Object
 
-    public struct Object {
+    public struct Object: Equatable {
         public init(id: UUID, keyPath: ObjectKeyPath) {
             self.id = id
             self.keyPath = keyPath
@@ -36,7 +36,7 @@ public struct DependencyObject {
 
         public let keyPath: ObjectKeyPath
 
-        public enum ObjectKeyPath {
+        public enum ObjectKeyPath: Equatable {
             case `protocol`(PartialKeyPath<ProtocolObject>)
             case `struct`(PartialKeyPath<StructObject>)
             case `class`(PartialKeyPath<ClassObject>)

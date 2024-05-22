@@ -32,6 +32,13 @@
         "identifier" : "SourceKitClientTests",
         "name" : "SourceKitClientTests"
       }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:RAGESS",
+        "identifier" : "SwiftDiagramViewTests",
+        "name" : "SwiftDiagramViewTests"
+      }
     }
   ],
   "version" : 1

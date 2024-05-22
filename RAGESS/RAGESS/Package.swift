@@ -210,6 +210,14 @@ let package = Package(
             ]
         ),
         .testTarget(
+            name: "SwiftDiagramViewTests",
+            dependencies: [
+                "SwiftDiagramView",
+                "TypeDeclaration",
+                .product(name: "Dependencies", package: "swift-dependencies")
+            ]
+        ),
+        .testTarget(
             name: "TypeAnnotationClientTests",
             dependencies: [
                 "TypeAnnotationClient",

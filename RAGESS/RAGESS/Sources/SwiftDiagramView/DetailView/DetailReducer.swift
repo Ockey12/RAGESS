@@ -1,9 +1,9 @@
 //
 //  DetailReducer.swift
 //
-//  
+//
 //  Created by Ockey12 on 2024/05/22
-//  
+//
 //
 
 import ComposableArchitecture
@@ -30,7 +30,7 @@ struct DetailReducer {
     }
 
     var body: some ReducerOf<Self> {
-        Reduce { state, action in
+        Reduce { _, action in
             switch action {
             case .items:
                 return .none

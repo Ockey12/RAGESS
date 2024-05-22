@@ -1,9 +1,9 @@
 //
 //  TextCellReducer.swift
 //
-//  
+//
 //  Created by Ockey12 on 2024/05/22
-//  
+//
 //
 
 import ComposableArchitecture
@@ -17,6 +17,7 @@ struct TextCellReducer {
         var id: UUID {
             object.id
         }
+
         let object: any DeclarationObject
         let bodyWidth: CGFloat
     }
@@ -26,7 +27,7 @@ struct TextCellReducer {
     }
 
     var body: some ReducerOf<Self> {
-        Reduce { state, action in
+        Reduce { _, action in
             switch action {
             case .clicked:
                 return .none

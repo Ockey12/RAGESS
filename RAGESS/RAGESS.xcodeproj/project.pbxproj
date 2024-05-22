@@ -10,6 +10,7 @@
 		AC20242D2BC151070007E156 /* RAGESSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC20242C2BC151070007E156 /* RAGESSApp.swift */; };
 		AC2024312BC151090007E156 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AC2024302BC151090007E156 /* Assets.xcassets */; };
 		AC2024342BC151090007E156 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AC2024332BC151090007E156 /* Preview Assets.xcassets */; };
+		ACB9B8452BFE24F0008C636F /* SwiftDiagramView in Frameworks */ = {isa = PBXBuildFile; productRef = ACB9B8442BFE24F0008C636F /* SwiftDiagramView */; };
 		ACCC9C342BD5114800C5F469 /* DebugView in Frameworks */ = {isa = PBXBuildFile; productRef = ACCC9C332BD5114800C5F469 /* DebugView */; };
 		ACD617EC2BFBA4AA00206D0B /* RAGESSView in Frameworks */ = {isa = PBXBuildFile; productRef = ACD617EB2BFBA4AA00206D0B /* RAGESSView */; };
 /* End PBXBuildFile section */
@@ -48,6 +49,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				ACD617EC2BFBA4AA00206D0B /* RAGESSView in Frameworks */,
+				ACB9B8452BFE24F0008C636F /* SwiftDiagramView in Frameworks */,
 				ACCC9C342BD5114800C5F469 /* DebugView in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -134,6 +136,7 @@
 			packageProductDependencies = (
 				ACCC9C332BD5114800C5F469 /* DebugView */,
 				ACD617EB2BFBA4AA00206D0B /* RAGESSView */,
+				ACB9B8442BFE24F0008C636F /* SwiftDiagramView */,
 			);
 			productName = RAGESS;
 			productReference = AC2024292BC151070007E156 /* RAGESS.app */;
@@ -573,6 +576,10 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		ACB9B8442BFE24F0008C636F /* SwiftDiagramView */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SwiftDiagramView;
+		};
 		ACCC9C332BD5114800C5F469 /* DebugView */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = DebugView;

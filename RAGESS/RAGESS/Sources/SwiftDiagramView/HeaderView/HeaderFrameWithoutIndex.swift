@@ -53,7 +53,11 @@ struct HeaderFrameWithoutIndex: Shape {
 }
 
 #Preview {
-    HeaderFrameWithoutIndex(bodyWidth: 500)
-        .stroke(lineWidth: ComponentSizeValues.borderWidth)
-        .padding()
+    VStack {
+        HeaderFrameWithoutIndex(bodyWidth: ComponentSizeValues.bodyMinWidth)
+            .stroke(lineWidth: ComponentSizeValues.borderWidth)
+
+    }
+    .frame(width: ComponentSizeValues.bodyMinWidth + 100)
+    .padding()
 }

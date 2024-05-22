@@ -14,6 +14,7 @@ import TypeDeclaration
 public struct StructViewReducer {
     public init() {}
 
+    @ObservableState
     public struct State {
         let object: StructObject
         let header: HeaderReducer.State
@@ -28,15 +29,30 @@ public struct StructViewReducer {
             allAnnotatedDecl.append(contentsOf: object.variables.map { $0.annotatedDecl })
             allAnnotatedDecl.append(contentsOf: object.functions.map { $0.annotatedDecl })
 
-            let maxWidth = calculateMaxTextWidth(allAnnotatedDecl)
-            bodyWidth = max(maxWidth, ComponentSizeValues.bodyMinWidth)
+            let maxWidth = max(
+                calculateMaxTextWidth(allAnnotatedDecl),
+                ComponentSizeValues.bodyMinWidth
+            )
+            bodyWidth = max(calculateMaxTextWidth(allAnnotatedDecl), ComponentSizeValues.bodyMinWidth)
 
             header = HeaderReducer.State(object: object, bodyWidth: maxWidth)
 
             details = [
-                DetailReducer.State(objects: object.initializers, bodyWidth: maxWidth),
-                DetailReducer.State(objects: object.variables, bodyWidth: maxWidth),
-                DetailReducer.State(objects: object.functions, bodyWidth: maxWidth)
+                DetailReducer.State(
+                    objects: object.initializers,
+                    kind: .initializers,
+                    bodyWidth: maxWidth
+                ),
+                DetailReducer.State(
+                    objects: object.variables,
+                    kind: .variables,
+                    bodyWidth: maxWidth
+                ),
+                DetailReducer.State(
+                    objects: object.functions,
+                    kind: .functions,
+                    bodyWidth: maxWidth
+                )
             ]
         }
     }

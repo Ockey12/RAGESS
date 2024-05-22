@@ -17,6 +17,13 @@ let package = Package(
         .library(
             name: "SwiftDiagramView",
             targets: ["SwiftDiagramView"]
+        ),
+        .library(
+            name: "SwiftDiagramView",
+            targets: [
+                "SwiftDiagramView",
+                "TypeDeclaration"
+            ]
         )
     ],
     dependencies: [

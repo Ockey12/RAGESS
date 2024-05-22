@@ -28,7 +28,7 @@ public struct DetailReducer {
 
             let header = itemHeight
 
-            let items = itemHeight*CGFloat(items.count)
+            let items = itemHeight * CGFloat(items.count)
 
             return header + items + bottomPadding + connectionHeight
         }

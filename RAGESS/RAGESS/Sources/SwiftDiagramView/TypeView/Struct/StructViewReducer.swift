@@ -25,27 +25,27 @@ public struct StructViewReducer {
             let bottomPadding = ComponentSizeValues.bottomPaddingForLastText
             let connectionHeight = ComponentSizeValues.connectionHeight
 
-            let header = itemHeight*2 + bottomPadding
+            let header = itemHeight * 2 + bottomPadding
 
             let initializers: CGFloat
             if object.initializers.isEmpty {
                 initializers = 0
             } else {
-                initializers = connectionHeight + itemHeight*CGFloat(object.initializers.count) + bottomPadding
+                initializers = connectionHeight + itemHeight * CGFloat(object.initializers.count) + bottomPadding
             }
 
             let variables: CGFloat
             if object.variables.isEmpty {
                 variables = 0
             } else {
-                variables = connectionHeight + itemHeight*CGFloat(object.variables.count) + bottomPadding
+                variables = connectionHeight + itemHeight * CGFloat(object.variables.count) + bottomPadding
             }
 
             let functions: CGFloat
             if object.functions.isEmpty {
                 functions = 0
             } else {
-                functions = connectionHeight + itemHeight*CGFloat(object.functions.count) + bottomPadding
+                functions = connectionHeight + itemHeight * CGFloat(object.functions.count) + bottomPadding
             }
 
             return header + initializers + variables + functions + connectionHeight

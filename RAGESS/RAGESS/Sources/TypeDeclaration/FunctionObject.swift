@@ -43,7 +43,7 @@ public struct FunctionObject: TypeNestable {
         self.name = name
         self.nameOffset = nameOffset
         self.fullPath = fullPath
-        
+
         if annotatedDecl == "" {
             self.annotatedDecl = name
         } else {

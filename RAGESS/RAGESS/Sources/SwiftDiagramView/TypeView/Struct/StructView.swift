@@ -18,16 +18,18 @@ public struct StructView: View {
     }
 
     public var body: some View {
-        VStack(spacing: -45) {
+        VStack(spacing: -ComponentSizeValues.connectionHeight) {
             HeaderView(store: store.scope(state: \.header, action: \.header))
 
-            ForEach(store.scope(state: \.details, action: \.details)) { detailStore in
-                if !detailStore.items.isEmpty {
-                    DetailView(store: detailStore)
+            VStack(spacing: -ComponentSizeValues.connectionHeight) {
+                ForEach(store.scope(state: \.details, action: \.details)) { detailStore in
+                    if !detailStore.items.isEmpty {
+                        DetailView(store: detailStore)
+                    }
                 }
             }
         } // VStack
-        .frame(width: store.bodyWidth)
+        .frame(width: store.bodyWidth, height: store.height)
     }
 }
 
@@ -37,33 +39,101 @@ public struct StructView: View {
         nameOffset: 0,
         fullPath: "",
         annotatedDecl: "public struct DebugStruct",
-//        annotatedDecl: "A",
         positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
         offsetRange: 0 ... 1
     )
 
-    let variableObjects = [
-        VariableObject(
-            name: "firstVariable",
+    let initializers = [
+        InitializerObject(
+            name: "",
             nameOffset: 0,
             fullPath: "",
-            annotatedDecl: "public var firstVariable: Int",
-//            annotatedDecl: "A",
+            annotatedDecl: "public init()",
             positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
             offsetRange: 0 ... 1
         ),
-        VariableObject(
-            name: "secondVariable",
+        InitializerObject(
+            name: "",
             nameOffset: 0,
             fullPath: "",
-            annotatedDecl: "var firstVariable: String { get set }",
-//            annotatedDecl: "A",
+            annotatedDecl: "public init()",
+            positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
+            offsetRange: 0 ... 1
+        ),
+        InitializerObject(
+            name: "",
+            nameOffset: 0,
+            fullPath: "",
+            annotatedDecl: "public init()",
             positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
             offsetRange: 0 ... 1
         )
     ]
+    structObject.initializers = initializers
 
+    let variableObjects = [
+        VariableObject(
+            name: "",
+            nameOffset: 0,
+            fullPath: "",
+            annotatedDecl: "public var firstVariable: Int",
+            positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
+            offsetRange: 0 ... 1
+        ),
+        VariableObject(
+            name: "",
+            nameOffset: 0,
+            fullPath: "",
+            annotatedDecl: "var variable: String { get set }",
+            positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
+            offsetRange: 0 ... 1
+        ),
+        VariableObject(
+            name: "",
+            nameOffset: 0,
+            fullPath: "",
+            annotatedDecl: "var variable: String { get set }",
+            positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
+            offsetRange: 0 ... 1
+        )
+    ]
     structObject.variables = variableObjects
+
+    let functionObjects = [
+        FunctionObject(
+            name: "",
+            nameOffset: 0,
+            fullPath: "",
+            annotatedDecl: "override func visit(_ node: ProtocolDeclSyntax) -> SyntaxVisitorContinueKind",
+            positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
+            offsetRange: 0 ... 1
+        ),
+        FunctionObject(
+            name: "",
+            nameOffset: 0,
+            fullPath: "",
+            annotatedDecl: "private func findProperty<T: TypeNestable>(in object: T, matching: (any DeclarationObject) -> Bool) -> PartialKeyPath<T>?",
+            positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
+            offsetRange: 0 ... 1
+        ),
+        FunctionObject(
+            name: "",
+            nameOffset: 0,
+            fullPath: "",
+            annotatedDecl: "funcion",
+            positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
+            offsetRange: 0 ... 1
+        ),
+        FunctionObject(
+            name: "",
+            nameOffset: 0,
+            fullPath: "",
+            annotatedDecl: "funcion",
+            positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
+            offsetRange: 0 ... 1
+        )
+    ]
+    structObject.functions = functionObjects
 
     return VStack {
         StructView(
@@ -74,5 +144,5 @@ public struct StructView: View {
         )
         .border(.pink)
     }
-    .frame(width: 1500, height: 1000)
+    .frame(width: 3500, height: 2000)
 }

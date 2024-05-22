@@ -79,10 +79,10 @@ public struct StructViewReducer {
 
             header = HeaderReducer.State(object: object, bodyWidth: maxWidth)
 
-            let protocolConformDependencies = object.objectsThatAreCalledByThisObject.filter { $0.kind == .protocolConformance }
-            let conformedProtocolObjects = protocolConformDependencies.compactMap { dependency in
-                allDeclarationObjects.first(where: { $0.id == dependency.definitionObject.id }) as? ProtocolObject
-            }
+            let conformedProtocolObjects = extractConformedProtocolObjects(
+                by: object,
+                allDeclarationObjects: allDeclarationObjects
+            )
             self.conformedProtocolObjects = conformedProtocolObjects
 
             details = [

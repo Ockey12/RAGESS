@@ -1,9 +1,9 @@
 //
 //  ExtractConformedProtocolObjectsTests.swift
 //
-//  
+//
 //  Created by Ockey12 on 2024/05/23
-//  
+//
 //
 
 import Dependencies
@@ -41,7 +41,7 @@ final class ExtractConformedProtocolObjectsTests: XCTestCase {
                 callerObject: .init(
                     id: structObject.id,
                     keyPath: .struct(\.self)
-                    ),
+                ),
                 definitionObject: .init(
                     id: protocolObject.id,
                     keyPath: .protocol(\.self)

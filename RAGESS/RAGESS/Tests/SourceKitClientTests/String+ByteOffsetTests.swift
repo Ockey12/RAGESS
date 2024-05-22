@@ -5,12 +5,12 @@
 //  Created by ockey12 on 2024/04/23.
 //
 
-//import LanguageServerProtocol
-//import XCTest
+// import LanguageServerProtocol
+// import XCTest
 //
-//@testable import SourceKitClient
+// @testable import SourceKitClient
 //
-//final class ByteOffsetTests: XCTestCase {
+// final class ByteOffsetTests: XCTestCase {
 //    func test_endOfString() {
 //        let target = """
 //        private struct Affected {
@@ -82,4 +82,4 @@
 //            XCTFail("Unexpected error: \(error)")
 //        }
 //    }
-//}
+// }

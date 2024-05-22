@@ -12,6 +12,7 @@ import TypeDeclaration
 
 struct DetailView: View {
     let store: StoreOf<DetailReducer>
+    let kind: Kind
 
     var body: some View {
         ZStack(alignment: .topLeading) {
@@ -28,7 +29,7 @@ struct DetailView: View {
             .stroke(lineWidth: ComponentSizeValues.borderWidth)
             .fill(.black)
 
-            Text("Associated Type")
+            Text(kind.text)
                 .font(.system(size: ComponentSizeValues.fontSize))
                 .frame(
                     width: store.bodyWidth + ComponentSizeValues.arrowTerminalWidth * 2,
@@ -42,6 +43,29 @@ struct DetailView: View {
             } // VStack
             .padding(.top, ComponentSizeValues.itemHeight)
         } // ZStack
+    }
+
+    enum Kind {
+        case initializers
+        case variables
+        case functions
+        case `case`
+        case nestType
+
+        var text: String {
+            switch self {
+            case .initializers:
+                "Initializer"
+            case .variables:
+                "Variables"
+            case .functions:
+                "Functions"
+            case .case:
+                "Case"
+            case .nestType:
+                "Nest"
+            }
+        }
     }
 }
 
@@ -78,7 +102,8 @@ struct DetailView: View {
                     bodyWidth: 800
                 ),
                 reducer: { DetailReducer() }
-            )
+            ),
+            kind: .functions
         )
         .padding()
     }

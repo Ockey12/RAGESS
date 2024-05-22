@@ -20,7 +20,7 @@ struct HeaderViewWithoutIndex: View {
     let textLeadingPadding = ComponentSizeValues.textLeadingPadding
 
     var body: some View {
-        ZStack {
+        ZStack(alignment: .topLeading) {
             HeaderFrameWithoutIndex(bodyWidth: store.bodyWidth)
                 .foregroundStyle(.white)
 
@@ -31,8 +31,13 @@ struct HeaderViewWithoutIndex: View {
             Text(store.object.annotatedDecl)
                 .font(.system(size: fontSize))
                 .foregroundStyle(.black)
-                .frame(width: store.bodyWidth, height: 10, alignment: .leading)
-                .position(x: (store.bodyWidth + textLeadingPadding) / 2 + arrowTerminalWidth, y: itemHeight / 2)
+                .padding(.leading, ComponentSizeValues.textLeadingPadding)
+                .offset(x: ComponentSizeValues.arrowTerminalWidth)
+                .frame(
+                    width: store.bodyWidth + ComponentSizeValues.arrowTerminalWidth * 2,
+                    height: ComponentSizeValues.itemHeight,
+                    alignment: .leading
+                )
                 .onTapGesture {
                     store.send(.nameClicked)
                 }

@@ -17,13 +17,12 @@ struct HeaderView: View {
     let itemHeight = ComponentSizeValues.itemHeight
 
     var body: some View {
-        ZStack(alignment: .topLeading) {
+        VStack(alignment: .leading, spacing: 0) {
             IndexView(object: store.object)
-                .offset(x: arrowTerminalWidth, y: 0)
+                .padding(.leading, arrowTerminalWidth)
 
             HeaderViewWithoutIndex(store: store)
-                .offset(x: 0, y: itemHeight)
-        } // ZStack
+        }
         .frame(
             width: store.bodyWidth + ComponentSizeValues.arrowTerminalWidth * 2,
             height: 300

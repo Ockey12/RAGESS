@@ -31,7 +31,7 @@ public struct ProtocolObject: Inheritable, Initializable, HasHeader {
         nameOffset: Int,
         fullPath: String,
         annotatedDecl: String = "",
-        sourceCode: String,
+        sourceCode: String = "",
         positionRange: ClosedRange<SourcePosition>,
         offsetRange: ClosedRange<Int>
     ) {

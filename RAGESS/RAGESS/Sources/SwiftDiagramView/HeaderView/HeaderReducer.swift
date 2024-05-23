@@ -33,7 +33,6 @@ public struct HeaderReducer {
         Reduce { state, action in
             switch action {
             case .nameClicked:
-                print("\(state.object.name) clicked!")
                 return .none
             }
         }

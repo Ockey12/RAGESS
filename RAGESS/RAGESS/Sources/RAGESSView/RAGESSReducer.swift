@@ -74,6 +74,10 @@ public struct RAGESSReducer {
     }
 
     public var body: some ReducerOf<Self> {
+        Scope(state: \.swiftDiagram, action: \.swiftDiagram) {
+            SwiftDiagramReducer()
+                ._printChanges()
+        }
         Reduce { state, action in
             switch action {
             case let .projectDirectorySelectorResponse(.success(urls)):

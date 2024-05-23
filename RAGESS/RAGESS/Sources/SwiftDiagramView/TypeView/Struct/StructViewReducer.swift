@@ -21,7 +21,7 @@ public struct StructViewReducer {
         }
 
         let object: StructObject
-        let header: HeaderReducer.State
+        var header: HeaderReducer.State
         var details: IdentifiedArrayOf<DetailReducer.State>
         let bodyWidth: CGFloat
         private let conformedProtocolObjects: [ProtocolObject]
@@ -117,6 +117,9 @@ public struct StructViewReducer {
     }
 
     public var body: some ReducerOf<Self> {
+        Scope(state: \.header, action: \.header) {
+            HeaderReducer()
+        }
         Reduce { _, action in
             switch action {
             case .header:

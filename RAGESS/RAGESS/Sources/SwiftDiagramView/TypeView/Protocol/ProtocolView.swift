@@ -1,9 +1,9 @@
 //
 //  ProtocolView.swift
 //
-//  
+//
 //  Created by Ockey12 on 2024/05/23
-//  
+//
 //
 
 import ComposableArchitecture
@@ -134,7 +134,6 @@ public struct ProtocolView: View {
         )
     ]
     protocolObject.functions = functionObjects
-
 
     let parentProtocolObject = ProtocolObject(
         name: "ParentProtocol",

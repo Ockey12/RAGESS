@@ -8,14 +8,15 @@
 
 import TypeDeclaration
 
-func extractParentProtocolObject(
+func extractParentProtocolObjects(
     by childProtocolObject: ProtocolObject,
     allDeclarationObjects: [any DeclarationObject]
-) -> ProtocolObject? {
-    let protocolInheritanceDependency = childProtocolObject.objectsThatAreCalledByThisObject.first(where: { $0.kind == .protocolInheritance })
-
-    guard let protocolInheritanceDependency else {
-        return nil
+) -> [ProtocolObject] {
+    let protocolInheritanceDependencies = childProtocolObject.objectsThatAreCalledByThisObject.filter {
+        $0.kind == .protocolInheritance
     }
-    return allDeclarationObjects.first(where: { $0.id == protocolInheritanceDependency.definitionObject.id }) as? ProtocolObject
+
+    return protocolInheritanceDependencies.compactMap { dependency in
+        allDeclarationObjects.first(where: { $0.id == dependency.definitionObject.id }) as? ProtocolObject
+    }
 }

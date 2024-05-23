@@ -40,6 +40,7 @@ public struct RAGESSReducer {
         ]
         var loadingTaskKindBuffer: [LoadingTaskKind] = []
         var swiftDiagram: SwiftDiagramReducer.State = .init(allDeclarationObjects: [])
+        var swiftDiagramScale: CGFloat = 0.5
 
         public init(projectRootDirectoryPath: String) {
             self.projectRootDirectoryPath = projectRootDirectoryPath
@@ -59,6 +60,8 @@ public struct RAGESSReducer {
         case startMonitoring
         case detectedDirectoryChange
         case swiftDiagram(SwiftDiagramReducer.Action)
+        case minusMagnifyingglassTapped
+        case plusMagnifyingglassTapped
         case binding(BindingAction<State>)
     }
 
@@ -304,6 +307,14 @@ public struct RAGESSReducer {
                     )
 
             case .swiftDiagram:
+                return .none
+
+            case .minusMagnifyingglassTapped:
+                state.swiftDiagramScale = max(state.swiftDiagramScale - 0.05, 0.05)
+                return .none
+
+            case .plusMagnifyingglassTapped:
+                state.swiftDiagramScale = min(state.swiftDiagramScale + 0.05, 1)
                 return .none
 
             case .binding:

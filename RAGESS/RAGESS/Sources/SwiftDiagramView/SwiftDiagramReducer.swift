@@ -7,6 +7,7 @@
 //
 
 import ComposableArchitecture
+import Foundation
 import TypeDeclaration
 
 @Reducer
@@ -19,6 +20,8 @@ public struct SwiftDiagramReducer {
         var structs: IdentifiedArrayOf<StructViewReducer.State>
         var classes: IdentifiedArrayOf<ClassViewReducer.State>
         var enums: IdentifiedArrayOf<EnumViewReducer.State>
+        public var frameWidth: CGFloat = 0
+        public var frameHeight: CGFloat = 0
 
         public init(allDeclarationObjects: [any DeclarationObject]) {
             var protocolObjects: [ProtocolObject] = []
@@ -60,11 +63,29 @@ public struct SwiftDiagramReducer {
         case structs(IdentifiedActionOf<StructViewReducer>)
         case classes(IdentifiedActionOf<ClassViewReducer>)
         case enums(IdentifiedActionOf<EnumViewReducer>)
+        case geometry(width: CGFloat, height: CGFloat)
     }
 
     public var body: some ReducerOf<Self> {
-        Reduce { _, _ in
-            .none
+        Reduce { state, action in
+            switch action {
+            case .protocols:
+                return .none
+
+            case .structs:
+                return .none
+
+            case .classes:
+                return .none
+
+            case .enums:
+                return .none
+
+            case let .geometry(width: width, height: height):
+                state.frameWidth = width
+                state.frameHeight = height
+                return .none
+            }
         }
         .forEach(\.protocols, action: \.protocols) {
             ProtocolViewReducer()

@@ -54,12 +54,39 @@ public struct RAGESSView: View {
                                 .padding()
 
                             Spacer()
+
+                            Button(
+                                action: {
+                                    store.send(.minusMagnifyingglassTapped)
+                                },
+                                label: {
+                                    Image(systemName: "minus.magnifyingglass")
+                                }
+                            )
+                            .padding(.horizontal)
+
+                            Button(
+                                action: {
+                                    store.send(.plusMagnifyingglassTapped)
+                                },
+                                label: {
+                                    Image(systemName: "plus.magnifyingglass")
+                                }
+                            )
+                            .padding(.trailing)
                         } // HStack
                         .frame(height: 40)
 
                         Divider()
 
-                        SwiftDiagramView(store: store.scope(state: \.swiftDiagram, action: \.swiftDiagram))
+                        ScrollView([.horizontal, .vertical]) {
+                            SwiftDiagramView(store: store.scope(state: \.swiftDiagram, action: \.swiftDiagram))
+                                .scaleEffect(store.swiftDiagramScale)
+                                .frame(
+                                    width: store.swiftDiagram.frameWidth * store.swiftDiagramScale,
+                                    height: store.swiftDiagram.frameHeight * store.swiftDiagramScale
+                                )
+                        }
 
                         Spacer()
                     } // VStack

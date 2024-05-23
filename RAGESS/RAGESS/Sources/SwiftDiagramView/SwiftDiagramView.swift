@@ -18,34 +18,39 @@ public struct SwiftDiagramView: View {
     }
 
     public var body: some View {
-        ScrollView([.horizontal, .vertical]) {
-            VStack(alignment: .leading, spacing: 100) {
-                HStack(alignment: .top, spacing: 100) {
-                    ForEach(store.scope(state: \.protocols, action: \.protocols)) { protocolStore in
-                        ProtocolView(store: protocolStore)
-                    }
-                }.padding()
-
-                HStack(alignment: .top, spacing: 100) {
-                    ForEach(store.scope(state: \.structs, action: \.structs)) { structStore in
-                        StructView(store: structStore)
-                    }
+        VStack(alignment: .leading, spacing: 100) {
+            HStack(alignment: .top, spacing: 100) {
+                ForEach(store.scope(state: \.protocols, action: \.protocols)) { protocolStore in
+                    ProtocolView(store: protocolStore)
                 }
-                .padding()
+            }.padding()
 
-                HStack(alignment: .top, spacing: 100) {
-                    ForEach(store.scope(state: \.classes, action: \.classes)) { classStore in
-                        ClassView(store: classStore)
-                    }
+            HStack(alignment: .top, spacing: 100) {
+                ForEach(store.scope(state: \.structs, action: \.structs)) { structStore in
+                    StructView(store: structStore)
                 }
-                .padding()
+            }
+            .padding()
 
-                HStack(alignment: .top, spacing: 100) {
-                    ForEach(store.scope(state: \.enums, action: \.enums)) { enumStore in
-                        EnumView(store: enumStore)
-                    }
+            HStack(alignment: .top, spacing: 100) {
+                ForEach(store.scope(state: \.classes, action: \.classes)) { classStore in
+                    ClassView(store: classStore)
                 }
-                .padding()
+            }
+            .padding()
+
+            HStack(alignment: .top, spacing: 100) {
+                ForEach(store.scope(state: \.enums, action: \.enums)) { enumStore in
+                    EnumView(store: enumStore)
+                }
+            }
+            .padding()
+        } // VStack
+        .background() {
+            GeometryReader { geometry in
+                Path { path in
+                    store.send(.geometry(width: geometry.size.width, height: geometry.size.height))
+                }
             }
         }
     }

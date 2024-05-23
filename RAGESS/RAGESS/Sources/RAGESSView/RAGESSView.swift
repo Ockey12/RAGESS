@@ -65,7 +65,7 @@ public struct RAGESSView: View {
                             )
                             .padding(.leading)
 
-                            Text("\(Int(store.swiftDiagramScale*100))%")
+                            Text("\(Int(store.swiftDiagramScale * 100))%")
                                 .frame(width: 50)
 
                             Button(

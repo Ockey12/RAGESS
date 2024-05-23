@@ -46,9 +46,9 @@ public struct SwiftDiagramView: View {
             }
             .padding()
         } // VStack
-        .background() {
+        .background {
             GeometryReader { geometry in
-                Path { path in
+                Path { _ in
                     store.send(.geometry(width: geometry.size.width, height: geometry.size.height))
                 }
             }

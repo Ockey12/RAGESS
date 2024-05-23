@@ -17,8 +17,16 @@ final class ExtractParentProtocolObjectsTests: XCTestCase {
         withDependencies {
             $0.uuid = .incrementing
         } operation: {
-            var parentProtocolObject = ProtocolObject(
-                name: "ParentProtocol",
+            var firstParentProtocolObject = ProtocolObject(
+                name: "FirstParentProtocol",
+                nameOffset: 0,
+                fullPath: "",
+                positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
+                offsetRange: 0 ... 1
+            )
+
+            var secondParentProtocolObject = ProtocolObject(
+                name: "SecondParentProtocol",
                 nameOffset: 0,
                 fullPath: "",
                 positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
@@ -33,34 +41,48 @@ final class ExtractParentProtocolObjectsTests: XCTestCase {
                 offsetRange: 0 ... 1
             )
 
-            let inheritDependency = DependencyObject(
+            let firstInheritDependency = DependencyObject(
                 kind: .protocolInheritance,
                 callerObject: .init(
                     id: childProtocolObject.id,
                     keyPath: .protocol(\.self)
                 ),
                 definitionObject: .init(
-                    id: parentProtocolObject.id,
+                    id: firstParentProtocolObject.id,
                     keyPath: .protocol(\.self)
                 )
             )
 
-            parentProtocolObject.objectsThatCallThisObject.append(inheritDependency)
-            childProtocolObject.objectsThatAreCalledByThisObject.append(inheritDependency)
+            firstParentProtocolObject.objectsThatCallThisObject.append(firstInheritDependency)
+            childProtocolObject.objectsThatAreCalledByThisObject.append(firstInheritDependency)
+
+            let secondInheritDependency = DependencyObject(
+                kind: .protocolInheritance,
+                callerObject: .init(
+                    id: childProtocolObject.id,
+                    keyPath: .protocol(\.self)
+                ),
+                definitionObject: .init(
+                    id: secondParentProtocolObject.id,
+                    keyPath: .protocol(\.self)
+                )
+            )
+
+            secondParentProtocolObject.objectsThatCallThisObject.append(secondInheritDependency)
+            childProtocolObject.objectsThatAreCalledByThisObject.append(secondInheritDependency)
 
             let allDeclarationObjects: [any DeclarationObject] = [
-                parentProtocolObject,
+                firstParentProtocolObject,
+                secondParentProtocolObject,
                 childProtocolObject
             ]
 
-            guard let extractedParentProtocolObject = extractParentProtocolObject(
+            let extractedParentProtocolObjects = extractParentProtocolObjects(
                 by: childProtocolObject,
                 allDeclarationObjects: allDeclarationObjects
-            ) else {
-                return XCTFail()
-            }
+            )
 
-            XCTAssertEqual(parentProtocolObject, extractedParentProtocolObject)
+            XCTAssertEqual([firstParentProtocolObject, secondParentProtocolObject], extractedParentProtocolObjects)
         }
     }
 
@@ -68,7 +90,7 @@ final class ExtractParentProtocolObjectsTests: XCTestCase {
         withDependencies {
             $0.uuid = .incrementing
         } operation: {
-            var childProtocolObject = ProtocolObject(
+            var protocolObject = ProtocolObject(
                 name: "ChildProtocol",
                 nameOffset: 0,
                 fullPath: "",
@@ -76,14 +98,25 @@ final class ExtractParentProtocolObjectsTests: XCTestCase {
                 offsetRange: 0 ... 1
             )
 
-            let allDeclarationObjects: [any DeclarationObject] = [childProtocolObject]
+            var otherProtocolObject = ProtocolObject(
+                name: "FirstParentProtocol",
+                nameOffset: 0,
+                fullPath: "",
+                positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
+                offsetRange: 0 ... 1
+            )
 
-            if let _ = extractParentProtocolObject(
-                by: childProtocolObject,
+            let allDeclarationObjects: [any DeclarationObject] = [
+                protocolObject,
+                otherProtocolObject
+            ]
+
+            let extractedParentProtocolObjects = extractParentProtocolObjects(
+                by: protocolObject,
                 allDeclarationObjects: allDeclarationObjects
-            ) {
-                XCTFail()
-            }
+            )
+
+            XCTAssertEqual([], extractedParentProtocolObjects)
         }
     }
 }

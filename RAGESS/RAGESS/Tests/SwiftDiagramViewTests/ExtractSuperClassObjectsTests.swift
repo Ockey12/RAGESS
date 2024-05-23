@@ -57,7 +57,7 @@ final class ExtractSuperClassObjectsTests: XCTestCase {
                     subClassObject
                 ]
 
-                guard let extractedSuperClassObject = extractSuperClassObjects(
+                guard let extractedSuperClassObject = extractSuperClassObject(
                     by: subClassObject,
                     allDeclarationObjects: allDeclarationObjects
                 ) else {

@@ -74,7 +74,7 @@ public struct ClassViewReducer {
         public init(object: ClassObject, allDeclarationObjects: [any DeclarationObject]) {
             self.object = object
 
-            let superClassObject = extractSuperClassObjects(
+            let superClassObject = extractSuperClassObject(
                 by: object,
                 allDeclarationObjects: allDeclarationObjects
             )

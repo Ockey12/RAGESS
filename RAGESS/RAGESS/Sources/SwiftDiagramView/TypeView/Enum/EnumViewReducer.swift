@@ -23,9 +23,9 @@ public struct EnumViewReducer {
         let object: EnumObject
         var header: HeaderReducer.State
         var details: IdentifiedArrayOf<DetailReducer.State>
-        let bodyWidth: CGFloat
+        let frameWidth: CGFloat
         private let conformedProtocolObjects: [ProtocolObject]
-        var height: CGFloat {
+        var frameHeight: CGFloat {
             let itemHeight = ComponentSizeValues.itemHeight
             let bottomPadding = ComponentSizeValues.bottomPaddingForLastText
             let connectionHeight = ComponentSizeValues.connectionHeight
@@ -60,7 +60,13 @@ public struct EnumViewReducer {
                 functions = connectionHeight + itemHeight * CGFloat(object.functions.count) + bottomPadding
             }
 
-            return header + conformances + cases + variables + functions + connectionHeight
+            return header
+            + conformances
+            + cases
+            + variables
+            + functions
+            + connectionHeight
+            + ComponentSizeValues.borderWidth
         }
 
         public init(object: EnumObject, allDeclarationObjects: [any DeclarationObject]) {
@@ -82,7 +88,9 @@ public struct EnumViewReducer {
                 calculateMaxTextWidth(allAnnotatedDecl),
                 ComponentSizeValues.bodyMinWidth
             )
-            bodyWidth = max(calculateMaxTextWidth(allAnnotatedDecl), ComponentSizeValues.bodyMinWidth)
+            frameWidth = max(calculateMaxTextWidth(allAnnotatedDecl), ComponentSizeValues.bodyMinWidth)
+            + ComponentSizeValues.arrowTerminalWidth*2
+            + ComponentSizeValues.borderWidth
 
             header = HeaderReducer.State(object: object, bodyWidth: maxWidth)
 

@@ -23,10 +23,10 @@ public struct ClassViewReducer {
         let object: ClassObject
         var header: HeaderReducer.State
         var details: IdentifiedArrayOf<DetailReducer.State>
-        let bodyWidth: CGFloat
+        let frameWidth: CGFloat
         private let conformedProtocolObjects: [ProtocolObject]
         private let superClassObject: ClassObject?
-        var height: CGFloat {
+        var frameHeight: CGFloat {
             let itemHeight = ComponentSizeValues.itemHeight
             let bottomPadding = ComponentSizeValues.bottomPaddingForLastText
             let connectionHeight = ComponentSizeValues.connectionHeight
@@ -68,7 +68,14 @@ public struct ClassViewReducer {
                 functions = connectionHeight + itemHeight * CGFloat(object.functions.count) + bottomPadding
             }
 
-            return header + inheritance + conformances + initializers + variables + functions + connectionHeight
+            return header
+            + inheritance
+            + conformances
+            + initializers
+            + variables
+            + functions
+            + connectionHeight
+            + ComponentSizeValues.borderWidth
         }
 
         public init(object: ClassObject, allDeclarationObjects: [any DeclarationObject]) {
@@ -99,7 +106,9 @@ public struct ClassViewReducer {
                 calculateMaxTextWidth(allAnnotatedDecl),
                 ComponentSizeValues.bodyMinWidth
             )
-            bodyWidth = max(calculateMaxTextWidth(allAnnotatedDecl), ComponentSizeValues.bodyMinWidth)
+            frameWidth = max(calculateMaxTextWidth(allAnnotatedDecl), ComponentSizeValues.bodyMinWidth)
+            + ComponentSizeValues.arrowTerminalWidth*2
+            + ComponentSizeValues.borderWidth
 
             header = HeaderReducer.State(object: object, bodyWidth: maxWidth)
 

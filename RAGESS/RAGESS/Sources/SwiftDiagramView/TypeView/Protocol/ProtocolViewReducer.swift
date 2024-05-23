@@ -23,9 +23,9 @@ public struct ProtocolViewReducer {
         let object: ProtocolObject
         var header: HeaderReducer.State
         var details: IdentifiedArrayOf<DetailReducer.State>
-        let bodyWidth: CGFloat
+        let frameWidth: CGFloat
         private let parentProtocolObjects: [ProtocolObject]
-        var height: CGFloat {
+        var frameHeight: CGFloat {
             let itemHeight = ComponentSizeValues.itemHeight
             let bottomPadding = ComponentSizeValues.bottomPaddingForLastText
             let connectionHeight = ComponentSizeValues.connectionHeight
@@ -60,7 +60,13 @@ public struct ProtocolViewReducer {
                 functions = connectionHeight + itemHeight * CGFloat(object.functions.count) + bottomPadding
             }
 
-            return header + parentProtocols + initializers + variables + functions + connectionHeight
+            return header
+            + parentProtocols
+            + initializers
+            + variables
+            + functions
+            + connectionHeight
+            + ComponentSizeValues.borderWidth
         }
 
         public init(object: ProtocolObject, allDeclarationObjects: [any DeclarationObject]) {
@@ -82,7 +88,9 @@ public struct ProtocolViewReducer {
                 calculateMaxTextWidth(allAnnotatedDecl),
                 ComponentSizeValues.bodyMinWidth
             )
-            bodyWidth = max(calculateMaxTextWidth(allAnnotatedDecl), ComponentSizeValues.bodyMinWidth)
+            frameWidth = max(calculateMaxTextWidth(allAnnotatedDecl), ComponentSizeValues.bodyMinWidth)
+            + ComponentSizeValues.arrowTerminalWidth*2
+            + ComponentSizeValues.borderWidth
 
             header = HeaderReducer.State(object: object, bodyWidth: maxWidth)
 

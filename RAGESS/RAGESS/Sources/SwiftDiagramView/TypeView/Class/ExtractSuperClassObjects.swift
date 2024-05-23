@@ -8,7 +8,7 @@
 
 import TypeDeclaration
 
-func extractSuperClassObjects(
+func extractSuperClassObject(
     by subClassObject: ClassObject,
     allDeclarationObjects: [any DeclarationObject]
 ) -> ClassObject? {

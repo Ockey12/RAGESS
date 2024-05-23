@@ -61,12 +61,12 @@ public struct StructViewReducer {
             }
 
             return header
-            + conformances
-            + initializers
-            + variables
-            + functions
-            + connectionHeight
-            + ComponentSizeValues.borderWidth
+                + conformances
+                + initializers
+                + variables
+                + functions
+                + connectionHeight
+                + ComponentSizeValues.borderWidth
         }
 
         public init(object: StructObject, allDeclarationObjects: [any DeclarationObject]) {
@@ -89,8 +89,8 @@ public struct StructViewReducer {
                 ComponentSizeValues.bodyMinWidth
             )
             frameWidth = max(calculateMaxTextWidth(allAnnotatedDecl), ComponentSizeValues.bodyMinWidth)
-            + ComponentSizeValues.arrowTerminalWidth*2
-            + ComponentSizeValues.borderWidth
+                + ComponentSizeValues.arrowTerminalWidth * 2
+                + ComponentSizeValues.borderWidth
 
             header = HeaderReducer.State(object: object, bodyWidth: maxWidth)
 

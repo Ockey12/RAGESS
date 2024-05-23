@@ -61,12 +61,12 @@ public struct EnumViewReducer {
             }
 
             return header
-            + conformances
-            + cases
-            + variables
-            + functions
-            + connectionHeight
-            + ComponentSizeValues.borderWidth
+                + conformances
+                + cases
+                + variables
+                + functions
+                + connectionHeight
+                + ComponentSizeValues.borderWidth
         }
 
         public init(object: EnumObject, allDeclarationObjects: [any DeclarationObject]) {
@@ -89,8 +89,8 @@ public struct EnumViewReducer {
                 ComponentSizeValues.bodyMinWidth
             )
             frameWidth = max(calculateMaxTextWidth(allAnnotatedDecl), ComponentSizeValues.bodyMinWidth)
-            + ComponentSizeValues.arrowTerminalWidth*2
-            + ComponentSizeValues.borderWidth
+                + ComponentSizeValues.arrowTerminalWidth * 2
+                + ComponentSizeValues.borderWidth
 
             header = HeaderReducer.State(object: object, bodyWidth: maxWidth)
 

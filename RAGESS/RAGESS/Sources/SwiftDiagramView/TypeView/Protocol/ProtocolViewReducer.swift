@@ -61,12 +61,12 @@ public struct ProtocolViewReducer {
             }
 
             return header
-            + parentProtocols
-            + initializers
-            + variables
-            + functions
-            + connectionHeight
-            + ComponentSizeValues.borderWidth
+                + parentProtocols
+                + initializers
+                + variables
+                + functions
+                + connectionHeight
+                + ComponentSizeValues.borderWidth
         }
 
         public init(object: ProtocolObject, allDeclarationObjects: [any DeclarationObject]) {
@@ -89,8 +89,8 @@ public struct ProtocolViewReducer {
                 ComponentSizeValues.bodyMinWidth
             )
             frameWidth = max(calculateMaxTextWidth(allAnnotatedDecl), ComponentSizeValues.bodyMinWidth)
-            + ComponentSizeValues.arrowTerminalWidth*2
-            + ComponentSizeValues.borderWidth
+                + ComponentSizeValues.arrowTerminalWidth * 2
+                + ComponentSizeValues.borderWidth
 
             header = HeaderReducer.State(object: object, bodyWidth: maxWidth)
 

@@ -30,7 +30,7 @@ public struct HeaderReducer {
     }
 
     public var body: some ReducerOf<Self> {
-        Reduce { state, action in
+        Reduce { _, action in
             switch action {
             case .nameClicked:
                 return .none

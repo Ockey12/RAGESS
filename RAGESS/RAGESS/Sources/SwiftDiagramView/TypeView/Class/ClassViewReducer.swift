@@ -69,13 +69,13 @@ public struct ClassViewReducer {
             }
 
             return header
-            + inheritance
-            + conformances
-            + initializers
-            + variables
-            + functions
-            + connectionHeight
-            + ComponentSizeValues.borderWidth
+                + inheritance
+                + conformances
+                + initializers
+                + variables
+                + functions
+                + connectionHeight
+                + ComponentSizeValues.borderWidth
         }
 
         public init(object: ClassObject, allDeclarationObjects: [any DeclarationObject]) {
@@ -107,8 +107,8 @@ public struct ClassViewReducer {
                 ComponentSizeValues.bodyMinWidth
             )
             frameWidth = max(calculateMaxTextWidth(allAnnotatedDecl), ComponentSizeValues.bodyMinWidth)
-            + ComponentSizeValues.arrowTerminalWidth*2
-            + ComponentSizeValues.borderWidth
+                + ComponentSizeValues.arrowTerminalWidth * 2
+                + ComponentSizeValues.borderWidth
 
             header = HeaderReducer.State(object: object, bodyWidth: maxWidth)
 

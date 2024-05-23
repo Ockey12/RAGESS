@@ -21,6 +21,12 @@ public struct SwiftDiagramView: View {
         ScrollView([.horizontal, .vertical]) {
             VStack(alignment: .leading, spacing: 100) {
                 HStack(alignment: .top, spacing: 100) {
+                    ForEach(store.scope(state: \.protocols, action: \.protocols)) { protocolStore in
+                        ProtocolView(store: protocolStore)
+                    }
+                }.padding()
+
+                HStack(alignment: .top, spacing: 100) {
                     ForEach(store.scope(state: \.structs, action: \.structs)) { structStore in
                         StructView(store: structStore)
                     }

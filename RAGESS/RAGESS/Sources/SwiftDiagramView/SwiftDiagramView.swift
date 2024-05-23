@@ -19,12 +19,21 @@ public struct SwiftDiagramView: View {
 
     public var body: some View {
         ScrollView([.horizontal, .vertical]) {
-            HStack(alignment: .top, spacing: 100) {
-                ForEach(store.scope(state: \.structs, action: \.structs)) { structStore in
-                    StructView(store: structStore)
+            VStack(alignment: .leading, spacing: 100) {
+                HStack(alignment: .top, spacing: 100) {
+                    ForEach(store.scope(state: \.structs, action: \.structs)) { structStore in
+                        StructView(store: structStore)
+                    }
                 }
+                .padding()
+
+                HStack(alignment: .top, spacing: 100) {
+                    ForEach(store.scope(state: \.classes, action: \.classes)) { classStore in
+                        ClassView(store: classStore)
+                    }
+                }
+                .padding()
             }
-            .padding()
         }
     }
 }

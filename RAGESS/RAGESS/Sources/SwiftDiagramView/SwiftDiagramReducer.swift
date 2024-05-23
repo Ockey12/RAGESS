@@ -47,7 +47,7 @@ public struct SwiftDiagramReducer {
 
     public var body: some ReducerOf<Self> {
         Reduce { _, _ in
-                .none
+            .none
         }
         .forEach(\.structs, action: \.structs) {
             StructViewReducer()

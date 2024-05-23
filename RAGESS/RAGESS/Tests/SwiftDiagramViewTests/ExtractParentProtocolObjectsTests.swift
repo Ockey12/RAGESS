@@ -62,6 +62,28 @@ final class ExtractParentProtocolObjectsTests: XCTestCase {
 
             XCTAssertEqual(parentProtocolObject, extractedParentProtocolObject)
         }
+    }
 
+    func test_Parent_ChildRelationshipDoesNotExist() async {
+        withDependencies {
+            $0.uuid = .incrementing
+        } operation: {
+            var childProtocolObject = ProtocolObject(
+                name: "ChildProtocol",
+                nameOffset: 0,
+                fullPath: "",
+                positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
+                offsetRange: 0 ... 1
+            )
+
+            let allDeclarationObjects: [any DeclarationObject] = [childProtocolObject]
+
+            if let _ = extractParentProtocolObject(
+                by: childProtocolObject,
+                allDeclarationObjects: allDeclarationObjects
+            ) {
+                XCTFail()
+            }
+        }
     }
 }

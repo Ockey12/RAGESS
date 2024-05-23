@@ -37,6 +37,7 @@ public struct EnumObject: TypeDeclaration {
         name: String,
         nameOffset: Int,
         fullPath: String,
+        annotatedDecl: String = "",
         sourceCode: String = "",
         positionRange: ClosedRange<SourcePosition>,
         offsetRange: ClosedRange<Int>
@@ -46,7 +47,13 @@ public struct EnumObject: TypeDeclaration {
         self.name = name
         self.nameOffset = nameOffset
         self.fullPath = fullPath
-        annotatedDecl = name
+
+        if annotatedDecl == "" {
+            self.annotatedDecl = name
+        } else {
+            self.annotatedDecl = annotatedDecl
+        }
+
         self.sourceCode = sourceCode
         self.positionRange = positionRange
         self.offsetRange = offsetRange
@@ -72,6 +79,7 @@ public struct EnumObject: TypeDeclaration {
         public init(
             nameOffset: Int,
             fullPath: String,
+            annotatedDecl: String = "",
             sourceCode: String,
             positionRange: ClosedRange<SourcePosition>,
             offsetRange: ClosedRange<Int>
@@ -80,7 +88,13 @@ public struct EnumObject: TypeDeclaration {
             id = uuid()
             self.nameOffset = nameOffset
             self.fullPath = fullPath
-            annotatedDecl = "case"
+
+            if annotatedDecl == "" {
+                self.annotatedDecl = name
+            } else {
+                self.annotatedDecl = annotatedDecl
+            }
+
             self.sourceCode = sourceCode
             self.positionRange = positionRange
             self.offsetRange = offsetRange

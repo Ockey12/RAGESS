@@ -21,15 +21,13 @@ public struct ClassView: View {
         VStack(spacing: -ComponentSizeValues.connectionHeight) {
             HeaderView(store: store.scope(state: \.header, action: \.header))
 
-            VStack(spacing: -ComponentSizeValues.connectionHeight) {
-                ForEach(store.scope(state: \.details, action: \.details)) { detailStore in
-                    if !detailStore.items.isEmpty {
-                        DetailView(store: detailStore)
-                    }
+            ForEach(store.scope(state: \.details, action: \.details)) { detailStore in
+                if !detailStore.items.isEmpty {
+                    DetailView(store: detailStore)
                 }
             }
         } // VStack
-        .frame(width: store.bodyWidth, height: store.height)
+        .frame(width: store.frameWidth, height: store.frameHeight)
     }
 }
 

@@ -21,15 +21,13 @@ public struct StructView: View {
         VStack(spacing: -ComponentSizeValues.connectionHeight) {
             HeaderView(store: store.scope(state: \.header, action: \.header))
 
-            VStack(spacing: -ComponentSizeValues.connectionHeight) {
-                ForEach(store.scope(state: \.details, action: \.details)) { detailStore in
-                    if !detailStore.items.isEmpty {
-                        DetailView(store: detailStore)
-                    }
+            ForEach(store.scope(state: \.details, action: \.details)) { detailStore in
+                if !detailStore.items.isEmpty {
+                    DetailView(store: detailStore)
                 }
             }
         } // VStack
-        .frame(width: store.bodyWidth, height: store.height)
+        .frame(width: store.frameWidth, height: store.frameHeight)
     }
 }
 
@@ -177,6 +175,35 @@ public struct StructView: View {
             )
         )
         .border(.pink)
+    }
+    .frame(width: 3500, height: 2000)
+}
+
+#Preview {
+    let structObject = StructObject(
+        name: "DebugStruct",
+        nameOffset: 0,
+        fullPath: "",
+        annotatedDecl: "public struct DebugStruct",
+        positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
+        offsetRange: 0 ... 1
+    )
+
+    let allDeclarationObjects = [structObject]
+
+    return VStack {
+        StructView(
+            store: .init(
+                initialState: StructViewReducer.State(
+                    object: structObject,
+                    allDeclarationObjects: allDeclarationObjects
+                ),
+                reducer: {
+                    StructViewReducer()
+                }
+            )
+        )
+//        .border(.pink)
     }
     .frame(width: 3500, height: 2000)
 }

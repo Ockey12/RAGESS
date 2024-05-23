@@ -7,6 +7,7 @@
 //
 
 public enum DetailKind {
+    case superClass
     case protocolConformance
     case initializers
     case variables
@@ -16,6 +17,8 @@ public enum DetailKind {
 
     var text: String {
         switch self {
+        case .superClass:
+            "Super Class"
         case .protocolConformance:
             "Conform"
         case .initializers:

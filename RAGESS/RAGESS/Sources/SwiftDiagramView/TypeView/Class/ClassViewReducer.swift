@@ -25,12 +25,20 @@ public struct ClassViewReducer {
         var details: IdentifiedArrayOf<DetailReducer.State>
         let bodyWidth: CGFloat
         private let conformedProtocolObjects: [ProtocolObject]
+        private let superClassObject: ClassObject?
         var height: CGFloat {
             let itemHeight = ComponentSizeValues.itemHeight
             let bottomPadding = ComponentSizeValues.bottomPaddingForLastText
             let connectionHeight = ComponentSizeValues.connectionHeight
 
             let header = itemHeight * 2 + bottomPadding
+
+            let inheritance: CGFloat
+            if let superClassObject {
+                inheritance = connectionHeight + itemHeight + bottomPadding
+            } else {
+                inheritance = 0
+            }
 
             let conformances: CGFloat
             if conformedProtocolObjects.isEmpty {
@@ -60,11 +68,17 @@ public struct ClassViewReducer {
                 functions = connectionHeight + itemHeight * CGFloat(object.functions.count) + bottomPadding
             }
 
-            return header + conformances + initializers + variables + functions + connectionHeight
+            return header + inheritance + conformances + initializers + variables + functions + connectionHeight
         }
 
         public init(object: ClassObject, allDeclarationObjects: [any DeclarationObject]) {
             self.object = object
+
+            let superClassObject = extractSuperClassObjects(
+                by: object,
+                allDeclarationObjects: allDeclarationObjects
+            )
+            self.superClassObject = superClassObject
 
             let conformedProtocolObjects = extractConformedProtocolObjects(
                 by: object,
@@ -73,6 +87,9 @@ public struct ClassViewReducer {
             self.conformedProtocolObjects = conformedProtocolObjects
 
             var allAnnotatedDecl = [object.annotatedDecl]
+            if let superClassObject {
+                allAnnotatedDecl.append(superClassObject.annotatedDecl)
+            }
             allAnnotatedDecl.append(contentsOf: conformedProtocolObjects.map { $0.annotatedDecl })
             allAnnotatedDecl.append(contentsOf: object.initializers.map { $0.annotatedDecl })
             allAnnotatedDecl.append(contentsOf: object.variables.map { $0.annotatedDecl })
@@ -86,7 +103,19 @@ public struct ClassViewReducer {
 
             header = HeaderReducer.State(object: object, bodyWidth: maxWidth)
 
-            details = [
+            var details: [DetailReducer.State] = []
+
+            if let superClassObject {
+                details.append(
+                    DetailReducer.State(
+                        objects: [superClassObject],
+                        kind: .superClass,
+                        bodyWidth: maxWidth
+                    )
+                )
+            }
+
+            details.append(contentsOf: [
                 DetailReducer.State(
                     objects: conformedProtocolObjects,
                     kind: .protocolConformance,
@@ -107,7 +136,9 @@ public struct ClassViewReducer {
                     kind: .functions,
                     bodyWidth: maxWidth
                 )
-            ]
+            ])
+
+            self.details = .init(uniqueElements: details)
         }
     }
 

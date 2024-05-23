@@ -63,7 +63,10 @@ public struct RAGESSView: View {
                                     Image(systemName: "minus.magnifyingglass")
                                 }
                             )
-                            .padding(.horizontal)
+                            .padding(.leading)
+
+                            Text("\(Int(store.swiftDiagramScale*100))%")
+                                .frame(width: 50)
 
                             Button(
                                 action: {

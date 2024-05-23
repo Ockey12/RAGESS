@@ -1,6 +1,6 @@
 //
 //  EnumView.swift
-//  
+//
 //  
 //  Created by Ockey12 on 2024/05/23
 //  
@@ -43,8 +43,133 @@ public struct EnumView: View {
         offsetRange: 0 ... 1
     )
 
+    let caseObjects = [
+        EnumObject.CaseObject(
+            nameOffset: 0,
+            fullPath: "",
+            annotatedDecl: "case Sunday",
+            sourceCode: "",
+            positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
+            offsetRange: 0 ... 1
+        ),
+        EnumObject.CaseObject(
+            nameOffset: 0,
+            fullPath: "",
+            annotatedDecl: "case text(String)",
+            sourceCode: "",
+            positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
+            offsetRange: 0 ... 1
+        ),
+        EnumObject.CaseObject(
+            nameOffset: 0,
+            fullPath: "",
+            annotatedDecl: "case count(Int)",
+            sourceCode: "",
+            positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
+            offsetRange: 0 ... 1
+        ),
+        EnumObject.CaseObject(
+            nameOffset: 0,
+            fullPath: "",
+            annotatedDecl: "case duration(Double)",
+            sourceCode: "",
+            positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
+            offsetRange: 0 ... 1
+        )
+    ]
+    enumObject.cases = caseObjects
+
+    let variableObjects = [
+        VariableObject(
+            name: "",
+            nameOffset: 0,
+            fullPath: "",
+            annotatedDecl: "public var firstVariable: Int",
+            positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
+            offsetRange: 0 ... 1
+        ),
+        VariableObject(
+            name: "",
+            nameOffset: 0,
+            fullPath: "",
+            annotatedDecl: "var variable: String { get set }",
+            positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
+            offsetRange: 0 ... 1
+        ),
+        VariableObject(
+            name: "",
+            nameOffset: 0,
+            fullPath: "",
+            annotatedDecl: "var variable: String { get set }",
+            positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
+            offsetRange: 0 ... 1
+        )
+    ]
+    enumObject.variables = variableObjects
+
+    let functionObjects = [
+        FunctionObject(
+            name: "",
+            nameOffset: 0,
+            fullPath: "",
+            annotatedDecl: "override func visit(_ node: ProtocolDeclSyntax) -> SyntaxVisitorContinueKind",
+            positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
+            offsetRange: 0 ... 1
+        ),
+        FunctionObject(
+            name: "",
+            nameOffset: 0,
+            fullPath: "",
+            annotatedDecl: "private func findProperty<T: TypeNestable>(in object: T, matching: (any DeclarationObject) -> Bool) -> PartialKeyPath<T>?",
+            positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
+            offsetRange: 0 ... 1
+        ),
+        FunctionObject(
+            name: "",
+            nameOffset: 0,
+            fullPath: "",
+            annotatedDecl: "funcion",
+            positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
+            offsetRange: 0 ... 1
+        ),
+        FunctionObject(
+            name: "",
+            nameOffset: 0,
+            fullPath: "",
+            annotatedDecl: "funcion",
+            positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
+            offsetRange: 0 ... 1
+        )
+    ]
+    enumObject.functions = functionObjects
+
+    let protocolObject = ProtocolObject(
+        name: "ConformedProtocol",
+        nameOffset: 0,
+        fullPath: "",
+        annotatedDecl: "public protocol ConformedProtocol",
+        sourceCode: "",
+        positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
+        offsetRange: 0 ... 1
+    )
+
+    let conformDependency = DependencyObject(
+        kind: .protocolConformance,
+        callerObject: .init(
+            id: enumObject.id,
+            keyPath: .struct(\.self)
+        ),
+        definitionObject: .init(
+            id: protocolObject.id,
+            keyPath: .protocol(\.self)
+        )
+    )
+
+    enumObject.objectsThatAreCalledByThisObject.append(conformDependency)
+
     let allDeclarationObjects: [any DeclarationObject] = [
-        enumObject
+        enumObject,
+        protocolObject
     ]
 
     return VStack {

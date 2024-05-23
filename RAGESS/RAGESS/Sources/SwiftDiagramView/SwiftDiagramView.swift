@@ -33,6 +33,13 @@ public struct SwiftDiagramView: View {
                     }
                 }
                 .padding()
+
+                HStack(alignment: .top, spacing: 100) {
+                    ForEach(store.scope(state: \.enums, action: \.enums)) { enumStore in
+                        EnumView(store: enumStore)
+                    }
+                }
+                .padding()
             }
         }
     }

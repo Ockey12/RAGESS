@@ -9,9 +9,9 @@
 import SwiftUI
 
 struct HeaderFrameWithoutIndex: Shape {
-    var bodyWidth: CGFloat
+    var frameWidth: CGFloat
     var widthFromLeftEdgeToConnection: CGFloat {
-        (bodyWidth - connectionWidth) / 2 + arrowTerminalWidth
+        (frameWidth - connectionWidth) / 2 + arrowTerminalWidth
     }
 
     let connectionWidth = ComponentSizeValues.connectionWidth
@@ -38,15 +38,15 @@ struct HeaderFrameWithoutIndex: Shape {
             path.addLine(to: CGPoint(x: widthFromLeftEdgeToConnection, y: oneVerticalLineWithoutArrow * 2 + arrowTerminalHeight + bottomPaddingForLastText))
             path.addLine(to: CGPoint(x: widthFromLeftEdgeToConnection + connectionWidth, y: oneVerticalLineWithoutArrow * 2 + arrowTerminalHeight + bottomPaddingForLastText))
             path.addLine(to: CGPoint(x: widthFromLeftEdgeToConnection + connectionWidth, y: oneVerticalLineWithoutArrow * 2 + arrowTerminalHeight + bottomPaddingForLastText + connectionHeight))
-            path.addLine(to: CGPoint(x: bodyWidth + arrowTerminalWidth, y: oneVerticalLineWithoutArrow * 2 + arrowTerminalHeight + bottomPaddingForLastText + connectionHeight))
+            path.addLine(to: CGPoint(x: frameWidth + arrowTerminalWidth, y: oneVerticalLineWithoutArrow * 2 + arrowTerminalHeight + bottomPaddingForLastText + connectionHeight))
 
             // right side
             // from bottom to top
-            path.addLine(to: CGPoint(x: bodyWidth + arrowTerminalWidth, y: oneVerticalLineWithoutArrow + arrowTerminalHeight))
-            path.addLine(to: CGPoint(x: bodyWidth + arrowTerminalWidth * 2, y: oneVerticalLineWithoutArrow + arrowTerminalHeight))
-            path.addLine(to: CGPoint(x: bodyWidth + arrowTerminalWidth * 2, y: oneVerticalLineWithoutArrow))
-            path.addLine(to: CGPoint(x: bodyWidth + arrowTerminalWidth, y: oneVerticalLineWithoutArrow))
-            path.addLine(to: CGPoint(x: bodyWidth + arrowTerminalWidth, y: 0))
+            path.addLine(to: CGPoint(x: frameWidth + arrowTerminalWidth, y: oneVerticalLineWithoutArrow + arrowTerminalHeight))
+            path.addLine(to: CGPoint(x: frameWidth + arrowTerminalWidth * 2, y: oneVerticalLineWithoutArrow + arrowTerminalHeight))
+            path.addLine(to: CGPoint(x: frameWidth + arrowTerminalWidth * 2, y: oneVerticalLineWithoutArrow))
+            path.addLine(to: CGPoint(x: frameWidth + arrowTerminalWidth, y: oneVerticalLineWithoutArrow))
+            path.addLine(to: CGPoint(x: frameWidth + arrowTerminalWidth, y: 0))
             path.closeSubpath()
         } // Path
     } // func path(in rect: CGRect) -> Path
@@ -54,7 +54,7 @@ struct HeaderFrameWithoutIndex: Shape {
 
 #Preview {
     VStack {
-        HeaderFrameWithoutIndex(bodyWidth: ComponentSizeValues.bodyMinWidth)
+        HeaderFrameWithoutIndex(frameWidth: ComponentSizeValues.bodyMinWidth)
             .stroke(lineWidth: ComponentSizeValues.borderWidth)
     }
     .frame(width: ComponentSizeValues.bodyMinWidth + 100)

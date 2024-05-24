@@ -21,17 +21,17 @@ struct HeaderViewWithoutIndex: View {
 
     var body: some View {
         ZStack(alignment: .topLeading) {
-            HeaderFrameWithoutIndex(bodyWidth: store.bodyWidth)
+            HeaderFrameWithoutIndex(frameWidth: store.frameWidth)
                 .foregroundStyle(.white)
 
-            HeaderFrameWithoutIndex(bodyWidth: store.bodyWidth)
+            HeaderFrameWithoutIndex(frameWidth: store.frameWidth)
                 .stroke(lineWidth: borderWidth)
                 .fill(.black)
 
             TextCellView(store: store.scope(state: \.text, action: \.text))
         } // ZStack
         .frame(
-            width: store.bodyWidth + ComponentSizeValues.arrowTerminalWidth * 2,
+            width: store.frameWidth + ComponentSizeValues.arrowTerminalWidth * 2,
             height: 210
         )
     }
@@ -52,7 +52,7 @@ struct HeaderViewWithoutIndex: View {
             store: .init(
                 initialState: HeaderReducer.State(
                     object: protocolObject,
-                    bodyWidth: max(
+                    frameWidth: max(
                         protocolObject.name.systemSize50Width,
                         ComponentSizeValues.bodyMinWidth
                     )

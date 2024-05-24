@@ -20,7 +20,7 @@ public struct DetailReducer {
         public let id: UUID
         var items: IdentifiedArrayOf<TextCellReducer.State>
         let kind: DetailKind
-        let bodyWidth: CGFloat
+        let frameWidth: CGFloat
         var height: CGFloat {
             let itemHeight = ComponentSizeValues.itemHeight
             let bottomPadding = ComponentSizeValues.bottomPaddingForLastText
@@ -33,14 +33,14 @@ public struct DetailReducer {
             return header + items + bottomPadding + connectionHeight
         }
 
-        public init(objects: [any DeclarationObject], kind: DetailKind, bodyWidth: CGFloat) {
+        public init(objects: [any DeclarationObject], kind: DetailKind, frameWidth: CGFloat) {
             @Dependency(\.uuid) var uuid
             id = uuid()
             items = .init(uniqueElements: objects.map {
-                TextCellReducer.State(object: $0, bodyWidth: bodyWidth)
+                TextCellReducer.State(object: $0, frameWidth: frameWidth)
             })
             self.kind = kind
-            self.bodyWidth = bodyWidth
+            self.frameWidth = frameWidth
         }
     }
 

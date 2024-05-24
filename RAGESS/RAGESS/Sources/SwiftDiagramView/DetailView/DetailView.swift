@@ -16,13 +16,13 @@ struct DetailView: View {
     var body: some View {
         ZStack(alignment: .topLeading) {
             DetailFrameShape(
-                bodyWidth: store.bodyWidth,
+                frameWidth: store.frameWidth,
                 numberOfItems: store.items.count
             )
             .foregroundStyle(.white)
 
             DetailFrameShape(
-                bodyWidth: store.bodyWidth,
+                frameWidth: store.frameWidth,
                 numberOfItems: store.items.count
             )
             .stroke(lineWidth: ComponentSizeValues.borderWidth)
@@ -31,7 +31,7 @@ struct DetailView: View {
             Text(store.kind.text)
                 .font(.system(size: ComponentSizeValues.fontSize))
                 .frame(
-                    width: store.bodyWidth + ComponentSizeValues.arrowTerminalWidth * 2,
+                    width: store.frameWidth + ComponentSizeValues.arrowTerminalWidth * 2,
                     height: ComponentSizeValues.itemHeight
                 )
 
@@ -43,7 +43,7 @@ struct DetailView: View {
             .padding(.top, ComponentSizeValues.itemHeight)
         } // ZStack
         .frame(
-            width: store.bodyWidth + ComponentSizeValues.arrowTerminalWidth * 2,
+            width: store.frameWidth + ComponentSizeValues.arrowTerminalWidth * 2,
             height: store.height
         )
     }
@@ -80,7 +80,7 @@ struct DetailView: View {
                 initialState: DetailReducer.State(
                     objects: functionObjects,
                     kind: .functions,
-                    bodyWidth: 800
+                    frameWidth: 800
                 ),
                 reducer: { DetailReducer() }
             )

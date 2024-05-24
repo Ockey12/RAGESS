@@ -19,7 +19,7 @@ public struct TextCellReducer {
         }
 
         let object: any DeclarationObject
-        let bodyWidth: CGFloat
+        let frameWidth: CGFloat
     }
 
     public enum Action {

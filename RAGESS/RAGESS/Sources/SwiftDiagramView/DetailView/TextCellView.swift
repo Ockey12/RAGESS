@@ -20,7 +20,7 @@ struct TextCellView: View {
             .padding(.leading, ComponentSizeValues.textLeadingPadding)
             .offset(x: ComponentSizeValues.arrowTerminalWidth)
             .frame(
-                width: store.bodyWidth + ComponentSizeValues.arrowTerminalWidth * 2,
+                width: store.frameWidth + ComponentSizeValues.arrowTerminalWidth * 2,
                 height: ComponentSizeValues.itemHeight,
                 alignment: .leading
             )
@@ -44,7 +44,7 @@ struct TextCellView: View {
         store: .init(
             initialState: TextCellReducer.State(
                 object: protocolObject,
-                bodyWidth: 800
+                frameWidth: 800
             ),
             reducer: { TextCellReducer() }
         )

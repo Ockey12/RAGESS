@@ -9,11 +9,11 @@
 import SwiftUI
 
 struct DetailFrameShape: Shape {
-    let bodyWidth: CGFloat
+    let frameWidth: CGFloat
     var numberOfItems: Int
 
     var widthFromLeftEdgeToConnection: CGFloat {
-        (bodyWidth - headerWidth) / 2 + arrowTerminalWidth
+        (frameWidth - headerWidth) / 2 + arrowTerminalWidth
     }
 
     let headerWidth = ComponentSizeValues.connectionWidth
@@ -28,7 +28,7 @@ struct DetailFrameShape: Shape {
         Path { path in
             // header
             // from right to left
-            path.move(to: CGPoint(x: arrowTerminalWidth + bodyWidth, y: headerHeight))
+            path.move(to: CGPoint(x: arrowTerminalWidth + frameWidth, y: headerHeight))
             path.addLine(to: CGPoint(x: widthFromLeftEdgeToConnection + headerWidth, y: headerHeight))
             path.addLine(to: CGPoint(x: widthFromLeftEdgeToConnection + headerWidth, y: 0))
             path.addLine(to: CGPoint(x: widthFromLeftEdgeToConnection, y: 0))
@@ -53,19 +53,19 @@ struct DetailFrameShape: Shape {
             path.addLine(to: CGPoint(x: widthFromLeftEdgeToConnection, y: bottomPaddingForLastText + headerHeight + itemHeight * CGFloat(numberOfItems)))
             path.addLine(to: CGPoint(x: widthFromLeftEdgeToConnection + headerWidth, y: bottomPaddingForLastText + headerHeight + itemHeight * CGFloat(numberOfItems)))
             path.addLine(to: CGPoint(x: widthFromLeftEdgeToConnection + headerWidth, y: bottomPaddingForLastText + headerHeight * 2 + itemHeight * CGFloat(numberOfItems)))
-            path.addLine(to: CGPoint(x: bodyWidth + arrowTerminalWidth, y: bottomPaddingForLastText + headerHeight * 2 + itemHeight * CGFloat(numberOfItems)))
-            path.addLine(to: CGPoint(x: bodyWidth + arrowTerminalWidth, y: headerHeight + itemHeight * CGFloat(numberOfItems)))
+            path.addLine(to: CGPoint(x: frameWidth + arrowTerminalWidth, y: bottomPaddingForLastText + headerHeight * 2 + itemHeight * CGFloat(numberOfItems)))
+            path.addLine(to: CGPoint(x: frameWidth + arrowTerminalWidth, y: headerHeight + itemHeight * CGFloat(numberOfItems)))
 
             // items
             // right side
             // from bottom to top
             for numberOfItem in 0 ..< numberOfItems {
                 let numberOfItemFromBottom = numberOfItems - (numberOfItem + 1)
-                path.addLine(to: CGPoint(x: arrowTerminalWidth + bodyWidth, y: headerHeight + itemHeight * CGFloat(numberOfItemFromBottom) + oneVerticalLineWithoutArrow + arrowTerminalHeight))
-                path.addLine(to: CGPoint(x: arrowTerminalWidth * 2 + bodyWidth, y: headerHeight + itemHeight * CGFloat(numberOfItemFromBottom) + oneVerticalLineWithoutArrow + arrowTerminalHeight))
-                path.addLine(to: CGPoint(x: arrowTerminalWidth * 2 + bodyWidth, y: headerHeight + itemHeight * CGFloat(numberOfItemFromBottom) + oneVerticalLineWithoutArrow))
-                path.addLine(to: CGPoint(x: arrowTerminalWidth + bodyWidth, y: headerHeight + itemHeight * CGFloat(numberOfItemFromBottom) + oneVerticalLineWithoutArrow))
-                path.addLine(to: CGPoint(x: arrowTerminalWidth + bodyWidth, y: headerHeight + itemHeight * CGFloat(numberOfItemFromBottom)))
+                path.addLine(to: CGPoint(x: arrowTerminalWidth + frameWidth, y: headerHeight + itemHeight * CGFloat(numberOfItemFromBottom) + oneVerticalLineWithoutArrow + arrowTerminalHeight))
+                path.addLine(to: CGPoint(x: arrowTerminalWidth * 2 + frameWidth, y: headerHeight + itemHeight * CGFloat(numberOfItemFromBottom) + oneVerticalLineWithoutArrow + arrowTerminalHeight))
+                path.addLine(to: CGPoint(x: arrowTerminalWidth * 2 + frameWidth, y: headerHeight + itemHeight * CGFloat(numberOfItemFromBottom) + oneVerticalLineWithoutArrow))
+                path.addLine(to: CGPoint(x: arrowTerminalWidth + frameWidth, y: headerHeight + itemHeight * CGFloat(numberOfItemFromBottom) + oneVerticalLineWithoutArrow))
+                path.addLine(to: CGPoint(x: arrowTerminalWidth + frameWidth, y: headerHeight + itemHeight * CGFloat(numberOfItemFromBottom)))
             }
         } // Path
     } // func path(in rect: CGRect) -> Path
@@ -74,7 +74,7 @@ struct DetailFrameShape: Shape {
 #Preview {
     VStack {
         DetailFrameShape(
-            bodyWidth: ComponentSizeValues.bodyMinWidth,
+            frameWidth: ComponentSizeValues.bodyMinWidth,
             numberOfItems: 1
         )
         .stroke(lineWidth: ComponentSizeValues.borderWidth)
@@ -82,7 +82,7 @@ struct DetailFrameShape: Shape {
         .padding()
 
         DetailFrameShape(
-            bodyWidth: ComponentSizeValues.bodyMinWidth,
+            frameWidth: ComponentSizeValues.bodyMinWidth,
             numberOfItems: 5
         )
         .stroke(lineWidth: ComponentSizeValues.borderWidth)

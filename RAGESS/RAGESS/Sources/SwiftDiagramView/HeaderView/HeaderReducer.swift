@@ -18,12 +18,12 @@ public struct HeaderReducer {
     public struct State {
         var object: any HasHeader
         var text: TextCellReducer.State
-        var bodyWidth: CGFloat
+        var frameWidth: CGFloat
 
-        public init(object: any HasHeader, bodyWidth: CGFloat) {
+        public init(object: any HasHeader, frameWidth: CGFloat) {
             self.object = object
-            self.text = TextCellReducer.State(object: object, bodyWidth: bodyWidth)
-            self.bodyWidth = bodyWidth
+            self.text = TextCellReducer.State(object: object, frameWidth: frameWidth)
+            self.frameWidth = frameWidth
         }
     }
 

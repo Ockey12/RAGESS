@@ -92,28 +92,28 @@ public struct ProtocolViewReducer {
                 + ComponentSizeValues.arrowTerminalWidth * 2
                 + ComponentSizeValues.borderWidth
 
-            header = HeaderReducer.State(object: object, bodyWidth: maxWidth)
+            header = HeaderReducer.State(object: object, frameWidth: maxWidth)
 
             details = [
                 DetailReducer.State(
                     objects: parentProtocolObjects,
                     kind: .parentProtocol,
-                    bodyWidth: maxWidth
+                    frameWidth: maxWidth
                 ),
                 DetailReducer.State(
                     objects: object.initializers,
                     kind: .initializers,
-                    bodyWidth: maxWidth
+                    frameWidth: maxWidth
                 ),
                 DetailReducer.State(
                     objects: object.variables,
                     kind: .variables,
-                    bodyWidth: maxWidth
+                    frameWidth: maxWidth
                 ),
                 DetailReducer.State(
                     objects: object.functions,
                     kind: .functions,
-                    bodyWidth: maxWidth
+                    frameWidth: maxWidth
                 )
             ]
         }

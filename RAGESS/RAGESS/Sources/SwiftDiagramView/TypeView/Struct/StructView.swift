@@ -169,7 +169,8 @@ public struct StructView: View {
             store: .init(
                 initialState: StructViewReducer.State(
                     object: structObject,
-                    allDeclarationObjects: allDeclarationObjects
+                    allDeclarationObjects: allDeclarationObjects,
+                    topLeadingPoint: CGPoint(x: 0, y: 0)
                 ),
                 reducer: {
                     StructViewReducer()
@@ -198,7 +199,8 @@ public struct StructView: View {
             store: .init(
                 initialState: StructViewReducer.State(
                     object: structObject,
-                    allDeclarationObjects: allDeclarationObjects
+                    allDeclarationObjects: allDeclarationObjects,
+                    topLeadingPoint: CGPoint(x: 0, y: 0)
                 ),
                 reducer: {
                     StructViewReducer()

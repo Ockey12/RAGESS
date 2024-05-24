@@ -23,6 +23,7 @@ public struct ClassViewReducer {
         let object: ClassObject
         var header: HeaderReducer.State
         var details: IdentifiedArrayOf<DetailReducer.State>
+        var topLeadingPoint: CGPoint
         let frameWidth: CGFloat
         private let conformedProtocolObjects: [ProtocolObject]
         private let superClassObject: ClassObject?
@@ -78,8 +79,9 @@ public struct ClassViewReducer {
                 + ComponentSizeValues.borderWidth
         }
 
-        public init(object: ClassObject, allDeclarationObjects: [any DeclarationObject]) {
+        public init(object: ClassObject, allDeclarationObjects: [any DeclarationObject], topLeadingPoint: CGPoint) {
             self.object = object
+            self.topLeadingPoint = topLeadingPoint
 
             let superClassObject = extractSuperClassObject(
                 by: object,

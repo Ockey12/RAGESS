@@ -177,7 +177,8 @@ public struct EnumView: View {
             store: .init(
                 initialState: EnumViewReducer.State(
                     object: enumObject,
-                    allDeclarationObjects: allDeclarationObjects
+                    allDeclarationObjects: allDeclarationObjects,
+                    topLeadingPoint: CGPoint(x: 0, y: 0)
                 ),
                 reducer: {
                     EnumViewReducer()

@@ -169,7 +169,8 @@ public struct ProtocolView: View {
             store: .init(
                 initialState: ProtocolViewReducer.State(
                     object: protocolObject,
-                    allDeclarationObjects: allDeclarationObjects
+                    allDeclarationObjects: allDeclarationObjects,
+                    topLeadingPoint: CGPoint(x: 0, y: 0)
                 ),
                 reducer: {
                     ProtocolViewReducer()

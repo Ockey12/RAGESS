@@ -23,6 +23,7 @@ public struct StructViewReducer {
         let object: StructObject
         var header: HeaderReducer.State
         var details: IdentifiedArrayOf<DetailReducer.State>
+        var topLeadingPoint: CGPoint
         let frameWidth: CGFloat
         private let conformedProtocolObjects: [ProtocolObject]
         var frameHeight: CGFloat {
@@ -69,8 +70,9 @@ public struct StructViewReducer {
                 + ComponentSizeValues.borderWidth
         }
 
-        public init(object: StructObject, allDeclarationObjects: [any DeclarationObject]) {
+        public init(object: StructObject, allDeclarationObjects: [any DeclarationObject], topLeadingPoint: CGPoint) {
             self.object = object
+            self.topLeadingPoint = topLeadingPoint
 
             let conformedProtocolObjects = extractConformedProtocolObjects(
                 by: object,

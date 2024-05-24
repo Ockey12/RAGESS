@@ -23,6 +23,7 @@ public struct EnumViewReducer {
         let object: EnumObject
         var header: HeaderReducer.State
         var details: IdentifiedArrayOf<DetailReducer.State>
+        var topLeadingPoint: CGPoint
         let frameWidth: CGFloat
         private let conformedProtocolObjects: [ProtocolObject]
         var frameHeight: CGFloat {
@@ -69,8 +70,9 @@ public struct EnumViewReducer {
                 + ComponentSizeValues.borderWidth
         }
 
-        public init(object: EnumObject, allDeclarationObjects: [any DeclarationObject]) {
+        public init(object: EnumObject, allDeclarationObjects: [any DeclarationObject], topLeadingPoint: CGPoint) {
             self.object = object
+            self.topLeadingPoint = topLeadingPoint
 
             let conformedProtocolObjects = extractConformedProtocolObjects(
                 by: object,

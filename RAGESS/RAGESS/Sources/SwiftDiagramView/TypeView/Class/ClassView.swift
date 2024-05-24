@@ -195,7 +195,8 @@ public struct ClassView: View {
             store: .init(
                 initialState: ClassViewReducer.State(
                     object: subClass,
-                    allDeclarationObjects: allDeclarationObjects
+                    allDeclarationObjects: allDeclarationObjects,
+                    topLeadingPoint: CGPoint(x: 0, y: 0)
                 ),
                 reducer: {
                     ClassViewReducer()

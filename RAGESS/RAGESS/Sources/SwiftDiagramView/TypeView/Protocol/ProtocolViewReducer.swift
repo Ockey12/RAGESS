@@ -23,6 +23,7 @@ public struct ProtocolViewReducer {
         let object: ProtocolObject
         var header: HeaderReducer.State
         var details: IdentifiedArrayOf<DetailReducer.State>
+        var topLeadingPoint: CGPoint
         let frameWidth: CGFloat
         private let parentProtocolObjects: [ProtocolObject]
         var frameHeight: CGFloat {
@@ -69,8 +70,9 @@ public struct ProtocolViewReducer {
                 + ComponentSizeValues.borderWidth
         }
 
-        public init(object: ProtocolObject, allDeclarationObjects: [any DeclarationObject]) {
+        public init(object: ProtocolObject, allDeclarationObjects: [any DeclarationObject], topLeadingPoint: CGPoint) {
             self.object = object
+            self.topLeadingPoint = topLeadingPoint
 
             let parentProtocolObjects = extractParentProtocolObjects(
                 by: object,

@@ -24,6 +24,7 @@ struct TextCellView: View {
                 height: ComponentSizeValues.itemHeight,
                 alignment: .leading
             )
+            .border(.red)
             .onTapGesture {
                 store.send(.clicked)
             }

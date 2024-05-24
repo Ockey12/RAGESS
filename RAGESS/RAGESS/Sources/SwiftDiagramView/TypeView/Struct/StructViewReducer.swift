@@ -119,6 +119,7 @@ public struct StructViewReducer {
         }
     }
 
+    @CasePathable
     public enum Action {
         case header(HeaderReducer.Action)
         case details(IdentifiedActionOf<DetailReducer>)
@@ -128,12 +129,15 @@ public struct StructViewReducer {
         Scope(state: \.header, action: \.header) {
             HeaderReducer()
         }
-        Reduce { _, action in
+        Reduce { state, action in
             switch action {
+
             case .header:
+                print(".header")
                 return .none
 
             case .details:
+                print(".details")
                 return .none
             }
         }

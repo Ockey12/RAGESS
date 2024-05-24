@@ -122,6 +122,11 @@ public struct ProtocolViewReducer {
     public enum Action {
         case header(HeaderReducer.Action)
         case details(IdentifiedActionOf<DetailReducer>)
+        case delegate
+
+        public enum Delegate {
+            case leafObjectClicked(clickedLeafObject: any DeclarationObject, rootObject: StructObject)
+        }
     }
 
     public var body: some ReducerOf<Self> {
@@ -134,6 +139,9 @@ public struct ProtocolViewReducer {
                 return .none
 
             case .details:
+                return .none
+
+            case .delegate:
                 return .none
             }
         }

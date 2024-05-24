@@ -46,12 +46,26 @@ public struct DetailReducer {
 
     public enum Action {
         case texts(IdentifiedActionOf<TextCellReducer>)
+        case delegate(Delegate)
+
+        public enum Delegate {
+            case clickedCell(object: any DeclarationObject)
+        }
     }
 
     public var body: some ReducerOf<Self> {
-        Reduce { _, action in
+        Reduce { state, action in
             switch action {
+            case let .texts(.element(id: id, action: .clicked)):
+                guard let clickedObject = state.texts[id: id]?.object else {
+                    return .none
+                }
+                return .send(.delegate(.clickedCell(object: clickedObject)))
+
             case .texts:
+                return .none
+
+            case .delegate:
                 return .none
             }
         }

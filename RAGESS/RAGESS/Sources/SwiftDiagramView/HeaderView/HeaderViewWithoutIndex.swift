@@ -28,7 +28,20 @@ struct HeaderViewWithoutIndex: View {
                 .stroke(lineWidth: borderWidth)
                 .fill(.black)
 
-            TextCellView(store: store.scope(state: \.text, action: \.text))
+            Text(store.object.annotatedDecl)
+                .font(.system(size: ComponentSizeValues.fontSize))
+                .foregroundStyle(.black)
+                .padding(.leading, ComponentSizeValues.textLeadingPadding)
+                .offset(x: ComponentSizeValues.arrowTerminalWidth)
+                .frame(
+                    width: store.frameWidth + ComponentSizeValues.arrowTerminalWidth * 2,
+                    height: ComponentSizeValues.itemHeight,
+                    alignment: .leading
+                )
+                .border(.blue)
+                .onTapGesture {
+                    store.send(.nameClicked)
+                }
         } // ZStack
         .frame(
             width: store.frameWidth + ComponentSizeValues.arrowTerminalWidth * 2,

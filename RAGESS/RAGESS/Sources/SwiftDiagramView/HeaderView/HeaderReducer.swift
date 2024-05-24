@@ -17,23 +17,24 @@ public struct HeaderReducer {
     @ObservableState
     public struct State {
         var object: any HasHeader
-        var text: TextCellReducer.State
         var frameWidth: CGFloat
 
         public init(object: any HasHeader, frameWidth: CGFloat) {
             self.object = object
-            self.text = TextCellReducer.State(object: object, frameWidth: frameWidth)
             self.frameWidth = frameWidth
         }
     }
 
     public enum Action {
-        case text(TextCellReducer.Action)
+        case nameClicked
     }
 
     public var body: some ReducerOf<Self> {
-        Scope(state: \.text, action: \.text) {
-            TextCellReducer()
+        Reduce { _, action in
+            switch action {
+            case .nameClicked:
+                return .none
+            }
         }
     }
 }

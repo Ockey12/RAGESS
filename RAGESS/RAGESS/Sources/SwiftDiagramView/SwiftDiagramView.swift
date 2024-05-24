@@ -17,41 +17,74 @@ public struct SwiftDiagramView: View {
         self.store = store
     }
 
+    let spacing = ComponentSizeValues.typeRowsSpacing
+
     public var body: some View {
-        VStack(alignment: .leading, spacing: 100) {
-            HStack(alignment: .top, spacing: 100) {
-                ForEach(store.scope(state: \.protocols, action: \.protocols)) { protocolStore in
-                    ProtocolView(store: protocolStore)
+        ZStack {
+            VStack(alignment: .leading, spacing: spacing) {
+                HStack(alignment: .top, spacing: spacing) {
+                    ForEach(store.scope(state: \.protocols, action: \.protocols)) { protocolStore in
+                        ProtocolView(store: protocolStore)
+                            .border(.gray)
+                    }
                 }
-            }.padding()
 
-            HStack(alignment: .top, spacing: 100) {
-                ForEach(store.scope(state: \.structs, action: \.structs)) { structStore in
-                    StructView(store: structStore)
+                HStack(alignment: .top, spacing: spacing) {
+                    ForEach(store.scope(state: \.structs, action: \.structs)) { structStore in
+                        StructView(store: structStore)
+                            .border(.green)
+                    }
                 }
-            }
-            .padding()
 
-            HStack(alignment: .top, spacing: 100) {
-                ForEach(store.scope(state: \.classes, action: \.classes)) { classStore in
-                    ClassView(store: classStore)
+                HStack(alignment: .top, spacing: spacing) {
+                    ForEach(store.scope(state: \.classes, action: \.classes)) { classStore in
+                        ClassView(store: classStore)
+                            .border(.orange)
+                    }
                 }
-            }
-            .padding()
 
-            HStack(alignment: .top, spacing: 100) {
-                ForEach(store.scope(state: \.enums, action: \.enums)) { enumStore in
-                    EnumView(store: enumStore)
+                HStack(alignment: .top, spacing: spacing) {
+                    ForEach(store.scope(state: \.enums, action: \.enums)) { enumStore in
+                        EnumView(store: enumStore)
+                            .border(.blue)
+                    }
+                }
+            } // VStack
+            .background {
+                GeometryReader { geometry in
+                    Path { _ in
+                        store.send(.geometry(width: geometry.size.width, height: geometry.size.height))
+                    }
                 }
             }
-            .padding()
-        } // VStack
-        .background {
-            GeometryReader { geometry in
-                Path { _ in
-                    store.send(.geometry(width: geometry.size.width, height: geometry.size.height))
-                }
+
+            ForEach(store.protocols.elements) { state in
+                Circle()
+                    .foregroundStyle(.gray)
+                    .frame(width: 10, height: 10)
+                    .position(x: state.topLeadingPoint.x, y: state.topLeadingPoint.y)
             }
-        }
+
+            ForEach(store.structs.elements) { state in
+                Circle()
+                    .foregroundStyle(.green)
+                    .frame(width: 10, height: 10)
+                    .position(x: state.topLeadingPoint.x, y: state.topLeadingPoint.y)
+            }
+
+            ForEach(store.classes.elements) { state in
+                Circle()
+                    .foregroundStyle(.orange)
+                    .frame(width: 10, height: 10)
+                    .position(x: state.topLeadingPoint.x, y: state.topLeadingPoint.y)
+            }
+
+            ForEach(store.enums.elements) { state in
+                Circle()
+                    .foregroundStyle(.blue)
+                    .frame(width: 10, height: 10)
+                    .position(x: state.topLeadingPoint.x, y: state.topLeadingPoint.y)
+            }
+        } // ZStack
     }
 }

@@ -16,6 +16,7 @@ public struct SwiftDiagramReducer {
 
     @ObservableState
     public struct State {
+        var allDeclarationObjects: [any DeclarationObject] = []
         var protocols: IdentifiedArrayOf<ProtocolViewReducer.State>
         var structs: IdentifiedArrayOf<StructViewReducer.State>
         var classes: IdentifiedArrayOf<ClassViewReducer.State>
@@ -41,20 +42,62 @@ public struct SwiftDiagramReducer {
                 }
             }
 
-            protocols = .init(uniqueElements: protocolObjects.map {
-                ProtocolViewReducer.State(object: $0, allDeclarationObjects: allDeclarationObjects)
+            var topLeadingPoint = CGPoint(x: 0, y: 0)
+
+            let protocols = IdentifiedArray(uniqueElements: protocolObjects.map { object in
+                let state = ProtocolViewReducer.State(object: object, allDeclarationObjects: allDeclarationObjects, topLeadingPoint: topLeadingPoint)
+                let frameWidth = state.frameWidth
+                topLeadingPoint.x += frameWidth
+                topLeadingPoint.x += ComponentSizeValues.typeRowsSpacing
+                return state
             })
-            structs = .init(uniqueElements: structObjects.map {
-                StructViewReducer.State(object: $0, allDeclarationObjects: allDeclarationObjects)
+            self.protocols = protocols
+
+            topLeadingPoint.x = 0
+            if !protocols.isEmpty {
+                topLeadingPoint.y += protocols.map { $0.frameHeight }.max()!
+            }
+            topLeadingPoint.y += ComponentSizeValues.typeRowsSpacing
+
+            let structs = IdentifiedArray(uniqueElements: structObjects.map { object in
+                let state = StructViewReducer.State(object: object, allDeclarationObjects: allDeclarationObjects, topLeadingPoint: topLeadingPoint)
+                let frameWidth = state.frameWidth
+                topLeadingPoint.x += frameWidth
+                topLeadingPoint.x += ComponentSizeValues.typeRowsSpacing
+                return state
+            })
+            self.structs = structs
+
+            topLeadingPoint.x = 0
+            if !structs.isEmpty {
+                topLeadingPoint.y += structs.map { $0.frameHeight }.max()!
+            }
+            topLeadingPoint.y += ComponentSizeValues.typeRowsSpacing
+
+            let classes = IdentifiedArray(uniqueElements: classObjects.map { object in
+                let state = ClassViewReducer.State(object: object, allDeclarationObjects: allDeclarationObjects, topLeadingPoint: topLeadingPoint)
+                let frameWidth = state.frameWidth
+                topLeadingPoint.x += frameWidth
+                topLeadingPoint.x += ComponentSizeValues.typeRowsSpacing
+                return state
+            })
+            self.classes = classes
+
+            topLeadingPoint.x = 0
+            if !classes.isEmpty {
+                topLeadingPoint.y += classes.map { $0.frameHeight }.max()!
+            }
+            topLeadingPoint.y += ComponentSizeValues.typeRowsSpacing
+
+            enums = .init(uniqueElements: enumObjects.map { object in
+                let state = EnumViewReducer.State(object: object, allDeclarationObjects: allDeclarationObjects, topLeadingPoint: topLeadingPoint)
+                let frameWidth = state.frameWidth
+                topLeadingPoint.x += frameWidth
+                topLeadingPoint.x += ComponentSizeValues.typeRowsSpacing
+                return state
             })
 
-            classes = .init(uniqueElements: classObjects.map {
-                ClassViewReducer.State(object: $0, allDeclarationObjects: allDeclarationObjects)
-            })
-
-            enums = .init(uniqueElements: enumObjects.map {
-                EnumViewReducer.State(object: $0, allDeclarationObjects: allDeclarationObjects)
-            })
+            self.allDeclarationObjects = allDeclarationObjects
         }
     }
 

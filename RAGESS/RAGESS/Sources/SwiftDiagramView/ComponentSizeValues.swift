@@ -28,4 +28,6 @@ enum ComponentSizeValues {
     static let textLeadingPadding: CGFloat = 30
 
     static let headerIndexWidth: CGFloat = 300
+
+    static let typeRowsSpacing: CGFloat = 100
 }

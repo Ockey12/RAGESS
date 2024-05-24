@@ -115,7 +115,7 @@ public struct SwiftDiagramReducer {
             case .protocols:
                 return .none
 
-            case let .structs(.element(id: structID, action: .header(.nameClicked))):
+            case let .structs(.element(id: structID, action: .header(.text(.clicked)))):
                 let structObject = state.structs[id: structID]!.object
                 let dependencies = structObject.objectsThatCallThisObject.filter { $0.definitionObject.leafObjectID == structObject.id }
                 dump(dependencies)

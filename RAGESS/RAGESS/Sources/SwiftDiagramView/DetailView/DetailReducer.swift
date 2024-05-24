@@ -18,7 +18,7 @@ public struct DetailReducer {
     @ObservableState
     public struct State: Identifiable {
         public let id: UUID
-        var items: IdentifiedArrayOf<TextCellReducer.State>
+        var texts: IdentifiedArrayOf<TextCellReducer.State>
         let kind: DetailKind
         let frameWidth: CGFloat
         var height: CGFloat {
@@ -28,7 +28,7 @@ public struct DetailReducer {
 
             let header = itemHeight
 
-            let items = itemHeight * CGFloat(items.count)
+            let items = itemHeight * CGFloat(texts.count)
 
             return header + items + bottomPadding + connectionHeight
         }
@@ -36,7 +36,7 @@ public struct DetailReducer {
         public init(objects: [any DeclarationObject], kind: DetailKind, frameWidth: CGFloat) {
             @Dependency(\.uuid) var uuid
             id = uuid()
-            items = .init(uniqueElements: objects.map {
+            texts = .init(uniqueElements: objects.map {
                 TextCellReducer.State(object: $0, frameWidth: frameWidth)
             })
             self.kind = kind
@@ -45,17 +45,17 @@ public struct DetailReducer {
     }
 
     public enum Action {
-        case items(IdentifiedActionOf<TextCellReducer>)
+        case texts(IdentifiedActionOf<TextCellReducer>)
     }
 
     public var body: some ReducerOf<Self> {
         Reduce { _, action in
             switch action {
-            case .items:
+            case .texts:
                 return .none
             }
         }
-        .forEach(\.items, action: \.items) {
+        .forEach(\.texts, action: \.texts) {
             TextCellReducer()
         }
     }

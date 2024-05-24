@@ -22,7 +22,7 @@ public struct ProtocolView: View {
             HeaderView(store: store.scope(state: \.header, action: \.header))
 
             ForEach(store.scope(state: \.details, action: \.details)) { detailStore in
-                if !detailStore.items.isEmpty {
+                if !detailStore.texts.isEmpty {
                     DetailView(store: detailStore)
                 }
             }

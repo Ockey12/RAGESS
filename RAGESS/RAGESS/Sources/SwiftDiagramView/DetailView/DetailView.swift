@@ -17,13 +17,13 @@ struct DetailView: View {
         ZStack(alignment: .topLeading) {
             DetailFrameShape(
                 frameWidth: store.frameWidth,
-                numberOfItems: store.items.count
+                numberOfItems: store.texts.count
             )
             .foregroundStyle(.white)
 
             DetailFrameShape(
                 frameWidth: store.frameWidth,
-                numberOfItems: store.items.count
+                numberOfItems: store.texts.count
             )
             .stroke(lineWidth: ComponentSizeValues.borderWidth)
             .fill(.black)
@@ -36,7 +36,7 @@ struct DetailView: View {
                 )
 
             VStack(alignment: .leading, spacing: 0) {
-                ForEach(store.scope(state: \.items, action: \.items)) { textCellStore in
+                ForEach(store.scope(state: \.texts, action: \.texts)) { textCellStore in
                     TextCellView(store: textCellStore)
                 }
             } // VStack

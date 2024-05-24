@@ -367,7 +367,6 @@ struct DependencyExtractor {
                 let callerObject = structObject[keyPath: keyPath] as! any DeclarationObject
                 optionalCallerLeafObjectID = callerObject.id
 
-
                 switch callerObject {
                 case is ProtocolObject:
                     callerObjectKind = .protocol
@@ -390,7 +389,6 @@ struct DependencyExtractor {
 
                 let callerObject = classObject[keyPath: keyPath] as! any DeclarationObject
                 optionalCallerLeafObjectID = callerObject.id
-
 
                 switch callerObject {
                 case is ProtocolObject:
@@ -415,7 +413,6 @@ struct DependencyExtractor {
                 let callerObject = enumObject[keyPath: keyPath] as! any DeclarationObject
                 optionalCallerLeafObjectID = callerObject.id
 
-
                 switch callerObject {
                 case is ProtocolObject:
                     callerObjectKind = .protocol
@@ -439,7 +436,6 @@ struct DependencyExtractor {
                 let callerObject = variableObject[keyPath: keyPath] as! any DeclarationObject
                 optionalCallerLeafObjectID = callerObject.id
 
-
                 switch callerObject {
                 case is ProtocolObject:
                     callerObjectKind = .protocol
@@ -462,7 +458,6 @@ struct DependencyExtractor {
 
                 let callerObject = functionObject[keyPath: keyPath] as! any DeclarationObject
                 optionalCallerLeafObjectID = callerObject.id
-
 
                 switch callerObject {
                 case is ProtocolObject:

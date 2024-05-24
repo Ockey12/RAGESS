@@ -129,9 +129,8 @@ public struct StructViewReducer {
         Scope(state: \.header, action: \.header) {
             HeaderReducer()
         }
-        Reduce { state, action in
+        Reduce { _, action in
             switch action {
-
             case .header:
                 print(".header")
                 return .none

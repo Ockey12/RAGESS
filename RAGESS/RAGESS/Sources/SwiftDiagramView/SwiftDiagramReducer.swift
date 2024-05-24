@@ -74,13 +74,13 @@ public struct SwiftDiagramReducer {
 
             case let .structs(.element(id: structID, action: .header(.nameClicked))):
                 let structObject = state.structs[id: structID]!.object
-                let dependencies = structObject.objectsThatCallThisObject.filter({ $0.definitionObject.leafObjectID == structObject.id })
+                let dependencies = structObject.objectsThatCallThisObject.filter { $0.definitionObject.leafObjectID == structObject.id }
                 dump(dependencies)
                 return .none
 
-                // FIXME: Apply the Delegate pattern.
+            // FIXME: Apply the Delegate pattern.
             case let .structs(.element(id: structID, action: .details(.element(id: _, action: .delegate(.clickedCell(object: clickedObject)))))):
-                let dependencies = state.structs[id: structID]!.object.objectsThatCallThisObject.filter({ $0.definitionObject.leafObjectID == clickedObject.id })
+                let dependencies = state.structs[id: structID]!.object.objectsThatCallThisObject.filter { $0.definitionObject.leafObjectID == clickedObject.id }
                 dump(dependencies)
                 return .none
 

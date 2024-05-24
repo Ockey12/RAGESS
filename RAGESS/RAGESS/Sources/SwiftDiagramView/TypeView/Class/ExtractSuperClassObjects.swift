@@ -17,5 +17,5 @@ func extractSuperClassObject(
     guard let classInheritanceDependency else {
         return nil
     }
-    return allDeclarationObjects.first(where: { $0.id == classInheritanceDependency.definitionObject.id }) as? ClassObject
+    return allDeclarationObjects.first(where: { $0.id == classInheritanceDependency.definitionObject.rootObjectID }) as? ClassObject
 }

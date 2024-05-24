@@ -154,11 +154,13 @@ public struct EnumView: View {
     let conformDependency = DependencyObject(
         kind: .protocolConformance,
         callerObject: .init(
-            id: enumObject.id,
+            rootObjectID: enumObject.id,
+            leafObjectID: enumObject.id,
             keyPath: .struct(\.self)
         ),
         definitionObject: .init(
-            id: protocolObject.id,
+            rootObjectID: protocolObject.id,
+            leafObjectID: protocolObject.id,
             keyPath: .protocol(\.self)
         )
     )

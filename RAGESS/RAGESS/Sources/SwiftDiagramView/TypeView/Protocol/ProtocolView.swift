@@ -146,11 +146,13 @@ public struct ProtocolView: View {
     let conformDependency = DependencyObject(
         kind: .protocolInheritance,
         callerObject: .init(
-            id: protocolObject.id,
+            rootObjectID: protocolObject.id,
+            leafObjectID: protocolObject.id,
             keyPath: .struct(\.self)
         ),
         definitionObject: .init(
-            id: parentProtocolObject.id,
+            rootObjectID: parentProtocolObject.id,
+            leafObjectID: parentProtocolObject.id,
             keyPath: .protocol(\.self)
         )
     )

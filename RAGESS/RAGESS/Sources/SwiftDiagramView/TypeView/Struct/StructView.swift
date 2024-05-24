@@ -146,11 +146,13 @@ public struct StructView: View {
     let conformDependency = DependencyObject(
         kind: .protocolConformance,
         callerObject: .init(
-            id: structObject.id,
+            rootObjectID: structObject.id,
+            leafObjectID: structObject.id,
             keyPath: .struct(\.self)
         ),
         definitionObject: .init(
-            id: protocolObject.id,
+            rootObjectID: protocolObject.id,
+            leafObjectID: protocolObject.id,
             keyPath: .protocol(\.self)
         )
     )

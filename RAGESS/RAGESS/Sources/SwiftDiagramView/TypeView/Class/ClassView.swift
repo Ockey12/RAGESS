@@ -145,11 +145,13 @@ public struct ClassView: View {
     let inheritDependency = DependencyObject(
         kind: .classInheritance,
         callerObject: .init(
-            id: subClass.id,
+            rootObjectID: subClass.id,
+            leafObjectID: subClass.id,
             keyPath: .class(\.self)
         ),
         definitionObject: .init(
-            id: superClass.id,
+            rootObjectID: superClass.id,
+            leafObjectID: superClass.id,
             keyPath: .class(\.self)
         )
     )
@@ -169,11 +171,13 @@ public struct ClassView: View {
     let conformDependency = DependencyObject(
         kind: .protocolConformance,
         callerObject: .init(
-            id: subClass.id,
+            rootObjectID: subClass.id,
+            leafObjectID: subClass.id,
             keyPath: .struct(\.self)
         ),
         definitionObject: .init(
-            id: protocolObject.id,
+            rootObjectID: protocolObject.id,
+            leafObjectID: protocolObject.id,
             keyPath: .protocol(\.self)
         )
     )

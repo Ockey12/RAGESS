@@ -17,6 +17,6 @@ func extractParentProtocolObjects(
     }
 
     return protocolInheritanceDependencies.compactMap { dependency in
-        allDeclarationObjects.first(where: { $0.id == dependency.definitionObject.id }) as? ProtocolObject
+        allDeclarationObjects.first(where: { $0.id == dependency.definitionObject.rootObjectID }) as? ProtocolObject
     }
 }

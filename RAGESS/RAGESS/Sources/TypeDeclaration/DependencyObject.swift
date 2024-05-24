@@ -26,13 +26,15 @@ public struct DependencyObject: Equatable {
     public var definitionObject: Object
 
     public struct Object: Equatable {
-        public init(id: UUID, keyPath: ObjectKeyPath) {
-            self.id = id
+        public init(rootObjectID: UUID, leafObjectID: UUID, keyPath: ObjectKeyPath) {
+            self.rootObjectID = rootObjectID
+            self.leafObjectID = leafObjectID
             self.keyPath = keyPath
         }
 
         /// ID of the parent object with the shallowest hierarchy
-        public let id: UUID
+        public let rootObjectID: UUID
+        public let leafObjectID: UUID
 
         public let keyPath: ObjectKeyPath
 

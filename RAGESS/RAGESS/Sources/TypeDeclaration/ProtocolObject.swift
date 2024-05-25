@@ -23,6 +23,14 @@ public struct ProtocolObject: Inheritable, Initializable, HasHeader {
     public var variables: [VariableObject] = []
     public var functions: [FunctionObject] = []
 
+    public var descendantsID: [UUID] {
+        var ids: [UUID] = [id]
+        ids.append(contentsOf: initializers.flatMap({ $0.descendantsID }))
+        ids.append(contentsOf: variables.flatMap({ $0.descendantsID }))
+        ids.append(contentsOf: functions.flatMap({ $0.descendantsID }))
+        return ids
+    }
+
     public var objectsThatCallThisObject: [DependencyObject] = []
     public var objectsThatAreCalledByThisObject: [DependencyObject] = []
 

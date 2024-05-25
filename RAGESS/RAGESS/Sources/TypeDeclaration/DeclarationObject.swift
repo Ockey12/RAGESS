@@ -21,6 +21,8 @@ public protocol DeclarationObject: Identifiable, Equatable {
     var variables: [VariableObject] { get set }
     var functions: [FunctionObject] { get set }
 
+    var descendantsID: [UUID] { get }
+
     var objectsThatCallThisObject: [DependencyObject] { get set }
 
     var objectsThatAreCalledByThisObject: [DependencyObject] { get set }

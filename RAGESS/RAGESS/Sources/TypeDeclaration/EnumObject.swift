@@ -29,6 +29,19 @@ public struct EnumObject: TypeDeclaration {
     public var nestingClasses: [ClassObject] = []
     public var nestingEnums: [EnumObject] = []
 
+    public var descendantsID: [UUID] {
+        var ids: [UUID] = [id]
+        // `case` cannot nest other elements, so omit them.
+        ids.append(contentsOf: initializers.flatMap({ $0.descendantsID }))
+        ids.append(contentsOf: variables.flatMap({ $0.descendantsID }))
+        ids.append(contentsOf: functions.flatMap({ $0.descendantsID }))
+        ids.append(contentsOf: nestingProtocols.flatMap({ $0.descendantsID }))
+        ids.append(contentsOf: nestingStructs.flatMap({ $0.descendantsID }))
+        ids.append(contentsOf: nestingClasses.flatMap({ $0.descendantsID }))
+        ids.append(contentsOf: nestingEnums.flatMap({ $0.descendantsID }))
+        return ids
+    }
+
     public var objectsThatCallThisObject: [DependencyObject] = []
     public var objectsThatAreCalledByThisObject: [DependencyObject] = []
 
@@ -71,6 +84,10 @@ public struct EnumObject: TypeDeclaration {
         // FIXME: Enum case cannot have variables and functions.
         public var variables: [VariableObject] = []
         public var functions: [FunctionObject] = []
+
+        public var descendantsID: [UUID] {
+            return []
+        }
 
         public var objectsThatCallThisObject: [DependencyObject] = []
         public var objectsThatAreCalledByThisObject: [DependencyObject] = []

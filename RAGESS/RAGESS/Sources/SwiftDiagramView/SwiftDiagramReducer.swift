@@ -21,6 +21,7 @@ public struct SwiftDiagramReducer {
         var structs: IdentifiedArrayOf<StructViewReducer.State>
         var classes: IdentifiedArrayOf<ClassViewReducer.State>
         var enums: IdentifiedArrayOf<EnumViewReducer.State>
+        var arrows: IdentifiedArrayOf<ArrowViewReducer.State> = []
         public var frameWidth: CGFloat = 0
         public var frameHeight: CGFloat = 0
 
@@ -106,6 +107,7 @@ public struct SwiftDiagramReducer {
         case structs(IdentifiedActionOf<StructViewReducer>)
         case classes(IdentifiedActionOf<ClassViewReducer>)
         case enums(IdentifiedActionOf<EnumViewReducer>)
+        case arrows(IdentifiedActionOf<ArrowViewReducer>)
         case geometry(width: CGFloat, height: CGFloat)
     }
 
@@ -119,7 +121,7 @@ public struct SwiftDiagramReducer {
                 return .none
 
             // FIXME: Apply the Delegate pattern.
-            case let .protocols(.element(id: protocolID, action: .details(.element(id: _, action: .delegate(.clickedCell(object: clickedObject)))))):
+            case let .protocols(.element(id: protocolID, action: .details(.element(id: _, action: .delegate(.clickedCell(object: clickedObject, leadingArrowTerminalPoint: leadingArrowTerminalPoint, trailingArrowTerminalPoint: trailingArrowTerminalPoint)))))):
                 let dependencies = state.protocols[id: protocolID]!.object.objectsThatCallThisObject.filter { $0.definitionObject.leafObjectID == clickedObject.id }
                 dump(dependencies)
                 return .none
@@ -134,9 +136,100 @@ public struct SwiftDiagramReducer {
                 return .none
 
             // FIXME: Apply the Delegate pattern.
-            case let .structs(.element(id: structID, action: .details(.element(id: _, action: .delegate(.clickedCell(object: clickedObject)))))):
+            case let .structs(.element(id: structID, action: .details(.element(id: _, action: .delegate(.clickedCell(object: clickedObject, leadingArrowTerminalPoint: leadingStartPoint, trailingArrowTerminalPoint: trailingStartPoint)))))):
                 let dependencies = state.structs[id: structID]!.object.objectsThatCallThisObject.filter { $0.definitionObject.leafObjectID == clickedObject.id }
                 dump(dependencies)
+                var arrowStates: [ArrowViewReducer.State] = []
+                for dependency in dependencies {
+                    let callerLeafID = dependency.callerObject.leafObjectID
+                    let endPointsTuple: (CGPoint, CGPoint)? = {
+                        switch dependency.callerObject.keyPath {
+                        case .protocol(let partialKeyPath):
+                            for protocolState in state.structs {
+                                for detail in protocolState.details {
+                                    for textState in detail.texts {
+                                        if textState.id == callerLeafID {
+                                            return (textState.leadingArrowTerminalPoint, textState.trailingArrowTerminalPoint)
+                                        }
+                                    }
+                                }
+                            }
+                            return nil
+
+                        case .struct(let partialKeyPath):
+                            for structState in state.structs {
+                                for detail in structState.details {
+                                    for textState in detail.texts {
+                                        if textState.id == callerLeafID {
+                                            return (textState.leadingArrowTerminalPoint, textState.trailingArrowTerminalPoint)
+                                        }
+                                    }
+                                }
+                            }
+                            return nil
+
+                        case .class(let partialKeyPath):
+                            for classState in state.structs {
+                                for detail in classState.details {
+                                    for textState in detail.texts {
+                                        if textState.id == callerLeafID {
+                                            return (textState.leadingArrowTerminalPoint, textState.trailingArrowTerminalPoint)
+                                        }
+                                    }
+                                }
+                            }
+                            return nil
+
+                        case .enum(let partialKeyPath):
+                            for enumState in state.structs {
+                                for detail in enumState.details {
+                                    for textState in detail.texts {
+                                        if textState.id == callerLeafID {
+                                            return (textState.leadingArrowTerminalPoint, textState.trailingArrowTerminalPoint)
+                                        }
+                                    }
+                                }
+                            }
+                            return nil
+
+                        case .variable(let partialKeyPath):
+                            return nil
+
+                        case .function(let partialKeyPath):
+                            return nil
+                        }
+                    }()
+
+                    guard let endPointsTuple else {
+                        continue
+                    }
+                    let (leadingEndPoint, trailingEndPoint) = endPointsTuple
+                    let combinations = [
+                        (leadingStartPoint, leadingEndPoint),
+                        (leadingStartPoint, trailingEndPoint),
+                        (trailingStartPoint, leadingEndPoint),
+                        (trailingStartPoint, trailingEndPoint)
+                    ]
+
+                    var minDistance = CGFloat.infinity
+                    var startPoint = CGPoint()
+                    var endPoint = CGPoint()
+                    for (start, end) in combinations {
+                        let distance = hypot(start.x - end.x, start.y - end.y)
+                        if distance < minDistance {
+                            startPoint = start
+                            endPoint = end
+                            minDistance = distance
+                        }
+                    }
+
+                    arrowStates.append(ArrowViewReducer.State(
+                        startPointRootObjectID: structID,
+                        endPointRootObjectID: dependency.callerObject.rootObjectID,
+                        startPoint: startPoint,
+                        endPoint: endPoint))
+                }
+                state.arrows = .init(uniqueElements: arrowStates)
                 return .none
 
             case .structs:
@@ -149,7 +242,7 @@ public struct SwiftDiagramReducer {
                 return .none
 
             // FIXME: Apply the Delegate pattern.
-            case let .classes(.element(id: classID, action: .details(.element(id: _, action: .delegate(.clickedCell(object: clickedObject)))))):
+            case let .classes(.element(id: classID, action: .details(.element(id: _, action: .delegate(.clickedCell(object: clickedObject, leadingArrowTerminalPoint: leadingArrowTerminalPoint, trailingArrowTerminalPoint: trailingArrowTerminalPoint)))))):
                 let dependencies = state.classes[id: classID]!.object.objectsThatCallThisObject.filter { $0.definitionObject.leafObjectID == clickedObject.id }
                 dump(dependencies)
                 return .none
@@ -164,12 +257,15 @@ public struct SwiftDiagramReducer {
                 return .none
 
             // FIXME: Apply the Delegate pattern.
-            case let .enums(.element(id: enumID, action: .details(.element(id: _, action: .delegate(.clickedCell(object: clickedObject)))))):
+            case let .enums(.element(id: enumID, action: .details(.element(id: _, action: .delegate(.clickedCell(object: clickedObject, leadingArrowTerminalPoint: leadingArrowTerminalPoint, trailingArrowTerminalPoint: trailingArrowTerminalPoint)))))):
                 let dependencies = state.enums[id: enumID]!.object.objectsThatCallThisObject.filter { $0.definitionObject.leafObjectID == clickedObject.id }
                 dump(dependencies)
                 return .none
 
             case .enums:
+                return .none
+
+            case .arrows:
                 return .none
 
             case let .geometry(width: width, height: height):
@@ -189,6 +285,9 @@ public struct SwiftDiagramReducer {
         }
         .forEach(\.enums, action: \.enums) {
             EnumViewReducer()
+        }
+        .forEach(\.arrows, action: \.arrows) {
+            ArrowViewReducer()
         }
     }
 }

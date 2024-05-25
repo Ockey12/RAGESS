@@ -17,8 +17,23 @@ public struct ArrowViewReducer {
     @ObservableState
     public struct State: Identifiable {
         public var id: UUID
-        let rootObjectID: UUID
+        var startPointRootObjectID: UUID
+        var endPointRootObjectID: UUID
         var startPoint: CGPoint
         var endPoint: CGPoint
+
+        public init(
+            startPointRootObjectID: UUID,
+            endPointRootObjectID: UUID,
+            startPoint: CGPoint,
+            endPoint: CGPoint
+        ) {
+            @Dependency(\.uuid) var uuid
+            self.id = uuid()
+            self.startPointRootObjectID = startPointRootObjectID
+            self.endPointRootObjectID = endPointRootObjectID
+            self.startPoint = startPoint
+            self.endPoint = endPoint
+        }
     }
 }

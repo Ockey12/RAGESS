@@ -18,11 +18,17 @@ public struct HeaderReducer {
     public struct State {
         var object: any HasHeader
         var text: TextCellReducer.State
+        var topLeadingPoint: CGPoint
         var frameWidth: CGFloat
 
-        public init(object: any HasHeader, frameWidth: CGFloat) {
+        public init(
+            object: any HasHeader,
+            topLeadingPoint: CGPoint,
+            frameWidth: CGFloat
+        ) {
             self.object = object
             self.text = TextCellReducer.State(object: object, frameWidth: frameWidth)
+            self.topLeadingPoint = topLeadingPoint
             self.frameWidth = frameWidth
         }
     }

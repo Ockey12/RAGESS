@@ -112,7 +112,11 @@ public struct ClassViewReducer {
                 + ComponentSizeValues.arrowTerminalWidth * 2
                 + ComponentSizeValues.borderWidth
 
-            header = HeaderReducer.State(object: object, frameWidth: maxWidth)
+            header = HeaderReducer.State(
+                object: object,
+                topLeadingPoint: CGPoint(x: 0, y: 0),
+                frameWidth: maxWidth
+            )
 
             var details: [DetailReducer.State] = []
 
@@ -121,6 +125,7 @@ public struct ClassViewReducer {
                     DetailReducer.State(
                         objects: [superClassObject],
                         kind: .superClass,
+                        topLeadingPoint: topLeadingPoint,
                         frameWidth: maxWidth
                     )
                 )
@@ -130,21 +135,25 @@ public struct ClassViewReducer {
                 DetailReducer.State(
                     objects: conformedProtocolObjects,
                     kind: .protocolConformance,
+                    topLeadingPoint: topLeadingPoint,
                     frameWidth: maxWidth
                 ),
                 DetailReducer.State(
                     objects: object.initializers,
                     kind: .initializers,
+                    topLeadingPoint: topLeadingPoint,
                     frameWidth: maxWidth
                 ),
                 DetailReducer.State(
                     objects: object.variables,
                     kind: .variables,
+                    topLeadingPoint: topLeadingPoint,
                     frameWidth: maxWidth
                 ),
                 DetailReducer.State(
                     objects: object.functions,
                     kind: .functions,
+                    topLeadingPoint: topLeadingPoint,
                     frameWidth: maxWidth
                 )
             ])

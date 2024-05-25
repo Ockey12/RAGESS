@@ -72,6 +72,7 @@ struct HeaderView: View {
             store: .init(
                 initialState: HeaderReducer.State(
                     object: protocolObject,
+                    topLeadingPoint: CGPoint(x: 0, y: 0),
                     frameWidth: max(
                         protocolObject.name.systemSize50Width,
                         ComponentSizeValues.bodyMinWidth
@@ -86,6 +87,7 @@ struct HeaderView: View {
             store: .init(
                 initialState: HeaderReducer.State(
                     object: structObject,
+                    topLeadingPoint: CGPoint(x: 0, y: 0),
                     frameWidth: max(
                         structObject.name.systemSize50Width,
                         ComponentSizeValues.bodyMinWidth
@@ -100,6 +102,7 @@ struct HeaderView: View {
             store: .init(
                 initialState: HeaderReducer.State(
                     object: classObject,
+                    topLeadingPoint: CGPoint(x: 0, y: 0),
                     frameWidth: max(
                         classObject.name.systemSize50Width,
                         ComponentSizeValues.bodyMinWidth
@@ -114,6 +117,7 @@ struct HeaderView: View {
             store: .init(
                 initialState: HeaderReducer.State(
                     object: enumObject,
+                    topLeadingPoint: CGPoint(x: 0, y: 0),
                     frameWidth: max(
                         enumObject.name.systemSize50Width,
                         ComponentSizeValues.bodyMinWidth

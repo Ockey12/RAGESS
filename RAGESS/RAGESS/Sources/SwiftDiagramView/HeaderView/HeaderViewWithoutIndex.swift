@@ -52,6 +52,7 @@ struct HeaderViewWithoutIndex: View {
             store: .init(
                 initialState: HeaderReducer.State(
                     object: protocolObject,
+                    topLeadingPoint: CGPoint(x: 0, y: 0),
                     frameWidth: max(
                         protocolObject.name.systemSize50Width,
                         ComponentSizeValues.bodyMinWidth

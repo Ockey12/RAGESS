@@ -80,6 +80,7 @@ struct DetailView: View {
                 initialState: DetailReducer.State(
                     objects: functionObjects,
                     kind: .functions,
+                    topLeadingPoint: CGPoint(x: 0, y: 0),
                     frameWidth: 800
                 ),
                 reducer: { DetailReducer() }

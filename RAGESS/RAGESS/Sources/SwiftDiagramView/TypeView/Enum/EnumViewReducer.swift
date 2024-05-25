@@ -40,6 +40,13 @@ public struct EnumViewReducer {
                 conformances = connectionHeight + itemHeight * CGFloat(conformedProtocolObjects.count) + bottomPadding
             }
 
+            let initializers: CGFloat
+            if object.initializers.isEmpty {
+                initializers = 0
+            } else {
+                initializers = connectionHeight + itemHeight * CGFloat(object.initializers.count) + bottomPadding
+            }
+
             let cases: CGFloat
             if object.cases.isEmpty {
                 cases = 0
@@ -63,6 +70,7 @@ public struct EnumViewReducer {
 
             return header
                 + conformances
+                + initializers
                 + cases
                 + variables
                 + functions
@@ -128,17 +136,6 @@ public struct EnumViewReducer {
                 )
             }
 
-            let casesFrameTopLeadingPoint = frameBottomLeadingPoint
-            if !object.cases.isEmpty {
-                frameBottomLeadingPoint = CGPoint(
-                    x: frameBottomLeadingPoint.x,
-                    y: frameBottomLeadingPoint.y
-                        + connectionHeight
-                        + itemHeight * CGFloat(object.cases.count)
-                        + bottomPaddingForLastText
-                )
-            }
-
             let initializersTopLeadingPoint = frameBottomLeadingPoint
             if !object.initializers.isEmpty {
                 frameBottomLeadingPoint = CGPoint(
@@ -147,6 +144,17 @@ public struct EnumViewReducer {
                         + connectionHeight
                         + itemHeight * CGFloat(object.initializers.count)
                         + bottomPaddingForLastText
+                )
+            }
+
+            let casesFrameTopLeadingPoint = frameBottomLeadingPoint
+            if !object.cases.isEmpty {
+                frameBottomLeadingPoint = CGPoint(
+                    x: frameBottomLeadingPoint.x,
+                    y: frameBottomLeadingPoint.y
+                    + connectionHeight
+                    + itemHeight * CGFloat(object.cases.count)
+                    + bottomPaddingForLastText
                 )
             }
 
@@ -171,17 +179,15 @@ public struct EnumViewReducer {
                     frameWidth: bodyWidth
                 ),
                 DetailReducer.State(
-                    objects: object.cases,
-                    kind: .case,
-                    topLeadingPoint: casesFrameTopLeadingPoint,
-                    frameWidth: bodyWidth
-                ),
-
-                // FIXME: enum cannot has inititalizers.
-                DetailReducer.State(
                     objects: object.initializers,
                     kind: .initializers,
                     topLeadingPoint: initializersTopLeadingPoint,
+                    frameWidth: bodyWidth
+                ),
+                DetailReducer.State(
+                    objects: object.cases,
+                    kind: .case,
+                    topLeadingPoint: casesFrameTopLeadingPoint,
                     frameWidth: bodyWidth
                 ),
                 DetailReducer.State(

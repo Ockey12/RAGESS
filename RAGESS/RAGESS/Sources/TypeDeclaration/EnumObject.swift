@@ -20,7 +20,6 @@ public struct EnumObject: TypeDeclaration {
 
     public var cases: [CaseObject] = []
 
-    // FIXME: Enum cannot have initializers.
     public var initializers: [InitializerObject] = []
     public var variables: [VariableObject] = []
     public var functions: [FunctionObject] = []

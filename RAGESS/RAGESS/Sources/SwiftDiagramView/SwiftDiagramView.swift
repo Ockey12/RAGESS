@@ -261,6 +261,14 @@ public struct SwiftDiagramView: View {
                     }
                 }
             }
+
+            if !store.structs.isEmpty,
+               2 <= store.classes.count {
+                ArrowView(
+                    startPoint: store.structs[0].header.trailingArrowTerminalPoint,
+                    endPoint: store.classes[1].header.leadingArrowTerminalPoint
+                )
+            }
         } // ZStack
     }
 }

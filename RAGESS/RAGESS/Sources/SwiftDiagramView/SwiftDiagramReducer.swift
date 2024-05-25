@@ -208,22 +208,48 @@ public struct SwiftDiagramReducer {
             case .structs:
                 return .none
 
-            case let .classes(.element(id: classID, action: .header(.text(.clicked)))):
-                let classObject = state.classes[id: classID]!.object
-                let dependencies = classObject.objectsThatCallThisObject.filter { $0.definitionObject.leafObjectID == classObject.id }
+            case let .classes(.element(id: classID, action: .header(.delegate(.clicked(
+                leadingArrowTerminalPoint: leadingStartPoint,
+                trailingArrowTerminalPoint: trailingStartPoint
+            ))))):
+                let dependencies = state.classes[id: classID]!.object.objectsThatCallThisObject.filter { $0.definitionObject.leafObjectID == classID }
+
+#if DEBUG
                 dump(dependencies)
+#endif
+
+                state.arrows = .init(
+                    uniqueElements: generateArrowStates(
+                        state: state,
+                        startPointRootObjectID: classID,
+                        leadingStartPoint: leadingStartPoint,
+                        trailingStartPoint: trailingStartPoint,
+                        dependencies: dependencies
+                    )
+                )
                 return .none
 
             // FIXME: Apply the Delegate pattern.
-            case let .classes(.element(
-                id: classID,
-                action: .details(.element(
-                    id: _,
-                    action: .delegate(.clickedCell(object: clickedObject, leadingArrowTerminalPoint: leadingArrowTerminalPoint, trailingArrowTerminalPoint: trailingArrowTerminalPoint))
-                ))
-            )):
+            case let .classes(.element(id: classID, action: .details(.element(id: _, action: .delegate(.clickedCell(
+                object: clickedObject,
+                leadingArrowTerminalPoint: leadingStartPoint,
+                trailingArrowTerminalPoint: trailingStartPoint
+            )))))):
                 let dependencies = state.classes[id: classID]!.object.objectsThatCallThisObject.filter { $0.definitionObject.leafObjectID == clickedObject.id }
+
+#if DEBUG
                 dump(dependencies)
+#endif
+
+                state.arrows = .init(
+                    uniqueElements: generateArrowStates(
+                        state: state,
+                        startPointRootObjectID: classID,
+                        leadingStartPoint: leadingStartPoint,
+                        trailingStartPoint: trailingStartPoint,
+                        dependencies: dependencies
+                    )
+                )
                 return .none
 
             case .classes:
@@ -301,7 +327,7 @@ extension SwiftDiagramReducer {
             case .identifierType:
                 callerLeafID = dependency.callerObject.leafObjectID
             }
-            
+
             let endPointsTuple: (CGPoint, CGPoint)? = {
                 switch dependency.callerObject.keyPath {
                 case .protocol:

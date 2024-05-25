@@ -28,6 +28,7 @@ public struct HeaderReducer {
                     + ComponentSizeValues.borderWidth / 2
             )
         }
+
         var trailingArrowTerminalPoint: CGPoint {
             CGPoint(
                 x: topLeadingPoint.x

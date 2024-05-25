@@ -130,9 +130,9 @@ public struct ClassViewReducer {
             var frameBottomLeadingPoint = CGPoint(
                 x: topLeadingPoint.x,
                 y: topLeadingPoint.y
-                + borderWidth / 2
-                + itemHeight*2
-                + bottomPaddingForLastText
+                    + borderWidth / 2
+                    + itemHeight * 2
+                    + bottomPaddingForLastText
             )
 
             var details: [DetailReducer.State] = []
@@ -150,9 +150,9 @@ public struct ClassViewReducer {
                 frameBottomLeadingPoint = CGPoint(
                     x: frameBottomLeadingPoint.x,
                     y: frameBottomLeadingPoint.y
-                    + connectionHeight
-                    + itemHeight
-                    + bottomPaddingForLastText
+                        + connectionHeight
+                        + itemHeight
+                        + bottomPaddingForLastText
                 )
             }
 
@@ -161,9 +161,9 @@ public struct ClassViewReducer {
                 frameBottomLeadingPoint = CGPoint(
                     x: frameBottomLeadingPoint.x,
                     y: frameBottomLeadingPoint.y
-                    + connectionHeight
-                    + itemHeight*CGFloat(conformedProtocolObjects.count)
-                    + bottomPaddingForLastText
+                        + connectionHeight
+                        + itemHeight * CGFloat(conformedProtocolObjects.count)
+                        + bottomPaddingForLastText
                 )
             }
 
@@ -172,9 +172,9 @@ public struct ClassViewReducer {
                 frameBottomLeadingPoint = CGPoint(
                     x: frameBottomLeadingPoint.x,
                     y: frameBottomLeadingPoint.y
-                    + connectionHeight
-                    + itemHeight*CGFloat(object.initializers.count)
-                    + bottomPaddingForLastText
+                        + connectionHeight
+                        + itemHeight * CGFloat(object.initializers.count)
+                        + bottomPaddingForLastText
                 )
             }
 
@@ -183,9 +183,9 @@ public struct ClassViewReducer {
                 frameBottomLeadingPoint = CGPoint(
                     x: frameBottomLeadingPoint.x,
                     y: frameBottomLeadingPoint.y
-                    + connectionHeight
-                    + itemHeight*CGFloat(object.variables.count)
-                    + bottomPaddingForLastText
+                        + connectionHeight
+                        + itemHeight * CGFloat(object.variables.count)
+                        + bottomPaddingForLastText
                 )
             }
 

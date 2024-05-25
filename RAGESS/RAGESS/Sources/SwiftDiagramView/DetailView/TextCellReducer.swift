@@ -24,19 +24,21 @@ public struct TextCellReducer {
             CGPoint(
                 x: topLeadingPoint.x,
                 y: topLeadingPoint.y
-                + ComponentSizeValues.itemHeight / 2
+                    + ComponentSizeValues.itemHeight / 2
             )
         }
+
         var trailingArrowTerminalPoint: CGPoint {
             CGPoint(
                 x: topLeadingPoint.x
-                + bodyWidth
-                + ComponentSizeValues.arrowTerminalWidth * 2
-                + ComponentSizeValues.borderWidth,
+                    + bodyWidth
+                    + ComponentSizeValues.arrowTerminalWidth * 2
+                    + ComponentSizeValues.borderWidth,
                 y: topLeadingPoint.y
-                + ComponentSizeValues.itemHeight / 2
+                    + ComponentSizeValues.itemHeight / 2
             )
         }
+
         let bodyWidth: CGFloat
     }
 

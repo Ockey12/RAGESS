@@ -70,7 +70,11 @@ public struct ProtocolViewReducer {
                 + ComponentSizeValues.borderWidth
         }
 
-        public init(object: ProtocolObject, allDeclarationObjects: [any DeclarationObject], topLeadingPoint: CGPoint) {
+        public init(
+            object: ProtocolObject,
+            allDeclarationObjects: [any DeclarationObject],
+            topLeadingPoint: CGPoint
+        ) {
             self.object = object
             self.topLeadingPoint = topLeadingPoint
 
@@ -100,7 +104,6 @@ public struct ProtocolViewReducer {
                 bodyWidth: bodyWidth
             )
 
-
             let borderWidth = ComponentSizeValues.borderWidth
             let connectionHeight = ComponentSizeValues.connectionHeight
             let itemHeight = ComponentSizeValues.itemHeight
@@ -109,9 +112,9 @@ public struct ProtocolViewReducer {
             var frameBottomLeadingPoint = CGPoint(
                 x: topLeadingPoint.x,
                 y: topLeadingPoint.y
-                + borderWidth / 2
-                + itemHeight*2
-                + bottomPaddingForLastText
+                    + borderWidth / 2
+                    + itemHeight * 2
+                    + bottomPaddingForLastText
             )
 
             let protocolsFrameTopLeadingPoint = frameBottomLeadingPoint
@@ -119,9 +122,9 @@ public struct ProtocolViewReducer {
                 frameBottomLeadingPoint = CGPoint(
                     x: frameBottomLeadingPoint.x,
                     y: frameBottomLeadingPoint.y
-                    + connectionHeight
-                    + itemHeight*CGFloat(parentProtocolObjects.count)
-                    + bottomPaddingForLastText
+                        + connectionHeight
+                        + itemHeight * CGFloat(parentProtocolObjects.count)
+                        + bottomPaddingForLastText
                 )
             }
 
@@ -130,9 +133,9 @@ public struct ProtocolViewReducer {
                 frameBottomLeadingPoint = CGPoint(
                     x: frameBottomLeadingPoint.x,
                     y: frameBottomLeadingPoint.y
-                    + connectionHeight
-                    + itemHeight*CGFloat(object.initializers.count)
-                    + bottomPaddingForLastText
+                        + connectionHeight
+                        + itemHeight * CGFloat(object.initializers.count)
+                        + bottomPaddingForLastText
                 )
             }
 
@@ -141,9 +144,9 @@ public struct ProtocolViewReducer {
                 frameBottomLeadingPoint = CGPoint(
                     x: frameBottomLeadingPoint.x,
                     y: frameBottomLeadingPoint.y
-                    + connectionHeight
-                    + itemHeight*CGFloat(object.variables.count)
-                    + bottomPaddingForLastText
+                        + connectionHeight
+                        + itemHeight * CGFloat(object.variables.count)
+                        + bottomPaddingForLastText
                 )
             }
 

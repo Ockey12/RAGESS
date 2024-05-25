@@ -114,22 +114,48 @@ public struct SwiftDiagramReducer {
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case let .protocols(.element(id: protocolID, action: .header(.text(.clicked)))):
-                let protocolObject = state.protocols[id: protocolID]!.object
-                let dependencies = protocolObject.objectsThatCallThisObject.filter { $0.definitionObject.leafObjectID == protocolObject.id }
+            case let .protocols(.element(id: protocolID, action: .header(.delegate(.clicked(
+                leadingArrowTerminalPoint: leadingStartPoint,
+                trailingArrowTerminalPoint: trailingStartPoint
+            ))))):
+                let dependencies = state.protocols[id: protocolID]!.object.objectsThatCallThisObject.filter { $0.definitionObject.leafObjectID == protocolID }
+
+#if DEBUG
                 dump(dependencies)
+#endif
+
+                state.arrows = .init(
+                    uniqueElements: generateArrowStates(
+                        state: state,
+                        startPointRootObjectID: protocolID,
+                        leadingStartPoint: leadingStartPoint,
+                        trailingStartPoint: trailingStartPoint,
+                        dependencies: dependencies
+                    )
+                )
                 return .none
 
             // FIXME: Apply the Delegate pattern.
-            case let .protocols(.element(
-                id: protocolID,
-                action: .details(.element(
-                    id: _,
-                    action: .delegate(.clickedCell(object: clickedObject, leadingArrowTerminalPoint: leadingArrowTerminalPoint, trailingArrowTerminalPoint: trailingArrowTerminalPoint))
-                ))
-            )):
+            case let .protocols(.element(id: protocolID, action: .details(.element(id: _, action: .delegate(.clickedCell(
+                object: clickedObject,
+                leadingArrowTerminalPoint: leadingStartPoint,
+                trailingArrowTerminalPoint: trailingStartPoint
+            )))))):
                 let dependencies = state.protocols[id: protocolID]!.object.objectsThatCallThisObject.filter { $0.definitionObject.leafObjectID == clickedObject.id }
+
+#if DEBUG
                 dump(dependencies)
+#endif
+
+                state.arrows = .init(
+                    uniqueElements: generateArrowStates(
+                        state: state,
+                        startPointRootObjectID: protocolID,
+                        leadingStartPoint: leadingStartPoint,
+                        trailingStartPoint: trailingStartPoint,
+                        dependencies: dependencies
+                    )
+                )
                 return .none
 
             case .protocols:

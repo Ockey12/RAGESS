@@ -153,6 +153,34 @@ public struct SwiftDiagramView: View {
                         x: state.header.trailingArrowTerminalPoint.x,
                         y: state.header.trailingArrowTerminalPoint.y
                     )
+
+                ForEach(state.details) { detail in
+                    Circle()
+                        .foregroundStyle(.orange)
+                        .frame(width: 10, height: 10)
+                        .position(
+                            x: detail.topLeadingPoint.x,
+                            y: detail.topLeadingPoint.y
+                        )
+
+                    ForEach(detail.texts) { text in
+                        Circle()
+                            .foregroundStyle(.red)
+                            .frame(width: 10, height: 10)
+                            .position(
+                                x: text.leadingArrowTerminalPoint.x,
+                                y: text.leadingArrowTerminalPoint.y
+                            )
+
+                        Circle()
+                            .foregroundStyle(.blue)
+                            .frame(width: 10, height: 10)
+                            .position(
+                                x: text.trailingArrowTerminalPoint.x,
+                                y: text.trailingArrowTerminalPoint.y
+                            )
+                    }
+                }
             }
 
             ForEach(store.enums.elements) { state in

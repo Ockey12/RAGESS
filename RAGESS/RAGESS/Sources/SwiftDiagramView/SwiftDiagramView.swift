@@ -102,6 +102,16 @@ public struct SwiftDiagramView: View {
                         x: state.header.trailingArrowTerminalPoint.x,
                         y: state.header.trailingArrowTerminalPoint.y
                     )
+
+                ForEach(state.details) { detail in
+                    Circle()
+                        .foregroundStyle(.orange)
+                        .frame(width: 10, height: 10)
+                        .position(
+                            x: detail.topLeadingPoint.x,
+                            y: detail.topLeadingPoint.y
+                        )
+                }
             }
 
             ForEach(store.classes.elements) { state in

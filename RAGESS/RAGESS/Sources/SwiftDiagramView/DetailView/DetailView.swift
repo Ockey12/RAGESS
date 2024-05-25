@@ -46,6 +46,7 @@ struct DetailView: View {
             width: store.frameWidth + ComponentSizeValues.arrowTerminalWidth * 2,
             height: store.height
         )
+        .border(.orange)
     }
 }
 

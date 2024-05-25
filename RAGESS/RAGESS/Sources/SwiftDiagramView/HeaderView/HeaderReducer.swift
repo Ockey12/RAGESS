@@ -29,23 +29,25 @@ public struct HeaderReducer {
         }
         var trailingArrowTerminalPoint: CGPoint {
             CGPoint(
-                x: topLeadingPoint.x + frameWidth,
+                x: topLeadingPoint.x + bodyWidth,
                 y: topLeadingPoint.y
                 + ComponentSizeValues.itemHeight
                 + ComponentSizeValues.itemHeight/2
             )
         }
-        var frameWidth: CGFloat
+
+        /// Width without ArrowTerminal.
+        var bodyWidth: CGFloat
 
         public init(
             object: any HasHeader,
             topLeadingPoint: CGPoint,
-            frameWidth: CGFloat
+            bodyWidth: CGFloat
         ) {
             self.object = object
-            self.text = TextCellReducer.State(object: object, frameWidth: frameWidth)
+            self.text = TextCellReducer.State(object: object, frameWidth: bodyWidth)
             self.topLeadingPoint = topLeadingPoint
-            self.frameWidth = frameWidth
+            self.bodyWidth = bodyWidth
         }
     }
 

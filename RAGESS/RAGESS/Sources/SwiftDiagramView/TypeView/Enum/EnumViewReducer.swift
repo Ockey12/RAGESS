@@ -97,7 +97,7 @@ public struct EnumViewReducer {
             header = HeaderReducer.State(
                 object: object,
                 topLeadingPoint: topLeadingPoint,
-                frameWidth: maxWidth
+                bodyWidth: maxWidth
             )
 
             details = [

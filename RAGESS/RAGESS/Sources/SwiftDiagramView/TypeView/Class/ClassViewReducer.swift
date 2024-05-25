@@ -115,7 +115,7 @@ public struct ClassViewReducer {
             header = HeaderReducer.State(
                 object: object,
                 topLeadingPoint: topLeadingPoint,
-                frameWidth: maxWidth
+                bodyWidth: maxWidth
             )
 
             var details: [DetailReducer.State] = []

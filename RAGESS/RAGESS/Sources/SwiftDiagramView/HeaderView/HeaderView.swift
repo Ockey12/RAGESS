@@ -24,7 +24,7 @@ struct HeaderView: View {
             HeaderViewWithoutIndex(store: store)
         }
         .frame(
-            width: store.frameWidth + ComponentSizeValues.arrowTerminalWidth * 2,
+            width: store.bodyWidth + ComponentSizeValues.arrowTerminalWidth * 2,
             height: 300
         )
     }
@@ -73,7 +73,7 @@ struct HeaderView: View {
                 initialState: HeaderReducer.State(
                     object: protocolObject,
                     topLeadingPoint: CGPoint(x: 0, y: 0),
-                    frameWidth: max(
+                    bodyWidth: max(
                         protocolObject.name.systemSize50Width,
                         ComponentSizeValues.bodyMinWidth
                     )
@@ -88,7 +88,7 @@ struct HeaderView: View {
                 initialState: HeaderReducer.State(
                     object: structObject,
                     topLeadingPoint: CGPoint(x: 0, y: 0),
-                    frameWidth: max(
+                    bodyWidth: max(
                         structObject.name.systemSize50Width,
                         ComponentSizeValues.bodyMinWidth
                     )
@@ -103,7 +103,7 @@ struct HeaderView: View {
                 initialState: HeaderReducer.State(
                     object: classObject,
                     topLeadingPoint: CGPoint(x: 0, y: 0),
-                    frameWidth: max(
+                    bodyWidth: max(
                         classObject.name.systemSize50Width,
                         ComponentSizeValues.bodyMinWidth
                     )
@@ -118,7 +118,7 @@ struct HeaderView: View {
                 initialState: HeaderReducer.State(
                     object: enumObject,
                     topLeadingPoint: CGPoint(x: 0, y: 0),
-                    frameWidth: max(
+                    bodyWidth: max(
                         enumObject.name.systemSize50Width,
                         ComponentSizeValues.bodyMinWidth
                     )

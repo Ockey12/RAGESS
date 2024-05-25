@@ -120,9 +120,9 @@ public struct SwiftDiagramReducer {
             ))))):
                 let dependencies = state.protocols[id: protocolID]!.object.objectsThatCallThisObject.filter { $0.definitionObject.leafObjectID == protocolID }
 
-#if DEBUG
-                dump(dependencies)
-#endif
+                #if DEBUG
+                    dump(dependencies)
+                #endif
 
                 state.arrows = .init(
                     uniqueElements: generateArrowStates(
@@ -143,9 +143,9 @@ public struct SwiftDiagramReducer {
             )))))):
                 let dependencies = state.protocols[id: protocolID]!.object.objectsThatCallThisObject.filter { $0.definitionObject.leafObjectID == clickedObject.id }
 
-#if DEBUG
-                dump(dependencies)
-#endif
+                #if DEBUG
+                    dump(dependencies)
+                #endif
 
                 state.arrows = .init(
                     uniqueElements: generateArrowStates(
@@ -214,9 +214,9 @@ public struct SwiftDiagramReducer {
             ))))):
                 let dependencies = state.classes[id: classID]!.object.objectsThatCallThisObject.filter { $0.definitionObject.leafObjectID == classID }
 
-#if DEBUG
-                dump(dependencies)
-#endif
+                #if DEBUG
+                    dump(dependencies)
+                #endif
 
                 state.arrows = .init(
                     uniqueElements: generateArrowStates(
@@ -237,9 +237,9 @@ public struct SwiftDiagramReducer {
             )))))):
                 let dependencies = state.classes[id: classID]!.object.objectsThatCallThisObject.filter { $0.definitionObject.leafObjectID == clickedObject.id }
 
-#if DEBUG
-                dump(dependencies)
-#endif
+                #if DEBUG
+                    dump(dependencies)
+                #endif
 
                 state.arrows = .init(
                     uniqueElements: generateArrowStates(
@@ -261,9 +261,9 @@ public struct SwiftDiagramReducer {
             ))))):
                 let dependencies = state.enums[id: enumID]!.object.objectsThatCallThisObject.filter { $0.definitionObject.leafObjectID == enumID }
 
-#if DEBUG
-                dump(dependencies)
-#endif
+                #if DEBUG
+                    dump(dependencies)
+                #endif
 
                 state.arrows = .init(
                     uniqueElements: generateArrowStates(
@@ -284,9 +284,9 @@ public struct SwiftDiagramReducer {
             )))))):
                 let dependencies = state.enums[id: enumID]!.object.objectsThatCallThisObject.filter { $0.definitionObject.leafObjectID == clickedObject.id }
 
-#if DEBUG
-                dump(dependencies)
-#endif
+                #if DEBUG
+                    dump(dependencies)
+                #endif
 
                 state.arrows = .init(
                     uniqueElements: generateArrowStates(
@@ -358,7 +358,7 @@ extension SwiftDiagramReducer {
                 switch dependency.callerObject.keyPath {
                 case .protocol:
                     for protocolState in state.protocols
-                    where protocolState.object.id == dependency.callerObject.rootObjectID {
+                        where protocolState.object.id == dependency.callerObject.rootObjectID {
                         for detail in protocolState.details {
                             for textState in detail.texts {
                                 if textState.id == callerLeafID {
@@ -371,7 +371,7 @@ extension SwiftDiagramReducer {
 
                 case .struct:
                     for structState in state.structs
-                    where structState.object.id == dependency.callerObject.rootObjectID {
+                        where structState.object.id == dependency.callerObject.rootObjectID {
                         for detail in structState.details {
                             for textState in detail.texts {
                                 if textState.id == callerLeafID {
@@ -384,7 +384,7 @@ extension SwiftDiagramReducer {
 
                 case .class:
                     for classState in state.classes
-                    where classState.object.id == dependency.callerObject.rootObjectID {
+                        where classState.object.id == dependency.callerObject.rootObjectID {
                         for detail in classState.details {
                             for textState in detail.texts {
                                 if textState.id == callerLeafID {
@@ -397,7 +397,7 @@ extension SwiftDiagramReducer {
 
                 case .enum:
                     for enumState in state.enums
-                    where enumState.object.id == dependency.callerObject.rootObjectID {
+                        where enumState.object.id == dependency.callerObject.rootObjectID {
                         for detail in enumState.details {
                             for textState in detail.texts {
                                 if textState.id == callerLeafID {

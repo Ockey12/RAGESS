@@ -63,12 +63,30 @@ public struct HeaderReducer {
 
     public enum Action {
         case text(TextCellReducer.Action)
+        case delegate(Delegate)
+
+        public enum Delegate {
+            case clicked(
+                object: any DeclarationObject,
+                leadingArrowTerminalPoint: CGPoint,
+                trailingArrowTerminalPoint: CGPoint
+            )
+        }
     }
 
     public var body: some ReducerOf<Self> {
-        Reduce { _, action in
+        Reduce { state, action in
             switch action {
+            case .text(.clicked):
+                return .send(.delegate(.clicked(
+                    object: state.object,
+                    leadingArrowTerminalPoint: state.leadingArrowTerminalPoint,
+                    trailingArrowTerminalPoint: state.trailingArrowTerminalPoint)))
+
             case .text:
+                return .none
+
+            case .delegate:
                 return .none
             }
         }

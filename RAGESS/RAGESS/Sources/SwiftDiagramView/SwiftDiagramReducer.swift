@@ -364,9 +364,9 @@ extension SwiftDiagramReducer {
                                 if textState.id == callerLeafID
                                     || textState.object.descendantsID.contains(callerLeafID) {
                                     if startPointRootObjectID != protocolState.id,
-                                        let childDependencies = state.protocols[id: protocolState.id]?.object.objectsThatCallThisObject.filter({
-                                        $0.definitionObject.leafObjectID == callerLeafID
-                                    }) {
+                                       let childDependencies = state.protocols[id: protocolState.id]?.object.objectsThatCallThisObject.filter({
+                                           $0.definitionObject.leafObjectID == callerLeafID
+                                       }) {
                                         let childArrowStates = generateArrowStates(
                                             state: state,
                                             startPointRootObjectID: protocolState.id,
@@ -391,9 +391,9 @@ extension SwiftDiagramReducer {
                                 if textState.id == callerLeafID
                                     || textState.object.descendantsID.contains(callerLeafID) {
                                     if startPointRootObjectID != structState.id,
-                                        let childDependencies = state.structs[id: structState.id]?.object.objectsThatCallThisObject.filter({
-                                        $0.definitionObject.leafObjectID == callerLeafID
-                                    }) {
+                                       let childDependencies = state.structs[id: structState.id]?.object.objectsThatCallThisObject.filter({
+                                           $0.definitionObject.leafObjectID == callerLeafID
+                                       }) {
                                         let childArrowStates = generateArrowStates(
                                             state: state,
                                             startPointRootObjectID: structState.id,
@@ -418,9 +418,9 @@ extension SwiftDiagramReducer {
                                 if textState.id == callerLeafID
                                     || textState.object.descendantsID.contains(callerLeafID) {
                                     if startPointRootObjectID != classState.id,
-                                        let childDependencies = state.classes[id: classState.id]?.object.objectsThatCallThisObject.filter({
-                                        $0.definitionObject.leafObjectID == callerLeafID
-                                    }) {
+                                       let childDependencies = state.classes[id: classState.id]?.object.objectsThatCallThisObject.filter({
+                                           $0.definitionObject.leafObjectID == callerLeafID
+                                       }) {
                                         let childArrowStates = generateArrowStates(
                                             state: state,
                                             startPointRootObjectID: classState.id,
@@ -445,9 +445,9 @@ extension SwiftDiagramReducer {
                                 if textState.id == callerLeafID
                                     || textState.object.descendantsID.contains(callerLeafID) {
                                     if startPointRootObjectID != enumState.id,
-                                        let childDependencies = state.enums[id: enumState.id]?.object.objectsThatCallThisObject.filter({
-                                        $0.definitionObject.leafObjectID == callerLeafID
-                                    }) {
+                                       let childDependencies = state.enums[id: enumState.id]?.object.objectsThatCallThisObject.filter({
+                                           $0.definitionObject.leafObjectID == callerLeafID
+                                       }) {
                                         let childArrowStates = generateArrowStates(
                                             state: state,
                                             startPointRootObjectID: enumState.id,

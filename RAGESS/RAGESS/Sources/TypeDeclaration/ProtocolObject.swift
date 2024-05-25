@@ -25,9 +25,9 @@ public struct ProtocolObject: Inheritable, Initializable, HasHeader {
 
     public var descendantsID: [UUID] {
         var ids: [UUID] = [id]
-        ids.append(contentsOf: initializers.flatMap({ $0.descendantsID }))
-        ids.append(contentsOf: variables.flatMap({ $0.descendantsID }))
-        ids.append(contentsOf: functions.flatMap({ $0.descendantsID }))
+        ids.append(contentsOf: initializers.flatMap { $0.descendantsID })
+        ids.append(contentsOf: variables.flatMap { $0.descendantsID })
+        ids.append(contentsOf: functions.flatMap { $0.descendantsID })
         return ids
     }
 

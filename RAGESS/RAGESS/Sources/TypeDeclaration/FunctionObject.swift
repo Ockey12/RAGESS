@@ -28,12 +28,12 @@ public struct FunctionObject: TypeNestable {
 
     public var descendantsID: [UUID] {
         var ids: [UUID] = [id]
-        ids.append(contentsOf: variables.flatMap({ $0.descendantsID }))
-        ids.append(contentsOf: functions.flatMap({ $0.descendantsID }))
-        ids.append(contentsOf: nestingProtocols.flatMap({ $0.descendantsID }))
-        ids.append(contentsOf: nestingStructs.flatMap({ $0.descendantsID }))
-        ids.append(contentsOf: nestingClasses.flatMap({ $0.descendantsID }))
-        ids.append(contentsOf: nestingEnums.flatMap({ $0.descendantsID }))
+        ids.append(contentsOf: variables.flatMap { $0.descendantsID })
+        ids.append(contentsOf: functions.flatMap { $0.descendantsID })
+        ids.append(contentsOf: nestingProtocols.flatMap { $0.descendantsID })
+        ids.append(contentsOf: nestingStructs.flatMap { $0.descendantsID })
+        ids.append(contentsOf: nestingClasses.flatMap { $0.descendantsID })
+        ids.append(contentsOf: nestingEnums.flatMap { $0.descendantsID })
         return ids
     }
 

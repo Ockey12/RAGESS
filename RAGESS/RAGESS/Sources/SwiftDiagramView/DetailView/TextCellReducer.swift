@@ -19,7 +19,25 @@ public struct TextCellReducer {
         }
 
         let object: any DeclarationObject
-        let frameWidth: CGFloat
+        var topLeadingPoint: CGPoint
+        var leadingArrowTerminalPoint: CGPoint {
+            CGPoint(
+                x: topLeadingPoint.x,
+                y: topLeadingPoint.y
+                + ComponentSizeValues.itemHeight / 2
+            )
+        }
+        var trailingArrowTerminalPoint: CGPoint {
+            CGPoint(
+                x: topLeadingPoint.x
+                + bodyWidth
+                + ComponentSizeValues.arrowTerminalWidth * 2
+                + ComponentSizeValues.borderWidth,
+                y: topLeadingPoint.y
+                + ComponentSizeValues.itemHeight / 2
+            )
+        }
+        let bodyWidth: CGFloat
     }
 
     public enum Action {

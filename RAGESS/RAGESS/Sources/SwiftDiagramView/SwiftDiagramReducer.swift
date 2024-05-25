@@ -362,7 +362,8 @@ extension SwiftDiagramReducer {
                         for detail in protocolState.details {
                             for textState in detail.texts {
                                 if textState.id == callerLeafID {
-                                    if let childDependencies = state.protocols[id: protocolState.id]?.object.objectsThatCallThisObject.filter({
+                                    if startPointRootObjectID != protocolState.id,
+                                        let childDependencies = state.protocols[id: protocolState.id]?.object.objectsThatCallThisObject.filter({
                                         $0.definitionObject.leafObjectID == callerLeafID
                                     }) {
                                         let childArrowStates = generateArrowStates(
@@ -387,7 +388,8 @@ extension SwiftDiagramReducer {
                         for detail in structState.details {
                             for textState in detail.texts {
                                 if textState.id == callerLeafID {
-                                    if let childDependencies = state.structs[id: structState.id]?.object.objectsThatCallThisObject.filter({
+                                    if startPointRootObjectID != structState.id,
+                                        let childDependencies = state.structs[id: structState.id]?.object.objectsThatCallThisObject.filter({
                                         $0.definitionObject.leafObjectID == callerLeafID
                                     }) {
                                         let childArrowStates = generateArrowStates(
@@ -412,7 +414,8 @@ extension SwiftDiagramReducer {
                         for detail in classState.details {
                             for textState in detail.texts {
                                 if textState.id == callerLeafID {
-                                    if let childDependencies = state.classes[id: classState.id]?.object.objectsThatCallThisObject.filter({
+                                    if startPointRootObjectID != classState.id,
+                                        let childDependencies = state.classes[id: classState.id]?.object.objectsThatCallThisObject.filter({
                                         $0.definitionObject.leafObjectID == callerLeafID
                                     }) {
                                         let childArrowStates = generateArrowStates(
@@ -437,7 +440,8 @@ extension SwiftDiagramReducer {
                         for detail in enumState.details {
                             for textState in detail.texts {
                                 if textState.id == callerLeafID {
-                                    if let childDependencies = state.enums[id: enumState.id]?.object.objectsThatCallThisObject.filter({
+                                    if startPointRootObjectID != enumState.id,
+                                        let childDependencies = state.enums[id: enumState.id]?.object.objectsThatCallThisObject.filter({
                                         $0.definitionObject.leafObjectID == callerLeafID
                                     }) {
                                         let childArrowStates = generateArrowStates(

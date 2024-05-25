@@ -100,7 +100,7 @@ public struct StructViewReducer {
 
             header = HeaderReducer.State(
                 object: object,
-                topLeadingPoint: CGPoint(x: 0, y: 0),
+                topLeadingPoint: topLeadingPoint,
                 frameWidth: maxWidth
             )
 

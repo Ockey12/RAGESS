@@ -63,27 +63,91 @@ public struct SwiftDiagramView: View {
                     .foregroundStyle(.gray)
                     .frame(width: 10, height: 10)
                     .position(x: state.topLeadingPoint.x, y: state.topLeadingPoint.y)
+
+                Circle()
+                    .foregroundStyle(.red)
+                    .frame(width: 10, height: 10)
+                    .position(
+                        x: state.header.leadingArrowTerminalPoint.x,
+                        y: state.header.leadingArrowTerminalPoint.y
+                    )
+
+                Circle()
+                    .foregroundStyle(.blue)
+                    .frame(width: 10, height: 10)
+                    .position(
+                        x: state.header.trailingArrowTerminalPoint.x,
+                        y: state.header.trailingArrowTerminalPoint.y
+                    )
             }
 
             ForEach(store.structs.elements) { state in
                 Circle()
-                    .foregroundStyle(.green)
+                    .foregroundStyle(.gray)
                     .frame(width: 10, height: 10)
                     .position(x: state.topLeadingPoint.x, y: state.topLeadingPoint.y)
+
+                Circle()
+                    .foregroundStyle(.red)
+                    .frame(width: 10, height: 10)
+                    .position(
+                        x: state.header.leadingArrowTerminalPoint.x,
+                        y: state.header.leadingArrowTerminalPoint.y
+                    )
+
+                Circle()
+                    .foregroundStyle(.blue)
+                    .frame(width: 10, height: 10)
+                    .position(
+                        x: state.header.trailingArrowTerminalPoint.x,
+                        y: state.header.trailingArrowTerminalPoint.y
+                    )
             }
 
             ForEach(store.classes.elements) { state in
                 Circle()
-                    .foregroundStyle(.orange)
+                    .foregroundStyle(.gray)
                     .frame(width: 10, height: 10)
                     .position(x: state.topLeadingPoint.x, y: state.topLeadingPoint.y)
+
+                Circle()
+                    .foregroundStyle(.red)
+                    .frame(width: 10, height: 10)
+                    .position(
+                        x: state.header.leadingArrowTerminalPoint.x,
+                        y: state.header.leadingArrowTerminalPoint.y
+                    )
+
+                Circle()
+                    .foregroundStyle(.blue)
+                    .frame(width: 10, height: 10)
+                    .position(
+                        x: state.header.trailingArrowTerminalPoint.x,
+                        y: state.header.trailingArrowTerminalPoint.y
+                    )
             }
 
             ForEach(store.enums.elements) { state in
                 Circle()
-                    .foregroundStyle(.blue)
+                    .foregroundStyle(.gray)
                     .frame(width: 10, height: 10)
                     .position(x: state.topLeadingPoint.x, y: state.topLeadingPoint.y)
+
+                Circle()
+                    .foregroundStyle(.red)
+                    .frame(width: 10, height: 10)
+                    .position(
+                        x: state.header.leadingArrowTerminalPoint.x,
+                        y: state.header.leadingArrowTerminalPoint.y
+                    )
+
+                Circle()
+                    .foregroundStyle(.blue)
+                    .frame(width: 10, height: 10)
+                    .position(
+                        x: state.header.trailingArrowTerminalPoint.x,
+                        y: state.header.trailingArrowTerminalPoint.y
+                    )
             }
         } // ZStack
     }

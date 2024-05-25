@@ -262,11 +262,25 @@ extension SwiftDiagramReducer {
         var arrowStates: [ArrowViewReducer.State] = []
 
         for dependency in dependencies {
-            let callerLeafID = dependency.callerObject.leafObjectID
+            let callerLeafID: UUID
+            switch dependency.kind {
+            case .protocolInheritance:
+                callerLeafID = startPointRootObjectID
+            case .classInheritance:
+                callerLeafID = startPointRootObjectID
+            case .protocolConformance:
+                callerLeafID = startPointRootObjectID
+            case .declarationReference:
+                callerLeafID = dependency.callerObject.leafObjectID
+            case .identifierType:
+                callerLeafID = dependency.callerObject.leafObjectID
+            }
+            
             let endPointsTuple: (CGPoint, CGPoint)? = {
                 switch dependency.callerObject.keyPath {
                 case .protocol:
-                    for protocolState in state.structs {
+                    for protocolState in state.protocols
+                    where protocolState.object.id == dependency.callerObject.rootObjectID {
                         for detail in protocolState.details {
                             for textState in detail.texts {
                                 if textState.id == callerLeafID {
@@ -278,7 +292,8 @@ extension SwiftDiagramReducer {
                     return nil
 
                 case .struct:
-                    for structState in state.structs {
+                    for structState in state.structs
+                    where structState.object.id == dependency.callerObject.rootObjectID {
                         for detail in structState.details {
                             for textState in detail.texts {
                                 if textState.id == callerLeafID {
@@ -290,7 +305,8 @@ extension SwiftDiagramReducer {
                     return nil
 
                 case .class:
-                    for classState in state.structs {
+                    for classState in state.classes
+                    where classState.object.id == dependency.callerObject.rootObjectID {
                         for detail in classState.details {
                             for textState in detail.texts {
                                 if textState.id == callerLeafID {
@@ -302,7 +318,8 @@ extension SwiftDiagramReducer {
                     return nil
 
                 case .enum:
-                    for enumState in state.structs {
+                    for enumState in state.enums
+                    where enumState.object.id == dependency.callerObject.rootObjectID {
                         for detail in enumState.details {
                             for textState in detail.texts {
                                 if textState.id == callerLeafID {

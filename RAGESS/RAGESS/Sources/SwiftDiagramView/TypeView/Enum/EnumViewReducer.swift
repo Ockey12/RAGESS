@@ -86,18 +86,18 @@ public struct EnumViewReducer {
             allAnnotatedDecl.append(contentsOf: object.variables.map { $0.annotatedDecl })
             allAnnotatedDecl.append(contentsOf: object.functions.map { $0.annotatedDecl })
 
-            let maxWidth = max(
+            let bodyWidth = max(
                 calculateMaxTextWidth(allAnnotatedDecl),
                 ComponentSizeValues.bodyMinWidth
             )
-            frameWidth = max(calculateMaxTextWidth(allAnnotatedDecl), ComponentSizeValues.bodyMinWidth)
+            frameWidth = bodyWidth
                 + ComponentSizeValues.arrowTerminalWidth * 2
                 + ComponentSizeValues.borderWidth
 
             header = HeaderReducer.State(
                 object: object,
                 topLeadingPoint: topLeadingPoint,
-                bodyWidth: maxWidth
+                bodyWidth: bodyWidth
             )
 
             details = [
@@ -105,31 +105,31 @@ public struct EnumViewReducer {
                     objects: conformedProtocolObjects,
                     kind: .protocolConformance,
                     topLeadingPoint: topLeadingPoint,
-                    frameWidth: maxWidth
+                    frameWidth: bodyWidth
                 ),
                 DetailReducer.State(
                     objects: object.cases,
                     kind: .case,
                     topLeadingPoint: topLeadingPoint,
-                    frameWidth: maxWidth
+                    frameWidth: bodyWidth
                 ),
                 DetailReducer.State(
                     objects: object.initializers,
                     kind: .initializers,
                     topLeadingPoint: topLeadingPoint,
-                    frameWidth: maxWidth
+                    frameWidth: bodyWidth
                 ),
                 DetailReducer.State(
                     objects: object.variables,
                     kind: .variables,
                     topLeadingPoint: topLeadingPoint,
-                    frameWidth: maxWidth
+                    frameWidth: bodyWidth
                 ),
                 DetailReducer.State(
                     objects: object.functions,
                     kind: .functions,
                     topLeadingPoint: topLeadingPoint,
-                    frameWidth: maxWidth
+                    frameWidth: bodyWidth
                 )
             ]
         }

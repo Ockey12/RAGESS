@@ -112,6 +112,18 @@ public struct SwiftDiagramReducer {
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
+            case let .protocols(.element(id: protocolID, action: .header(.text(.clicked)))):
+                let protocolObject = state.protocols[id: protocolID]!.object
+                let dependencies = protocolObject.objectsThatCallThisObject.filter { $0.definitionObject.leafObjectID == protocolObject.id }
+                dump(dependencies)
+                return .none
+
+            // FIXME: Apply the Delegate pattern.
+            case let .protocols(.element(id: protocolID, action: .details(.element(id: _, action: .delegate(.clickedCell(object: clickedObject)))))):
+                let dependencies = state.protocols[id: protocolID]!.object.objectsThatCallThisObject.filter { $0.definitionObject.leafObjectID == clickedObject.id }
+                dump(dependencies)
+                return .none
+
             case .protocols:
                 return .none
 
@@ -130,7 +142,31 @@ public struct SwiftDiagramReducer {
             case .structs:
                 return .none
 
+            case let .classes(.element(id: classID, action: .header(.text(.clicked)))):
+                let classObject = state.classes[id: classID]!.object
+                let dependencies = classObject.objectsThatCallThisObject.filter { $0.definitionObject.leafObjectID == classObject.id }
+                dump(dependencies)
+                return .none
+
+            // FIXME: Apply the Delegate pattern.
+            case let .classes(.element(id: classID, action: .details(.element(id: _, action: .delegate(.clickedCell(object: clickedObject)))))):
+                let dependencies = state.classes[id: classID]!.object.objectsThatCallThisObject.filter { $0.definitionObject.leafObjectID == clickedObject.id }
+                dump(dependencies)
+                return .none
+
             case .classes:
+                return .none
+
+            case let .enums(.element(id: enumID, action: .header(.text(.clicked)))):
+                let enumObject = state.enums[id: enumID]!.object
+                let dependencies = enumObject.objectsThatCallThisObject.filter { $0.definitionObject.leafObjectID == enumObject.id }
+                dump(dependencies)
+                return .none
+
+            // FIXME: Apply the Delegate pattern.
+            case let .enums(.element(id: enumID, action: .details(.element(id: _, action: .delegate(.clickedCell(object: clickedObject)))))):
+                let dependencies = state.enums[id: enumID]!.object.objectsThatCallThisObject.filter { $0.definitionObject.leafObjectID == clickedObject.id }
+                dump(dependencies)
                 return .none
 
             case .enums:

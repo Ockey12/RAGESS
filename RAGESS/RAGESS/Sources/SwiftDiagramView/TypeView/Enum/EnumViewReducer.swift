@@ -70,7 +70,11 @@ public struct EnumViewReducer {
                 + ComponentSizeValues.borderWidth
         }
 
-        public init(object: EnumObject, allDeclarationObjects: [any DeclarationObject], topLeadingPoint: CGPoint) {
+        public init(
+            object: EnumObject,
+            allDeclarationObjects: [any DeclarationObject],
+            topLeadingPoint: CGPoint
+        ) {
             self.object = object
             self.topLeadingPoint = topLeadingPoint
 
@@ -100,35 +104,96 @@ public struct EnumViewReducer {
                 bodyWidth: bodyWidth
             )
 
+            let borderWidth = ComponentSizeValues.borderWidth
+            let connectionHeight = ComponentSizeValues.connectionHeight
+            let itemHeight = ComponentSizeValues.itemHeight
+            let bottomPaddingForLastText = ComponentSizeValues.bottomPaddingForLastText
+
+            var frameBottomLeadingPoint = CGPoint(
+                x: topLeadingPoint.x,
+                y: topLeadingPoint.y
+                + borderWidth / 2
+                + itemHeight*2
+                + bottomPaddingForLastText
+            )
+
+            let protocolsFrameTopLeadingPoint = frameBottomLeadingPoint
+            if !conformedProtocolObjects.isEmpty {
+                frameBottomLeadingPoint = CGPoint(
+                    x: frameBottomLeadingPoint.x,
+                    y: frameBottomLeadingPoint.y
+                    + connectionHeight
+                    + itemHeight*CGFloat(conformedProtocolObjects.count)
+                    + bottomPaddingForLastText
+                )
+            }
+
+            let casesFrameTopLeadingPoint = frameBottomLeadingPoint
+            if !object.cases.isEmpty {
+                frameBottomLeadingPoint = CGPoint(
+                    x: frameBottomLeadingPoint.x,
+                    y: frameBottomLeadingPoint.y
+                    + connectionHeight
+                    + itemHeight*CGFloat(object.cases.count)
+                    + bottomPaddingForLastText
+                )
+            }
+
+            let initializersTopLeadingPoint = frameBottomLeadingPoint
+            if !object.initializers.isEmpty {
+                frameBottomLeadingPoint = CGPoint(
+                    x: frameBottomLeadingPoint.x,
+                    y: frameBottomLeadingPoint.y
+                    + connectionHeight
+                    + itemHeight*CGFloat(object.initializers.count)
+                    + bottomPaddingForLastText
+                )
+            }
+
+            let variablesTopLeadingPoint = frameBottomLeadingPoint
+            if !object.variables.isEmpty {
+                frameBottomLeadingPoint = CGPoint(
+                    x: frameBottomLeadingPoint.x,
+                    y: frameBottomLeadingPoint.y
+                    + connectionHeight
+                    + itemHeight*CGFloat(object.variables.count)
+                    + bottomPaddingForLastText
+                )
+            }
+
+            let functionsTopLeadingPoint = frameBottomLeadingPoint
+
             details = [
                 DetailReducer.State(
                     objects: conformedProtocolObjects,
                     kind: .protocolConformance,
-                    topLeadingPoint: topLeadingPoint,
+                    topLeadingPoint: protocolsFrameTopLeadingPoint,
                     frameWidth: bodyWidth
                 ),
                 DetailReducer.State(
                     objects: object.cases,
                     kind: .case,
-                    topLeadingPoint: topLeadingPoint,
+                    topLeadingPoint: casesFrameTopLeadingPoint,
                     frameWidth: bodyWidth
                 ),
+
+                // FIXME: enum cannot has inititalizers.
                 DetailReducer.State(
                     objects: object.initializers,
                     kind: .initializers,
-                    topLeadingPoint: topLeadingPoint,
+                    topLeadingPoint: initializersTopLeadingPoint,
                     frameWidth: bodyWidth
                 ),
                 DetailReducer.State(
                     objects: object.variables,
                     kind: .variables,
-                    topLeadingPoint: topLeadingPoint,
+                    topLeadingPoint: variablesTopLeadingPoint,
                     frameWidth: bodyWidth
                 ),
                 DetailReducer.State(
                     objects: object.functions,
                     kind: .functions,
-                    topLeadingPoint: topLeadingPoint,
+                    topLeadingPoint: functionsTopLeadingPoint,
                     frameWidth: bodyWidth
                 )
             ]

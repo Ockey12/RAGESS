@@ -79,7 +79,11 @@ public struct ClassViewReducer {
                 + ComponentSizeValues.borderWidth
         }
 
-        public init(object: ClassObject, allDeclarationObjects: [any DeclarationObject], topLeadingPoint: CGPoint) {
+        public init(
+            object: ClassObject,
+            allDeclarationObjects: [any DeclarationObject],
+            topLeadingPoint: CGPoint
+        ) {
             self.object = object
             self.topLeadingPoint = topLeadingPoint
 

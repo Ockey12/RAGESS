@@ -50,13 +50,6 @@ public struct SwiftDiagramView: View {
                     }
                 }
             } // VStack
-            .background {
-                GeometryReader { geometry in
-                    Path { _ in
-                        store.send(.geometry(width: geometry.size.width, height: geometry.size.height))
-                    }
-                }
-            }
 
             ForEach(store.protocols.elements) { state in
                 Circle()

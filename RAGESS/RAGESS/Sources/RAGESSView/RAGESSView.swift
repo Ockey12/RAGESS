@@ -86,8 +86,8 @@ public struct RAGESSView: View {
                             SwiftDiagramView(store: store.scope(state: \.swiftDiagram, action: \.swiftDiagram))
                                 .scaleEffect(store.swiftDiagramScale)
                                 .frame(
-                                    width: store.swiftDiagram.frameWidth * store.swiftDiagramScale,
-                                    height: store.swiftDiagram.frameHeight * store.swiftDiagramScale
+                                    width: max(store.swiftDiagram.frameWidth * store.swiftDiagramScale, 10),
+                                    height: max(store.swiftDiagram.frameHeight * store.swiftDiagramScale, 10)
                                 )
                         }
 

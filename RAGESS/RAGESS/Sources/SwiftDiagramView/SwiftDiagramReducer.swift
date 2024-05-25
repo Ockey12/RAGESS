@@ -22,8 +22,8 @@ public struct SwiftDiagramReducer {
         var classes: IdentifiedArrayOf<ClassViewReducer.State>
         var enums: IdentifiedArrayOf<EnumViewReducer.State>
         var arrows: IdentifiedArrayOf<ArrowViewReducer.State> = []
-        public var frameWidth: CGFloat = 0
-        public var frameHeight: CGFloat = 0
+        public var frameWidth: CGFloat = 1
+        public var frameHeight: CGFloat = 1
 
         public init(allDeclarationObjects: [any DeclarationObject]) {
             var protocolObjects: [ProtocolObject] = []
@@ -45,11 +45,14 @@ public struct SwiftDiagramReducer {
 
             var topLeadingPoint = CGPoint(x: 0, y: 0)
 
+            var protocolsRowTrailingX: CGFloat = 0
             let protocols = IdentifiedArray(uniqueElements: protocolObjects.map { object in
                 let state = ProtocolViewReducer.State(object: object, allDeclarationObjects: allDeclarationObjects, topLeadingPoint: topLeadingPoint)
                 let frameWidth = state.frameWidth
                 topLeadingPoint.x += frameWidth
                 topLeadingPoint.x += ComponentSizeValues.typeRowsSpacing
+                protocolsRowTrailingX += frameWidth
+                protocolsRowTrailingX += ComponentSizeValues.typeRowsSpacing
                 return state
             })
             self.protocols = protocols
@@ -60,11 +63,14 @@ public struct SwiftDiagramReducer {
             }
             topLeadingPoint.y += ComponentSizeValues.typeRowsSpacing
 
+            var structsRowTrailingX: CGFloat = 0
             let structs = IdentifiedArray(uniqueElements: structObjects.map { object in
                 let state = StructViewReducer.State(object: object, allDeclarationObjects: allDeclarationObjects, topLeadingPoint: topLeadingPoint)
                 let frameWidth = state.frameWidth
                 topLeadingPoint.x += frameWidth
                 topLeadingPoint.x += ComponentSizeValues.typeRowsSpacing
+                structsRowTrailingX += frameWidth
+                structsRowTrailingX += ComponentSizeValues.typeRowsSpacing
                 return state
             })
             self.structs = structs
@@ -75,11 +81,14 @@ public struct SwiftDiagramReducer {
             }
             topLeadingPoint.y += ComponentSizeValues.typeRowsSpacing
 
+            var classesRowTrailingX: CGFloat = 0
             let classes = IdentifiedArray(uniqueElements: classObjects.map { object in
                 let state = ClassViewReducer.State(object: object, allDeclarationObjects: allDeclarationObjects, topLeadingPoint: topLeadingPoint)
                 let frameWidth = state.frameWidth
                 topLeadingPoint.x += frameWidth
                 topLeadingPoint.x += ComponentSizeValues.typeRowsSpacing
+                classesRowTrailingX += frameWidth
+                classesRowTrailingX += ComponentSizeValues.typeRowsSpacing
                 return state
             })
             self.classes = classes
@@ -90,13 +99,36 @@ public struct SwiftDiagramReducer {
             }
             topLeadingPoint.y += ComponentSizeValues.typeRowsSpacing
 
-            enums = .init(uniqueElements: enumObjects.map { object in
+            var enumsRowTrailingX: CGFloat = 0
+            let enums = IdentifiedArray(uniqueElements: enumObjects.map { object in
                 let state = EnumViewReducer.State(object: object, allDeclarationObjects: allDeclarationObjects, topLeadingPoint: topLeadingPoint)
                 let frameWidth = state.frameWidth
                 topLeadingPoint.x += frameWidth
                 topLeadingPoint.x += ComponentSizeValues.typeRowsSpacing
+                enumsRowTrailingX += frameWidth
+                enumsRowTrailingX += ComponentSizeValues.typeRowsSpacing
                 return state
             })
+            self.enums = enums
+
+            self.frameWidth = max(
+                max(
+                    protocolsRowTrailingX - ComponentSizeValues.typeRowsSpacing,
+                    structsRowTrailingX - ComponentSizeValues.typeRowsSpacing
+                ),
+                max(
+                    classesRowTrailingX - ComponentSizeValues.typeRowsSpacing,
+                    enumsRowTrailingX - ComponentSizeValues.typeRowsSpacing
+                )
+            )
+
+            self.frameHeight = {
+                if enums.isEmpty {
+                    return topLeadingPoint.y
+                } else {
+                    return topLeadingPoint.y + enums.map { $0.frameHeight }.max()!
+                }
+            }()
 
             self.allDeclarationObjects = allDeclarationObjects
         }
@@ -108,7 +140,6 @@ public struct SwiftDiagramReducer {
         case classes(IdentifiedActionOf<ClassViewReducer>)
         case enums(IdentifiedActionOf<EnumViewReducer>)
         case arrows(IdentifiedActionOf<ArrowViewReducer>)
-        case geometry(width: CGFloat, height: CGFloat)
     }
 
     public var body: some ReducerOf<Self> {
@@ -303,11 +334,6 @@ public struct SwiftDiagramReducer {
                 return .none
 
             case .arrows:
-                return .none
-
-            case let .geometry(width: width, height: height):
-                state.frameWidth = width
-                state.frameHeight = height
                 return .none
             }
         }

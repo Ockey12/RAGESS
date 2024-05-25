@@ -24,10 +24,11 @@ public struct HeaderReducer {
                 x: topLeadingPoint.x,
                 y: topLeadingPoint.y
                     + ComponentSizeValues.itemHeight
-                    + ComponentSizeValues.itemHeight/2
-                    + ComponentSizeValues.borderWidth/2
+                    + ComponentSizeValues.itemHeight / 2
+                    + ComponentSizeValues.borderWidth / 2
             )
         }
+
         var trailingArrowTerminalPoint: CGPoint {
             CGPoint(
                 x: topLeadingPoint.x
@@ -36,8 +37,8 @@ public struct HeaderReducer {
                     + ComponentSizeValues.borderWidth,
                 y: topLeadingPoint.y
                     + ComponentSizeValues.itemHeight
-                    + ComponentSizeValues.itemHeight/2
-                    + ComponentSizeValues.borderWidth/2
+                    + ComponentSizeValues.itemHeight / 2
+                    + ComponentSizeValues.borderWidth / 2
             )
         }
 
@@ -50,7 +51,7 @@ public struct HeaderReducer {
             bodyWidth: CGFloat
         ) {
             self.object = object
-            self.text = TextCellReducer.State(object: object, frameWidth: bodyWidth)
+            text = TextCellReducer.State(object: object, frameWidth: bodyWidth)
             self.topLeadingPoint = topLeadingPoint
             self.bodyWidth = bodyWidth
         }

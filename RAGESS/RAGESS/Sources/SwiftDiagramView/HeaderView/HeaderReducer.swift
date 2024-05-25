@@ -67,7 +67,6 @@ public struct HeaderReducer {
 
         public enum Delegate {
             case clicked(
-                object: any DeclarationObject,
                 leadingArrowTerminalPoint: CGPoint,
                 trailingArrowTerminalPoint: CGPoint
             )
@@ -79,7 +78,6 @@ public struct HeaderReducer {
             switch action {
             case .text(.clicked):
                 return .send(.delegate(.clicked(
-                    object: state.object,
                     leadingArrowTerminalPoint: state.leadingArrowTerminalPoint,
                     trailingArrowTerminalPoint: state.trailingArrowTerminalPoint)))
 

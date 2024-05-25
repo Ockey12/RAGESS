@@ -25,14 +25,19 @@ public struct HeaderReducer {
                 y: topLeadingPoint.y
                     + ComponentSizeValues.itemHeight
                     + ComponentSizeValues.itemHeight/2
+                    + ComponentSizeValues.borderWidth/2
             )
         }
         var trailingArrowTerminalPoint: CGPoint {
             CGPoint(
-                x: topLeadingPoint.x + bodyWidth,
+                x: topLeadingPoint.x
+                    + bodyWidth
+                    + ComponentSizeValues.arrowTerminalWidth * 2
+                    + ComponentSizeValues.borderWidth,
                 y: topLeadingPoint.y
-                + ComponentSizeValues.itemHeight
-                + ComponentSizeValues.itemHeight/2
+                    + ComponentSizeValues.itemHeight
+                    + ComponentSizeValues.itemHeight/2
+                    + ComponentSizeValues.borderWidth/2
             )
         }
 

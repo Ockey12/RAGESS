@@ -255,22 +255,48 @@ public struct SwiftDiagramReducer {
             case .classes:
                 return .none
 
-            case let .enums(.element(id: enumID, action: .header(.text(.clicked)))):
-                let enumObject = state.enums[id: enumID]!.object
-                let dependencies = enumObject.objectsThatCallThisObject.filter { $0.definitionObject.leafObjectID == enumObject.id }
+            case let .enums(.element(id: enumID, action: .header(.delegate(.clicked(
+                leadingArrowTerminalPoint: leadingStartPoint,
+                trailingArrowTerminalPoint: trailingStartPoint
+            ))))):
+                let dependencies = state.enums[id: enumID]!.object.objectsThatCallThisObject.filter { $0.definitionObject.leafObjectID == enumID }
+
+#if DEBUG
                 dump(dependencies)
+#endif
+
+                state.arrows = .init(
+                    uniqueElements: generateArrowStates(
+                        state: state,
+                        startPointRootObjectID: enumID,
+                        leadingStartPoint: leadingStartPoint,
+                        trailingStartPoint: trailingStartPoint,
+                        dependencies: dependencies
+                    )
+                )
                 return .none
 
             // FIXME: Apply the Delegate pattern.
-            case let .enums(.element(
-                id: enumID,
-                action: .details(.element(
-                    id: _,
-                    action: .delegate(.clickedCell(object: clickedObject, leadingArrowTerminalPoint: leadingArrowTerminalPoint, trailingArrowTerminalPoint: trailingArrowTerminalPoint))
-                ))
-            )):
+            case let .enums(.element(id: enumID, action: .details(.element(id: _, action: .delegate(.clickedCell(
+                object: clickedObject,
+                leadingArrowTerminalPoint: leadingStartPoint,
+                trailingArrowTerminalPoint: trailingStartPoint
+            )))))):
                 let dependencies = state.enums[id: enumID]!.object.objectsThatCallThisObject.filter { $0.definitionObject.leafObjectID == clickedObject.id }
+
+#if DEBUG
                 dump(dependencies)
+#endif
+
+                state.arrows = .init(
+                    uniqueElements: generateArrowStates(
+                        state: state,
+                        startPointRootObjectID: enumID,
+                        leadingStartPoint: leadingStartPoint,
+                        trailingStartPoint: trailingStartPoint,
+                        dependencies: dependencies
+                    )
+                )
                 return .none
 
             case .enums:

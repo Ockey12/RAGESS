@@ -121,7 +121,13 @@ public struct SwiftDiagramReducer {
                 return .none
 
             // FIXME: Apply the Delegate pattern.
-            case let .protocols(.element(id: protocolID, action: .details(.element(id: _, action: .delegate(.clickedCell(object: clickedObject, leadingArrowTerminalPoint: leadingArrowTerminalPoint, trailingArrowTerminalPoint: trailingArrowTerminalPoint)))))):
+            case let .protocols(.element(
+                id: protocolID,
+                action: .details(.element(
+                    id: _,
+                    action: .delegate(.clickedCell(object: clickedObject, leadingArrowTerminalPoint: leadingArrowTerminalPoint, trailingArrowTerminalPoint: trailingArrowTerminalPoint))
+                ))
+            )):
                 let dependencies = state.protocols[id: protocolID]!.object.objectsThatCallThisObject.filter { $0.definitionObject.leafObjectID == clickedObject.id }
                 dump(dependencies)
                 return .none
@@ -145,7 +151,8 @@ public struct SwiftDiagramReducer {
                         startPointRootObjectID: structID,
                         leadingStartPoint: leadingStartPoint,
                         trailingStartPoint: trailingStartPoint,
-                        dependencies: dependencies)
+                        dependencies: dependencies
+                    )
                 )
                 return .none
 
@@ -167,7 +174,8 @@ public struct SwiftDiagramReducer {
                         startPointRootObjectID: structID,
                         leadingStartPoint: leadingStartPoint,
                         trailingStartPoint: trailingStartPoint,
-                        dependencies: dependencies)
+                        dependencies: dependencies
+                    )
                 )
                 return .none
 
@@ -181,7 +189,13 @@ public struct SwiftDiagramReducer {
                 return .none
 
             // FIXME: Apply the Delegate pattern.
-            case let .classes(.element(id: classID, action: .details(.element(id: _, action: .delegate(.clickedCell(object: clickedObject, leadingArrowTerminalPoint: leadingArrowTerminalPoint, trailingArrowTerminalPoint: trailingArrowTerminalPoint)))))):
+            case let .classes(.element(
+                id: classID,
+                action: .details(.element(
+                    id: _,
+                    action: .delegate(.clickedCell(object: clickedObject, leadingArrowTerminalPoint: leadingArrowTerminalPoint, trailingArrowTerminalPoint: trailingArrowTerminalPoint))
+                ))
+            )):
                 let dependencies = state.classes[id: classID]!.object.objectsThatCallThisObject.filter { $0.definitionObject.leafObjectID == clickedObject.id }
                 dump(dependencies)
                 return .none
@@ -196,7 +210,13 @@ public struct SwiftDiagramReducer {
                 return .none
 
             // FIXME: Apply the Delegate pattern.
-            case let .enums(.element(id: enumID, action: .details(.element(id: _, action: .delegate(.clickedCell(object: clickedObject, leadingArrowTerminalPoint: leadingArrowTerminalPoint, trailingArrowTerminalPoint: trailingArrowTerminalPoint)))))):
+            case let .enums(.element(
+                id: enumID,
+                action: .details(.element(
+                    id: _,
+                    action: .delegate(.clickedCell(object: clickedObject, leadingArrowTerminalPoint: leadingArrowTerminalPoint, trailingArrowTerminalPoint: trailingArrowTerminalPoint))
+                ))
+            )):
                 let dependencies = state.enums[id: enumID]!.object.objectsThatCallThisObject.filter { $0.definitionObject.leafObjectID == clickedObject.id }
                 dump(dependencies)
                 return .none
@@ -328,7 +348,8 @@ extension SwiftDiagramReducer {
                 startPointRootObjectID: startPointRootObjectID,
                 endPointRootObjectID: dependency.callerObject.rootObjectID,
                 startPoint: startPoint,
-                endPoint: endPoint))
+                endPoint: endPoint
+            ))
         } // for
 
         return arrowStates

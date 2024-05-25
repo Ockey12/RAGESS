@@ -79,7 +79,8 @@ public struct HeaderReducer {
             case .text(.clicked):
                 return .send(.delegate(.clicked(
                     leadingArrowTerminalPoint: state.leadingArrowTerminalPoint,
-                    trailingArrowTerminalPoint: state.trailingArrowTerminalPoint)))
+                    trailingArrowTerminalPoint: state.trailingArrowTerminalPoint
+                )))
 
             case .text:
                 return .none

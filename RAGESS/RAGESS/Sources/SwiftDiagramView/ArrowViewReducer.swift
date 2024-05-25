@@ -1,9 +1,9 @@
 //
 //  ArrowViewReducer.swift
 //
-//  
+//
 //  Created by Ockey12 on 2024/05/25
-//  
+//
 //
 
 import ComposableArchitecture
@@ -29,7 +29,7 @@ public struct ArrowViewReducer {
             endPoint: CGPoint
         ) {
             @Dependency(\.uuid) var uuid
-            self.id = uuid()
+            id = uuid()
             self.startPointRootObjectID = startPointRootObjectID
             self.endPointRootObjectID = endPointRootObjectID
             self.startPoint = startPoint

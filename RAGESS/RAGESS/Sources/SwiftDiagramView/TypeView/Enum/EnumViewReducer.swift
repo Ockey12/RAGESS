@@ -152,9 +152,9 @@ public struct EnumViewReducer {
                 frameBottomLeadingPoint = CGPoint(
                     x: frameBottomLeadingPoint.x,
                     y: frameBottomLeadingPoint.y
-                    + connectionHeight
-                    + itemHeight * CGFloat(object.cases.count)
-                    + bottomPaddingForLastText
+                        + connectionHeight
+                        + itemHeight * CGFloat(object.cases.count)
+                        + bottomPaddingForLastText
                 )
             }
 

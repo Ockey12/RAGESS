@@ -1,9 +1,9 @@
 //
 //  ArrowView.swift
 //
-//  
+//
 //  Created by Ockey12 on 2024/05/25
-//  
+//
 //
 
 import SwiftUI
@@ -13,7 +13,7 @@ struct ArrowView: View {
     let endPoint: CGPoint
 
     var body: some View {
-        GeometryReader { geometry in
+        GeometryReader { _ in
             let path = Path { path in
                 path.move(to: startPoint)
                 path.addLine(to: endPoint)

@@ -189,6 +189,14 @@ public struct SwiftDiagramReducer {
                 )
                 return .none
 
+            case let .protocols(.element(id: protocolID, action: .dragged(translation))):
+                dragged(draggedID: protocolID, translation: translation, arrowsState: &state.arrows)
+                return .none
+
+            case let .protocols(.element(id: protocolID, action: .dropped(translation))):
+                dropped(draggedID: protocolID, translation: translation, arrowsState: &state.arrows)
+                return .none
+
             case .protocols:
                 return .none
 

@@ -111,7 +111,7 @@ public struct SwiftDiagramReducer {
             })
             self.enums = enums
 
-            self.frameWidth = max(
+            frameWidth = max(
                 max(
                     protocolsRowTrailingX - ComponentSizeValues.typeRowsSpacing,
                     structsRowTrailingX - ComponentSizeValues.typeRowsSpacing
@@ -122,7 +122,7 @@ public struct SwiftDiagramReducer {
                 )
             )
 
-            self.frameHeight = {
+            frameHeight = {
                 if enums.isEmpty {
                     return topLeadingPoint.y
                 } else {

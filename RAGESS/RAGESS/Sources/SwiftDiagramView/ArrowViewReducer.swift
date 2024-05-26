@@ -85,16 +85,16 @@ public struct ArrowViewReducer {
             self.endPointRootObjectID = endPointRootObjectID
 
             self.leadingStartPoint = leadingStartPoint
-            self.beforeDragLeadingStartPoint = leadingStartPoint
+            beforeDragLeadingStartPoint = leadingStartPoint
 
             self.trailingStartPoint = trailingStartPoint
-            self.beforeDragTrailingStartPoint = trailingStartPoint
+            beforeDragTrailingStartPoint = trailingStartPoint
 
             self.leadingEndPoint = leadingEndPoint
-            self.beforeDragLeadingEndPoint = leadingEndPoint
+            beforeDragLeadingEndPoint = leadingEndPoint
 
             self.trailingEndPoint = trailingEndPoint
-            self.beforeDragTrailingEndPoint = trailingEndPoint
+            beforeDragTrailingEndPoint = trailingEndPoint
 //
 //            let combinations = [
 //                (leadingStartPoint, leadingEndPoint),

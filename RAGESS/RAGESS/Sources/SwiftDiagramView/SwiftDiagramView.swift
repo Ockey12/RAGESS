@@ -58,209 +58,209 @@ public struct SwiftDiagramView: View {
                 .position(x: 10, y: 10)
 
             #if DEBUG
-            ForEach(store.protocols.elements) { state in
-                Circle()
-                    .foregroundStyle(.gray)
-                    .frame(width: 10, height: 10)
-                    .position(x: state.topLeadingPoint.x, y: state.topLeadingPoint.y)
-
-                Circle()
-                    .foregroundStyle(.red)
-                    .frame(width: 10, height: 10)
-                    .position(
-                        x: state.header.leadingArrowTerminalPoint.x,
-                        y: state.header.leadingArrowTerminalPoint.y
-                    )
-
-                Circle()
-                    .foregroundStyle(.blue)
-                    .frame(width: 10, height: 10)
-                    .position(
-                        x: state.header.trailingArrowTerminalPoint.x,
-                        y: state.header.trailingArrowTerminalPoint.y
-                    )
-
-                ForEach(state.details) { detail in
+                ForEach(store.protocols.elements) { state in
                     Circle()
-                        .foregroundStyle(.orange)
+                        .foregroundStyle(.gray)
+                        .frame(width: 10, height: 10)
+                        .position(x: state.topLeadingPoint.x, y: state.topLeadingPoint.y)
+
+                    Circle()
+                        .foregroundStyle(.red)
                         .frame(width: 10, height: 10)
                         .position(
-                            x: detail.topLeadingPoint.x,
-                            y: detail.topLeadingPoint.y
+                            x: state.header.leadingArrowTerminalPoint.x,
+                            y: state.header.leadingArrowTerminalPoint.y
                         )
 
-                    ForEach(detail.texts) { text in
-                        Circle()
-                            .foregroundStyle(.red)
-                            .frame(width: 10, height: 10)
-                            .position(
-                                x: text.leadingArrowTerminalPoint.x,
-                                y: text.leadingArrowTerminalPoint.y
-                            )
-
-                        Circle()
-                            .foregroundStyle(.blue)
-                            .frame(width: 10, height: 10)
-                            .position(
-                                x: text.trailingArrowTerminalPoint.x,
-                                y: text.trailingArrowTerminalPoint.y
-                            )
-                    }
-                }
-            }
-
-            ForEach(store.structs.elements) { state in
-                Circle()
-                    .foregroundStyle(.gray)
-                    .frame(width: 10, height: 10)
-                    .position(x: state.topLeadingPoint.x, y: state.topLeadingPoint.y)
-
-                Circle()
-                    .foregroundStyle(.red)
-                    .frame(width: 10, height: 10)
-                    .position(
-                        x: state.header.leadingArrowTerminalPoint.x,
-                        y: state.header.leadingArrowTerminalPoint.y
-                    )
-
-                Circle()
-                    .foregroundStyle(.blue)
-                    .frame(width: 10, height: 10)
-                    .position(
-                        x: state.header.trailingArrowTerminalPoint.x,
-                        y: state.header.trailingArrowTerminalPoint.y
-                    )
-
-                ForEach(state.details) { detail in
                     Circle()
-                        .foregroundStyle(.orange)
+                        .foregroundStyle(.blue)
                         .frame(width: 10, height: 10)
                         .position(
-                            x: detail.topLeadingPoint.x,
-                            y: detail.topLeadingPoint.y
+                            x: state.header.trailingArrowTerminalPoint.x,
+                            y: state.header.trailingArrowTerminalPoint.y
                         )
 
-                    ForEach(detail.texts) { text in
+                    ForEach(state.details) { detail in
                         Circle()
-                            .foregroundStyle(.red)
+                            .foregroundStyle(.orange)
                             .frame(width: 10, height: 10)
                             .position(
-                                x: text.leadingArrowTerminalPoint.x,
-                                y: text.leadingArrowTerminalPoint.y
+                                x: detail.topLeadingPoint.x,
+                                y: detail.topLeadingPoint.y
                             )
 
-                        Circle()
-                            .foregroundStyle(.blue)
-                            .frame(width: 10, height: 10)
-                            .position(
-                                x: text.trailingArrowTerminalPoint.x,
-                                y: text.trailingArrowTerminalPoint.y
-                            )
+                        ForEach(detail.texts) { text in
+                            Circle()
+                                .foregroundStyle(.red)
+                                .frame(width: 10, height: 10)
+                                .position(
+                                    x: text.leadingArrowTerminalPoint.x,
+                                    y: text.leadingArrowTerminalPoint.y
+                                )
+
+                            Circle()
+                                .foregroundStyle(.blue)
+                                .frame(width: 10, height: 10)
+                                .position(
+                                    x: text.trailingArrowTerminalPoint.x,
+                                    y: text.trailingArrowTerminalPoint.y
+                                )
+                        }
                     }
                 }
-            }
 
-            ForEach(store.classes.elements) { state in
-                Circle()
-                    .foregroundStyle(.gray)
-                    .frame(width: 10, height: 10)
-                    .position(x: state.topLeadingPoint.x, y: state.topLeadingPoint.y)
-
-                Circle()
-                    .foregroundStyle(.red)
-                    .frame(width: 10, height: 10)
-                    .position(
-                        x: state.header.leadingArrowTerminalPoint.x,
-                        y: state.header.leadingArrowTerminalPoint.y
-                    )
-
-                Circle()
-                    .foregroundStyle(.blue)
-                    .frame(width: 10, height: 10)
-                    .position(
-                        x: state.header.trailingArrowTerminalPoint.x,
-                        y: state.header.trailingArrowTerminalPoint.y
-                    )
-
-                ForEach(state.details) { detail in
+                ForEach(store.structs.elements) { state in
                     Circle()
-                        .foregroundStyle(.orange)
+                        .foregroundStyle(.gray)
+                        .frame(width: 10, height: 10)
+                        .position(x: state.topLeadingPoint.x, y: state.topLeadingPoint.y)
+
+                    Circle()
+                        .foregroundStyle(.red)
                         .frame(width: 10, height: 10)
                         .position(
-                            x: detail.topLeadingPoint.x,
-                            y: detail.topLeadingPoint.y
+                            x: state.header.leadingArrowTerminalPoint.x,
+                            y: state.header.leadingArrowTerminalPoint.y
                         )
 
-                    ForEach(detail.texts) { text in
-                        Circle()
-                            .foregroundStyle(.red)
-                            .frame(width: 10, height: 10)
-                            .position(
-                                x: text.leadingArrowTerminalPoint.x,
-                                y: text.leadingArrowTerminalPoint.y
-                            )
-
-                        Circle()
-                            .foregroundStyle(.blue)
-                            .frame(width: 10, height: 10)
-                            .position(
-                                x: text.trailingArrowTerminalPoint.x,
-                                y: text.trailingArrowTerminalPoint.y
-                            )
-                    }
-                }
-            }
-
-            ForEach(store.enums.elements) { state in
-                Circle()
-                    .foregroundStyle(.gray)
-                    .frame(width: 10, height: 10)
-                    .position(x: state.topLeadingPoint.x, y: state.topLeadingPoint.y)
-
-                Circle()
-                    .foregroundStyle(.red)
-                    .frame(width: 10, height: 10)
-                    .position(
-                        x: state.header.leadingArrowTerminalPoint.x,
-                        y: state.header.leadingArrowTerminalPoint.y
-                    )
-
-                Circle()
-                    .foregroundStyle(.blue)
-                    .frame(width: 10, height: 10)
-                    .position(
-                        x: state.header.trailingArrowTerminalPoint.x,
-                        y: state.header.trailingArrowTerminalPoint.y
-                    )
-
-                ForEach(state.details) { detail in
                     Circle()
-                        .foregroundStyle(.orange)
+                        .foregroundStyle(.blue)
                         .frame(width: 10, height: 10)
                         .position(
-                            x: detail.topLeadingPoint.x,
-                            y: detail.topLeadingPoint.y
+                            x: state.header.trailingArrowTerminalPoint.x,
+                            y: state.header.trailingArrowTerminalPoint.y
                         )
 
-                    ForEach(detail.texts) { text in
+                    ForEach(state.details) { detail in
                         Circle()
-                            .foregroundStyle(.red)
+                            .foregroundStyle(.orange)
                             .frame(width: 10, height: 10)
                             .position(
-                                x: text.leadingArrowTerminalPoint.x,
-                                y: text.leadingArrowTerminalPoint.y
+                                x: detail.topLeadingPoint.x,
+                                y: detail.topLeadingPoint.y
                             )
 
-                        Circle()
-                            .foregroundStyle(.blue)
-                            .frame(width: 10, height: 10)
-                            .position(
-                                x: text.trailingArrowTerminalPoint.x,
-                                y: text.trailingArrowTerminalPoint.y
-                            )
+                        ForEach(detail.texts) { text in
+                            Circle()
+                                .foregroundStyle(.red)
+                                .frame(width: 10, height: 10)
+                                .position(
+                                    x: text.leadingArrowTerminalPoint.x,
+                                    y: text.leadingArrowTerminalPoint.y
+                                )
+
+                            Circle()
+                                .foregroundStyle(.blue)
+                                .frame(width: 10, height: 10)
+                                .position(
+                                    x: text.trailingArrowTerminalPoint.x,
+                                    y: text.trailingArrowTerminalPoint.y
+                                )
+                        }
                     }
                 }
-            }
+
+                ForEach(store.classes.elements) { state in
+                    Circle()
+                        .foregroundStyle(.gray)
+                        .frame(width: 10, height: 10)
+                        .position(x: state.topLeadingPoint.x, y: state.topLeadingPoint.y)
+
+                    Circle()
+                        .foregroundStyle(.red)
+                        .frame(width: 10, height: 10)
+                        .position(
+                            x: state.header.leadingArrowTerminalPoint.x,
+                            y: state.header.leadingArrowTerminalPoint.y
+                        )
+
+                    Circle()
+                        .foregroundStyle(.blue)
+                        .frame(width: 10, height: 10)
+                        .position(
+                            x: state.header.trailingArrowTerminalPoint.x,
+                            y: state.header.trailingArrowTerminalPoint.y
+                        )
+
+                    ForEach(state.details) { detail in
+                        Circle()
+                            .foregroundStyle(.orange)
+                            .frame(width: 10, height: 10)
+                            .position(
+                                x: detail.topLeadingPoint.x,
+                                y: detail.topLeadingPoint.y
+                            )
+
+                        ForEach(detail.texts) { text in
+                            Circle()
+                                .foregroundStyle(.red)
+                                .frame(width: 10, height: 10)
+                                .position(
+                                    x: text.leadingArrowTerminalPoint.x,
+                                    y: text.leadingArrowTerminalPoint.y
+                                )
+
+                            Circle()
+                                .foregroundStyle(.blue)
+                                .frame(width: 10, height: 10)
+                                .position(
+                                    x: text.trailingArrowTerminalPoint.x,
+                                    y: text.trailingArrowTerminalPoint.y
+                                )
+                        }
+                    }
+                }
+
+                ForEach(store.enums.elements) { state in
+                    Circle()
+                        .foregroundStyle(.gray)
+                        .frame(width: 10, height: 10)
+                        .position(x: state.topLeadingPoint.x, y: state.topLeadingPoint.y)
+
+                    Circle()
+                        .foregroundStyle(.red)
+                        .frame(width: 10, height: 10)
+                        .position(
+                            x: state.header.leadingArrowTerminalPoint.x,
+                            y: state.header.leadingArrowTerminalPoint.y
+                        )
+
+                    Circle()
+                        .foregroundStyle(.blue)
+                        .frame(width: 10, height: 10)
+                        .position(
+                            x: state.header.trailingArrowTerminalPoint.x,
+                            y: state.header.trailingArrowTerminalPoint.y
+                        )
+
+                    ForEach(state.details) { detail in
+                        Circle()
+                            .foregroundStyle(.orange)
+                            .frame(width: 10, height: 10)
+                            .position(
+                                x: detail.topLeadingPoint.x,
+                                y: detail.topLeadingPoint.y
+                            )
+
+                        ForEach(detail.texts) { text in
+                            Circle()
+                                .foregroundStyle(.red)
+                                .frame(width: 10, height: 10)
+                                .position(
+                                    x: text.leadingArrowTerminalPoint.x,
+                                    y: text.leadingArrowTerminalPoint.y
+                                )
+
+                            Circle()
+                                .foregroundStyle(.blue)
+                                .frame(width: 10, height: 10)
+                                .position(
+                                    x: text.trailingArrowTerminalPoint.x,
+                                    y: text.trailingArrowTerminalPoint.y
+                                )
+                        }
+                    }
+                }
             #endif
         } // ZStack
         .frame(width: store.frameWidth, height: store.frameHeight)

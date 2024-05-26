@@ -86,8 +86,7 @@ public struct EnumViewReducer {
         ) {
             self.object = object
             self.topLeadingPoint = topLeadingPoint
-            self.dragStartPosition = topLeadingPoint
-
+            dragStartPosition = topLeadingPoint
 
             let conformedProtocolObjects = extractConformedProtocolObjects(
                 by: object,

@@ -38,7 +38,6 @@ public struct EnumView: View {
                     store.send(.dropped(value.translation))
                 }
         )
-
     }
 }
 

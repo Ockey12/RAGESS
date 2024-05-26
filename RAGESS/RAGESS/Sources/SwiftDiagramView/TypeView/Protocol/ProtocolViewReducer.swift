@@ -78,7 +78,7 @@ public struct ProtocolViewReducer {
         ) {
             self.object = object
             self.topLeadingPoint = topLeadingPoint
-            self.dragStartPosition = topLeadingPoint
+            dragStartPosition = topLeadingPoint
 
             let parentProtocolObjects = extractParentProtocolObjects(
                 by: object,
@@ -237,7 +237,6 @@ public struct ProtocolViewReducer {
                     }
                 }
                 return .none
-
 
             case .details:
                 return .none

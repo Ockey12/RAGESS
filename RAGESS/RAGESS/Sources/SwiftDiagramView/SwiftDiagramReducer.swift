@@ -378,7 +378,6 @@ public struct SwiftDiagramReducer {
                 dropped(draggedID: enumID, translation: translation, arrowsState: &state.arrows)
                 return .none
 
-
             case .enums:
                 return .none
 

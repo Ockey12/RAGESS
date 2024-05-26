@@ -87,7 +87,7 @@ public struct ClassViewReducer {
         ) {
             self.object = object
             self.topLeadingPoint = topLeadingPoint
-            self.dragStartPosition = topLeadingPoint
+            dragStartPosition = topLeadingPoint
 
             let superClassObject = extractSuperClassObject(
                 by: object,

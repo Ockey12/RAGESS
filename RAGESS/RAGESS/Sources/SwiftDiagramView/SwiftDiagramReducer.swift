@@ -291,6 +291,14 @@ public struct SwiftDiagramReducer {
                 )
                 return .none
 
+            case let .classes(.element(id: classID, action: .dragged(translation))):
+                dragged(draggedID: classID, translation: translation, arrowsState: &state.arrows)
+                return .none
+
+            case let .classes(.element(id: classID, action: .dropped(translation))):
+                dropped(draggedID: classID, translation: translation, arrowsState: &state.arrows)
+                return .none
+
             case .classes:
                 return .none
 

@@ -23,10 +23,11 @@ public struct ClassViewReducer {
         let object: ClassObject
         var header: HeaderReducer.State
         var details: IdentifiedArrayOf<DetailReducer.State>
-        var topLeadingPoint: CGPoint
-        let frameWidth: CGFloat
         private let conformedProtocolObjects: [ProtocolObject]
         private let superClassObject: ClassObject?
+        var topLeadingPoint: CGPoint
+        var dragStartPosition: CGPoint
+        let frameWidth: CGFloat
         var frameHeight: CGFloat {
             let itemHeight = ComponentSizeValues.itemHeight
             let bottomPadding = ComponentSizeValues.bottomPaddingForLastText
@@ -86,6 +87,7 @@ public struct ClassViewReducer {
         ) {
             self.object = object
             self.topLeadingPoint = topLeadingPoint
+            self.dragStartPosition = topLeadingPoint
 
             let superClassObject = extractSuperClassObject(
                 by: object,
@@ -224,6 +226,8 @@ public struct ClassViewReducer {
 
     public enum Action {
         case header(HeaderReducer.Action)
+        case dragged(CGSize)
+        case dropped(CGSize)
         case details(IdentifiedActionOf<DetailReducer>)
     }
 
@@ -231,9 +235,43 @@ public struct ClassViewReducer {
         Scope(state: \.header, action: \.header) {
             HeaderReducer()
         }
-        Reduce { _, action in
+        Reduce { state, action in
             switch action {
             case .header:
+                return .none
+
+            case let .dragged(translation):
+                state.topLeadingPoint = CGPoint(
+                    x: state.dragStartPosition.x + translation.width,
+                    y: state.dragStartPosition.y + translation.height
+                )
+                return .none
+
+            case let .dropped(translation):
+                let droppedPosition = CGPoint(
+                    x: state.dragStartPosition.x + translation.width,
+                    y: state.dragStartPosition.y + translation.height
+                )
+                state.topLeadingPoint = droppedPosition
+                state.dragStartPosition = droppedPosition
+
+                state.header.topLeadingPoint = CGPoint(
+                    x: state.header.topLeadingPoint.x + translation.width,
+                    y: state.header.topLeadingPoint.y + translation.height
+                )
+
+                for detailID in state.details.ids {
+                    state.details[id: detailID]!.topLeadingPoint = CGPoint(
+                        x: state.details[id: detailID]!.topLeadingPoint.x + translation.width,
+                        y: state.details[id: detailID]!.topLeadingPoint.y + translation.height
+                    )
+                    for textID in state.details[id: detailID]!.texts.ids {
+                        state.details[id: detailID]!.texts[id: textID]!.topLeadingPoint = CGPoint(
+                            x: state.details[id: detailID]!.texts[id: textID]!.topLeadingPoint.x + translation.width,
+                            y: state.details[id: detailID]!.texts[id: textID]!.topLeadingPoint.y + translation.height
+                        )
+                    }
+                }
                 return .none
 
             case .details:

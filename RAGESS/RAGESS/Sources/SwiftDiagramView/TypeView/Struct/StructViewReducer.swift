@@ -211,6 +211,24 @@ public struct StructViewReducer {
                 )
                 state.topLeadingPoint = droppedPosition
                 state.dragStartPosition = droppedPosition
+
+                state.header.topLeadingPoint = CGPoint(
+                    x: state.header.topLeadingPoint.x + translation.width,
+                    y: state.header.topLeadingPoint.y + translation.height
+                )
+
+                for detailID in state.details.ids {
+                    state.details[id: detailID]!.topLeadingPoint = CGPoint(
+                        x: state.details[id: detailID]!.topLeadingPoint.x + translation.width,
+                        y: state.details[id: detailID]!.topLeadingPoint.y + translation.height
+                    )
+                    for textID in state.details[id: detailID]!.texts.ids {
+                        state.details[id: detailID]!.texts[id: textID]!.topLeadingPoint = CGPoint(
+                            x: state.details[id: detailID]!.texts[id: textID]!.topLeadingPoint.x + translation.width,
+                            y: state.details[id: detailID]!.texts[id: textID]!.topLeadingPoint.y + translation.height
+                        )
+                    }
+                }
                 return .none
 
             case .header:

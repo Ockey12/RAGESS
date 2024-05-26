@@ -29,8 +29,6 @@ public struct ArrowViewReducer {
         var beforeDragTrailingStartPoint: CGPoint
         var beforeDragLeadingEndPoint: CGPoint
         var beforeDragTrailingEndPoint: CGPoint
-//        var beforeDragStartPoint: CGPoint
-//        var beforeDragEndPoint: CGPoint
 
         var startPoint: CGPoint {
             let combinations = [
@@ -95,28 +93,6 @@ public struct ArrowViewReducer {
 
             self.trailingEndPoint = trailingEndPoint
             beforeDragTrailingEndPoint = trailingEndPoint
-//
-//            let combinations = [
-//                (leadingStartPoint, leadingEndPoint),
-//                (leadingStartPoint, trailingEndPoint),
-//                (trailingStartPoint, leadingEndPoint),
-//                (trailingStartPoint, trailingEndPoint)
-//            ]
-//
-//            var minDistance = CGFloat.infinity
-//            var startPoint = CGPoint()
-//            var endPoint = CGPoint()
-//            for (start, end) in combinations {
-//                let distance = hypot(start.x - end.x, start.y - end.y)
-//                if distance < minDistance {
-//                    startPoint = start
-//                    endPoint = end
-//                    minDistance = distance
-//                }
-//            }
-//
-//            self.beforeDragStartPoint = startPoint
-//            self.beforeDragEndPoint = endPoint
         }
     }
 }

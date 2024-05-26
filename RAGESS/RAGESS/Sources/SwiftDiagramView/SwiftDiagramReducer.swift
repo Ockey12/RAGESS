@@ -237,40 +237,7 @@ public struct SwiftDiagramReducer {
                 return .none
 
             case let .structs(.element(id: structID, action: .dragged(translation))):
-                for arrow in state.arrows {
-                    if arrow.startPointRootObjectID == structID {
-                        state.arrows[id: arrow.id]!.leadingStartPoint = CGPoint(
-                            x: state.arrows[id: arrow.id]!.beforeDragLeadingStartPoint.x + translation.width,
-                            y: state.arrows[id: arrow.id]!.beforeDragLeadingStartPoint.y + translation.height
-                        )
-                        state.arrows[id: arrow.id]!.trailingStartPoint = CGPoint(
-                            x: state.arrows[id: arrow.id]!.beforeDragTrailingStartPoint.x + translation.width,
-                            y: state.arrows[id: arrow.id]!.beforeDragTrailingStartPoint.y + translation.height
-                        )
-                    }
-                    if arrow.endPointRootObjectID == structID {
-                        state.arrows[id: arrow.id]!.leadingEndPoint = CGPoint(
-                            x: state.arrows[id: arrow.id]!.beforeDragLeadingEndPoint.x + translation.width,
-                            y: state.arrows[id: arrow.id]!.beforeDragLeadingEndPoint.y + translation.height
-                        )
-                        state.arrows[id: arrow.id]!.trailingEndPoint = CGPoint(
-                            x: state.arrows[id: arrow.id]!.beforeDragTrailingEndPoint.x + translation.width,
-                            y: state.arrows[id: arrow.id]!.beforeDragTrailingEndPoint.y + translation.height
-                        )
-                    }
-//                    if arrow.startPointRootObjectID == structID {
-//                        state.arrows[id: arrow.id]!.startPoint = CGPoint(
-//                            x: state.arrows[id: arrow.id]!.beforeDragStartPoint.x + translation.width,
-//                            y: state.arrows[id: arrow.id]!.beforeDragStartPoint.y + translation.height
-//                        )
-//                    }
-//                    if arrow.endPointRootObjectID == structID {
-//                        state.arrows[id: arrow.id]!.endPoint = CGPoint(
-//                            x: state.arrows[id: arrow.id]!.beforeDragEndPoint.x + translation.width,
-//                            y: state.arrows[id: arrow.id]!.beforeDragEndPoint.y + translation.height
-//                        )
-//                    }
-                }
+                dragged(draggedID: structID, translation: translation, arrowsState: &state.arrows)
                 return .none
 
             case let .structs(.element(id: structID, action: .dropped(translation))):
@@ -305,22 +272,6 @@ public struct SwiftDiagramReducer {
                         state.arrows[id: arrow.id]!.trailingEndPoint = trailingEndPoint
                         state.arrows[id: arrow.id]!.beforeDragTrailingEndPoint = trailingEndPoint
                     }
-//                    if arrow.startPointRootObjectID == structID {
-//                        let startPoint = CGPoint(
-//                            x: state.arrows[id: arrow.id]!.beforeDragStartPoint.x + translation.width,
-//                            y: state.arrows[id: arrow.id]!.beforeDragStartPoint.y + translation.height
-//                        )
-//                        state.arrows[id: arrow.id]!.startPoint = startPoint
-//                        state.arrows[id: arrow.id]!.beforeDragStartPoint = startPoint
-//                    }
-//                    if arrow.endPointRootObjectID == structID {
-//                        let endPoint = CGPoint(
-//                            x: state.arrows[id: arrow.id]!.beforeDragEndPoint.x + translation.width,
-//                            y: state.arrows[id: arrow.id]!.beforeDragEndPoint.y + translation.height
-//                        )
-//                        state.arrows[id: arrow.id]!.endPoint = endPoint
-//                        state.arrows[id: arrow.id]!.beforeDragEndPoint = endPoint
-//                    }
                 }
                 return .none
 
@@ -590,24 +541,6 @@ extension SwiftDiagramReducer {
                 continue
             }
             let (leadingEndPoint, trailingEndPoint) = endPointsTuple
-//            let combinations = [
-//                (leadingStartPoint, leadingEndPoint),
-//                (leadingStartPoint, trailingEndPoint),
-//                (trailingStartPoint, leadingEndPoint),
-//                (trailingStartPoint, trailingEndPoint)
-//            ]
-//
-//            var minDistance = CGFloat.infinity
-//            var startPoint = CGPoint()
-//            var endPoint = CGPoint()
-//            for (start, end) in combinations {
-//                let distance = hypot(start.x - end.x, start.y - end.y)
-//                if distance < minDistance {
-//                    startPoint = start
-//                    endPoint = end
-//                    minDistance = distance
-//                }
-//            }
 
             arrowStates.append(ArrowViewReducer.State(
                 startPointRootObjectID: startPointRootObjectID,
@@ -620,5 +553,32 @@ extension SwiftDiagramReducer {
         } // for
 
         return arrowStates
+    }
+}
+
+extension SwiftDiagramReducer {
+    func dragged(draggedID: UUID, translation: CGSize, arrowsState: inout IdentifiedArrayOf<ArrowViewReducer.State>) {
+        for arrow in arrowsState {
+            if arrow.startPointRootObjectID == draggedID {
+                arrowsState[id: arrow.id]!.leadingStartPoint = CGPoint(
+                    x: arrowsState[id: arrow.id]!.beforeDragLeadingStartPoint.x + translation.width,
+                    y: arrowsState[id: arrow.id]!.beforeDragLeadingStartPoint.y + translation.height
+                )
+                arrowsState[id: arrow.id]!.trailingStartPoint = CGPoint(
+                    x: arrowsState[id: arrow.id]!.beforeDragTrailingStartPoint.x + translation.width,
+                    y: arrowsState[id: arrow.id]!.beforeDragTrailingStartPoint.y + translation.height
+                )
+            }
+            if arrow.endPointRootObjectID == draggedID {
+                arrowsState[id: arrow.id]!.leadingEndPoint = CGPoint(
+                    x: arrowsState[id: arrow.id]!.beforeDragLeadingEndPoint.x + translation.width,
+                    y: arrowsState[id: arrow.id]!.beforeDragLeadingEndPoint.y + translation.height
+                )
+                arrowsState[id: arrow.id]!.trailingEndPoint = CGPoint(
+                    x: arrowsState[id: arrow.id]!.beforeDragTrailingEndPoint.x + translation.width,
+                    y: arrowsState[id: arrow.id]!.beforeDragTrailingEndPoint.y + translation.height
+                )
+            }
+        }
     }
 }

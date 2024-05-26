@@ -149,7 +149,9 @@ public struct SwiftDiagramReducer {
                 leadingArrowTerminalPoint: leadingStartPoint,
                 trailingArrowTerminalPoint: trailingStartPoint
             ))))):
-                let dependencies = state.protocols[id: protocolID]!.object.objectsThatCallThisObject.filter { $0.definitionObject.leafObjectID == protocolID }
+                let dependencies = state.protocols[id: protocolID]!.object.objectsThatCallThisObject.filter {
+                    $0.definitionObject.leafObjectID == protocolID
+                }
 
                 #if DEBUG
                     dump(dependencies)
@@ -172,7 +174,9 @@ public struct SwiftDiagramReducer {
                 leadingArrowTerminalPoint: leadingStartPoint,
                 trailingArrowTerminalPoint: trailingStartPoint
             )))))):
-                let dependencies = state.protocols[id: protocolID]!.object.objectsThatCallThisObject.filter { $0.definitionObject.leafObjectID == clickedObject.id }
+                let dependencies = state.protocols[id: protocolID]!.object.objectsThatCallThisObject.filter {
+                    $0.definitionObject.leafObjectID == clickedObject.id
+                }
 
                 #if DEBUG
                     dump(dependencies)
@@ -204,7 +208,9 @@ public struct SwiftDiagramReducer {
                 leadingArrowTerminalPoint: leadingStartPoint,
                 trailingArrowTerminalPoint: trailingStartPoint
             ))))):
-                let dependencies = state.structs[id: structID]!.object.objectsThatCallThisObject.filter { $0.definitionObject.leafObjectID == structID }
+                let dependencies = state.structs[id: structID]!.object.objectsThatCallThisObject.filter {
+                    $0.definitionObject.leafObjectID == structID
+                }
 
                 #if DEBUG
                     dump(dependencies)
@@ -227,7 +233,9 @@ public struct SwiftDiagramReducer {
                 leadingArrowTerminalPoint: leadingStartPoint,
                 trailingArrowTerminalPoint: trailingStartPoint
             )))))):
-                let dependencies = state.structs[id: structID]!.object.objectsThatCallThisObject.filter { $0.definitionObject.leafObjectID == clickedObject.id }
+                let dependencies = state.structs[id: structID]!.object.objectsThatCallThisObject.filter {
+                    $0.definitionObject.leafObjectID == clickedObject.id
+                }
 
                 #if DEBUG
                     dump(dependencies)
@@ -259,7 +267,9 @@ public struct SwiftDiagramReducer {
                 leadingArrowTerminalPoint: leadingStartPoint,
                 trailingArrowTerminalPoint: trailingStartPoint
             ))))):
-                let dependencies = state.classes[id: classID]!.object.objectsThatCallThisObject.filter { $0.definitionObject.leafObjectID == classID }
+                let dependencies = state.classes[id: classID]!.object.objectsThatCallThisObject.filter {
+                    $0.definitionObject.leafObjectID == classID
+                }
 
                 #if DEBUG
                     dump(dependencies)
@@ -282,7 +292,9 @@ public struct SwiftDiagramReducer {
                 leadingArrowTerminalPoint: leadingStartPoint,
                 trailingArrowTerminalPoint: trailingStartPoint
             )))))):
-                let dependencies = state.classes[id: classID]!.object.objectsThatCallThisObject.filter { $0.definitionObject.leafObjectID == clickedObject.id }
+                let dependencies = state.classes[id: classID]!.object.objectsThatCallThisObject.filter {
+                    $0.definitionObject.leafObjectID == clickedObject.id
+                }
 
                 #if DEBUG
                     dump(dependencies)
@@ -314,7 +326,9 @@ public struct SwiftDiagramReducer {
                 leadingArrowTerminalPoint: leadingStartPoint,
                 trailingArrowTerminalPoint: trailingStartPoint
             ))))):
-                let dependencies = state.enums[id: enumID]!.object.objectsThatCallThisObject.filter { $0.definitionObject.leafObjectID == enumID }
+                let dependencies = state.enums[id: enumID]!.object.objectsThatCallThisObject.filter {
+                    $0.definitionObject.leafObjectID == enumID
+                }
 
                 #if DEBUG
                     dump(dependencies)
@@ -337,7 +351,9 @@ public struct SwiftDiagramReducer {
                 leadingArrowTerminalPoint: leadingStartPoint,
                 trailingArrowTerminalPoint: trailingStartPoint
             )))))):
-                let dependencies = state.enums[id: enumID]!.object.objectsThatCallThisObject.filter { $0.definitionObject.leafObjectID == clickedObject.id }
+                let dependencies = state.enums[id: enumID]!.object.objectsThatCallThisObject.filter {
+                    $0.definitionObject.leafObjectID == clickedObject.id
+                }
 
                 #if DEBUG
                     dump(dependencies)

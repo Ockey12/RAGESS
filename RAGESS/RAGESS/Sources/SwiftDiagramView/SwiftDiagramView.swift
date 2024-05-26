@@ -23,24 +23,41 @@ public struct SwiftDiagramView: View {
         ZStack(alignment: .topLeading) {
             ForEach(store.scope(state: \.protocols, action: \.protocols)) { protocolStore in
                 ProtocolView(store: protocolStore)
+                #if DEBUG
                     .border(.gray)
+                #endif
             }
 
             ForEach(store.scope(state: \.structs, action: \.structs)) { structStore in
                 StructView(store: structStore)
+                #if DEBUG
                     .border(.green)
+                #endif
             }
 
             ForEach(store.scope(state: \.classes, action: \.classes)) { classStore in
                 ClassView(store: classStore)
+                #if DEBUG
                     .border(.orange)
+                #endif
             }
 
             ForEach(store.scope(state: \.enums, action: \.enums)) { enumStore in
                 EnumView(store: enumStore)
+                #if DEBUG
                     .border(.blue)
+                #endif
             }
 
+            ForEach(store.scope(state: \.arrows, action: \.arrows)) { arrow in
+                ArrowView(store: arrow)
+            }
+
+            Circle()
+                .foregroundStyle(.clear)
+                .position(x: 10, y: 10)
+
+            #if DEBUG
             ForEach(store.protocols.elements) { state in
                 Circle()
                     .foregroundStyle(.gray)
@@ -244,10 +261,7 @@ public struct SwiftDiagramView: View {
                     }
                 }
             }
-
-            ForEach(store.scope(state: \.arrows, action: \.arrows)) { arrow in
-                ArrowView(store: arrow)
-            }
+            #endif
         } // ZStack
         .frame(width: store.frameWidth, height: store.frameHeight)
     }

@@ -29,6 +29,16 @@ public struct EnumView: View {
         } // VStack
         .frame(width: store.frameWidth, height: store.frameHeight)
         .offset(x: store.topLeadingPoint.x, y: store.topLeadingPoint.y)
+        .gesture(
+            DragGesture()
+                .onChanged { value in
+                    store.send(.dragged(value.translation))
+                }
+                .onEnded { value in
+                    store.send(.dropped(value.translation))
+                }
+        )
+
     }
 }
 

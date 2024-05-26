@@ -354,6 +354,15 @@ public struct SwiftDiagramReducer {
                 )
                 return .none
 
+            case let .enums(.element(id: enumID, action: .dragged(translation))):
+                dragged(draggedID: enumID, translation: translation, arrowsState: &state.arrows)
+                return .none
+
+            case let .enums(.element(id: enumID, action: .dropped(translation))):
+                dropped(draggedID: enumID, translation: translation, arrowsState: &state.arrows)
+                return .none
+
+
             case .enums:
                 return .none
 

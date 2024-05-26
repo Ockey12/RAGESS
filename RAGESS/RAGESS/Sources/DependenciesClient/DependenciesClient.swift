@@ -92,11 +92,11 @@ private func printDependencies(
         of dependencyObject: DependencyObject,
         declarationObjects: [any DeclarationObject]
     ) {
-        guard let callerObject = declarationObjects.first(where: { $0.id == dependencyObject.callerObject.id }) else {
+        guard let callerObject = declarationObjects.first(where: { $0.id == dependencyObject.callerObject.rootObjectID }) else {
             print("ERROR in \(#filePath) - \(#function): Cannot find `callerObject` in `declarationObjects`.\n")
             return
         }
-        guard let definitionObject = declarationObjects.first(where: { $0.id == dependencyObject.definitionObject.id }) else {
+        guard let definitionObject = declarationObjects.first(where: { $0.id == dependencyObject.definitionObject.rootObjectID }) else {
             print("ERROR in \(#filePath) - \(#function): Cannot find `definitionObject` in `declarationObjects`.\n")
             return
         }
@@ -170,7 +170,7 @@ private func printDependencies(
             debugText += "\(component.fullPath)\n╰─\(component.name)\n"
         }
 
-        debugText += " calls ↓ \(dependencyObject.callerObject.kind)\n"
+        debugText += " calls ↓ \(dependencyObject.kind)\n"
 
         switch dependencyObject.definitionObject.keyPath {
         case let .protocol(partialKeyPath):

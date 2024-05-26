@@ -13,6 +13,17 @@ let package = Package(
         .library(
             name: "RAGESSView",
             targets: ["RAGESSView"]
+        ),
+        .library(
+            name: "SwiftDiagramView",
+            targets: ["SwiftDiagramView"]
+        ),
+        .library(
+            name: "SwiftDiagramView",
+            targets: [
+                "SwiftDiagramView",
+                "TypeDeclaration"
+            ]
         )
     ],
     dependencies: [
@@ -129,6 +140,7 @@ let package = Package(
                 "DumpPackageClient",
                 "MonitorClient",
                 "SourceFileClient",
+                "SwiftDiagramView",
                 "TypeDeclaration",
                 "XcodeObject",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
@@ -152,6 +164,14 @@ let package = Package(
                 .product(name: "DependenciesMacros", package: "swift-dependencies"),
                 .product(name: "LSPBindings", package: "sourcekit-lsp"),
                 .product(name: "SourceKittenFramework", package: "SourceKitten")
+            ]
+        ),
+        .target(
+            name: "SwiftDiagramView",
+            dependencies: [
+                "TypeDeclaration",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                .product(name: "Dependencies", package: "swift-dependencies")
             ]
         ),
         .target(
@@ -188,6 +208,14 @@ let package = Package(
                 .product(name: "DependenciesMacros", package: "swift-dependencies"),
                 .product(name: "LSPBindings", package: "sourcekit-lsp"),
                 .product(name: "SourceKittenFramework", package: "SourceKitten")
+            ]
+        ),
+        .testTarget(
+            name: "SwiftDiagramViewTests",
+            dependencies: [
+                "SwiftDiagramView",
+                "TypeDeclaration",
+                .product(name: "Dependencies", package: "swift-dependencies")
             ]
         ),
         .testTarget(

@@ -8,7 +8,7 @@
 
 import Foundation
 
-public protocol DeclarationObject: Identifiable {
+public protocol DeclarationObject: Identifiable, Equatable {
     var id: UUID { get }
     var name: String { get }
     var nameOffset: Int { get }
@@ -20,6 +20,8 @@ public protocol DeclarationObject: Identifiable {
 
     var variables: [VariableObject] { get set }
     var functions: [FunctionObject] { get set }
+
+    var descendantsID: [UUID] { get }
 
     var objectsThatCallThisObject: [DependencyObject] { get set }
 

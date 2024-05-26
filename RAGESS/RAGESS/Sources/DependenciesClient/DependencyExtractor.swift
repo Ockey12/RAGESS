@@ -7,6 +7,7 @@
 //
 
 import Dependencies
+import Foundation
 import LanguageServerProtocol
 import SourceKitClient
 import SwiftParser
@@ -173,6 +174,7 @@ struct DependencyExtractor {
 
             var optionalDefinitionKeyPath: DependencyObject.Object.ObjectKeyPath?
             var definitionObjectKind = ObjectKind.other
+            var optionalDefinitionLeafObjectID: UUID?
 
             if let protocolObject = declarationObjects[definitionObjectIndex] as? ProtocolObject {
                 guard let keyPath = findProperty(in: protocolObject, matching: {
@@ -182,7 +184,8 @@ struct DependencyExtractor {
                     return
                 }
                 optionalDefinitionKeyPath = .protocol(keyPath)
-                let definitionObject = protocolObject[keyPath: keyPath]
+                let definitionObject = protocolObject[keyPath: keyPath] as! any DeclarationObject
+                optionalDefinitionLeafObjectID = definitionObject.id
 
                 switch definitionObject {
                 case is ProtocolObject:
@@ -204,7 +207,8 @@ struct DependencyExtractor {
                 }
                 optionalDefinitionKeyPath = .struct(keyPath)
 
-                let definitionObject = structObject[keyPath: keyPath]
+                let definitionObject = structObject[keyPath: keyPath] as! any DeclarationObject
+                optionalDefinitionLeafObjectID = definitionObject.id
 
                 switch definitionObject {
                 case is ProtocolObject:
@@ -226,7 +230,8 @@ struct DependencyExtractor {
                 }
                 optionalDefinitionKeyPath = .class(keyPath)
 
-                let definitionObject = classObject[keyPath: keyPath]
+                let definitionObject = classObject[keyPath: keyPath] as! any DeclarationObject
+                optionalDefinitionLeafObjectID = definitionObject.id
 
                 switch definitionObject {
                 case is ProtocolObject:
@@ -248,7 +253,8 @@ struct DependencyExtractor {
                 }
                 optionalDefinitionKeyPath = .enum(keyPath)
 
-                let definitionObject = enumObject[keyPath: keyPath]
+                let definitionObject = enumObject[keyPath: keyPath] as! any DeclarationObject
+                optionalDefinitionLeafObjectID = definitionObject.id
 
                 switch definitionObject {
                 case is ProtocolObject:
@@ -270,7 +276,8 @@ struct DependencyExtractor {
                 }
                 optionalDefinitionKeyPath = .variable(keyPath)
 
-                let definitionObject = variableObject[keyPath: keyPath]
+                let definitionObject = variableObject[keyPath: keyPath] as! any DeclarationObject
+                optionalDefinitionLeafObjectID = definitionObject.id
 
                 switch definitionObject {
                 case is ProtocolObject:
@@ -292,7 +299,8 @@ struct DependencyExtractor {
                 }
                 optionalDefinitionKeyPath = .function(keyPath)
 
-                let definitionObject = functionObject[keyPath: keyPath]
+                let definitionObject = functionObject[keyPath: keyPath] as! any DeclarationObject
+                optionalDefinitionLeafObjectID = definitionObject.id
 
                 switch definitionObject {
                 case is ProtocolObject:
@@ -322,6 +330,7 @@ struct DependencyExtractor {
 
             var optionalCallerKeyPath: DependencyObject.Object.ObjectKeyPath?
             var callerObjectKind = ObjectKind.other
+            var optionalCallerLeafObjectID: UUID?
 
             if let protocolObject = declarationObjects[callerObjectIndex] as? ProtocolObject {
                 guard let keyPath = findProperty(in: protocolObject, matching: {
@@ -332,7 +341,8 @@ struct DependencyExtractor {
                 }
                 optionalCallerKeyPath = .protocol(keyPath)
 
-                let callerObject = protocolObject[keyPath: keyPath]
+                let callerObject = protocolObject[keyPath: keyPath] as! any DeclarationObject
+                optionalCallerLeafObjectID = callerObject.id
 
                 switch callerObject {
                 case is ProtocolObject:
@@ -354,7 +364,8 @@ struct DependencyExtractor {
                 }
                 optionalCallerKeyPath = .struct(keyPath)
 
-                let callerObject = structObject[keyPath: keyPath]
+                let callerObject = structObject[keyPath: keyPath] as! any DeclarationObject
+                optionalCallerLeafObjectID = callerObject.id
 
                 switch callerObject {
                 case is ProtocolObject:
@@ -376,7 +387,8 @@ struct DependencyExtractor {
                 }
                 optionalCallerKeyPath = .class(keyPath)
 
-                let callerObject = classObject[keyPath: keyPath]
+                let callerObject = classObject[keyPath: keyPath] as! any DeclarationObject
+                optionalCallerLeafObjectID = callerObject.id
 
                 switch callerObject {
                 case is ProtocolObject:
@@ -398,7 +410,8 @@ struct DependencyExtractor {
                 }
                 optionalCallerKeyPath = .enum(keyPath)
 
-                let callerObject = enumObject[keyPath: keyPath]
+                let callerObject = enumObject[keyPath: keyPath] as! any DeclarationObject
+                optionalCallerLeafObjectID = callerObject.id
 
                 switch callerObject {
                 case is ProtocolObject:
@@ -420,7 +433,8 @@ struct DependencyExtractor {
                 }
                 optionalCallerKeyPath = .variable(keyPath)
 
-                let callerObject = variableObject[keyPath: keyPath]
+                let callerObject = variableObject[keyPath: keyPath] as! any DeclarationObject
+                optionalCallerLeafObjectID = callerObject.id
 
                 switch callerObject {
                 case is ProtocolObject:
@@ -442,7 +456,8 @@ struct DependencyExtractor {
                 }
                 optionalCallerKeyPath = .function(keyPath)
 
-                let callerObject = functionObject[keyPath: keyPath]
+                let callerObject = functionObject[keyPath: keyPath] as! any DeclarationObject
+                optionalCallerLeafObjectID = callerObject.id
 
                 switch callerObject {
                 case is ProtocolObject:
@@ -473,7 +488,7 @@ struct DependencyExtractor {
                 return
             }
 
-            var dependencyKind = DependencyObject.Object.Kind.declarationReference
+            var dependencyKind = DependencyObject.Kind.declarationReference
 
             switch (offsetKind, definitionObjectKind, callerObjectKind) {
             case (.inherit, .protocol, .protocol):
@@ -493,15 +508,16 @@ struct DependencyExtractor {
             }
 
             let dependencyObject = DependencyObject(
+                kind: dependencyKind,
                 callerObject: .init(
-                    id: callerObject.id,
-                    keyPath: callerKeyPath,
-                    kind: dependencyKind
+                    rootObjectID: callerObject.id,
+                    leafObjectID: optionalCallerLeafObjectID!,
+                    keyPath: callerKeyPath
                 ),
                 definitionObject: .init(
-                    id: definitionObject.id,
-                    keyPath: definitionKeyPath,
-                    kind: dependencyKind
+                    rootObjectID: definitionObject.id,
+                    leafObjectID: optionalDefinitionLeafObjectID!,
+                    keyPath: definitionKeyPath
                 )
             )
 

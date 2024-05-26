@@ -9,7 +9,7 @@
 import Dependencies
 import Foundation
 
-public struct ProtocolObject: Inheritable, Initializable {
+public struct ProtocolObject: Inheritable, Initializable, HasHeader {
     public var id: UUID
     public var name: String
     public var nameOffset: Int
@@ -23,6 +23,14 @@ public struct ProtocolObject: Inheritable, Initializable {
     public var variables: [VariableObject] = []
     public var functions: [FunctionObject] = []
 
+    public var descendantsID: [UUID] {
+        var ids: [UUID] = [id]
+        ids.append(contentsOf: initializers.flatMap { $0.descendantsID })
+        ids.append(contentsOf: variables.flatMap { $0.descendantsID })
+        ids.append(contentsOf: functions.flatMap { $0.descendantsID })
+        return ids
+    }
+
     public var objectsThatCallThisObject: [DependencyObject] = []
     public var objectsThatAreCalledByThisObject: [DependencyObject] = []
 
@@ -30,7 +38,8 @@ public struct ProtocolObject: Inheritable, Initializable {
         name: String,
         nameOffset: Int,
         fullPath: String,
-        sourceCode: String,
+        annotatedDecl: String = "",
+        sourceCode: String = "",
         positionRange: ClosedRange<SourcePosition>,
         offsetRange: ClosedRange<Int>
     ) {
@@ -39,7 +48,13 @@ public struct ProtocolObject: Inheritable, Initializable {
         self.name = name
         self.nameOffset = nameOffset
         self.fullPath = fullPath
-        annotatedDecl = name
+
+        if annotatedDecl == "" {
+            self.annotatedDecl = name
+        } else {
+            self.annotatedDecl = annotatedDecl
+        }
+
         self.sourceCode = sourceCode
         self.positionRange = positionRange
         self.offsetRange = offsetRange

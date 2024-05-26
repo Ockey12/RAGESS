@@ -15,6 +15,7 @@ import DumpPackageClient
 import Foundation
 import MonitorClient
 import SourceFileClient
+import SwiftDiagramView
 import TypeDeclaration
 import XcodeObject
 
@@ -38,6 +39,8 @@ public struct RAGESSReducer {
             ".swiftpm"
         ]
         var loadingTaskKindBuffer: [LoadingTaskKind] = []
+        var swiftDiagram: SwiftDiagramReducer.State = .init(allDeclarationObjects: [])
+        var swiftDiagramScale: CGFloat = 0.5
 
         public init(projectRootDirectoryPath: String) {
             self.projectRootDirectoryPath = projectRootDirectoryPath
@@ -56,6 +59,9 @@ public struct RAGESSReducer {
         case extractDependenciesResponse(Result<[any DeclarationObject], Error>)
         case startMonitoring
         case detectedDirectoryChange
+        case swiftDiagram(SwiftDiagramReducer.Action)
+        case minusMagnifyingglassTapped
+        case plusMagnifyingglassTapped
         case binding(BindingAction<State>)
     }
 
@@ -71,6 +77,10 @@ public struct RAGESSReducer {
     }
 
     public var body: some ReducerOf<Self> {
+        Scope(state: \.swiftDiagram, action: \.swiftDiagram) {
+            SwiftDiagramReducer()
+                ._printChanges()
+        }
         Reduce { state, action in
             switch action {
             case let .projectDirectorySelectorResponse(.success(urls)):
@@ -259,6 +269,9 @@ public struct RAGESSReducer {
                 #endif
 
                 state.declarationObjects = hasDependenciesObjects
+
+                state.swiftDiagram = .init(allDeclarationObjects: hasDependenciesObjects)
+
                 return .send(.startMonitoring)
 
             case let .extractDependenciesResponse(.failure(error)):
@@ -292,6 +305,17 @@ public struct RAGESSReducer {
                         for: 1.0,
                         scheduler: self.mainQueue
                     )
+
+            case .swiftDiagram:
+                return .none
+
+            case .minusMagnifyingglassTapped:
+                state.swiftDiagramScale = max(state.swiftDiagramScale - 0.05, 0.05)
+                return .none
+
+            case .plusMagnifyingglassTapped:
+                state.swiftDiagramScale = min(state.swiftDiagramScale + 0.05, 1)
+                return .none
 
             case .binding:
                 return .none

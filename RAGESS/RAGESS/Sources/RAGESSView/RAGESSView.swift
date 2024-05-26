@@ -7,6 +7,7 @@
 //
 
 import ComposableArchitecture
+import SwiftDiagramView
 import SwiftUI
 
 public struct RAGESSView: View {
@@ -53,10 +54,42 @@ public struct RAGESSView: View {
                                 .padding()
 
                             Spacer()
+
+                            Button(
+                                action: {
+                                    store.send(.minusMagnifyingglassTapped)
+                                },
+                                label: {
+                                    Image(systemName: "minus.magnifyingglass")
+                                }
+                            )
+                            .padding(.leading)
+
+                            Text("\(Int(store.swiftDiagramScale * 100))%")
+                                .frame(width: 50)
+
+                            Button(
+                                action: {
+                                    store.send(.plusMagnifyingglassTapped)
+                                },
+                                label: {
+                                    Image(systemName: "plus.magnifyingglass")
+                                }
+                            )
+                            .padding(.trailing)
                         } // HStack
                         .frame(height: 40)
 
                         Divider()
+
+                        ScrollView([.horizontal, .vertical]) {
+                            SwiftDiagramView(store: store.scope(state: \.swiftDiagram, action: \.swiftDiagram))
+                                .scaleEffect(store.swiftDiagramScale)
+                                .frame(
+                                    width: max(store.swiftDiagram.frameWidth * store.swiftDiagramScale, 10),
+                                    height: max(store.swiftDiagram.frameHeight * store.swiftDiagramScale, 10)
+                                )
+                        }
 
                         Spacer()
                     } // VStack

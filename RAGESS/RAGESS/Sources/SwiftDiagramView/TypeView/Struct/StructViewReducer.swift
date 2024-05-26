@@ -23,9 +23,10 @@ public struct StructViewReducer {
         let object: StructObject
         var header: HeaderReducer.State
         var details: IdentifiedArrayOf<DetailReducer.State>
-        var topLeadingPoint: CGPoint
-        let frameWidth: CGFloat
         private let conformedProtocolObjects: [ProtocolObject]
+        var topLeadingPoint: CGPoint
+        var dragStartPosition: CGPoint
+        let frameWidth: CGFloat
         var frameHeight: CGFloat {
             let itemHeight = ComponentSizeValues.itemHeight
             let bottomPadding = ComponentSizeValues.bottomPaddingForLastText
@@ -77,6 +78,7 @@ public struct StructViewReducer {
         ) {
             self.object = object
             self.topLeadingPoint = topLeadingPoint
+            self.dragStartPosition = topLeadingPoint
 
             let conformedProtocolObjects = extractConformedProtocolObjects(
                 by: object,
@@ -184,6 +186,8 @@ public struct StructViewReducer {
     @CasePathable
     public enum Action {
         case header(HeaderReducer.Action)
+        case dragged(CGSize)
+        case dropped(CGSize)
         case details(IdentifiedActionOf<DetailReducer>)
     }
 
@@ -191,14 +195,28 @@ public struct StructViewReducer {
         Scope(state: \.header, action: \.header) {
             HeaderReducer()
         }
-        Reduce { _, action in
+        Reduce { state, action in
             switch action {
+            case let .dragged(translation):
+                state.topLeadingPoint = CGPoint(
+                    x: state.dragStartPosition.x + translation.width,
+                    y: state.dragStartPosition.y + translation.height
+                )
+                return .none
+
+            case let .dropped(translation):
+                let droppedPosition = CGPoint(
+                    x: state.dragStartPosition.x + translation.width,
+                    y: state.dragStartPosition.y + translation.height
+                )
+                state.topLeadingPoint = droppedPosition
+                state.dragStartPosition = droppedPosition
+                return .none
+
             case .header:
-                print(".header")
                 return .none
 
             case .details:
-                print(".details")
                 return .none
             }
         }

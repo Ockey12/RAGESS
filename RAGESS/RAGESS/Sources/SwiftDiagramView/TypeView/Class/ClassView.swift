@@ -28,6 +28,7 @@ public struct ClassView: View {
             }
         } // VStack
         .frame(width: store.frameWidth, height: store.frameHeight)
+        .offset(x: store.topLeadingPoint.x, y: store.topLeadingPoint.y)
     }
 }
 

@@ -6,33 +6,35 @@
 //
 //
 
+import ComposableArchitecture
 import SwiftUI
 
 struct ArrowView: View {
-    let startPoint: CGPoint
-    let endPoint: CGPoint
+    let store: StoreOf<ArrowViewReducer>
+//    let startPoint: CGPoint
+//    let endPoint: CGPoint
 
     var body: some View {
         let path = Path { path in
-            path.move(to: startPoint)
-            path.addLine(to: endPoint)
+            path.move(to: store.startPoint)
+            path.addLine(to: store.endPoint)
 
             // Arrow tip
             let arrowSize: CGFloat = 10
-            let angle = atan2(endPoint.y - startPoint.y, endPoint.x - startPoint.x)
+            let angle = atan2(store.endPoint.y - store.startPoint.y, store.endPoint.x - store.startPoint.x)
             let arrowPoint1 = CGPoint(
-                x: endPoint.x - arrowSize * cos(angle - CGFloat.pi / 6),
-                y: endPoint.y - arrowSize * sin(angle - CGFloat.pi / 6)
+                x: store.endPoint.x - arrowSize * cos(angle - CGFloat.pi / 6),
+                y: store.endPoint.y - arrowSize * sin(angle - CGFloat.pi / 6)
             )
             let arrowPoint2 = CGPoint(
-                x: endPoint.x - arrowSize * cos(
+                x: store.endPoint.x - arrowSize * cos(
                     angle + CGFloat.pi / 6
                 ),
-                y: endPoint.y - arrowSize * sin(angle + CGFloat.pi / 6)
+                y: store.endPoint.y - arrowSize * sin(angle + CGFloat.pi / 6)
             )
 
             path.addLine(to: arrowPoint1)
-            path.move(to: endPoint)
+            path.move(to: store.endPoint)
             path.addLine(to: arrowPoint2)
         }
 

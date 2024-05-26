@@ -19,21 +19,104 @@ public struct ArrowViewReducer {
         public var id: UUID
         var startPointRootObjectID: UUID
         var endPointRootObjectID: UUID
-        var startPoint: CGPoint
-        var endPoint: CGPoint
+
+        var leadingStartPoint: CGPoint
+        var trailingStartPoint: CGPoint
+        var leadingEndPoint: CGPoint
+        var trailingEndPoint: CGPoint
+
+        var beforeDragLeadingStartPoint: CGPoint
+        var beforeDragTrailingStartPoint: CGPoint
+        var beforeDragLeadingEndPoint: CGPoint
+        var beforeDragTrailingEndPoint: CGPoint
+//        var beforeDragStartPoint: CGPoint
+//        var beforeDragEndPoint: CGPoint
+
+        var startPoint: CGPoint {
+            let combinations = [
+                (leadingStartPoint, leadingEndPoint),
+                (leadingStartPoint, trailingEndPoint),
+                (trailingStartPoint, leadingEndPoint),
+                (trailingStartPoint, trailingEndPoint)
+            ]
+            var minDistance = CGFloat.infinity
+            var startPoint = CGPoint()
+            for (start, end) in combinations {
+                let distance = hypot(start.x - end.x, start.y - end.y)
+                if distance < minDistance {
+                    startPoint = start
+                    minDistance = distance
+                }
+            }
+            return startPoint
+        }
+
+        var endPoint: CGPoint {
+            let combinations = [
+                (leadingStartPoint, leadingEndPoint),
+                (leadingStartPoint, trailingEndPoint),
+                (trailingStartPoint, leadingEndPoint),
+                (trailingStartPoint, trailingEndPoint)
+            ]
+
+            var minDistance = CGFloat.infinity
+            var endPoint = CGPoint()
+            for (start, end) in combinations {
+                let distance = hypot(start.x - end.x, start.y - end.y)
+                if distance < minDistance {
+                    endPoint = end
+                    minDistance = distance
+                }
+            }
+            return endPoint
+        }
 
         public init(
             startPointRootObjectID: UUID,
             endPointRootObjectID: UUID,
-            startPoint: CGPoint,
-            endPoint: CGPoint
+            leadingStartPoint: CGPoint,
+            trailingStartPoint: CGPoint,
+            leadingEndPoint: CGPoint,
+            trailingEndPoint: CGPoint
         ) {
             @Dependency(\.uuid) var uuid
             id = uuid()
             self.startPointRootObjectID = startPointRootObjectID
             self.endPointRootObjectID = endPointRootObjectID
-            self.startPoint = startPoint
-            self.endPoint = endPoint
+
+            self.leadingStartPoint = leadingStartPoint
+            self.beforeDragLeadingStartPoint = leadingStartPoint
+
+            self.trailingStartPoint = trailingStartPoint
+            self.beforeDragTrailingStartPoint = trailingStartPoint
+
+            self.leadingEndPoint = leadingEndPoint
+            self.beforeDragLeadingEndPoint = leadingEndPoint
+
+            self.trailingEndPoint = trailingEndPoint
+            self.beforeDragTrailingEndPoint = trailingEndPoint
+//
+//            let combinations = [
+//                (leadingStartPoint, leadingEndPoint),
+//                (leadingStartPoint, trailingEndPoint),
+//                (trailingStartPoint, leadingEndPoint),
+//                (trailingStartPoint, trailingEndPoint)
+//            ]
+//
+//            var minDistance = CGFloat.infinity
+//            var startPoint = CGPoint()
+//            var endPoint = CGPoint()
+//            for (start, end) in combinations {
+//                let distance = hypot(start.x - end.x, start.y - end.y)
+//                if distance < minDistance {
+//                    startPoint = start
+//                    endPoint = end
+//                    minDistance = distance
+//                }
+//            }
+//
+//            self.beforeDragStartPoint = startPoint
+//            self.beforeDragEndPoint = endPoint
         }
     }
 }

@@ -20,36 +20,52 @@ public struct SwiftDiagramView: View {
     let spacing = ComponentSizeValues.typeRowsSpacing
 
     public var body: some View {
-        ZStack {
-            VStack(alignment: .leading, spacing: spacing) {
-                HStack(alignment: .top, spacing: spacing) {
-                    ForEach(store.scope(state: \.protocols, action: \.protocols)) { protocolStore in
-                        ProtocolView(store: protocolStore)
-                            .border(.gray)
-                    }
-                }
-
-                HStack(alignment: .top, spacing: spacing) {
-                    ForEach(store.scope(state: \.structs, action: \.structs)) { structStore in
-                        StructView(store: structStore)
-                            .border(.green)
-                    }
-                }
-
-                HStack(alignment: .top, spacing: spacing) {
-                    ForEach(store.scope(state: \.classes, action: \.classes)) { classStore in
-                        ClassView(store: classStore)
-                            .border(.orange)
-                    }
-                }
-
-                HStack(alignment: .top, spacing: spacing) {
-                    ForEach(store.scope(state: \.enums, action: \.enums)) { enumStore in
-                        EnumView(store: enumStore)
-                            .border(.blue)
-                    }
-                }
-            } // VStack
+        ZStack(alignment: .topLeading) {
+            ForEach(store.scope(state: \.protocols, action: \.protocols)) { protocolStore in
+                ProtocolView(store: protocolStore)
+                    .border(.gray)
+            }
+            ForEach(store.scope(state: \.structs, action: \.structs)) { structStore in
+                StructView(store: structStore)
+                    .border(.green)
+            }
+            ForEach(store.scope(state: \.classes, action: \.classes)) { classStore in
+                ClassView(store: classStore)
+                    .border(.orange)
+            }
+            ForEach(store.scope(state: \.enums, action: \.enums)) { enumStore in
+                EnumView(store: enumStore)
+                    .border(.blue)
+            }
+//            VStack(alignment: .leading, spacing: spacing) {
+//                HStack(alignment: .top, spacing: spacing) {
+//                    ForEach(store.scope(state: \.protocols, action: \.protocols)) { protocolStore in
+//                        ProtocolView(store: protocolStore)
+//                            .border(.gray)
+//                    }
+//                }
+//
+//                HStack(alignment: .top, spacing: spacing) {
+//                    ForEach(store.scope(state: \.structs, action: \.structs)) { structStore in
+//                        StructView(store: structStore)
+//                            .border(.green)
+//                    }
+//                }
+//
+//                HStack(alignment: .top, spacing: spacing) {
+//                    ForEach(store.scope(state: \.classes, action: \.classes)) { classStore in
+//                        ClassView(store: classStore)
+//                            .border(.orange)
+//                    }
+//                }
+//
+//                HStack(alignment: .top, spacing: spacing) {
+//                    ForEach(store.scope(state: \.enums, action: \.enums)) { enumStore in
+//                        EnumView(store: enumStore)
+//                            .border(.blue)
+//                    }
+//                }
+//            } // VStack
 
             ForEach(store.protocols.elements) { state in
                 Circle()
@@ -255,12 +271,16 @@ public struct SwiftDiagramView: View {
                 }
             }
 
-            ForEach(store.arrows) { arrow in
-                ArrowView(
-                    startPoint: arrow.startPoint,
-                    endPoint: arrow.endPoint
-                )
+//            ForEach(store.arrows) { arrow in
+//                ArrowView(
+//                    startPoint: arrow.startPoint,
+//                    endPoint: arrow.endPoint
+//                )
+//            }
+            ForEach(store.scope(state: \.arrows, action: \.arrows)) { arrow in
+                ArrowView(store: arrow)
             }
         } // ZStack
+        .frame(width: store.frameWidth, height: store.frameHeight)
     }
 }

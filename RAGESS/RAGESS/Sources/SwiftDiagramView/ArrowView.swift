@@ -20,7 +20,7 @@ struct ArrowView: View {
             path.addLine(to: store.endPoint)
 
             // Arrow tip
-            let arrowSize: CGFloat = 10
+            let arrowSize: CGFloat = 30
             let angle = atan2(store.endPoint.y - store.startPoint.y, store.endPoint.x - store.startPoint.x)
             let arrowPoint1 = CGPoint(
                 x: store.endPoint.x - arrowSize * cos(angle - CGFloat.pi / 6),
@@ -38,6 +38,6 @@ struct ArrowView: View {
             path.addLine(to: arrowPoint2)
         }
 
-        path.stroke(Color.black, lineWidth: 4)
+        path.stroke(Color.black, lineWidth: 10)
     }
 }

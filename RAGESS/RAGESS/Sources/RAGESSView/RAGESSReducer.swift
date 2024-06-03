@@ -41,6 +41,7 @@ public struct RAGESSReducer {
         var loadingTaskKindBuffer: [LoadingTaskKind] = []
         var swiftDiagram: SwiftDiagramReducer.State = .init(allDeclarationObjects: [])
         var swiftDiagramScale: CGFloat = 0.5
+        var processStartTime = CFAbsoluteTimeGetCurrent()
 
         public init(projectRootDirectoryPath: String) {
             self.projectRootDirectoryPath = projectRootDirectoryPath
@@ -95,6 +96,7 @@ public struct RAGESSReducer {
                 #endif
 
                 state.projectRootDirectoryPath = url.path()
+                state.processStartTime = CFAbsoluteTimeGetCurrent()
 
                 return .send(.extractSourceFiles)
 
@@ -271,6 +273,12 @@ public struct RAGESSReducer {
                 state.declarationObjects = hasDependenciesObjects
 
                 state.swiftDiagram = .init(allDeclarationObjects: hasDependenciesObjects)
+
+                print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
+                print("COMPLETE ALL PROCESSES")
+                print("TIME ELAPSED: \(CFAbsoluteTimeGetCurrent() - state.processStartTime)")
+                print("NUMBER OF DECLARATION OBJECTS: \(state.declarationObjects.count)")
+                print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
 
                 return .send(.startMonitoring)
 

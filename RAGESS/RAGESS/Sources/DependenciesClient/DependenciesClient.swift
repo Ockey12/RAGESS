@@ -39,6 +39,7 @@ extension DependenciesClient: DependencyKey {
             packages: packages
         )
 
+        #if DEBUG
         let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
         var numberOfDependencyObjects = 0
         for object in declarationObjects {
@@ -48,6 +49,7 @@ extension DependenciesClient: DependencyKey {
         print("NUMBER OF DEPENDENCY OBJECTS: \(numberOfDependencyObjects)")
         print("TIME ELAPSED: \(timeElapsed)")
         print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=\n")
+        #endif
 
         return declarationObjects
     }

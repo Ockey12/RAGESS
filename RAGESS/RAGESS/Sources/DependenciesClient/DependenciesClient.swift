@@ -40,15 +40,15 @@ extension DependenciesClient: DependencyKey {
         )
 
         #if DEBUG
-        let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
-        var numberOfDependencyObjects = 0
-        for object in declarationObjects {
-            printDependencies(of: object, declarationObjects: declarationObjects, numberOfDependencyObjects: &numberOfDependencyObjects)
-        }
-        print("DependenciesClient.extractDependencies COMPLETED")
-        print("NUMBER OF DEPENDENCY OBJECTS: \(numberOfDependencyObjects)")
-        print("TIME ELAPSED: \(timeElapsed)")
-        print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=\n")
+            let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
+            var numberOfDependencyObjects = 0
+            for object in declarationObjects {
+                printDependencies(of: object, declarationObjects: declarationObjects, numberOfDependencyObjects: &numberOfDependencyObjects)
+            }
+            print("DependenciesClient.extractDependencies COMPLETED")
+            print("NUMBER OF DEPENDENCY OBJECTS: \(numberOfDependencyObjects)")
+            print("TIME ELAPSED: \(timeElapsed)")
+            print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=\n")
         #endif
 
         return declarationObjects

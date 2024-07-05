@@ -96,7 +96,6 @@ public struct RAGESSReducer {
                 #endif
 
                 state.projectRootDirectoryPath = url.path()
-                state.processStartTime = CFAbsoluteTimeGetCurrent()
 
                 return .send(.extractSourceFiles)
 
@@ -105,6 +104,7 @@ public struct RAGESSReducer {
                 return .none
 
             case .extractSourceFiles:
+                state.processStartTime = CFAbsoluteTimeGetCurrent()
                 state.loadingTaskKindBuffer.append(.sourceFiles)
 
                 return .run { [

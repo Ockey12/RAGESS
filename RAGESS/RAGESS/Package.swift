@@ -114,7 +114,11 @@ let package = Package(
             ]
         ),
         .target(
-            name: "FileTreeView"
+            name: "FileTreeView",
+            dependencies: [
+                "TypeDeclaration",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+            ]
         ),
         .target(
             name: "LSPClient",

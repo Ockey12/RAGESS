@@ -114,6 +114,9 @@ let package = Package(
             ]
         ),
         .target(
+            name: "FileTreeView"
+        ),
+        .target(
             name: "LSPClient",
             dependencies: [
                 "SourceFileClient",

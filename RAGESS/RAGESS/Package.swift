@@ -117,6 +117,7 @@ let package = Package(
             name: "FileTreeView",
             dependencies: [
                 "TypeDeclaration",
+                "XcodeObject",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ]
         ),
@@ -148,7 +149,6 @@ let package = Package(
                 "MonitorClient",
                 "SourceFileClient",
                 "SwiftDiagramView",
-                "TypeDeclaration",
                 "XcodeObject",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "Dependencies", package: "swift-dependencies")

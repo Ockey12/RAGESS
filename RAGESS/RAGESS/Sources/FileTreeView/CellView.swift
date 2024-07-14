@@ -154,6 +154,48 @@ struct CellView: View {
             )
         )
         .listRowSeparator(.hidden)
+
+        CellView(
+            store: .init(
+                initialState: CellReducer.State(
+                    content: .directory(
+                        Directory(
+                            path: "Project/Directory",
+                            subDirectories: [
+                                Directory(
+                                    path: "Project/Directory/Directory",
+                                    subDirectories: [],
+                                    files: []
+                                )
+                            ],
+                            files: []
+                        )
+                    ),
+                    leadingPadding: 0,
+                    isExpanding: true
+                ),
+                reducer: {
+                    CellReducer()
+                }
+            )
+        )
+        .listRowSeparator(.hidden)
+
+        CellView(
+            store: .init(
+                initialState: CellReducer.State(
+                    content: .sourceFile(
+                        SourceFile(path: "Project/Directory/File.swift", content: "")
+                    ),
+                    leadingPadding: 0,
+                    isExpanding: true
+                ),
+                reducer: {
+                    CellReducer()
+                }
+            )
+        )
+        .listRowSeparator(.hidden)
     }
-    .frame(width: 500, height: 500)
+    .frame(width: 200, height: 200)
 }

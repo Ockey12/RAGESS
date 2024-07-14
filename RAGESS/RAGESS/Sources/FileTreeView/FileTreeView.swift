@@ -17,6 +17,10 @@ public struct FileTreeView: View {
     }
 
     public var body: some View {
-        Text("")
+        List {
+            ForEach(store.scope(state: \.cells, action: \.cells)) { cellStore in
+                CellView(store: cellStore)
+            }
+        }
     }
 }

@@ -11,10 +11,10 @@ import SwiftUI
 import XcodeObject
 
 @Reducer
-struct CellReducer {
+public struct CellReducer {
     @ObservableState
-    struct State: Identifiable {
-        var id: String {
+    public struct State: Identifiable {
+        public var id: String {
             content.id
         }
         let content: Content
@@ -25,7 +25,7 @@ struct CellReducer {
         var isExpanding: Bool
     }
 
-    enum Content {
+    public enum Content {
         case directory(Directory)
         case sourceFile(SourceFile)
 
@@ -48,11 +48,11 @@ struct CellReducer {
         }
     }
 
-    enum Action {
+    public enum Action {
         case expandButtonTapped
     }
 
-    var body: some ReducerOf<Self> {
+    public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
             case .expandButtonTapped:
@@ -106,7 +106,7 @@ struct CellView: View {
                     Image(systemName: "folder.fill.badge.gearshape")
                         .foregroundStyle(Color(red: 39 / 255, green: 185 / 255, blue: 1))
                 }
-            case let .sourceFile(sourceFile):
+            case .sourceFile:
                 Image(systemName: "swift")
                     .foregroundStyle(Color(red: 1, green: 120 / 255, blue: 67 / 255))
             }

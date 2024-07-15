@@ -46,7 +46,23 @@ public struct FileTreeView: View {
                         ),
                         Directory(
                             path: "Project/Model",
-                            subDirectories: [],
+                            subDirectories: [
+                                Directory(
+                                    path: "Project/Model/Data",
+                                    subDirectories: [],
+                                    files: []
+                                ),
+                                Directory(
+                                    path: "Project/Model/API",
+                                    subDirectories: [],
+                                    files: [
+                                        SourceFile(
+                                            path: "Project/Model/API/Post.swift",
+                                            content: ""
+                                        )
+                                    ]
+                                )
+                            ],
                             files: [
                                 SourceFile(
                                     path: "Project/Model/DogModel.swift",

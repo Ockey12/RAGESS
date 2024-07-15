@@ -138,7 +138,8 @@ struct CellView: View {
 
     var body: some View {
         HStack(spacing: 0) {
-            if case .directory = store.content {
+            if case let .directory(directory) = store.content,
+               (!directory.files.isEmpty || !directory.subDirectories.isEmpty) {
                 Button(
                     action: {
                         store.send(.expandButtonTapped)

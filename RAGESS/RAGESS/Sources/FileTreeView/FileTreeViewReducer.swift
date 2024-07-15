@@ -85,7 +85,11 @@ public struct FileTreeViewReducer {
 
                     state.cells.insert(
                         contentsOf: IdentifiedArrayOf(uniqueElements: directory.subDirectories.map {
-                            CellReducer.State(content: .directory($0), leadingPadding: leadingPadding + 22)
+                            let padding = leadingPadding +
+                                            ($0.files.isEmpty && $0.subDirectories.isEmpty
+                                            ? 37
+                                            : 22)
+                            return CellReducer.State(content: .directory($0), leadingPadding: padding)
                         }),
                         at: index
                     )

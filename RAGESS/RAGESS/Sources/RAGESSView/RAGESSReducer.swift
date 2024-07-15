@@ -12,6 +12,7 @@ import DeclarationExtractor
 import Dependencies
 import DependenciesClient
 import DumpPackageClient
+import FileTreeView
 import Foundation
 import MonitorClient
 import SourceFileClient
@@ -38,6 +39,7 @@ public struct RAGESSReducer {
             ".github",
             ".swiftpm"
         ]
+        var fileTree: FileTreeViewReducer.State = .init()
         var loadingTaskKindBuffer: [LoadingTaskKind] = []
         var swiftDiagram: SwiftDiagramReducer.State = .init(allDeclarationObjects: [])
         var swiftDiagramScale: CGFloat = 0.5
@@ -60,6 +62,7 @@ public struct RAGESSReducer {
         case extractDependenciesResponse(Result<[any DeclarationObject], Error>)
         case startMonitoring
         case detectedDirectoryChange
+        case fileTree(FileTreeViewReducer.Action)
         case swiftDiagram(SwiftDiagramReducer.Action)
         case minusMagnifyingglassTapped
         case plusMagnifyingglassTapped
@@ -78,6 +81,9 @@ public struct RAGESSReducer {
     }
 
     public var body: some ReducerOf<Self> {
+        Scope(state: \.fileTree, action: \.fileTree) {
+            FileTreeViewReducer()
+        }
         Scope(state: \.swiftDiagram, action: \.swiftDiagram) {
             SwiftDiagramReducer()
                 ._printChanges()
@@ -129,6 +135,7 @@ public struct RAGESSReducer {
                 #endif
 
                 state.rootDirectory = rootDirectory
+                state.fileTree.rootDirectory = rootDirectory
 
                 guard !rootDirectory.allXcodeprojPathsUnderDirectory.isEmpty else {
                     print("ERROR in \(#file) - \(#line): Cannot find `**.xcodeproj`")
@@ -313,6 +320,9 @@ public struct RAGESSReducer {
                         for: 1.0,
                         scheduler: self.mainQueue
                     )
+
+            case .fileTree:
+                return .none
 
             case .swiftDiagram:
                 return .none

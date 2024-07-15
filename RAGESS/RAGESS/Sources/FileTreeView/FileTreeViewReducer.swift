@@ -12,24 +12,46 @@ import XcodeObject
 
 @Reducer
 public struct FileTreeViewReducer {
+    public init() {}
+
     @ObservableState
     public struct State {
-        let rootDirectory: Directory
+        public var rootDirectory: Directory? {
+            didSet {
+                if let directory = rootDirectory {
+                    cells = .init(
+                        uniqueElements: [
+                            CellReducer.State(
+                                content: .directory(
+                                    directory
+                                ),
+                                leadingPadding: 0,
+                                isExpanding: false
+                            )
+                        ]
+                    )
+                }
+            }
+        }
         var cells: IdentifiedArrayOf<CellReducer.State>
 
-        public init(rootDirectory: Directory) {
+        public init(rootDirectory: Directory? = nil) {
             self.rootDirectory = rootDirectory
-            cells = .init(
-                uniqueElements: [
-                    CellReducer.State(
-                        content: .directory(
-                            rootDirectory
-                        ),
-                        leadingPadding: 0,
-                        isExpanding: false
-                    )
-                ]
-            )
+            if let directory = rootDirectory {
+                cells = .init(
+                    uniqueElements: [
+                        CellReducer.State(
+                            content: .directory(
+                                directory
+                            ),
+                            leadingPadding: 0,
+                            isExpanding: false
+                        )
+                    ]
+                )
+            } else {
+                cells = []
+            }
         }
     }
 

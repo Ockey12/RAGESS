@@ -150,6 +150,7 @@ let package = Package(
                 "DeclarationExtractor",
                 "DependenciesClient",
                 "DumpPackageClient",
+                "FileTreeView",
                 "MonitorClient",
                 "SourceFileClient",
                 "SwiftDiagramView",

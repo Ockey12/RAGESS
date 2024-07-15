@@ -7,6 +7,7 @@
 //
 
 import ComposableArchitecture
+import FileTreeView
 import SwiftDiagramView
 import SwiftUI
 
@@ -26,10 +27,8 @@ public struct RAGESSView: View {
                 sidebar: {
                     Divider()
 
-                    if let rootDirectory = store.rootDirectory {
-                        ScrollView {
-                            FileTreeView(store: store, directory: rootDirectory)
-                        }
+                    if let _ = store.fileTree.rootDirectory {
+                        FileTreeView(store: store.scope(state: \.fileTree, action: \.fileTree))
                         .padding(.leading, 20)
                     }
 

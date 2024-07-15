@@ -1,9 +1,9 @@
 //
-//  File.swift
-//  
-//  
+//  CellView.swift
+//
+//
 //  Created by Ockey12 on 2024/07/13
-//  
+//
 //
 
 import ComposableArchitecture
@@ -13,14 +13,16 @@ import XcodeObject
 @Reducer
 public struct CellReducer {
     @ObservableState
-    public struct State: Identifiable{
+    public struct State: Identifiable {
         public var id: String {
             content.id
         }
+
         let content: Content
         var name: String {
             content.name
         }
+
         var children: IdentifiedArrayOf<Self>
         let leadingPadding: CGFloat
         var isExpanding: Bool
@@ -34,14 +36,14 @@ public struct CellReducer {
             switch content {
             case let .directory(directory):
                 var children: [Self] = directory.files.map {
-                    Self.init(
+                    Self(
                         content: .sourceFile($0),
                         leadingPadding: leadingPadding,
                         isExpanding: isExpanding
                     )
                 }
                 children.append(contentsOf: directory.subDirectories.map {
-                    Self.init(
+                    Self(
                         content: .directory($0),
                         leadingPadding: leadingPadding,
                         isExpanding: isExpanding
@@ -101,13 +103,13 @@ public struct CellReducer {
                 state.isExpanding.toggle()
                 return .send(
                     state.isExpanding
-                    ? .delegate(.expandChildren(
-                        content: state.content,
-                        leadingPadding: state.leadingPadding
-                    ))
-                    : .delegate(.collapseChildren(
-                        content: state.content
-                    )),
+                        ? .delegate(.expandChildren(
+                            content: state.content,
+                            leadingPadding: state.leadingPadding
+                        ))
+                        : .delegate(.collapseChildren(
+                            content: state.content
+                        )),
                     animation: .easeInOut
                 )
 

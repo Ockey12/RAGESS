@@ -164,12 +164,14 @@ struct CellView: View {
 
             switch store.content {
             case let .directory(directory):
+
+                // FIXME: Classify icons into directories, packages, and modules.
                 if directory.files.isEmpty,
                    directory.subDirectories.isEmpty {
-                    Image(systemName: "folder.badge.gearshape")
+                    Image(systemName: "folder")
                         .foregroundStyle(Color(red: 39 / 255, green: 185 / 255, blue: 1))
                 } else {
-                    Image(systemName: "folder.fill.badge.gearshape")
+                    Image(systemName: "folder.fill")
                         .foregroundStyle(Color(red: 39 / 255, green: 185 / 255, blue: 1))
                 }
             case .sourceFile:

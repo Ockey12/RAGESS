@@ -6,11 +6,11 @@
 ////
 ////
 //
-//import ComposableArchitecture
-//import SwiftUI
-//import XcodeObject
+// import ComposableArchitecture
+// import SwiftUI
+// import XcodeObject
 //
-//struct FileTreeView: View {
+// struct FileTreeView: View {
 //    @Bindable var store: StoreOf<RAGESSReducer>
 //    let directory: Directory
 //
@@ -61,4 +61,4 @@
 //            .padding(.leading, 24)
 //        }
 //    }
-//}
+// }

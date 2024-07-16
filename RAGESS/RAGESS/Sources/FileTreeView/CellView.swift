@@ -164,7 +164,7 @@ struct CellView: View {
     var body: some View {
         HStack(spacing: 0) {
             if case let .directory(directory) = store.content,
-               (!directory.files.isEmpty || !directory.subDirectories.isEmpty) {
+               !directory.files.isEmpty || !directory.subDirectories.isEmpty {
                 Button(
                     action: {
                         store.send(.expandButtonTapped)
@@ -221,7 +221,7 @@ struct CellView: View {
                 action: \.destination.popover
             )
         ) { popoverStore in
-                FileTreePopoverContent(store: popoverStore)
+            FileTreePopoverContent(store: popoverStore)
         }
     }
 }

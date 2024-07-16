@@ -1,9 +1,9 @@
 //
-//  File.swift
-//  
-//  
+//  FileTreePopoverCell.swift
+//
+//
 //  Created by Ockey12 on 2024/07/17
-//  
+//
 //
 
 import ComposableArchitecture
@@ -17,6 +17,7 @@ public struct FileTreePopoverCellReducer {
         public var id: UUID {
             declarationObject.id
         }
+
         let declarationObject: any DeclarationObject
     }
 }

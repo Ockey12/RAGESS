@@ -1,9 +1,9 @@
 //
-//  File.swift
-//  
-//  
+//  FileTreePopover.swift
+//
+//
 //  Created by Ockey12 on 2024/07/15
-//  
+//
 //
 
 import ComposableArchitecture
@@ -22,7 +22,6 @@ public struct FileTreePopoverReducer {
 
             var objects: [any DeclarationObject] = []
             switch content {
-                
             case let .directory(directory):
                 break
             case let .sourceFile(sourceFile):
@@ -39,7 +38,7 @@ public struct FileTreePopoverReducer {
     }
 
     public var body: some ReducerOf<Self> {
-        Reduce { state, action in
+        Reduce { _, action in
             switch action {
             case .declarationObjects:
                 return .none

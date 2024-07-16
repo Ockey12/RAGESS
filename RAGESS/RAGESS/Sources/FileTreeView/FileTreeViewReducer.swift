@@ -33,6 +33,7 @@ public struct FileTreeViewReducer {
                 }
             }
         }
+
         var cells: IdentifiedArrayOf<CellReducer.State>
 
         public init(rootDirectory: Directory? = nil) {
@@ -86,9 +87,11 @@ public struct FileTreeViewReducer {
                     state.cells.insert(
                         contentsOf: IdentifiedArrayOf(uniqueElements: directory.subDirectories.map {
                             let padding = leadingPadding +
-                                            ($0.files.isEmpty && $0.subDirectories.isEmpty
-                                            ? 37
-                                            : 22)
+                                (
+                                    $0.files.isEmpty && $0.subDirectories.isEmpty
+                                        ? 37
+                                        : 22
+                                )
                             return CellReducer.State(content: .directory($0), leadingPadding: padding)
                         }),
                         at: index

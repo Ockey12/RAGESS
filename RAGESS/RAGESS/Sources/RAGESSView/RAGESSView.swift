@@ -29,7 +29,7 @@ public struct RAGESSView: View {
 
                     if let _ = store.fileTree.rootDirectory {
                         FileTreeView(store: store.scope(state: \.fileTree, action: \.fileTree))
-                        .padding(.leading, 20)
+                            .padding(.leading, 20)
                     }
 
                     Spacer()

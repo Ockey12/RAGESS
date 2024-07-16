@@ -7,11 +7,20 @@
 //
 
 import ComposableArchitecture
+import DeclarationObjectsClient
+import Dependencies
 import SwiftUI
+import TypeDeclaration
 import XcodeObject
 
 @Reducer
 public struct CellReducer {
+//    @Reducer(state: .equatable)
+    @Reducer
+    public enum Destination {
+        case popover(FileTreePopoverReducer)
+    }
+
     @ObservableState
     public struct State: Identifiable {
         public var id: String {
@@ -26,6 +35,7 @@ public struct CellReducer {
         var children: IdentifiedArrayOf<Self>
         let leadingPadding: CGFloat
         var isExpanding: Bool
+        @Presents var destination: Destination.State?
 
         public init(
             content: Content,
@@ -60,33 +70,14 @@ public struct CellReducer {
         }
     }
 
-    public enum Content {
-        case directory(Directory)
-        case sourceFile(SourceFile)
-
-        var id: String {
-            switch self {
-            case let .directory(directory):
-                directory.id
-            case let .sourceFile(sourceFile):
-                sourceFile.id
-            }
-        }
-
-        var name: String {
-            switch self {
-            case let .directory(directory):
-                directory.name
-            case let .sourceFile(sourceFile):
-                sourceFile.name
-            }
-        }
-    }
+    @Dependency(DeclarationObjectsClient.self) var declarationObjectsClient
 
     public indirect enum Action {
         case expandButtonTapped
         case nameClicked
+        case declarationObjectsResponse([any DeclarationObject])
         case children(IdentifiedActionOf<CellReducer>)
+        case destination(PresentationAction<Destination.Action>)
         case delegate(Delegate)
 
         public enum Delegate {
@@ -114,9 +105,19 @@ public struct CellReducer {
                 )
 
             case .nameClicked:
-                return .send(.delegate(.nameClicked(state.content)))
+                return .run { send in
+                    let declarationObjects = await declarationObjectsClient.get()
+                    await send(.declarationObjectsResponse(declarationObjects))
+                }
+
+            case let .declarationObjectsResponse(objects):
+                state.destination = .popover(FileTreePopoverReducer.State(content: state.content, declarationObjects: objects))
+                return .none
 
             case .children:
+                return .none
+
+            case .destination:
                 return .none
 
             case .delegate:
@@ -126,11 +127,35 @@ public struct CellReducer {
         .forEach(\.children, action: \.children) {
             CellReducer()
         }
+        .ifLet(\.$destination, action: \.destination)
+    }
+}
+
+public enum Content {
+    case directory(Directory)
+    case sourceFile(SourceFile)
+
+    var id: String {
+        switch self {
+        case let .directory(directory):
+            directory.id
+        case let .sourceFile(sourceFile):
+            sourceFile.id
+        }
+    }
+
+    var name: String {
+        switch self {
+        case let .directory(directory):
+            directory.name
+        case let .sourceFile(sourceFile):
+            sourceFile.name
+        }
     }
 }
 
 struct CellView: View {
-    let store: StoreOf<CellReducer>
+    @Bindable var store: StoreOf<CellReducer>
 
     init(store: StoreOf<CellReducer>) {
         self.store = store
@@ -187,6 +212,17 @@ struct CellView: View {
         } // HStack
         .frame(height: 20)
         .padding(.leading, store.leadingPadding)
+        .onTapGesture {
+            store.send(.nameClicked)
+        }
+        .popover(
+            item: $store.scope(
+                state: \.destination?.popover,
+                action: \.destination.popover
+            )
+        ) { popoverStore in
+                FileTreePopoverContent(store: popoverStore)
+        }
     }
 }
 

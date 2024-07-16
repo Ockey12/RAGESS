@@ -128,9 +128,11 @@ let package = Package(
         .target(
             name: "FileTreeView",
             dependencies: [
+                "DeclarationObjectsClient",
                 "TypeDeclaration",
                 "XcodeObject",
-                .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                .product(name: "Dependencies", package: "swift-dependencies")
             ]
         ),
         .target(
@@ -156,6 +158,7 @@ let package = Package(
             dependencies: [
                 "BuildSettingsClient",
                 "DeclarationExtractor",
+                "DeclarationObjectsClient",
                 "DependenciesClient",
                 "DumpPackageClient",
                 "FileTreeView",

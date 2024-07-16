@@ -9,6 +9,7 @@
 import BuildSettingsClient
 import ComposableArchitecture
 import DeclarationExtractor
+import DeclarationObjectsClient
 import Dependencies
 import DependenciesClient
 import DumpPackageClient
@@ -73,6 +74,7 @@ public struct RAGESSReducer {
     @Dependency(SourceFileClient.self) var sourceFileClient
     @Dependency(BuildSettingsClient.self) var buildSettingsClient
     @Dependency(DumpPackageClient.self) var dumpPackageClient
+    @Dependency(DeclarationObjectsClient.self) var declarationObjectsClient
     @Dependency(DependenciesClient.self) var dependenciesClient
     @Dependency(\.mainQueue) var mainQueue
 
@@ -258,6 +260,8 @@ public struct RAGESSReducer {
                         buildSettings = state.buildSettings,
                         packages = state.packages
                     ] send in
+
+                    await declarationObjectsClient.set(declarationObjects)
 
                     await send(.extractDependenciesResponse(Result {
                         try await dependenciesClient.extractDependencies(

@@ -81,8 +81,8 @@ public struct CellReducer {
         case delegate(Delegate)
 
         public enum Delegate {
-            case expandChildren(content: Content, leadingPadding: CGFloat)
-            case collapseChildren(content: Content)
+            case childrenExpanded(content: Content, leadingPadding: CGFloat)
+            case childrenCollapsed(content: Content)
             case nameClicked(Content)
             case popoverCellClicked(objectID: UUID)
         }
@@ -95,11 +95,11 @@ public struct CellReducer {
                 state.isExpanding.toggle()
                 return .send(
                     state.isExpanding
-                        ? .delegate(.expandChildren(
+                        ? .delegate(.childrenExpanded(
                             content: state.content,
                             leadingPadding: state.leadingPadding
                         ))
-                        : .delegate(.collapseChildren(
+                        : .delegate(.childrenCollapsed(
                             content: state.content
                         )),
                     animation: .easeInOut

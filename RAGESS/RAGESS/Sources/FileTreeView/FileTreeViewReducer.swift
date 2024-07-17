@@ -71,7 +71,7 @@ public struct FileTreeViewReducer {
             switch action {
             case let .cells(.element(id: id, action: .delegate(delegateAction))):
                 switch delegateAction {
-                case let .expandChildren(content: content, leadingPadding: leadingPadding):
+                case let .childrenExpanded(content: content, leadingPadding: leadingPadding):
                     guard var index = state.cells.index(id: id) else {
                         return .none
                     }
@@ -105,7 +105,7 @@ public struct FileTreeViewReducer {
 
                     return .none
 
-                case let .collapseChildren(content: content):
+                case let .childrenCollapsed(content: content):
                     guard case let .directory(directory) = content else {
                         return .none
                     }

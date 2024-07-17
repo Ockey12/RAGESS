@@ -325,6 +325,9 @@ public struct RAGESSReducer {
                         scheduler: self.mainQueue
                     )
 
+            case let .fileTree(.delegate(.popoverCellClicked(objectID: objectID))):
+                return .none
+
             case .fileTree:
                 return .none
 

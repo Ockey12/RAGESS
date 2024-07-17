@@ -84,6 +84,7 @@ public struct CellReducer {
             case expandChildren(content: Content, leadingPadding: CGFloat)
             case collapseChildren(content: Content)
             case nameClicked(Content)
+            case popoverCellClicked(objectID: UUID)
         }
     }
 
@@ -116,6 +117,9 @@ public struct CellReducer {
 
             case .children:
                 return .none
+
+            case let .destination(.presented(.popover(.delegate(.cellClicked(objectID: objectID))))):
+                return .send(.delegate(.popoverCellClicked(objectID: objectID)))
 
             case .destination:
                 return .none

@@ -7,6 +7,7 @@
 //
 
 import ComposableArchitecture
+import Foundation
 import TypeDeclaration
 import XcodeObject
 
@@ -58,6 +59,11 @@ public struct FileTreeViewReducer {
 
     public enum Action {
         case cells(IdentifiedActionOf<CellReducer>)
+        case delegate(Delegate)
+
+        public enum Delegate {
+            case popoverCellClicked(objectID: UUID)
+        }
     }
 
     public var body: some ReducerOf<Self> {
@@ -110,9 +116,15 @@ public struct FileTreeViewReducer {
 
                 case let .nameClicked(content):
                     return .none
+
+                case let .popoverCellClicked(objectID: objectID):
+                    return .send(.delegate(.popoverCellClicked(objectID: objectID)))
                 }
 
             case .cells:
+                return .none
+
+            case .delegate:
                 return .none
             }
         }

@@ -17,17 +17,18 @@ public struct TreeViewReducer {
 
     @ObservableState
     public struct State {
-        var rootObject: any TypeDeclaration {
+        var rootObject: (any DeclarationObject)? {
             didSet {
-                nodes = generateTree(rootObject: rootObject, allDeclarationObjects: allDeclarationObjects)
+                if let object = rootObject {
+                    nodes = generateTree(rootObject: object, allDeclarationObjects: allDeclarationObjects)
+                }
             }
         }
         var nodes: IdentifiedArrayOf<NodeReducer.State> = []
-        var allDeclarationObjects: [any DeclarationObject]
+        var allDeclarationObjects: [any DeclarationObject] = []
 
-        public init(rootObject: any TypeDeclaration, allDeclarationObjects: [any DeclarationObject]) {
+        public init(rootObject: (any TypeDeclaration)? = nil) {
             self.rootObject = rootObject
-            self.allDeclarationObjects = allDeclarationObjects
         }
 
         func generateTree(

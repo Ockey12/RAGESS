@@ -192,6 +192,7 @@ let package = Package(
         .target(
             name: "SwiftDiagramView",
             dependencies: [
+                "DeclarationObjectsClient",
                 "TypeDeclaration",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "Dependencies", package: "swift-dependencies")

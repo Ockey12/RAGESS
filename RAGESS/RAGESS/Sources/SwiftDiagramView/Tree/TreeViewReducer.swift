@@ -12,23 +12,87 @@ import Dependencies
 import TypeDeclaration
 
 @Reducer
-struct TreeViewReducer {
+public struct TreeViewReducer {
+    public init() {}
+
     @ObservableState
-    struct State {
+    public struct State {
         var rootObject: any TypeDeclaration {
             didSet {
-                generateTree(rootObject: rootObject)
+                nodes = generateTree(rootObject: rootObject, allDeclarationObjects: allDeclarationObjects)
             }
         }
-        var nodes: IdentifiedArrayOf<NodeReducer.State>
+        var nodes: IdentifiedArrayOf<NodeReducer.State> = []
         var allDeclarationObjects: [any DeclarationObject]
 
-        mutating func generateTree(rootObject: any TypeDeclaration) {
-            nodes = []
+        public init(rootObject: any TypeDeclaration, allDeclarationObjects: [any DeclarationObject]) {
+            self.rootObject = rootObject
+            self.allDeclarationObjects = allDeclarationObjects
+        }
+
+        func generateTree(
+            rootObject: any DeclarationObject,
+            allDeclarationObjects: [any DeclarationObject]
+        ) -> IdentifiedArrayOf<NodeReducer.State> {
+            let genericTypeObject: GenericTypeObject
+            switch rootObject {
+            case let structObject as StructObject:
+                genericTypeObject = .struct(structObject)
+            case let classObject as ClassObject:
+                genericTypeObject = .class(classObject)
+            case let enumObject as EnumObject:
+                genericTypeObject = .enum(enumObject)
+            case let protocolObject as ProtocolObject:
+                genericTypeObject = .protocol(protocolObject)
+            default:
+#if DEBUG
+                print("ERROR: \(#file) - \(#function): Cannot cast \(rootObject.name) to Type.")
+#endif
+                return []
+            }
+            let rootNode = extractChildren(parentNode: NodeModel(object: genericTypeObject), allDeclarationObjects: allDeclarationObjects)
+
+#if DEBUG
+            dump(rootNode)
+#endif
+
+            return []
+        }
+
+        func extractChildren(
+            parentNode: NodeModel,
+            allDeclarationObjects: [any DeclarationObject]
+        ) -> [NodeModel] {
+            let dependencies = parentNode.object.objectsThatCallThisObject
+            var children: [NodeModel] = []
+
+            for dependency in dependencies {
+                guard let callerObject = allDeclarationObjects.first(where: {$0.id == dependency.callerObject.rootObjectID}) else {
+                    continue
+                }
+                let genericTypeObject: GenericTypeObject
+                switch callerObject {
+                case let structObject as StructObject:
+                    genericTypeObject = .struct(structObject)
+                case let classObject as ClassObject:
+                    genericTypeObject = .class(classObject)
+                case let enumObject as EnumObject:
+                    genericTypeObject = .enum(enumObject)
+                case let protocolObject as ProtocolObject:
+                    genericTypeObject = .protocol(protocolObject)
+                default:
+                    continue
+                }
+                var child = NodeModel(object: genericTypeObject)
+                child.children = extractChildren(parentNode: child, allDeclarationObjects: allDeclarationObjects)
+                children.append(child)
+            }
+
+            return children
         }
     }
 
-    enum Action {
+    public enum Action {
         case task
         case declarationObjectsClientResponse(Result<[any DeclarationObject], Error>)
         case nodes(IdentifiedActionOf<NodeReducer>)
@@ -36,7 +100,7 @@ struct TreeViewReducer {
 
     @Dependency(DeclarationObjectsClient.self) var declarationObjectsClient
 
-    var body: some ReducerOf<Self> {
+    public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
             case .task:
@@ -63,3 +127,4 @@ struct TreeViewReducer {
         }
     }
 }
+

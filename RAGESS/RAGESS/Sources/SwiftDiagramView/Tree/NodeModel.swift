@@ -10,9 +10,9 @@ import Foundation
 
 struct NodeModel {
     let object: GenericTypeObject
-    let children: [Self]
+    var children: [Self] = []
 
-    let frameWidth: CGFloat
-    let frameHeight: CGFloat
-    let topLeadingPoint: CGPoint
+    let frameWidth: CGFloat = 0
+    let frameHeight: CGFloat = 0
+    let topLeadingPoint: CGPoint = .zero
 }

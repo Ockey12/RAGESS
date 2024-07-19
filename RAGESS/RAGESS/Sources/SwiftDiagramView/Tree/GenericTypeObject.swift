@@ -9,7 +9,7 @@
 import Foundation
 import TypeDeclaration
 
-enum GenericTypeObject: Equatable {
+public enum GenericTypeObject: Equatable {
     case `struct`(StructObject)
     case `class`(ClassObject)
     case `enum`(EnumObject)
@@ -25,6 +25,19 @@ enum GenericTypeObject: Equatable {
             enumObject.id
         case let .protocol(protocolObject):
             protocolObject.id
+        }
+    }
+
+    var objectsThatCallThisObject: [DependencyObject] {
+        switch self {
+        case let .struct(structObject):
+            structObject.objectsThatCallThisObject
+        case let .class(classObject):
+            classObject.objectsThatCallThisObject
+        case let .enum(enumObject):
+            enumObject.objectsThatCallThisObject
+        case let .protocol(protocolObject):
+            protocolObject.objectsThatCallThisObject
         }
     }
 }

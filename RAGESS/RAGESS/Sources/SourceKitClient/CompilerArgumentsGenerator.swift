@@ -39,12 +39,13 @@ extension CompilerArgumentsClient: DependencyKey {
             return nil
         }
 
-        @Sendable func getModuleName(sourceFilePath: String, packages: [PackageObject], buildSettings: [String: String]) -> String? {
+        @Sendable func getModuleName(sourceFilePath: String, packages: [PackageObject], buildSettings: [String: String]) -> String {
+            var sourceDirectory = NSString(string: sourceFilePath).deletingLastPathComponent
+
             guard !packages.isEmpty,
                   let packageName = getPackageName(sourceFilePath: sourceFilePath, buildSettings: buildSettings) else {
-                return nil
+                return NSString(string: sourceDirectory).lastPathComponent
             }
-            var sourceDirectory = NSString(string: sourceFilePath).deletingLastPathComponent
 
             while sourceDirectory != "/" {
                 guard let package = packages.filter({ $0.name == packageName }).first else {
@@ -62,7 +63,7 @@ extension CompilerArgumentsClient: DependencyKey {
                 sourceDirectory = NSString(string: sourceDirectory).deletingLastPathComponent
             }
 
-            return nil
+            return NSString(string: sourceDirectory).lastPathComponent
         }
 
         @Sendable func getModuleMapPaths(derivedDataPath: String) -> [String] {
@@ -204,9 +205,7 @@ extension CompilerArgumentsClient: DependencyKey {
                 guard let packageName = getPackageName(sourceFilePath: targetFilePath, buildSettings: buildSettings) else {
                     throw CompilerArgumentGenerationError.notFoundPackageName
                 }
-                guard let moduleName = getModuleName(sourceFilePath: targetFilePath, packages: packages, buildSettings: buildSettings) else {
-                    throw CompilerArgumentGenerationError.notFoundModuleName
-                }
+                let moduleName = getModuleName(sourceFilePath: targetFilePath, packages: packages, buildSettings: buildSettings)
                 guard let buildDirectory = buildSettings["BUILD_DIR"] else {
                     throw CompilerArgumentGenerationError.notFoundBuildDirectory
                 }
@@ -378,12 +377,8 @@ public struct CompilerArgumentsGenerator {
     let packages: [PackageObject]
 
     public func generateArguments() throws -> [String] {
-        guard let packageName = getPackageName(sourceFilePath: targetFilePath, buildSettings: buildSettings) else {
-            throw CompilerArgumentGenerationError.notFoundPackageName
-        }
-        guard let moduleName = getModuleName(sourceFilePath: targetFilePath, packages: packages, buildSettings: buildSettings) else {
-            throw CompilerArgumentGenerationError.notFoundModuleName
-        }
+        let packageName = getPackageName(sourceFilePath: targetFilePath, buildSettings: buildSettings)
+        let moduleName = getModuleName(sourceFilePath: targetFilePath, packages: packages, buildSettings: buildSettings)
         guard let buildDirectory = buildSettings["BUILD_DIR"] else {
             throw CompilerArgumentGenerationError.notFoundBuildDirectory
         }
@@ -533,7 +528,7 @@ public struct CompilerArgumentsGenerator {
         return arguments
     }
 
-    func getPackageName(sourceFilePath: String, buildSettings: [String: String]) -> String? {
+    func getPackageName(sourceFilePath: String, buildSettings: [String: String]) -> String {
         let fileManager = FileManager.default
         var currentDirectory = URL(fileURLWithPath: sourceFilePath).deletingLastPathComponent()
 
@@ -544,15 +539,17 @@ public struct CompilerArgumentsGenerator {
             }
             currentDirectory = currentDirectory.deletingLastPathComponent()
         }
-        return nil
+//        return nil
+        return NSString(string: NSString(string: sourceFilePath).deletingLastPathComponent).lastPathComponent
     }
 
-    func getModuleName(sourceFilePath: String, packages: [PackageObject], buildSettings: [String: String]) -> String? {
-        guard !packages.isEmpty,
-              let packageName = getPackageName(sourceFilePath: sourceFilePath, buildSettings: buildSettings) else {
-            return nil
-        }
+    func getModuleName(sourceFilePath: String, packages: [PackageObject], buildSettings: [String: String]) -> String {
         var sourceDirectory = NSString(string: sourceFilePath).deletingLastPathComponent
+
+        guard !packages.isEmpty else {
+            return NSString(string: sourceDirectory).lastPathComponent
+        }
+        let packageName = getPackageName(sourceFilePath: sourceFilePath, buildSettings: buildSettings)
 
         while sourceDirectory != "/" {
             guard let package = packages.filter({ $0.name == packageName }).first else {
@@ -570,7 +567,7 @@ public struct CompilerArgumentsGenerator {
             sourceDirectory = NSString(string: sourceDirectory).deletingLastPathComponent
         }
 
-        return nil
+        return NSString(string: sourceDirectory).lastPathComponent
     }
 
     func getModuleMapPaths(derivedDataPath: String) -> [String] {

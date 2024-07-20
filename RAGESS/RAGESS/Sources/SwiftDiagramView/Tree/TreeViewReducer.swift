@@ -1,9 +1,9 @@
 //
-//  File.swift
-//  
-//  
+//  TreeViewReducer.swift
+//
+//
 //  Created by Ockey12 on 2024/07/19
-//  
+//
 //
 
 import ComposableArchitecture
@@ -22,15 +22,16 @@ public struct TreeViewReducer {
             didSet {
                 if let object = rootObject {
                     #if DEBUG
-                    let rootNode = generateTree(rootObject: object, allDeclarationObjects: allDeclarationObjects)
-                    print("printTree(parentNode: rootNode)")
-                    if let rootNode {
-                        printTree(parentNode: rootNode)
-                    }
+                        let rootNode = generateTree(rootObject: object, allDeclarationObjects: allDeclarationObjects)
+                        print("printTree(parentNode: rootNode)")
+                        if let rootNode {
+                            printTree(parentNode: rootNode)
+                        }
                     #endif
                 }
             }
         }
+
         var nodes: IdentifiedArrayOf<NodeReducer.State> = []
         var allDeclarationObjects: [any DeclarationObject] = []
 
@@ -55,9 +56,9 @@ public struct TreeViewReducer {
             case let protocolObject as ProtocolObject:
                 genericTypeObject = .protocol(protocolObject)
             default:
-#if DEBUG
-                print("ERROR: \(#file) - \(#function): Cannot cast \(rootObject.name) to Type.")
-#endif
+                #if DEBUG
+                    print("ERROR: \(#file) - \(#function): Cannot cast \(rootObject.name) to Type.")
+                #endif
                 return nil
             }
 
@@ -101,8 +102,6 @@ public struct TreeViewReducer {
                     queue.append(child)
                     allNodesWithParentID.append((node.object.id, child))
                 }
-
-
             } // while
 
             while !(allNodesWithParentID.count <= 1) {
@@ -114,9 +113,9 @@ public struct TreeViewReducer {
                 }
 
                 guard let parentIndex = allNodesWithParentID.firstIndex(where: { $0.1.object.id == parentID }) else {
-#if DEBUG
-                    print("ERROR: \(#file) - \(#function): Couldn't find parent node.")
-#endif
+                    #if DEBUG
+                        print("ERROR: \(#file) - \(#function): Couldn't find parent node.")
+                    #endif
                     break
                 }
 
@@ -127,14 +126,14 @@ public struct TreeViewReducer {
         }
 
         #if DEBUG
-        func printTree(parentNode: NodeModel, level: Int = 0) {
-            let indent = String(repeating: "  ", count: level)
-            print("\(indent)\(parentNode.object.name)")
+            func printTree(parentNode: NodeModel, level: Int = 0) {
+                let indent = String(repeating: "  ", count: level)
+                print("\(indent)\(parentNode.object.name)")
 
-            for child in parentNode.children {
-                printTree(parentNode: child, level: level + 1)
+                for child in parentNode.children {
+                    printTree(parentNode: child, level: level + 1)
+                }
             }
-        }
         #endif
     }
 
@@ -173,4 +172,3 @@ public struct TreeViewReducer {
         }
     }
 }
-

@@ -1,9 +1,9 @@
 //
-//  File.swift
-//  
-//  
+//  NodeReducer.swift
+//
+//
 //  Created by Ockey12 on 2024/07/19
-//  
+//
 //
 
 import ComposableArchitecture
@@ -18,6 +18,7 @@ public struct NodeReducer {
         public var id: UUID {
             object.id
         }
+
         let object: GenericTypeObject
 
         let frameWidth: CGFloat

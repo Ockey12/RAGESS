@@ -27,7 +27,7 @@ public struct FileTreePopoverReducer {
             case let .sourceFile(sourceFile):
                 objects = declarationObjects.filter { sourceFile.path == $0.fullPath }
             }
-            self.cells = .init(uniqueElements: objects.map {
+            cells = .init(uniqueElements: objects.map {
                 FileTreePopoverCellReducer.State(declarationObject: $0)
             })
         }

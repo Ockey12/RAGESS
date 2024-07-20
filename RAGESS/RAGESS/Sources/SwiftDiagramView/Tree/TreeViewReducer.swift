@@ -9,6 +9,7 @@
 import ComposableArchitecture
 import DeclarationObjectsClient
 import Dependencies
+import Foundation
 import TypeDeclaration
 
 @Reducer
@@ -17,24 +18,32 @@ public struct TreeViewReducer {
 
     @ObservableState
     public struct State {
-        var rootObject: (any DeclarationObject)? {
+        public var rootObject: (any DeclarationObject)? {
             didSet {
                 if let object = rootObject {
-                    nodes = generateTree(rootObject: object, allDeclarationObjects: allDeclarationObjects)
+                    #if DEBUG
+                    let rootNode = generateTree(rootObject: object, allDeclarationObjects: allDeclarationObjects)
+                    print("printTree(parentNode: rootNode)")
+                    if let rootNode {
+                        printTree(parentNode: rootNode)
+                    }
+                    #endif
                 }
             }
         }
         var nodes: IdentifiedArrayOf<NodeReducer.State> = []
         var allDeclarationObjects: [any DeclarationObject] = []
 
-        public init(rootObject: (any TypeDeclaration)? = nil) {
+        public init(rootObject: (any TypeDeclaration)? = nil, allDeclarationObjects: [any DeclarationObject]) {
             self.rootObject = rootObject
+            self.allDeclarationObjects = allDeclarationObjects
         }
 
+        /// Return  a root node.
         func generateTree(
             rootObject: any DeclarationObject,
             allDeclarationObjects: [any DeclarationObject]
-        ) -> IdentifiedArrayOf<NodeReducer.State> {
+        ) -> NodeModel? {
             let genericTypeObject: GenericTypeObject
             switch rootObject {
             case let structObject as StructObject:
@@ -49,48 +58,84 @@ public struct TreeViewReducer {
 #if DEBUG
                 print("ERROR: \(#file) - \(#function): Cannot cast \(rootObject.name) to Type.")
 #endif
-                return []
+                return nil
             }
-            let rootNode = extractChildren(parentNode: NodeModel(object: genericTypeObject), allDeclarationObjects: allDeclarationObjects)
 
+            let rootNode = NodeModel(object: genericTypeObject)
+            var queue: [NodeModel] = [rootNode]
+            var allNodesWithParentID: [(UUID?, NodeModel)] = [(nil, rootNode)]
+            var didVisitObjectsID: Set<UUID> = [rootNode.object.id]
+
+            while !queue.isEmpty {
+                let node = queue.removeFirst()
+                let dependencies = node.object.objectsThatCallThisObject
+                didVisitObjectsID.insert(node.object.id)
+
+                for dependency in dependencies {
+                    guard let callerObject = allDeclarationObjects.first(where: { $0.id == dependency.callerObject.rootObjectID }) else {
+                        continue
+                    }
+                    guard node.object.id != callerObject.id else {
+                        continue
+                    }
+                    guard !didVisitObjectsID.contains(callerObject.id) else {
+                        continue
+                    }
+                    didVisitObjectsID.insert(callerObject.id)
+
+                    let genericTypeObject: GenericTypeObject
+                    switch callerObject {
+                    case let structObject as StructObject:
+                        genericTypeObject = .struct(structObject)
+                    case let classObject as ClassObject:
+                        genericTypeObject = .class(classObject)
+                    case let enumObject as EnumObject:
+                        genericTypeObject = .enum(enumObject)
+                    case let protocolObject as ProtocolObject:
+                        genericTypeObject = .protocol(protocolObject)
+                    default:
+                        continue
+                    }
+
+                    let child = NodeModel(object: genericTypeObject)
+                    queue.append(child)
+                    allNodesWithParentID.append((node.object.id, child))
+                }
+
+
+            } // while
+
+            while !(allNodesWithParentID.count <= 1) {
+                let (parentID, child) = allNodesWithParentID.removeLast()
+
+                // For a root node, parentID is nil.
+                guard let parentID else {
+                    break
+                }
+
+                guard let parentIndex = allNodesWithParentID.firstIndex(where: { $0.1.object.id == parentID }) else {
 #if DEBUG
-            dump(rootNode)
+                    print("ERROR: \(#file) - \(#function): Couldn't find parent node.")
 #endif
-
-            return []
-        }
-
-        func extractChildren(
-            parentNode: NodeModel,
-            allDeclarationObjects: [any DeclarationObject]
-        ) -> [NodeModel] {
-            let dependencies = parentNode.object.objectsThatCallThisObject
-            var children: [NodeModel] = []
-
-            for dependency in dependencies {
-                guard let callerObject = allDeclarationObjects.first(where: {$0.id == dependency.callerObject.rootObjectID}) else {
-                    continue
+                    break
                 }
-                let genericTypeObject: GenericTypeObject
-                switch callerObject {
-                case let structObject as StructObject:
-                    genericTypeObject = .struct(structObject)
-                case let classObject as ClassObject:
-                    genericTypeObject = .class(classObject)
-                case let enumObject as EnumObject:
-                    genericTypeObject = .enum(enumObject)
-                case let protocolObject as ProtocolObject:
-                    genericTypeObject = .protocol(protocolObject)
-                default:
-                    continue
-                }
-                var child = NodeModel(object: genericTypeObject)
-                child.children = extractChildren(parentNode: child, allDeclarationObjects: allDeclarationObjects)
-                children.append(child)
+
+                allNodesWithParentID[parentIndex].1.children.append(child)
             }
 
-            return children
+            return allNodesWithParentID[0].1
         }
+
+        #if DEBUG
+        func printTree(parentNode: NodeModel, level: Int = 0) {
+            let indent = String(repeating: "  ", count: level)
+            print("\(indent)\(parentNode.object.name)")
+
+            for child in parentNode.children {
+                printTree(parentNode: child, level: level + 1)
+            }
+        }
+        #endif
     }
 
     public enum Action {

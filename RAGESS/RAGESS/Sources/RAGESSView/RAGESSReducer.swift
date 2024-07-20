@@ -325,8 +325,16 @@ public struct RAGESSReducer {
                         scheduler: self.mainQueue
                     )
 
-            case let .fileTree(.delegate(.popoverCellClicked(objectID: objectID))):
-                return .none
+            case let .fileTree(.delegate(delegateAction)):
+                switch delegateAction {
+                case let .popoverCellClicked(objectID: objectID):
+                    guard let clickedObject = state.declarationObjects.first(where: { $0.id == objectID }) else {
+                        return .none
+                    }
+                    print(clickedObject.name)
+                    state.swiftDiagram.tree.rootObject = clickedObject
+                    return .none
+                }
 
             case .fileTree:
                 return .none

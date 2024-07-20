@@ -22,10 +22,12 @@ public struct SwiftDiagramReducer {
         var classes: IdentifiedArrayOf<ClassViewReducer.State>
         var enums: IdentifiedArrayOf<EnumViewReducer.State>
         var arrows: IdentifiedArrayOf<ArrowViewReducer.State> = []
+        public var tree: TreeViewReducer.State
         public var frameWidth: CGFloat = 1
         public var frameHeight: CGFloat = 1
 
         public init(allDeclarationObjects: [any DeclarationObject]) {
+            tree = TreeViewReducer.State(allDeclarationObjects: allDeclarationObjects)
             var protocolObjects: [ProtocolObject] = []
             var structObjects: [StructObject] = []
             var classObjects: [ClassObject] = []

@@ -28,6 +28,19 @@ public enum GenericTypeObject: Equatable {
         }
     }
 
+    var name: String {
+        switch self {
+        case let .struct(structObject):
+            structObject.name
+        case let .class(classObject):
+            classObject.name
+        case let .enum(enumObject):
+            enumObject.name
+        case let .protocol(protocolObject):
+            protocolObject.name
+        }
+    }
+
     var objectsThatCallThisObject: [DependencyObject] {
         switch self {
         case let .struct(structObject):

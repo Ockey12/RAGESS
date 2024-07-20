@@ -41,17 +41,31 @@ struct DependencyExtractor {
                 packages: packages
             )
 
-            guard let arguments = try? generator.generateArguments() else {
+//            guard let arguments = try? generator.generateArguments() else {
+//                print("\(#filePath) - \(#function)")
+//                print("ERROR: Cannot generate compiler arguments about \(sourceFile.path).\n")
+//                continue
+//            }
+//            await extractDependencies(
+//                from: sourceFile,
+//                declarationObjects: &declarationObjects,
+//                allSourceFilePaths: allSourceFilePaths,
+//                sourceKitArguments: arguments
+//            )
+
+            do {
+                let arguments = try generator.generateArguments()
+                await extractDependencies(
+                    from: sourceFile,
+                    declarationObjects: &declarationObjects,
+                    allSourceFilePaths: allSourceFilePaths,
+                    sourceKitArguments: arguments
+                )
+            } catch {
                 print("\(#filePath) - \(#function)")
-                print("ERROR: Cannot generate compiler arguments about \(sourceFile.path).\n")
+                print("\(error): Cannot generate compiler arguments about \(sourceFile.path).\n")
                 continue
             }
-            await extractDependencies(
-                from: sourceFile,
-                declarationObjects: &declarationObjects,
-                allSourceFilePaths: allSourceFilePaths,
-                sourceKitArguments: arguments
-            )
         }
     }
 

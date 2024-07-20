@@ -47,7 +47,6 @@ extension CompilerArgumentsClient: DependencyKey {
                 return NSString(string: sourceDirectory).lastPathComponent
             }
 
-
             while sourceDirectory != "/" {
                 guard let package = packages.filter({ $0.name == packageName }).first else {
                     sourceDirectory = NSString(string: sourceDirectory).deletingLastPathComponent
@@ -550,7 +549,7 @@ public struct CompilerArgumentsGenerator {
         guard !packages.isEmpty else {
             return NSString(string: sourceDirectory).lastPathComponent
         }
-        let packageName = getPackageName(sourceFilePath: sourceFilePath, buildSettings: buildSettings) 
+        let packageName = getPackageName(sourceFilePath: sourceFilePath, buildSettings: buildSettings)
 
         while sourceDirectory != "/" {
             guard let package = packages.filter({ $0.name == packageName }).first else {

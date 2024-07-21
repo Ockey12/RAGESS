@@ -16,7 +16,7 @@ public struct TextCellReducer {
     public struct State: Identifiable, Equatable {
         public static func == (lhs: TextCellReducer.State, rhs: TextCellReducer.State) -> Bool {
             lhs.id == rhs.id
-            && lhs.object.id == rhs.object.id
+                && lhs.object.id == rhs.object.id
         }
 
         public var id: UUID {

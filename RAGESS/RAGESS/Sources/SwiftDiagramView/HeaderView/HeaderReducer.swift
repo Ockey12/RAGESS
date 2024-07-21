@@ -19,7 +19,7 @@ public struct HeaderReducer {
         public static func == (lhs: HeaderReducer.State, rhs: HeaderReducer.State) -> Bool {
             lhs.object.id == rhs.object.id
         }
-        
+
         var object: any HasHeader
         var text: TextCellReducer.State
         var topLeadingPoint: CGPoint

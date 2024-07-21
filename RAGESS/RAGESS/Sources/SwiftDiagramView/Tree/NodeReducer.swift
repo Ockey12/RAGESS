@@ -49,13 +49,13 @@ public struct NodeReducer {
             let bottomPaddingForLastText = ComponentSizeValues.bottomPaddingForLastText
             let bottomPadding = ComponentSizeValues.bottomPaddingForLastText
 
-            var hasSuperClass: Bool = false
-            var numberOfParentProtocols: Int = 0
-            var numberOfConformances: Int = 0
-            var numberOfInitializers: Int = 0
-            var numberOfCases: Int = 0
-            var numberOfVariables: Int = 0
-            var numberOfFunctions: Int = 0
+            var hasSuperClass = false
+            var numberOfParentProtocols = 0
+            var numberOfConformances = 0
+            var numberOfInitializers = 0
+            var numberOfCases = 0
+            var numberOfVariables = 0
+            var numberOfFunctions = 0
 
             switch object {
             case let .struct(structObject):
@@ -82,16 +82,16 @@ public struct NodeReducer {
                     calculateMaxTextWidth(allAnnotatedDecl),
                     ComponentSizeValues.bodyMinWidth
                 )
-                self.frameWidth = bodyWidth
+                frameWidth = bodyWidth
                     + ComponentSizeValues.arrowTerminalWidth * 2
                     + ComponentSizeValues.borderWidth
 
                 var frameBottomLeadingPoint = CGPoint(
                     x: topLeadingPoint.x,
                     y: topLeadingPoint.y
-                    + borderWidth / 2
-                    + itemHeight * 2
-                    + bottomPaddingForLastText
+                        + borderWidth / 2
+                        + itemHeight * 2
+                        + bottomPaddingForLastText
                 )
 
                 let protocolsFrameTopLeadingPoint = frameBottomLeadingPoint
@@ -99,9 +99,9 @@ public struct NodeReducer {
                     frameBottomLeadingPoint = CGPoint(
                         x: frameBottomLeadingPoint.x,
                         y: frameBottomLeadingPoint.y
-                        + connectionHeight
-                        + itemHeight * CGFloat(conformedProtocolObjects.count)
-                        + bottomPaddingForLastText
+                            + connectionHeight
+                            + itemHeight * CGFloat(conformedProtocolObjects.count)
+                            + bottomPaddingForLastText
                     )
                 }
 
@@ -110,9 +110,9 @@ public struct NodeReducer {
                     frameBottomLeadingPoint = CGPoint(
                         x: frameBottomLeadingPoint.x,
                         y: frameBottomLeadingPoint.y
-                        + connectionHeight
-                        + itemHeight * CGFloat(structObject.initializers.count)
-                        + bottomPaddingForLastText
+                            + connectionHeight
+                            + itemHeight * CGFloat(structObject.initializers.count)
+                            + bottomPaddingForLastText
                     )
                 }
 
@@ -121,15 +121,15 @@ public struct NodeReducer {
                     frameBottomLeadingPoint = CGPoint(
                         x: frameBottomLeadingPoint.x,
                         y: frameBottomLeadingPoint.y
-                        + connectionHeight
-                        + itemHeight * CGFloat(structObject.variables.count)
-                        + bottomPaddingForLastText
+                            + connectionHeight
+                            + itemHeight * CGFloat(structObject.variables.count)
+                            + bottomPaddingForLastText
                     )
                 }
 
                 let functionsTopLeadingPoint = frameBottomLeadingPoint
 
-                self.header = HeaderReducer.State(
+                header = HeaderReducer.State(
                     object: structObject,
                     topLeadingPoint: topLeadingPoint,
                     bodyWidth: bodyWidth
@@ -197,16 +197,16 @@ public struct NodeReducer {
                     calculateMaxTextWidth(allAnnotatedDecl),
                     ComponentSizeValues.bodyMinWidth
                 )
-                self.frameWidth = bodyWidth
+                frameWidth = bodyWidth
                     + ComponentSizeValues.arrowTerminalWidth * 2
                     + ComponentSizeValues.borderWidth
 
                 var frameBottomLeadingPoint = CGPoint(
                     x: topLeadingPoint.x,
                     y: topLeadingPoint.y
-                    + borderWidth / 2
-                    + itemHeight * 2
-                    + bottomPaddingForLastText
+                        + borderWidth / 2
+                        + itemHeight * 2
+                        + bottomPaddingForLastText
                 )
 
                 var details: [DetailReducer.State] = []
@@ -224,9 +224,9 @@ public struct NodeReducer {
                     frameBottomLeadingPoint = CGPoint(
                         x: frameBottomLeadingPoint.x,
                         y: frameBottomLeadingPoint.y
-                        + connectionHeight
-                        + itemHeight
-                        + bottomPaddingForLastText
+                            + connectionHeight
+                            + itemHeight
+                            + bottomPaddingForLastText
                     )
                 }
 
@@ -235,9 +235,9 @@ public struct NodeReducer {
                     frameBottomLeadingPoint = CGPoint(
                         x: frameBottomLeadingPoint.x,
                         y: frameBottomLeadingPoint.y
-                        + connectionHeight
-                        + itemHeight * CGFloat(conformedProtocolObjects.count)
-                        + bottomPaddingForLastText
+                            + connectionHeight
+                            + itemHeight * CGFloat(conformedProtocolObjects.count)
+                            + bottomPaddingForLastText
                     )
                 }
 
@@ -246,9 +246,9 @@ public struct NodeReducer {
                     frameBottomLeadingPoint = CGPoint(
                         x: frameBottomLeadingPoint.x,
                         y: frameBottomLeadingPoint.y
-                        + connectionHeight
-                        + itemHeight * CGFloat(classObject.initializers.count)
-                        + bottomPaddingForLastText
+                            + connectionHeight
+                            + itemHeight * CGFloat(classObject.initializers.count)
+                            + bottomPaddingForLastText
                     )
                 }
 
@@ -257,9 +257,9 @@ public struct NodeReducer {
                     frameBottomLeadingPoint = CGPoint(
                         x: frameBottomLeadingPoint.x,
                         y: frameBottomLeadingPoint.y
-                        + connectionHeight
-                        + itemHeight * CGFloat(classObject.variables.count)
-                        + bottomPaddingForLastText
+                            + connectionHeight
+                            + itemHeight * CGFloat(classObject.variables.count)
+                            + bottomPaddingForLastText
                     )
                 }
 
@@ -324,16 +324,16 @@ public struct NodeReducer {
                     calculateMaxTextWidth(allAnnotatedDecl),
                     ComponentSizeValues.bodyMinWidth
                 )
-                self.frameWidth = bodyWidth
-                + ComponentSizeValues.arrowTerminalWidth * 2
-                + ComponentSizeValues.borderWidth
+                frameWidth = bodyWidth
+                    + ComponentSizeValues.arrowTerminalWidth * 2
+                    + ComponentSizeValues.borderWidth
 
                 var frameBottomLeadingPoint = CGPoint(
                     x: topLeadingPoint.x,
                     y: topLeadingPoint.y
-                    + borderWidth / 2
-                    + itemHeight * 2
-                    + bottomPaddingForLastText
+                        + borderWidth / 2
+                        + itemHeight * 2
+                        + bottomPaddingForLastText
                 )
 
                 let protocolsFrameTopLeadingPoint = frameBottomLeadingPoint
@@ -341,9 +341,9 @@ public struct NodeReducer {
                     frameBottomLeadingPoint = CGPoint(
                         x: frameBottomLeadingPoint.x,
                         y: frameBottomLeadingPoint.y
-                        + connectionHeight
-                        + itemHeight * CGFloat(conformedProtocolObjects.count)
-                        + bottomPaddingForLastText
+                            + connectionHeight
+                            + itemHeight * CGFloat(conformedProtocolObjects.count)
+                            + bottomPaddingForLastText
                     )
                 }
 
@@ -352,9 +352,9 @@ public struct NodeReducer {
                     frameBottomLeadingPoint = CGPoint(
                         x: frameBottomLeadingPoint.x,
                         y: frameBottomLeadingPoint.y
-                        + connectionHeight
-                        + itemHeight * CGFloat(enumObject.initializers.count)
-                        + bottomPaddingForLastText
+                            + connectionHeight
+                            + itemHeight * CGFloat(enumObject.initializers.count)
+                            + bottomPaddingForLastText
                     )
                 }
 
@@ -363,9 +363,9 @@ public struct NodeReducer {
                     frameBottomLeadingPoint = CGPoint(
                         x: frameBottomLeadingPoint.x,
                         y: frameBottomLeadingPoint.y
-                        + connectionHeight
-                        + itemHeight * CGFloat(enumObject.cases.count)
-                        + bottomPaddingForLastText
+                            + connectionHeight
+                            + itemHeight * CGFloat(enumObject.cases.count)
+                            + bottomPaddingForLastText
                     )
                 }
 
@@ -374,9 +374,9 @@ public struct NodeReducer {
                     frameBottomLeadingPoint = CGPoint(
                         x: frameBottomLeadingPoint.x,
                         y: frameBottomLeadingPoint.y
-                        + connectionHeight
-                        + itemHeight * CGFloat(enumObject.variables.count)
-                        + bottomPaddingForLastText
+                            + connectionHeight
+                            + itemHeight * CGFloat(enumObject.variables.count)
+                            + bottomPaddingForLastText
                     )
                 }
 
@@ -388,7 +388,7 @@ public struct NodeReducer {
                     bodyWidth: bodyWidth
                 )
 
-                self.details = [
+                details = [
                     DetailReducer.State(
                         objects: conformedProtocolObjects,
                         kind: .protocolConformance,
@@ -427,7 +427,7 @@ public struct NodeReducer {
                     allDeclarationObjects: allDeclarationObjects
                 )
                 self.parentProtocolObjects = parentProtocolObjects
-                self.conformedProtocolObjects = []
+                conformedProtocolObjects = []
 
                 var allAnnotatedDecl = [protocolObject.annotatedDecl]
                 allAnnotatedDecl.append(contentsOf: parentProtocolObjects.map { $0.annotatedDecl })
@@ -446,16 +446,16 @@ public struct NodeReducer {
                     calculateMaxTextWidth(allAnnotatedDecl),
                     ComponentSizeValues.bodyMinWidth
                 )
-                self.frameWidth = bodyWidth
+                frameWidth = bodyWidth
                     + ComponentSizeValues.arrowTerminalWidth * 2
                     + ComponentSizeValues.borderWidth
 
                 var frameBottomLeadingPoint = CGPoint(
                     x: topLeadingPoint.x,
                     y: topLeadingPoint.y
-                    + borderWidth / 2
-                    + itemHeight * 2
-                    + bottomPaddingForLastText
+                        + borderWidth / 2
+                        + itemHeight * 2
+                        + bottomPaddingForLastText
                 )
 
                 let protocolsFrameTopLeadingPoint = frameBottomLeadingPoint
@@ -463,9 +463,9 @@ public struct NodeReducer {
                     frameBottomLeadingPoint = CGPoint(
                         x: frameBottomLeadingPoint.x,
                         y: frameBottomLeadingPoint.y
-                        + connectionHeight
-                        + itemHeight * CGFloat(parentProtocolObjects.count)
-                        + bottomPaddingForLastText
+                            + connectionHeight
+                            + itemHeight * CGFloat(parentProtocolObjects.count)
+                            + bottomPaddingForLastText
                     )
                 }
 
@@ -474,9 +474,9 @@ public struct NodeReducer {
                     frameBottomLeadingPoint = CGPoint(
                         x: frameBottomLeadingPoint.x,
                         y: frameBottomLeadingPoint.y
-                        + connectionHeight
-                        + itemHeight * CGFloat(protocolObject.initializers.count)
-                        + bottomPaddingForLastText
+                            + connectionHeight
+                            + itemHeight * CGFloat(protocolObject.initializers.count)
+                            + bottomPaddingForLastText
                     )
                 }
 
@@ -485,15 +485,15 @@ public struct NodeReducer {
                     frameBottomLeadingPoint = CGPoint(
                         x: frameBottomLeadingPoint.x,
                         y: frameBottomLeadingPoint.y
-                        + connectionHeight
-                        + itemHeight * CGFloat(protocolObject.variables.count)
-                        + bottomPaddingForLastText
+                            + connectionHeight
+                            + itemHeight * CGFloat(protocolObject.variables.count)
+                            + bottomPaddingForLastText
                     )
                 }
 
                 let functionsTopLeadingPoint = frameBottomLeadingPoint
 
-                self.details = [
+                details = [
                     DetailReducer.State(
                         objects: parentProtocolObjects,
                         kind: .parentProtocol,
@@ -520,7 +520,7 @@ public struct NodeReducer {
                     )
                 ]
 
-                self.header = HeaderReducer.State(
+                header = HeaderReducer.State(
                     object: protocolObject,
                     topLeadingPoint: topLeadingPoint,
                     bodyWidth: bodyWidth

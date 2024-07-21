@@ -62,7 +62,11 @@ public struct TreeViewReducer {
                 return nil
             }
 
-            let rootNode = NodeModel(object: genericTypeObject)
+            let rootNode = NodeModel(
+                object: genericTypeObject,
+                parentID: nil,
+                allDeclarationObjects: allDeclarationObjects
+            )
             var queue: [NodeModel] = [rootNode]
             var allNodesWithParentID: [(UUID?, NodeModel)] = [(nil, rootNode)]
             var didVisitObjectsID: Set<UUID> = [rootNode.object.id]
@@ -98,7 +102,11 @@ public struct TreeViewReducer {
                         continue
                     }
 
-                    let child = NodeModel(object: genericTypeObject)
+                    let child = NodeModel(
+                        object: genericTypeObject,
+                        parentID: node.object.id,
+                        allDeclarationObjects: allDeclarationObjects
+                    )
                     queue.append(child)
                     allNodesWithParentID.append((node.object.id, child))
                 }

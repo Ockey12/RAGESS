@@ -8,6 +8,7 @@
 
 import ComposableArchitecture
 import Foundation
+import TypeDeclaration
 
 @Reducer
 public struct NodeReducer {
@@ -20,6 +21,13 @@ public struct NodeReducer {
         }
 
         let object: GenericTypeObject
+        let treeDepth: Int
+
+        var header: HeaderReducer.State
+        var details: IdentifiedArrayOf<DetailReducer.State>
+        private var parentProtocolObjects: [ProtocolObject] = []
+        private var superClassObject: ClassObject? = nil
+        private let conformedProtocolObjects: [ProtocolObject]
 
         let frameWidth: CGFloat
         let frameHeight: CGFloat
@@ -27,13 +35,458 @@ public struct NodeReducer {
 
         public init(
             object: GenericTypeObject,
-            frameWidth: CGFloat,
-            frameHeight: CGFloat,
+            treeDepth: Int,
+            allDeclarationObjects: [any DeclarationObject],
             topLeadingPoint: CGPoint
         ) {
             self.object = object
-            self.frameWidth = frameWidth
-            self.frameHeight = frameHeight
+            self.treeDepth = treeDepth
+
+            let borderWidth = ComponentSizeValues.borderWidth
+            let connectionHeight = ComponentSizeValues.connectionHeight
+            let itemHeight = ComponentSizeValues.itemHeight
+            let bottomPaddingForLastText = ComponentSizeValues.bottomPaddingForLastText
+
+            switch object {
+            case let .struct(structObject):
+                let conformedProtocolObjects = extractConformedProtocolObjects(
+                    by: structObject,
+                    allDeclarationObjects: allDeclarationObjects
+                )
+                self.conformedProtocolObjects = conformedProtocolObjects
+
+                var allAnnotatedDecl = [structObject.annotatedDecl]
+                allAnnotatedDecl.append(contentsOf: conformedProtocolObjects.map { $0.annotatedDecl })
+                allAnnotatedDecl.append(contentsOf: structObject.initializers.map { $0.annotatedDecl })
+                allAnnotatedDecl.append(contentsOf: structObject.variables.map { $0.annotatedDecl })
+                allAnnotatedDecl.append(contentsOf: structObject.functions.map { $0.annotatedDecl })
+
+                let bodyWidth = max(
+                    calculateMaxTextWidth(allAnnotatedDecl),
+                    ComponentSizeValues.bodyMinWidth
+                )
+                self.frameWidth = bodyWidth
+                    + ComponentSizeValues.arrowTerminalWidth * 2
+                    + ComponentSizeValues.borderWidth
+
+                var frameBottomLeadingPoint = CGPoint(
+                    x: topLeadingPoint.x,
+                    y: topLeadingPoint.y
+                    + borderWidth / 2
+                    + itemHeight * 2
+                    + bottomPaddingForLastText
+                )
+
+                let protocolsFrameTopLeadingPoint = frameBottomLeadingPoint
+                if !conformedProtocolObjects.isEmpty {
+                    frameBottomLeadingPoint = CGPoint(
+                        x: frameBottomLeadingPoint.x,
+                        y: frameBottomLeadingPoint.y
+                        + connectionHeight
+                        + itemHeight * CGFloat(conformedProtocolObjects.count)
+                        + bottomPaddingForLastText
+                    )
+                }
+
+                let initializersTopLeadingPoint = frameBottomLeadingPoint
+                if !structObject.initializers.isEmpty {
+                    frameBottomLeadingPoint = CGPoint(
+                        x: frameBottomLeadingPoint.x,
+                        y: frameBottomLeadingPoint.y
+                        + connectionHeight
+                        + itemHeight * CGFloat(structObject.initializers.count)
+                        + bottomPaddingForLastText
+                    )
+                }
+
+                let variablesTopLeadingPoint = frameBottomLeadingPoint
+                if !structObject.variables.isEmpty {
+                    frameBottomLeadingPoint = CGPoint(
+                        x: frameBottomLeadingPoint.x,
+                        y: frameBottomLeadingPoint.y
+                        + connectionHeight
+                        + itemHeight * CGFloat(structObject.variables.count)
+                        + bottomPaddingForLastText
+                    )
+                }
+
+                let functionsTopLeadingPoint = frameBottomLeadingPoint
+
+                self.header = HeaderReducer.State(
+                    object: structObject,
+                    topLeadingPoint: topLeadingPoint,
+                    bodyWidth: bodyWidth
+                )
+
+                details = [
+                    DetailReducer.State(
+                        objects: conformedProtocolObjects,
+                        kind: .protocolConformance,
+                        topLeadingPoint: protocolsFrameTopLeadingPoint,
+                        frameWidth: bodyWidth
+                    ),
+                    DetailReducer.State(
+                        objects: structObject.initializers,
+                        kind: .initializers,
+                        topLeadingPoint: initializersTopLeadingPoint,
+                        frameWidth: bodyWidth
+                    ),
+                    DetailReducer.State(
+                        objects: structObject.variables,
+                        kind: .variables,
+                        topLeadingPoint: variablesTopLeadingPoint,
+                        frameWidth: bodyWidth
+                    ),
+                    DetailReducer.State(
+                        objects: structObject.functions,
+                        kind: .functions,
+                        topLeadingPoint: functionsTopLeadingPoint,
+                        frameWidth: bodyWidth
+                    )
+                ]
+
+            case let .class(classObject):
+                let superClassObject = extractSuperClassObject(
+                    by: classObject,
+                    allDeclarationObjects: allDeclarationObjects
+                )
+                self.superClassObject = superClassObject
+
+                let conformedProtocolObjects = extractConformedProtocolObjects(
+                    by: classObject,
+                    allDeclarationObjects: allDeclarationObjects
+                )
+                self.conformedProtocolObjects = conformedProtocolObjects
+
+                var allAnnotatedDecl = [classObject.annotatedDecl]
+                if let superClassObject {
+                    allAnnotatedDecl.append(superClassObject.annotatedDecl)
+                }
+                allAnnotatedDecl.append(contentsOf: conformedProtocolObjects.map { $0.annotatedDecl })
+                allAnnotatedDecl.append(contentsOf: classObject.initializers.map { $0.annotatedDecl })
+                allAnnotatedDecl.append(contentsOf: classObject.variables.map { $0.annotatedDecl })
+                allAnnotatedDecl.append(contentsOf: classObject.functions.map { $0.annotatedDecl })
+
+                let bodyWidth = max(
+                    calculateMaxTextWidth(allAnnotatedDecl),
+                    ComponentSizeValues.bodyMinWidth
+                )
+                self.frameWidth = bodyWidth
+                    + ComponentSizeValues.arrowTerminalWidth * 2
+                    + ComponentSizeValues.borderWidth
+
+                var frameBottomLeadingPoint = CGPoint(
+                    x: topLeadingPoint.x,
+                    y: topLeadingPoint.y
+                    + borderWidth / 2
+                    + itemHeight * 2
+                    + bottomPaddingForLastText
+                )
+
+                var details: [DetailReducer.State] = []
+
+                if let superClassObject {
+                    details.append(
+                        DetailReducer.State(
+                            objects: [superClassObject],
+                            kind: .superClass,
+                            topLeadingPoint: frameBottomLeadingPoint,
+                            frameWidth: bodyWidth
+                        )
+                    )
+
+                    frameBottomLeadingPoint = CGPoint(
+                        x: frameBottomLeadingPoint.x,
+                        y: frameBottomLeadingPoint.y
+                        + connectionHeight
+                        + itemHeight
+                        + bottomPaddingForLastText
+                    )
+                }
+
+                let protocolsFrameTopLeadingPoint = frameBottomLeadingPoint
+                if !conformedProtocolObjects.isEmpty {
+                    frameBottomLeadingPoint = CGPoint(
+                        x: frameBottomLeadingPoint.x,
+                        y: frameBottomLeadingPoint.y
+                        + connectionHeight
+                        + itemHeight * CGFloat(conformedProtocolObjects.count)
+                        + bottomPaddingForLastText
+                    )
+                }
+
+                let initializersTopLeadingPoint = frameBottomLeadingPoint
+                if !classObject.initializers.isEmpty {
+                    frameBottomLeadingPoint = CGPoint(
+                        x: frameBottomLeadingPoint.x,
+                        y: frameBottomLeadingPoint.y
+                        + connectionHeight
+                        + itemHeight * CGFloat(classObject.initializers.count)
+                        + bottomPaddingForLastText
+                    )
+                }
+
+                let variablesTopLeadingPoint = frameBottomLeadingPoint
+                if !classObject.variables.isEmpty {
+                    frameBottomLeadingPoint = CGPoint(
+                        x: frameBottomLeadingPoint.x,
+                        y: frameBottomLeadingPoint.y
+                        + connectionHeight
+                        + itemHeight * CGFloat(classObject.variables.count)
+                        + bottomPaddingForLastText
+                    )
+                }
+
+                let functionsTopLeadingPoint = frameBottomLeadingPoint
+
+                details.append(contentsOf: [
+                    DetailReducer.State(
+                        objects: conformedProtocolObjects,
+                        kind: .protocolConformance,
+                        topLeadingPoint: protocolsFrameTopLeadingPoint,
+                        frameWidth: bodyWidth
+                    ),
+                    DetailReducer.State(
+                        objects: classObject.initializers,
+                        kind: .initializers,
+                        topLeadingPoint: initializersTopLeadingPoint,
+                        frameWidth: bodyWidth
+                    ),
+                    DetailReducer.State(
+                        objects: classObject.variables,
+                        kind: .variables,
+                        topLeadingPoint: variablesTopLeadingPoint,
+                        frameWidth: bodyWidth
+                    ),
+                    DetailReducer.State(
+                        objects: classObject.functions,
+                        kind: .functions,
+                        topLeadingPoint: functionsTopLeadingPoint,
+                        frameWidth: bodyWidth
+                    )
+                ])
+
+                header = HeaderReducer.State(
+                    object: classObject,
+                    topLeadingPoint: topLeadingPoint,
+                    bodyWidth: bodyWidth
+                )
+                self.details = .init(uniqueElements: details)
+
+            case let .enum(enumObject):
+                let conformedProtocolObjects = extractConformedProtocolObjects(
+                    by: enumObject,
+                    allDeclarationObjects: allDeclarationObjects
+                )
+                self.conformedProtocolObjects = conformedProtocolObjects
+
+                var allAnnotatedDecl = [enumObject.annotatedDecl]
+                allAnnotatedDecl.append(contentsOf: conformedProtocolObjects.map { $0.annotatedDecl })
+                allAnnotatedDecl.append(contentsOf: enumObject.cases.map { $0.annotatedDecl })
+                allAnnotatedDecl.append(contentsOf: enumObject.variables.map { $0.annotatedDecl })
+                allAnnotatedDecl.append(contentsOf: enumObject.functions.map { $0.annotatedDecl })
+
+                let bodyWidth = max(
+                    calculateMaxTextWidth(allAnnotatedDecl),
+                    ComponentSizeValues.bodyMinWidth
+                )
+                self.frameWidth = bodyWidth
+                + ComponentSizeValues.arrowTerminalWidth * 2
+                + ComponentSizeValues.borderWidth
+
+                var frameBottomLeadingPoint = CGPoint(
+                    x: topLeadingPoint.x,
+                    y: topLeadingPoint.y
+                    + borderWidth / 2
+                    + itemHeight * 2
+                    + bottomPaddingForLastText
+                )
+
+                let protocolsFrameTopLeadingPoint = frameBottomLeadingPoint
+                if !conformedProtocolObjects.isEmpty {
+                    frameBottomLeadingPoint = CGPoint(
+                        x: frameBottomLeadingPoint.x,
+                        y: frameBottomLeadingPoint.y
+                        + connectionHeight
+                        + itemHeight * CGFloat(conformedProtocolObjects.count)
+                        + bottomPaddingForLastText
+                    )
+                }
+
+                let initializersTopLeadingPoint = frameBottomLeadingPoint
+                if !enumObject.initializers.isEmpty {
+                    frameBottomLeadingPoint = CGPoint(
+                        x: frameBottomLeadingPoint.x,
+                        y: frameBottomLeadingPoint.y
+                        + connectionHeight
+                        + itemHeight * CGFloat(enumObject.initializers.count)
+                        + bottomPaddingForLastText
+                    )
+                }
+
+                let casesFrameTopLeadingPoint = frameBottomLeadingPoint
+                if !enumObject.cases.isEmpty {
+                    frameBottomLeadingPoint = CGPoint(
+                        x: frameBottomLeadingPoint.x,
+                        y: frameBottomLeadingPoint.y
+                        + connectionHeight
+                        + itemHeight * CGFloat(enumObject.cases.count)
+                        + bottomPaddingForLastText
+                    )
+                }
+
+                let variablesTopLeadingPoint = frameBottomLeadingPoint
+                if !enumObject.variables.isEmpty {
+                    frameBottomLeadingPoint = CGPoint(
+                        x: frameBottomLeadingPoint.x,
+                        y: frameBottomLeadingPoint.y
+                        + connectionHeight
+                        + itemHeight * CGFloat(enumObject.variables.count)
+                        + bottomPaddingForLastText
+                    )
+                }
+
+                let functionsTopLeadingPoint = frameBottomLeadingPoint
+
+                header = HeaderReducer.State(
+                    object: enumObject,
+                    topLeadingPoint: topLeadingPoint,
+                    bodyWidth: bodyWidth
+                )
+
+                self.details = [
+                    DetailReducer.State(
+                        objects: conformedProtocolObjects,
+                        kind: .protocolConformance,
+                        topLeadingPoint: protocolsFrameTopLeadingPoint,
+                        frameWidth: bodyWidth
+                    ),
+                    DetailReducer.State(
+                        objects: enumObject.initializers,
+                        kind: .initializers,
+                        topLeadingPoint: initializersTopLeadingPoint,
+                        frameWidth: bodyWidth
+                    ),
+                    DetailReducer.State(
+                        objects: enumObject.cases,
+                        kind: .case,
+                        topLeadingPoint: casesFrameTopLeadingPoint,
+                        frameWidth: bodyWidth
+                    ),
+                    DetailReducer.State(
+                        objects: enumObject.variables,
+                        kind: .variables,
+                        topLeadingPoint: variablesTopLeadingPoint,
+                        frameWidth: bodyWidth
+                    ),
+                    DetailReducer.State(
+                        objects: enumObject.functions,
+                        kind: .functions,
+                        topLeadingPoint: functionsTopLeadingPoint,
+                        frameWidth: bodyWidth
+                    )
+                ]
+
+            case let .protocol(protocolObject):
+                let parentProtocolObjects = extractParentProtocolObjects(
+                    by: protocolObject,
+                    allDeclarationObjects: allDeclarationObjects
+                )
+                self.parentProtocolObjects = parentProtocolObjects
+                self.conformedProtocolObjects = []
+
+                var allAnnotatedDecl = [protocolObject.annotatedDecl]
+                allAnnotatedDecl.append(contentsOf: parentProtocolObjects.map { $0.annotatedDecl })
+                allAnnotatedDecl.append(contentsOf: protocolObject.initializers.map { $0.annotatedDecl })
+                allAnnotatedDecl.append(contentsOf: protocolObject.variables.map { $0.annotatedDecl })
+                allAnnotatedDecl.append(contentsOf: protocolObject.functions.map { $0.annotatedDecl })
+
+                let bodyWidth = max(
+                    calculateMaxTextWidth(allAnnotatedDecl),
+                    ComponentSizeValues.bodyMinWidth
+                )
+                self.frameWidth = bodyWidth
+                    + ComponentSizeValues.arrowTerminalWidth * 2
+                    + ComponentSizeValues.borderWidth
+
+                var frameBottomLeadingPoint = CGPoint(
+                    x: topLeadingPoint.x,
+                    y: topLeadingPoint.y
+                    + borderWidth / 2
+                    + itemHeight * 2
+                    + bottomPaddingForLastText
+                )
+
+                let protocolsFrameTopLeadingPoint = frameBottomLeadingPoint
+                if !parentProtocolObjects.isEmpty {
+                    frameBottomLeadingPoint = CGPoint(
+                        x: frameBottomLeadingPoint.x,
+                        y: frameBottomLeadingPoint.y
+                        + connectionHeight
+                        + itemHeight * CGFloat(parentProtocolObjects.count)
+                        + bottomPaddingForLastText
+                    )
+                }
+
+                let initializersTopLeadingPoint = frameBottomLeadingPoint
+                if !protocolObject.initializers.isEmpty {
+                    frameBottomLeadingPoint = CGPoint(
+                        x: frameBottomLeadingPoint.x,
+                        y: frameBottomLeadingPoint.y
+                        + connectionHeight
+                        + itemHeight * CGFloat(protocolObject.initializers.count)
+                        + bottomPaddingForLastText
+                    )
+                }
+
+                let variablesTopLeadingPoint = frameBottomLeadingPoint
+                if !protocolObject.variables.isEmpty {
+                    frameBottomLeadingPoint = CGPoint(
+                        x: frameBottomLeadingPoint.x,
+                        y: frameBottomLeadingPoint.y
+                        + connectionHeight
+                        + itemHeight * CGFloat(protocolObject.variables.count)
+                        + bottomPaddingForLastText
+                    )
+                }
+
+                let functionsTopLeadingPoint = frameBottomLeadingPoint
+
+                self.details = [
+                    DetailReducer.State(
+                        objects: parentProtocolObjects,
+                        kind: .parentProtocol,
+                        topLeadingPoint: protocolsFrameTopLeadingPoint,
+                        frameWidth: bodyWidth
+                    ),
+                    DetailReducer.State(
+                        objects: protocolObject.initializers,
+                        kind: .initializers,
+                        topLeadingPoint: initializersTopLeadingPoint,
+                        frameWidth: bodyWidth
+                    ),
+                    DetailReducer.State(
+                        objects: protocolObject.variables,
+                        kind: .variables,
+                        topLeadingPoint: variablesTopLeadingPoint,
+                        frameWidth: bodyWidth
+                    ),
+                    DetailReducer.State(
+                        objects: protocolObject.functions,
+                        kind: .functions,
+                        topLeadingPoint: functionsTopLeadingPoint,
+                        frameWidth: bodyWidth
+                    )
+                ]
+
+                self.header = HeaderReducer.State(
+                    object: protocolObject,
+                    topLeadingPoint: topLeadingPoint,
+                    bodyWidth: bodyWidth
+                )
+            }
+//            self.frameWidth = frameWidth
+            self.frameHeight = 0
             self.topLeadingPoint = topLeadingPoint
         }
     }

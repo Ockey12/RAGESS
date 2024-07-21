@@ -6,7 +6,7 @@
 //
 //
 
-public struct SourcePosition {
+public struct SourcePosition: Equatable {
     let line: Int
     let utf8index: Int
 

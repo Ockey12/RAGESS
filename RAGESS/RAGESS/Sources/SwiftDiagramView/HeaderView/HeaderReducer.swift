@@ -15,7 +15,11 @@ public struct HeaderReducer {
     public init() {}
 
     @ObservableState
-    public struct State {
+    public struct State: Equatable {
+        public static func == (lhs: HeaderReducer.State, rhs: HeaderReducer.State) -> Bool {
+            lhs.object.id == rhs.object.id
+        }
+        
         var object: any HasHeader
         var text: TextCellReducer.State
         var topLeadingPoint: CGPoint

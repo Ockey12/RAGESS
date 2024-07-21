@@ -13,7 +13,12 @@ import TypeDeclaration
 @Reducer
 public struct TextCellReducer {
     @ObservableState
-    public struct State: Identifiable {
+    public struct State: Identifiable, Equatable {
+        public static func == (lhs: TextCellReducer.State, rhs: TextCellReducer.State) -> Bool {
+            lhs.id == rhs.id
+            && lhs.object.id == rhs.object.id
+        }
+
         public var id: UUID {
             object.id
         }

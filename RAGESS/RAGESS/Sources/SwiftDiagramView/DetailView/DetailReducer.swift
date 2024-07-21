@@ -16,7 +16,7 @@ public struct DetailReducer {
     public init() {}
 
     @ObservableState
-    public struct State: Identifiable {
+    public struct State: Identifiable, Equatable {
         public let id: UUID
         var texts: IdentifiedArrayOf<TextCellReducer.State>
         let kind: DetailKind

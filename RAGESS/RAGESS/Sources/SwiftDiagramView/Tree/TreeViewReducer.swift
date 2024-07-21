@@ -68,7 +68,7 @@ public struct TreeViewReducer {
                 allDeclarationObjects: allDeclarationObjects
             )
             var queue: [NodeModel] = [rootNode]
-            var allNodesWithParentID: [(UUID?, NodeModel)] = [(nil, rootNode)]
+            var allNodes: [NodeModel] = [rootNode]
             var didVisitObjectsID: Set<UUID> = [rootNode.object.id]
 
             while !queue.isEmpty {
@@ -108,35 +108,30 @@ public struct TreeViewReducer {
                         allDeclarationObjects: allDeclarationObjects
                     )
                     queue.append(child)
-                    allNodesWithParentID.append((node.object.id, child))
+                    allNodes.append(child)
                 }
             } // while
 
-            while !(allNodesWithParentID.count <= 1) {
-                let (parentID, child) = allNodesWithParentID.removeLast()
+            while allNodes.count > 1 {
+                let child = allNodes.removeLast()
 
-                // For a root node, parentID is nil.
-                guard let parentID else {
-                    break
-                }
-
-                guard let parentIndex = allNodesWithParentID.firstIndex(where: { $0.1.object.id == parentID }) else {
+                guard let parentIndex = allNodes.firstIndex(where: { $0.id == child.parentID }) else {
                     #if DEBUG
                         print("ERROR: \(#file) - \(#function): Couldn't find parent node.")
                     #endif
                     break
                 }
 
-                allNodesWithParentID[parentIndex].1.children.append(child)
+                allNodes[parentIndex].children.append(child)
             }
 
-            return allNodesWithParentID[0].1
+            return allNodes[0]
         }
 
         #if DEBUG
             func printTree(parentNode: NodeModel, level: Int = 0) {
                 let indent = String(repeating: "  ", count: level)
-                print("\(indent)\(parentNode.object.name)")
+                print("\(indent)\(parentNode.object.name), id: \(parentNode.id), parentID: \(parentNode.parentID)")
 
                 for child in parentNode.children {
                     printTree(parentNode: child, level: level + 1)

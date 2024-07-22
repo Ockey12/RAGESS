@@ -24,8 +24,8 @@ struct NodeModel {
 
     var subtreeHeight: CGFloat {
         max(
-            frameWidth,
-            children.reduce(0, { $0 + $1.subtreeHeight})
+            frameHeight,
+            children.reduce(0, { $0 + $1.subtreeHeight + verticalPadding}) - verticalPadding
         )
     }
 

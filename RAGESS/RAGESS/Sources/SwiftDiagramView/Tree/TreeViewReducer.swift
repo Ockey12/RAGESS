@@ -21,19 +21,36 @@ public struct TreeViewReducer {
         public var rootObject: (any DeclarationObject)? {
             didSet {
                 if let object = rootObject {
+                    let rootNode = generateTree(rootObject: object, allDeclarationObjects: allDeclarationObjects)
                     #if DEBUG
-                        let rootNode = generateTree(rootObject: object, allDeclarationObjects: allDeclarationObjects)
                         print("printTree(parentNode: rootNode)")
                         if let rootNode {
                             printTree(parentNode: rootNode)
                         }
                     #endif
+                    if let rootNode {
+                        frameHeight = rootNode.subtreeHeight
+                        let nodesState = generateNodesState(rootNode: rootNode, allDeclarationObjects: allDeclarationObjects)
+                        frameWidth = nodesState.map { $0.topLeadingPoint.x + $0.frameWidth }.max() ?? 0
+                        nodes = .init(uniqueElements: nodesState)
+                        #if DEBUG
+                        for node in nodes {
+                            print(node.object.name)
+                            print("  topLeadingPoint: \(node.topLeadingPoint)")
+                            print("  W: \(node.frameWidth), H: \(node.frameWidth)")
+                        }
+                        print("frameWidth: \(frameWidth)")
+                        print("frameHeight: \(frameHeight)")
+                        #endif
+                    }
                 }
             }
         }
 
         var nodes: IdentifiedArrayOf<NodeReducer.State> = []
-        var allDeclarationObjects: [any DeclarationObject] = []
+        public var allDeclarationObjects: [any DeclarationObject] = []
+        public var frameWidth: CGFloat = 0
+        public var frameHeight: CGFloat = 0
 
         public init(rootObject: (any TypeDeclaration)? = nil, allDeclarationObjects: [any DeclarationObject]) {
             self.rootObject = rootObject
@@ -138,6 +155,98 @@ public struct TreeViewReducer {
                 }
             }
         #endif
+
+        func generateNodesState(
+            rootNode: NodeModel,
+            allDeclarationObjects: [any DeclarationObject]
+        ) -> [NodeReducer.State] {
+            var queue: [NodeModel] = [rootNode]
+            var allNodes: [NodeModel] = [rootNode]
+            let horizontalPadding: CGFloat = 0
+
+            while !queue.isEmpty {
+                let node = queue.removeFirst()
+                queue.append(contentsOf: node.children)
+                allNodes.append(contentsOf: node.children)
+            }
+
+            var currentParentID = rootNode.id
+            var currentSubtreeTopLeadingPoint = CGPoint(
+                x: 0,
+                y: 0
+            )
+            var nodesState: [NodeReducer.State] = []
+            for node in allNodes {
+                if node.id == rootNode.id {
+                    // root node
+                    nodesState.append(
+                        NodeReducer.State(
+                            object: node.object,
+                            allDeclarationObjects: allDeclarationObjects,
+                            topLeadingPoint: CGPoint(
+                                x: 0,
+                                y: node.subtreeHeight / 2 - node.frameHeight / 2
+                            ),
+                            subtreeTopLeadingPoint: CGPoint(x: 0, y: 0)
+                        )
+                    )
+
+                    currentSubtreeTopLeadingPoint.x += node.frameWidth + horizontalPadding
+#if DEBUG
+                    print("\nRoot Node")
+                    print(node.object.name)
+                    print("  topLeadingPoint: \(nodesState.last!.topLeadingPoint)")
+                    print("  W: \(node.frameWidth), H: \(node.frameHeight)")
+                    print("  State W: \(nodesState.last!.frameWidth), H: \(nodesState.last!.frameHeight)")
+                    print("  subtreeHeight: \(node.subtreeHeight)\n")
+#endif
+                    continue
+                } // if
+
+                if currentParentID != node.parentID,
+                   let parentID = node.parentID {
+                    guard let parent = nodesState.first(where: { $0.id == parentID }) else {
+#if DEBUG
+                        print("ERROR: \(#file) - \(#function): Couldn't find parent node.")
+#endif
+                        break
+                    }
+                    currentParentID = parentID
+                    currentSubtreeTopLeadingPoint = CGPoint(
+                        x: parent.topLeadingPoint.x + parent.frameWidth + horizontalPadding,
+                        y: parent.subtreeTopLeadingPoint.y
+                    )
+                    print("parentID changed: \(parentID)")
+                    print("new currentBottomPoint: \(currentSubtreeTopLeadingPoint)\n")
+                }
+
+                nodesState.append(
+                    NodeReducer.State(
+                        object: node.object,
+                        allDeclarationObjects: allDeclarationObjects,
+                        topLeadingPoint: CGPoint(
+                            x: currentSubtreeTopLeadingPoint.x,
+                            y: currentSubtreeTopLeadingPoint.y + node.subtreeHeight / 2 - node.frameHeight / 2
+                        ),
+                        subtreeTopLeadingPoint: currentSubtreeTopLeadingPoint
+                    )
+                )
+
+#if DEBUG
+                print(node.object.name)
+                print("  topLeadingPoint: \(nodesState.last!.topLeadingPoint)")
+                print("  W: \(node.frameWidth), H: \(node.frameHeight)")
+                print("  State W: \(nodesState.last!.frameWidth), H: \(nodesState.last!.frameHeight)")
+                print("  subtreeHeight: \(node.subtreeHeight)\n")
+#endif
+
+                currentSubtreeTopLeadingPoint.y += node.subtreeHeight + verticalPadding
+                print("increment currentBottomPoint.y: \(currentSubtreeTopLeadingPoint)\n")
+            }
+
+            print("end \(#function)\n")
+            return nodesState
+        }
     }
 
     public enum Action {
@@ -175,3 +284,5 @@ public struct TreeViewReducer {
         }
     }
 }
+
+let verticalPadding: CGFloat = 0

@@ -82,12 +82,20 @@ public struct RAGESSView: View {
                         Divider()
 
                         ScrollView([.horizontal, .vertical]) {
-                            SwiftDiagramView(store: store.scope(state: \.swiftDiagram, action: \.swiftDiagram))
+//                            SwiftDiagramView(store: store.scope(state: \.swiftDiagram, action: \.swiftDiagram))
+//                                .scaleEffect(store.swiftDiagramScale)
+//                                .frame(
+//                                    width: max(store.swiftDiagram.frameWidth * store.swiftDiagramScale, 10),
+//                                    height: max(store.swiftDiagram.frameHeight * store.swiftDiagramScale, 10)
+//                                )
+
+                            TreeView(store: store.scope(state: \.swiftDiagram.tree, action: \.swiftDiagram.tree))
                                 .scaleEffect(store.swiftDiagramScale)
                                 .frame(
-                                    width: max(store.swiftDiagram.frameWidth * store.swiftDiagramScale, 10),
-                                    height: max(store.swiftDiagram.frameHeight * store.swiftDiagramScale, 10)
+                                    width: max(store.swiftDiagram.tree.frameWidth * store.swiftDiagramScale, 10),
+                                    height: max(store.swiftDiagram.tree.frameHeight * store.swiftDiagramScale, 10)
                                 )
+                                .border(.blue)
                         }
 
                         Spacer()

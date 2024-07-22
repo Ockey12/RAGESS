@@ -21,7 +21,7 @@ public struct NodeReducer {
         }
 
         let object: GenericTypeObject
-        let treeDepth: Int
+//        let treeDepth: Int
 
         var header: HeaderReducer.State
         var details: IdentifiedArrayOf<DetailReducer.State>
@@ -32,16 +32,19 @@ public struct NodeReducer {
         let frameWidth: CGFloat
         let frameHeight: CGFloat
         let topLeadingPoint: CGPoint
+        let subtreeTopLeadingPoint: CGPoint
 
         public init(
             object: GenericTypeObject,
-            treeDepth: Int,
+//            treeDepth: Int,
             allDeclarationObjects: [any DeclarationObject],
-            topLeadingPoint: CGPoint
+            topLeadingPoint: CGPoint,
+            subtreeTopLeadingPoint: CGPoint
         ) {
             self.object = object
-            self.treeDepth = treeDepth
+//            self.treeDepth = treeDepth
             self.topLeadingPoint = topLeadingPoint
+            self.subtreeTopLeadingPoint = subtreeTopLeadingPoint
 
             let borderWidth = ComponentSizeValues.borderWidth
             let connectionHeight = ComponentSizeValues.connectionHeight
@@ -552,6 +555,23 @@ public struct NodeReducer {
             frameHeight += connectionHeight + borderWidth
 
             self.frameHeight = frameHeight
+        }
+    }
+
+    public enum Action {
+        case header(HeaderReducer.Action)
+        case details(IdentifiedActionOf<DetailReducer>)
+    }
+
+    public var body: some ReducerOf<Self> {
+        Scope(state: \.header, action: \.header) {
+            HeaderReducer()
+        }
+        Reduce { state, action in
+            return .none
+        }
+        .forEach(\.details, action: \.details) {
+            DetailReducer()
         }
     }
 }

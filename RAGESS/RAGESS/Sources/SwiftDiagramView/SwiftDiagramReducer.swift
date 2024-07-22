@@ -142,9 +142,13 @@ public struct SwiftDiagramReducer {
         case classes(IdentifiedActionOf<ClassViewReducer>)
         case enums(IdentifiedActionOf<EnumViewReducer>)
         case arrows(IdentifiedActionOf<ArrowViewReducer>)
+        case tree(TreeViewReducer.Action)
     }
 
     public var body: some ReducerOf<Self> {
+        Scope(state: \.tree, action: \.tree) {
+            TreeViewReducer()
+        }
         Reduce { state, action in
             switch action {
             case let .protocols(.element(id: protocolID, action: .header(.delegate(.clicked(
@@ -384,6 +388,9 @@ public struct SwiftDiagramReducer {
                 return .none
 
             case .arrows:
+                return .none
+
+            case .tree:
                 return .none
             }
         }

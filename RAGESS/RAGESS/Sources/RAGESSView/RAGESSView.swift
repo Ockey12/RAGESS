@@ -89,11 +89,11 @@ public struct RAGESSView: View {
 //                                    height: max(store.swiftDiagram.frameHeight * store.swiftDiagramScale, 10)
 //                                )
 
-                            TreeView(store: store.scope(state: \.swiftDiagram.tree, action: \.swiftDiagram.tree))
+                            TreeView(store: store.scope(state: \.tree, action: \.tree))
                                 .scaleEffect(store.swiftDiagramScale)
                                 .frame(
-                                    width: max(store.swiftDiagram.tree.frameWidth * store.swiftDiagramScale, 10),
-                                    height: max(store.swiftDiagram.tree.frameHeight * store.swiftDiagramScale, 10)
+                                    width: max(store.tree.frameWidth * store.swiftDiagramScale, 10),
+                                    height: max(store.tree.frameHeight * store.swiftDiagramScale, 10)
                                 )
                                 .border(.blue)
                         }

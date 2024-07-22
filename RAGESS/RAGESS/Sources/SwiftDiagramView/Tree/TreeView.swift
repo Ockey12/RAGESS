@@ -20,9 +20,17 @@ public struct TreeView: View {
         ZStack(alignment: .topLeading) {
             ForEach(store.scope(state: \.nodes, action: \.nodes)) { nodeStore in
                 NodeView(store: nodeStore)
+                    .offset(
+                        x: nodeStore.topLeadingPoint.x,
+                        y: nodeStore.topLeadingPoint.y
+                    )
             }
         }
-        .frame(width: store.frameWidth, height: store.frameHeight)
+        .frame(
+            width: store.frameWidth,
+            height: store.frameHeight,
+            alignment: .topLeading
+        )
         .border(.red)
     }
 }

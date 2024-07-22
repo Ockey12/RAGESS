@@ -43,7 +43,7 @@ public struct RAGESSReducer {
         var fileTree: FileTreeViewReducer.State = .init()
         var loadingTaskKindBuffer: [LoadingTaskKind] = []
         var swiftDiagram: SwiftDiagramReducer.State = .init(allDeclarationObjects: [])
-//        var tree: TreeViewReducer.State = .init(allDeclarationObjects: [])
+        var tree: TreeViewReducer.State = .init(allDeclarationObjects: [])
         var swiftDiagramScale: CGFloat = 0.5
         var processStartTime = CFAbsoluteTimeGetCurrent()
 
@@ -66,7 +66,7 @@ public struct RAGESSReducer {
         case detectedDirectoryChange
         case fileTree(FileTreeViewReducer.Action)
         case swiftDiagram(SwiftDiagramReducer.Action)
-//        case tree(TreeViewReducer.Action)
+        case tree(TreeViewReducer.Action)
         case minusMagnifyingglassTapped
         case plusMagnifyingglassTapped
         case binding(BindingAction<State>)
@@ -93,10 +93,10 @@ public struct RAGESSReducer {
             SwiftDiagramReducer()
 //                ._printChanges()
         }
-//        Scope(state: \.tree, action: \.tree) {
-//            TreeViewReducer()
+        Scope(state: \.tree, action: \.tree) {
+            TreeViewReducer()
 //                ._printChanges()
-//        }
+        }
         Reduce { state, action in
             switch action {
             case let .projectDirectorySelectorResponse(.success(urls)):
@@ -290,7 +290,7 @@ public struct RAGESSReducer {
 
                 state.declarationObjects = hasDependenciesObjects
 
-                state.swiftDiagram = .init(allDeclarationObjects: hasDependenciesObjects)
+//                state.swiftDiagram = .init(allDeclarationObjects: hasDependenciesObjects)
 //                state.tree.allDeclarationObjects = hasDependenciesObjects
 
                 print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
@@ -340,8 +340,8 @@ public struct RAGESSReducer {
                         return .none
                     }
                     print(clickedObject.name)
-                    state.swiftDiagram.tree.rootObject = clickedObject
-//                    state.tree.rootObject = clickedObject
+//                    state.swiftDiagram.tree.rootObject = clickedObject
+                    state.tree = .init(rootObject: clickedObject, allDeclarationObjects: state.declarationObjects)
                     return .none
                 }
 
@@ -351,8 +351,8 @@ public struct RAGESSReducer {
             case .swiftDiagram:
                 return .none
 
-//            case .tree:
-//                return .none
+            case .tree:
+                return .none
 
             case .minusMagnifyingglassTapped:
                 state.swiftDiagramScale = max(state.swiftDiagramScale - 0.05, 0.05)

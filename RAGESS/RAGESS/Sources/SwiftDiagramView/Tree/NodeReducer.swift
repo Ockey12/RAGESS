@@ -567,8 +567,8 @@ public struct NodeReducer {
         Scope(state: \.header, action: \.header) {
             HeaderReducer()
         }
-        Reduce { state, action in
-            return .none
+        Reduce { _, _ in
+            .none
         }
         .forEach(\.details, action: \.details) {
             DetailReducer()

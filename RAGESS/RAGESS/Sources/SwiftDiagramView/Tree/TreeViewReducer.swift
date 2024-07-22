@@ -34,13 +34,13 @@ public struct TreeViewReducer {
                         frameWidth = nodesState.map { $0.topLeadingPoint.x + $0.frameWidth }.max() ?? 0
                         nodes = .init(uniqueElements: nodesState)
                         #if DEBUG
-                        for node in nodes {
-                            print(node.object.name)
-                            print("  topLeadingPoint: \(node.topLeadingPoint)")
-                            print("  W: \(node.frameWidth), H: \(node.frameWidth)")
-                        }
-                        print("frameWidth: \(frameWidth)")
-                        print("frameHeight: \(frameHeight)")
+                            for node in nodes {
+                                print(node.object.name)
+                                print("  topLeadingPoint: \(node.topLeadingPoint)")
+                                print("  W: \(node.frameWidth), H: \(node.frameWidth)")
+                            }
+                            print("frameWidth: \(frameWidth)")
+                            print("frameHeight: \(frameHeight)")
                         #endif
                     }
                 }
@@ -192,23 +192,23 @@ public struct TreeViewReducer {
                     )
 
                     currentSubtreeTopLeadingPoint.x += node.frameWidth + horizontalPadding
-#if DEBUG
-                    print("\nRoot Node")
-                    print(node.object.name)
-                    print("  topLeadingPoint: \(nodesState.last!.topLeadingPoint)")
-                    print("  W: \(node.frameWidth), H: \(node.frameHeight)")
-                    print("  State W: \(nodesState.last!.frameWidth), H: \(nodesState.last!.frameHeight)")
-                    print("  subtreeHeight: \(node.subtreeHeight)\n")
-#endif
+                    #if DEBUG
+                        print("\nRoot Node")
+                        print(node.object.name)
+                        print("  topLeadingPoint: \(nodesState.last!.topLeadingPoint)")
+                        print("  W: \(node.frameWidth), H: \(node.frameHeight)")
+                        print("  State W: \(nodesState.last!.frameWidth), H: \(nodesState.last!.frameHeight)")
+                        print("  subtreeHeight: \(node.subtreeHeight)\n")
+                    #endif
                     continue
                 } // if
 
                 if currentParentID != node.parentID,
                    let parentID = node.parentID {
                     guard let parent = nodesState.first(where: { $0.id == parentID }) else {
-#if DEBUG
-                        print("ERROR: \(#file) - \(#function): Couldn't find parent node.")
-#endif
+                        #if DEBUG
+                            print("ERROR: \(#file) - \(#function): Couldn't find parent node.")
+                        #endif
                         break
                     }
                     currentParentID = parentID
@@ -232,13 +232,13 @@ public struct TreeViewReducer {
                     )
                 )
 
-#if DEBUG
-                print(node.object.name)
-                print("  topLeadingPoint: \(nodesState.last!.topLeadingPoint)")
-                print("  W: \(node.frameWidth), H: \(node.frameHeight)")
-                print("  State W: \(nodesState.last!.frameWidth), H: \(nodesState.last!.frameHeight)")
-                print("  subtreeHeight: \(node.subtreeHeight)\n")
-#endif
+                #if DEBUG
+                    print(node.object.name)
+                    print("  topLeadingPoint: \(nodesState.last!.topLeadingPoint)")
+                    print("  W: \(node.frameWidth), H: \(node.frameHeight)")
+                    print("  State W: \(nodesState.last!.frameWidth), H: \(nodesState.last!.frameHeight)")
+                    print("  subtreeHeight: \(node.subtreeHeight)\n")
+                #endif
 
                 currentSubtreeTopLeadingPoint.y += node.subtreeHeight + verticalPadding
                 print("increment currentBottomPoint.y: \(currentSubtreeTopLeadingPoint)\n")

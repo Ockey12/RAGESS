@@ -1,9 +1,9 @@
 //
-//  File.swift
-//  
-//  
+//  NodeView.swift
+//
+//
 //  Created by Ockey12 on 2024/07/22
-//  
+//
 //
 
 import ComposableArchitecture

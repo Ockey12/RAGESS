@@ -15,6 +15,7 @@ struct NodeModel {
     var id: UUID {
         object.id
     }
+
     let parentID: UUID?
     var children: [Self] = []
 
@@ -25,7 +26,7 @@ struct NodeModel {
     var subtreeHeight: CGFloat {
         max(
             frameHeight,
-            children.reduce(0, { $0 + $1.subtreeHeight + verticalPadding}) - verticalPadding
+            children.reduce(0) { $0 + $1.subtreeHeight + verticalPadding } - verticalPadding
         )
     }
 
@@ -51,7 +52,7 @@ struct NodeModel {
         var numberOfFunctions = 0
 
         switch object {
-        case .struct(let structObject):
+        case let .struct(structObject):
             let conformedProtocolObjects = extractConformedProtocolObjects(
                 by: structObject,
                 allDeclarationObjects: allDeclarationObjects
@@ -76,10 +77,10 @@ struct NodeModel {
             )
             self.bodyWidth = bodyWidth
             frameWidth = bodyWidth
-            + ComponentSizeValues.arrowTerminalWidth * 2
-            + ComponentSizeValues.borderWidth
+                + ComponentSizeValues.arrowTerminalWidth * 2
+                + ComponentSizeValues.borderWidth
 
-        case .class(let classObject):
+        case let .class(classObject):
             let superClassObject = extractSuperClassObject(
                 by: classObject,
                 allDeclarationObjects: allDeclarationObjects
@@ -114,10 +115,10 @@ struct NodeModel {
             )
             self.bodyWidth = bodyWidth
             frameWidth = bodyWidth
-            + ComponentSizeValues.arrowTerminalWidth * 2
-            + ComponentSizeValues.borderWidth
+                + ComponentSizeValues.arrowTerminalWidth * 2
+                + ComponentSizeValues.borderWidth
 
-        case .enum(let enumObject):
+        case let .enum(enumObject):
             let conformedProtocolObjects = extractConformedProtocolObjects(
                 by: enumObject,
                 allDeclarationObjects: allDeclarationObjects
@@ -143,10 +144,10 @@ struct NodeModel {
             )
             self.bodyWidth = bodyWidth
             frameWidth = bodyWidth
-            + ComponentSizeValues.arrowTerminalWidth * 2
-            + ComponentSizeValues.borderWidth
+                + ComponentSizeValues.arrowTerminalWidth * 2
+                + ComponentSizeValues.borderWidth
 
-        case .protocol(let protocolObject):
+        case let .protocol(protocolObject):
             let parentProtocolObjects = extractParentProtocolObjects(
                 by: protocolObject,
                 allDeclarationObjects: allDeclarationObjects
@@ -171,8 +172,8 @@ struct NodeModel {
             )
             self.bodyWidth = bodyWidth
             frameWidth = bodyWidth
-            + ComponentSizeValues.arrowTerminalWidth * 2
-            + ComponentSizeValues.borderWidth
+                + ComponentSizeValues.arrowTerminalWidth * 2
+                + ComponentSizeValues.borderWidth
         }
 
         var frameHeight: CGFloat = itemHeight * 2 + bottomPadding

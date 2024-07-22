@@ -152,11 +152,11 @@ public struct SwiftDiagramReducer {
                 let dependencies = state.protocols[id: protocolID]!.object.objectsThatCallThisObject.filter {
                     $0.definitionObject.leafObjectID == protocolID
                 }
-                
-#if DEBUG
-                dump(dependencies)
-#endif
-                
+
+                #if DEBUG
+                    dump(dependencies)
+                #endif
+
                 state.arrows = .init(
                     uniqueElements: generateArrowStates(
                         state: state,
@@ -167,8 +167,8 @@ public struct SwiftDiagramReducer {
                     )
                 )
                 return .none
-                
-                // FIXME: Apply the Delegate pattern.
+
+            // FIXME: Apply the Delegate pattern.
             case let .protocols(.element(id: protocolID, action: .details(.element(id: _, action: .delegate(.clickedCell(
                 object: clickedObject,
                 leadingArrowTerminalPoint: leadingStartPoint,
@@ -177,11 +177,11 @@ public struct SwiftDiagramReducer {
                 let dependencies = state.protocols[id: protocolID]!.object.objectsThatCallThisObject.filter {
                     $0.definitionObject.leafObjectID == clickedObject.id
                 }
-                
-#if DEBUG
-                dump(dependencies)
-#endif
-                
+
+                #if DEBUG
+                    dump(dependencies)
+                #endif
+
                 state.arrows = .init(
                     uniqueElements: generateArrowStates(
                         state: state,
@@ -192,18 +192,18 @@ public struct SwiftDiagramReducer {
                     )
                 )
                 return .none
-                
+
             case let .protocols(.element(id: protocolID, action: .dragged(translation))):
                 dragged(draggedID: protocolID, translation: translation, arrowsState: &state.arrows)
                 return .none
-                
+
             case let .protocols(.element(id: protocolID, action: .dropped(translation))):
                 dropped(draggedID: protocolID, translation: translation, arrowsState: &state.arrows)
                 return .none
-                
+
             case .protocols:
                 return .none
-                
+
             case let .structs(.element(id: structID, action: .header(.delegate(.clicked(
                 leadingArrowTerminalPoint: leadingStartPoint,
                 trailingArrowTerminalPoint: trailingStartPoint
@@ -211,11 +211,11 @@ public struct SwiftDiagramReducer {
                 let dependencies = state.structs[id: structID]!.object.objectsThatCallThisObject.filter {
                     $0.definitionObject.leafObjectID == structID
                 }
-                
-#if DEBUG
-                dump(dependencies)
-#endif
-                
+
+                #if DEBUG
+                    dump(dependencies)
+                #endif
+
                 state.arrows = .init(
                     uniqueElements: generateArrowStates(
                         state: state,
@@ -226,8 +226,8 @@ public struct SwiftDiagramReducer {
                     )
                 )
                 return .none
-                
-                // FIXME: Apply the Delegate pattern.
+
+            // FIXME: Apply the Delegate pattern.
             case let .structs(.element(id: structID, action: .details(.element(id: _, action: .delegate(.clickedCell(
                 object: clickedObject,
                 leadingArrowTerminalPoint: leadingStartPoint,
@@ -236,11 +236,11 @@ public struct SwiftDiagramReducer {
                 let dependencies = state.structs[id: structID]!.object.objectsThatCallThisObject.filter {
                     $0.definitionObject.leafObjectID == clickedObject.id
                 }
-                
-#if DEBUG
-                dump(dependencies)
-#endif
-                
+
+                #if DEBUG
+                    dump(dependencies)
+                #endif
+
                 state.arrows = .init(
                     uniqueElements: generateArrowStates(
                         state: state,
@@ -251,18 +251,18 @@ public struct SwiftDiagramReducer {
                     )
                 )
                 return .none
-                
+
             case let .structs(.element(id: structID, action: .dragged(translation))):
                 dragged(draggedID: structID, translation: translation, arrowsState: &state.arrows)
                 return .none
-                
+
             case let .structs(.element(id: structID, action: .dropped(translation))):
                 dropped(draggedID: structID, translation: translation, arrowsState: &state.arrows)
                 return .none
-                
+
             case .structs:
                 return .none
-                
+
             case let .classes(.element(id: classID, action: .header(.delegate(.clicked(
                 leadingArrowTerminalPoint: leadingStartPoint,
                 trailingArrowTerminalPoint: trailingStartPoint
@@ -270,11 +270,11 @@ public struct SwiftDiagramReducer {
                 let dependencies = state.classes[id: classID]!.object.objectsThatCallThisObject.filter {
                     $0.definitionObject.leafObjectID == classID
                 }
-                
-#if DEBUG
-                dump(dependencies)
-#endif
-                
+
+                #if DEBUG
+                    dump(dependencies)
+                #endif
+
                 state.arrows = .init(
                     uniqueElements: generateArrowStates(
                         state: state,
@@ -285,8 +285,8 @@ public struct SwiftDiagramReducer {
                     )
                 )
                 return .none
-                
-                // FIXME: Apply the Delegate pattern.
+
+            // FIXME: Apply the Delegate pattern.
             case let .classes(.element(id: classID, action: .details(.element(id: _, action: .delegate(.clickedCell(
                 object: clickedObject,
                 leadingArrowTerminalPoint: leadingStartPoint,
@@ -295,11 +295,11 @@ public struct SwiftDiagramReducer {
                 let dependencies = state.classes[id: classID]!.object.objectsThatCallThisObject.filter {
                     $0.definitionObject.leafObjectID == clickedObject.id
                 }
-                
-#if DEBUG
-                dump(dependencies)
-#endif
-                
+
+                #if DEBUG
+                    dump(dependencies)
+                #endif
+
                 state.arrows = .init(
                     uniqueElements: generateArrowStates(
                         state: state,
@@ -310,18 +310,18 @@ public struct SwiftDiagramReducer {
                     )
                 )
                 return .none
-                
+
             case let .classes(.element(id: classID, action: .dragged(translation))):
                 dragged(draggedID: classID, translation: translation, arrowsState: &state.arrows)
                 return .none
-                
+
             case let .classes(.element(id: classID, action: .dropped(translation))):
                 dropped(draggedID: classID, translation: translation, arrowsState: &state.arrows)
                 return .none
-                
+
             case .classes:
                 return .none
-                
+
             case let .enums(.element(id: enumID, action: .header(.delegate(.clicked(
                 leadingArrowTerminalPoint: leadingStartPoint,
                 trailingArrowTerminalPoint: trailingStartPoint
@@ -329,11 +329,11 @@ public struct SwiftDiagramReducer {
                 let dependencies = state.enums[id: enumID]!.object.objectsThatCallThisObject.filter {
                     $0.definitionObject.leafObjectID == enumID
                 }
-                
-#if DEBUG
-                dump(dependencies)
-#endif
-                
+
+                #if DEBUG
+                    dump(dependencies)
+                #endif
+
                 state.arrows = .init(
                     uniqueElements: generateArrowStates(
                         state: state,
@@ -344,8 +344,8 @@ public struct SwiftDiagramReducer {
                     )
                 )
                 return .none
-                
-                // FIXME: Apply the Delegate pattern.
+
+            // FIXME: Apply the Delegate pattern.
             case let .enums(.element(id: enumID, action: .details(.element(id: _, action: .delegate(.clickedCell(
                 object: clickedObject,
                 leadingArrowTerminalPoint: leadingStartPoint,
@@ -354,11 +354,11 @@ public struct SwiftDiagramReducer {
                 let dependencies = state.enums[id: enumID]!.object.objectsThatCallThisObject.filter {
                     $0.definitionObject.leafObjectID == clickedObject.id
                 }
-                
-#if DEBUG
-                dump(dependencies)
-#endif
-                
+
+                #if DEBUG
+                    dump(dependencies)
+                #endif
+
                 state.arrows = .init(
                     uniqueElements: generateArrowStates(
                         state: state,
@@ -369,18 +369,18 @@ public struct SwiftDiagramReducer {
                     )
                 )
                 return .none
-                
+
             case let .enums(.element(id: enumID, action: .dragged(translation))):
                 dragged(draggedID: enumID, translation: translation, arrowsState: &state.arrows)
                 return .none
-                
+
             case let .enums(.element(id: enumID, action: .dropped(translation))):
                 dropped(draggedID: enumID, translation: translation, arrowsState: &state.arrows)
                 return .none
-                
+
             case .enums:
                 return .none
-                
+
             case .arrows:
                 return .none
             }

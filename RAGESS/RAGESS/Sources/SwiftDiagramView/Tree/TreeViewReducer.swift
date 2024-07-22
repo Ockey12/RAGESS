@@ -43,27 +43,25 @@ public struct TreeViewReducer {
                 frameHeight = 0
                 return
             }
-#if DEBUG
-            print("printTree(parentNode: rootNode)")
-            TreeGenerator.printTree(parentNode: rootNode)
-#endif
+            #if DEBUG
+                print("printTree(parentNode: rootNode)")
+                TreeGenerator.printTree(parentNode: rootNode)
+            #endif
 
             frameHeight = rootNode.subtreeHeight
             let nodesState = TreeGenerator.generateNodesState(rootNode: rootNode, allDeclarationObjects: allDeclarationObjects)
             frameWidth = nodesState.map { $0.topLeadingPoint.x + $0.frameWidth }.max() ?? 0
             nodes = .init(uniqueElements: nodesState)
-#if DEBUG
-            for node in nodes {
-                print(node.object.name)
-                print("  topLeadingPoint: \(node.topLeadingPoint)")
-                print("  W: \(node.frameWidth), H: \(node.frameWidth)")
-            }
-            print("frameWidth: \(frameWidth)")
-            print("frameHeight: \(frameHeight)")
-#endif
+            #if DEBUG
+                for node in nodes {
+                    print(node.object.name)
+                    print("  topLeadingPoint: \(node.topLeadingPoint)")
+                    print("  W: \(node.frameWidth), H: \(node.frameWidth)")
+                }
+                print("frameWidth: \(frameWidth)")
+                print("frameHeight: \(frameHeight)")
+            #endif
         }
-
-
     }
 
     public enum Action {
@@ -75,7 +73,7 @@ public struct TreeViewReducer {
     @Dependency(DeclarationObjectsClient.self) var declarationObjectsClient
 
     public var body: some ReducerOf<Self> {
-        Reduce { state, action in
+        Reduce { _, action in
             switch action {
             case .task:
                 return .run { send in
@@ -104,7 +102,7 @@ public struct TreeViewReducer {
 
 let verticalPadding: CGFloat = 500
 
-private struct TreeGenerator {
+private enum TreeGenerator {
     /// Return  a root node.
     static func generateTree(
         rootObject: any DeclarationObject,
@@ -121,9 +119,9 @@ private struct TreeGenerator {
         case let protocolObject as ProtocolObject:
             genericTypeObject = .protocol(protocolObject)
         default:
-#if DEBUG
-            print("ERROR: \(#file) - \(#function): Cannot cast \(rootObject.name) to Type.")
-#endif
+            #if DEBUG
+                print("ERROR: \(#file) - \(#function): Cannot cast \(rootObject.name) to Type.")
+            #endif
             return nil
         }
 
@@ -181,9 +179,9 @@ private struct TreeGenerator {
             let child = allNodes.removeLast()
 
             guard let parentIndex = allNodes.firstIndex(where: { $0.id == child.parentID }) else {
-#if DEBUG
-                print("ERROR: \(#file) - \(#function): Couldn't find parent node.")
-#endif
+                #if DEBUG
+                    print("ERROR: \(#file) - \(#function): Couldn't find parent node.")
+                #endif
                 break
             }
 
@@ -193,16 +191,16 @@ private struct TreeGenerator {
         return allNodes[0]
     }
 
-#if DEBUG
-    static func printTree(parentNode: NodeModel, level: Int = 0) {
-        let indent = String(repeating: "  ", count: level)
-        print("\(indent)\(parentNode.object.name), id: \(parentNode.id), parentID: \(parentNode.parentID)")
+    #if DEBUG
+        static func printTree(parentNode: NodeModel, level: Int = 0) {
+            let indent = String(repeating: "  ", count: level)
+            print("\(indent)\(parentNode.object.name), id: \(parentNode.id), parentID: \(parentNode.parentID)")
 
-        for child in parentNode.children {
-            printTree(parentNode: child, level: level + 1)
+            for child in parentNode.children {
+                printTree(parentNode: child, level: level + 1)
+            }
         }
-    }
-#endif
+    #endif
 
     static func generateNodesState(
         rootNode: NodeModel,
@@ -240,23 +238,23 @@ private struct TreeGenerator {
                 )
 
                 currentSubtreeTopLeadingPoint.x += node.frameWidth + horizontalPadding
-#if DEBUG
-                print("\nRoot Node")
-                print(node.object.name)
-                print("  topLeadingPoint: \(nodesState.last!.topLeadingPoint)")
-                print("  W: \(node.frameWidth), H: \(node.frameHeight)")
-                print("  State W: \(nodesState.last!.frameWidth), H: \(nodesState.last!.frameHeight)")
-                print("  subtreeHeight: \(node.subtreeHeight)\n")
-#endif
+                #if DEBUG
+                    print("\nRoot Node")
+                    print(node.object.name)
+                    print("  topLeadingPoint: \(nodesState.last!.topLeadingPoint)")
+                    print("  W: \(node.frameWidth), H: \(node.frameHeight)")
+                    print("  State W: \(nodesState.last!.frameWidth), H: \(nodesState.last!.frameHeight)")
+                    print("  subtreeHeight: \(node.subtreeHeight)\n")
+                #endif
                 continue
             } // if
 
             if currentParentID != node.parentID,
                let parentID = node.parentID {
                 guard let parent = nodesState.first(where: { $0.id == parentID }) else {
-#if DEBUG
-                    print("ERROR: \(#file) - \(#function): Couldn't find parent node.")
-#endif
+                    #if DEBUG
+                        print("ERROR: \(#file) - \(#function): Couldn't find parent node.")
+                    #endif
                     break
                 }
                 currentParentID = parentID
@@ -280,13 +278,13 @@ private struct TreeGenerator {
                 )
             )
 
-#if DEBUG
-            print(node.object.name)
-            print("  topLeadingPoint: \(nodesState.last!.topLeadingPoint)")
-            print("  W: \(node.frameWidth), H: \(node.frameHeight)")
-            print("  State W: \(nodesState.last!.frameWidth), H: \(nodesState.last!.frameHeight)")
-            print("  subtreeHeight: \(node.subtreeHeight)\n")
-#endif
+            #if DEBUG
+                print(node.object.name)
+                print("  topLeadingPoint: \(nodesState.last!.topLeadingPoint)")
+                print("  W: \(node.frameWidth), H: \(node.frameHeight)")
+                print("  State W: \(nodesState.last!.frameWidth), H: \(nodesState.last!.frameHeight)")
+                print("  subtreeHeight: \(node.subtreeHeight)\n")
+            #endif
 
             currentSubtreeTopLeadingPoint.y += node.subtreeHeight + verticalPadding
             print("increment currentBottomPoint.y: \(currentSubtreeTopLeadingPoint)\n")

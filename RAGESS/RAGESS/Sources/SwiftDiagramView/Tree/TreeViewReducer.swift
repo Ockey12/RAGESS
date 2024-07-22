@@ -20,6 +20,7 @@ public struct TreeViewReducer {
     public struct State {
         let rootObject: (any DeclarationObject)?
         var nodes: IdentifiedArrayOf<NodeReducer.State>
+        var arrows: IdentifiedArrayOf<ArrowViewReducer.State>
         let allDeclarationObjects: [any DeclarationObject]
         public let frameWidth: CGFloat
         public let frameHeight: CGFloat
@@ -30,6 +31,7 @@ public struct TreeViewReducer {
 
             guard let rootObject else {
                 nodes = []
+                arrows = []
                 frameWidth = 0
                 frameHeight = 0
                 return
@@ -39,6 +41,7 @@ public struct TreeViewReducer {
 
             guard let rootNode else {
                 nodes = []
+                arrows = []
                 frameWidth = 0
                 frameHeight = 0
                 return
@@ -52,6 +55,8 @@ public struct TreeViewReducer {
             let nodesState = TreeGenerator.generateNodesState(rootNode: rootNode, allDeclarationObjects: allDeclarationObjects)
             frameWidth = nodesState.map { $0.topLeadingPoint.x + $0.frameWidth }.max() ?? 0
             nodes = .init(uniqueElements: nodesState)
+            let arrowsState = ArrowsStateGenerator.generate(nodes: nodesState)
+            arrows = .init(uniqueElements: arrowsState)
             #if DEBUG
                 for node in nodes {
                     print(node.object.name)
@@ -68,6 +73,7 @@ public struct TreeViewReducer {
         case task
         case declarationObjectsClientResponse(Result<[any DeclarationObject], Error>)
         case nodes(IdentifiedActionOf<NodeReducer>)
+        case arrows(IdentifiedActionOf<ArrowViewReducer>)
     }
 
     @Dependency(DeclarationObjectsClient.self) var declarationObjectsClient
@@ -92,10 +98,16 @@ public struct TreeViewReducer {
 
             case .nodes:
                 return .none
+
+            case .arrows:
+                return .none
             }
         }
         .forEach(\.nodes, action: \.nodes) {
             NodeReducer()
+        }
+        .forEach(\.arrows, action: \.arrows) {
+            ArrowViewReducer()
         }
     }
 }
@@ -292,5 +304,90 @@ private enum TreeGenerator {
 
         print("end \(#function)\n")
         return nodesState
+    }
+}
+
+private enum ArrowsStateGenerator {
+    static func generate(nodes: [NodeReducer.State]) -> [ArrowViewReducer.State] {
+        var arrowsState: [ArrowViewReducer.State] = []
+
+        for node in nodes {
+            for dependency in node.object.objectsThatCallThisObject {
+                if dependency.definitionObject.rootObjectID == dependency.callerObject.rootObjectID {
+                    continue
+                }
+                let callerID: UUID
+                var leadingStartPoint: CGPoint = .zero
+                var trailingStartPoint: CGPoint  = .zero
+
+                switch dependency.kind {
+                case .protocolInheritance, .classInheritance, .protocolConformance:
+                    callerID = dependency.callerObject.rootObjectID
+                    leadingStartPoint = node.header.leadingArrowTerminalPoint
+                    trailingStartPoint = node.header.trailingArrowTerminalPoint
+
+                case .declarationReference, .identifierType:
+                    callerID = dependency.callerObject.leafObjectID
+
+                    if node.id == dependency.definitionObject.leafObjectID {
+                        leadingStartPoint = node.header.leadingArrowTerminalPoint
+                        trailingStartPoint = node.header.trailingArrowTerminalPoint
+                    } else {
+                        for definitionDetail in node.details {
+                            for text in definitionDetail.texts {
+                                if text.id == dependency.definitionObject.leafObjectID {
+                                    leadingStartPoint = text.leadingArrowTerminalPoint
+                                    trailingStartPoint = text.trailingArrowTerminalPoint
+                                }
+                            }
+                        }
+                    }
+                    if trailingStartPoint == .zero {
+#if DEBUG
+                        print("ERROR: \(#file) - \(#function): Couldn't find definition of \(dependency.definitionObject.keyPath).")
+#endif
+                        continue
+                    }
+                }
+
+                var leadingEndPoint: CGPoint = .zero
+                var trailingEndPoint: CGPoint = .zero
+                var isFoundCaller = false
+                for caller in nodes {
+                    for detail in caller.details {
+                        for text in detail.texts {
+                            if text.id == callerID {
+                                leadingEndPoint = text.leadingArrowTerminalPoint
+                                trailingEndPoint = text.trailingArrowTerminalPoint
+                                isFoundCaller = true
+                                break
+                            }
+                        }
+                        if isFoundCaller { break }
+                    }
+                    if isFoundCaller { break }
+                }
+
+                if !isFoundCaller {
+                    #if DEBUG
+                    print("ERROR: \(#file) - \(#function): Couldn't find caller of \(dependency.definitionObject.keyPath).")
+                    #endif
+                    continue
+                }
+
+                arrowsState.append(
+                    .init(
+                        startPointRootObjectID: dependency.definitionObject.rootObjectID,
+                        endPointRootObjectID: dependency.callerObject.rootObjectID,
+                        leadingStartPoint: leadingStartPoint,
+                        trailingStartPoint: trailingStartPoint,
+                        leadingEndPoint: leadingEndPoint,
+                        trailingEndPoint: trailingEndPoint
+                    )
+                )
+            } // for dependency
+        } // for node
+
+        return arrowsState
     }
 }

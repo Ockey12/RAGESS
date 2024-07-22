@@ -21,7 +21,6 @@ public struct NodeReducer {
         }
 
         let object: GenericTypeObject
-//        let treeDepth: Int
 
         var header: HeaderReducer.State
         var details: IdentifiedArrayOf<DetailReducer.State>
@@ -36,13 +35,11 @@ public struct NodeReducer {
 
         public init(
             object: GenericTypeObject,
-//            treeDepth: Int,
             allDeclarationObjects: [any DeclarationObject],
             topLeadingPoint: CGPoint,
             subtreeTopLeadingPoint: CGPoint
         ) {
             self.object = object
-//            self.treeDepth = treeDepth
             self.topLeadingPoint = topLeadingPoint
             self.subtreeTopLeadingPoint = subtreeTopLeadingPoint
 

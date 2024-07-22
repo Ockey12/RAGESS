@@ -25,12 +25,15 @@ public struct TreeView: View {
                         y: nodeStore.topLeadingPoint.y
                     )
             }
+
+            ForEach(store.scope(state: \.arrows, action: \.arrows)) { arrowStore in
+                ArrowView(store: arrowStore)
+            }
         }
         .frame(
             width: store.frameWidth,
             height: store.frameHeight,
             alignment: .topLeading
         )
-        .border(.red)
     }
 }

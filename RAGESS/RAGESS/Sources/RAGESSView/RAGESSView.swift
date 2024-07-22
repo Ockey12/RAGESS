@@ -95,7 +95,7 @@ public struct RAGESSView: View {
                                     width: max(store.tree.frameWidth * store.swiftDiagramScale, 10),
                                     height: max(store.tree.frameHeight * store.swiftDiagramScale, 10)
                                 )
-                                .border(.blue)
+                                .padding(300)
                         }
 
                         Spacer()

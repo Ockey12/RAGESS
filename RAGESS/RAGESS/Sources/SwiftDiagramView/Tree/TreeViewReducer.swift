@@ -318,7 +318,7 @@ private enum ArrowsStateGenerator {
                 }
                 let callerID: UUID
                 var leadingStartPoint: CGPoint = .zero
-                var trailingStartPoint: CGPoint  = .zero
+                var trailingStartPoint: CGPoint = .zero
 
                 switch dependency.kind {
                 case .protocolInheritance, .classInheritance, .protocolConformance:
@@ -343,9 +343,9 @@ private enum ArrowsStateGenerator {
                         }
                     }
                     if trailingStartPoint == .zero {
-#if DEBUG
-                        print("ERROR: \(#file) - \(#function): Couldn't find definition of \(dependency.definitionObject.keyPath).")
-#endif
+                        #if DEBUG
+                            print("ERROR: \(#file) - \(#function): Couldn't find definition of \(dependency.definitionObject.keyPath).")
+                        #endif
                         continue
                     }
                 }
@@ -363,14 +363,18 @@ private enum ArrowsStateGenerator {
                                 break
                             }
                         }
-                        if isFoundCaller { break }
+                        if isFoundCaller {
+                            break
+                        }
                     }
-                    if isFoundCaller { break }
+                    if isFoundCaller {
+                        break
+                    }
                 }
 
                 if !isFoundCaller {
                     #if DEBUG
-                    print("ERROR: \(#file) - \(#function): Couldn't find caller of \(dependency.definitionObject.keyPath).")
+                        print("ERROR: \(#file) - \(#function): Couldn't find caller of \(dependency.definitionObject.keyPath).")
                     #endif
                     continue
                 }

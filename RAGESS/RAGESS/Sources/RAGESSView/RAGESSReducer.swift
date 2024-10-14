@@ -42,7 +42,6 @@ public struct RAGESSReducer {
         ]
         var fileTree: FileTreeViewReducer.State = .init()
         var loadingTaskKindBuffer: [LoadingTaskKind] = []
-        var swiftDiagram: SwiftDiagramReducer.State = .init(allDeclarationObjects: [])
         var tree: TreeViewReducer.State = .init(allDeclarationObjects: [])
         var swiftDiagramScale: CGFloat = 0.5
         var processStartTime = CFAbsoluteTimeGetCurrent()
@@ -65,7 +64,6 @@ public struct RAGESSReducer {
         case startMonitoring
         case detectedDirectoryChange
         case fileTree(FileTreeViewReducer.Action)
-        case swiftDiagram(SwiftDiagramReducer.Action)
         case tree(TreeViewReducer.Action)
         case minusMagnifyingglassTapped
         case plusMagnifyingglassTapped
@@ -87,9 +85,6 @@ public struct RAGESSReducer {
     public var body: some ReducerOf<Self> {
         Scope(state: \.fileTree, action: \.fileTree) {
             FileTreeViewReducer()
-        }
-        Scope(state: \.swiftDiagram, action: \.swiftDiagram) {
-            SwiftDiagramReducer()
         }
         Scope(state: \.tree, action: \.tree) {
             TreeViewReducer()
@@ -339,9 +334,6 @@ public struct RAGESSReducer {
                 }
 
             case .fileTree:
-                return .none
-
-            case .swiftDiagram:
                 return .none
 
             case .tree:

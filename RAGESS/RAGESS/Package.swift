@@ -7,6 +7,10 @@ let package = Package(
     platforms: [.macOS(.v14)],
     products: [
         .library(
+            name: "FileTreeView",
+            targets: ["FileTreeView"]
+        ),
+        .library(
             name: "DebugView",
             targets: ["DebugView"]
         ),
@@ -94,6 +98,14 @@ let package = Package(
             ]
         ),
         .target(
+            name: "DeclarationObjectsClient",
+            dependencies: [
+                "TypeDeclaration",
+                .product(name: "Dependencies", package: "swift-dependencies"),
+                .product(name: "DependenciesMacros", package: "swift-dependencies")
+            ]
+        ),
+        .target(
             name: "DependenciesClient",
             dependencies: [
                 "SourceKitClient",
@@ -111,6 +123,16 @@ let package = Package(
                 "XcodeObject",
                 .product(name: "Dependencies", package: "swift-dependencies"),
                 .product(name: "DependenciesMacros", package: "swift-dependencies")
+            ]
+        ),
+        .target(
+            name: "FileTreeView",
+            dependencies: [
+                "DeclarationObjectsClient",
+                "TypeDeclaration",
+                "XcodeObject",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                .product(name: "Dependencies", package: "swift-dependencies")
             ]
         ),
         .target(
@@ -136,12 +158,13 @@ let package = Package(
             dependencies: [
                 "BuildSettingsClient",
                 "DeclarationExtractor",
+                "DeclarationObjectsClient",
                 "DependenciesClient",
                 "DumpPackageClient",
+                "FileTreeView",
                 "MonitorClient",
                 "SourceFileClient",
                 "SwiftDiagramView",
-                "TypeDeclaration",
                 "XcodeObject",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "Dependencies", package: "swift-dependencies")
@@ -169,6 +192,7 @@ let package = Package(
         .target(
             name: "SwiftDiagramView",
             dependencies: [
+                "DeclarationObjectsClient",
                 "TypeDeclaration",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "Dependencies", package: "swift-dependencies")

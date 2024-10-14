@@ -9,9 +9,11 @@
 import BuildSettingsClient
 import ComposableArchitecture
 import DeclarationExtractor
+import DeclarationObjectsClient
 import Dependencies
 import DependenciesClient
 import DumpPackageClient
+import FileTreeView
 import Foundation
 import MonitorClient
 import SourceFileClient
@@ -38,8 +40,9 @@ public struct RAGESSReducer {
             ".github",
             ".swiftpm"
         ]
+        var fileTree: FileTreeViewReducer.State = .init()
         var loadingTaskKindBuffer: [LoadingTaskKind] = []
-        var swiftDiagram: SwiftDiagramReducer.State = .init(allDeclarationObjects: [])
+        var swiftDiagramTree: SwiftDiagramTreeViewReducer.State = .init(allDeclarationObjects: [])
         var swiftDiagramScale: CGFloat = 0.5
         var processStartTime = CFAbsoluteTimeGetCurrent()
 
@@ -60,7 +63,8 @@ public struct RAGESSReducer {
         case extractDependenciesResponse(Result<[any DeclarationObject], Error>)
         case startMonitoring
         case detectedDirectoryChange
-        case swiftDiagram(SwiftDiagramReducer.Action)
+        case fileTree(FileTreeViewReducer.Action)
+        case swiftDiagramTree(SwiftDiagramTreeViewReducer.Action)
         case minusMagnifyingglassTapped
         case plusMagnifyingglassTapped
         case binding(BindingAction<State>)
@@ -70,6 +74,7 @@ public struct RAGESSReducer {
     @Dependency(SourceFileClient.self) var sourceFileClient
     @Dependency(BuildSettingsClient.self) var buildSettingsClient
     @Dependency(DumpPackageClient.self) var dumpPackageClient
+    @Dependency(DeclarationObjectsClient.self) var declarationObjectsClient
     @Dependency(DependenciesClient.self) var dependenciesClient
     @Dependency(\.mainQueue) var mainQueue
 
@@ -78,9 +83,11 @@ public struct RAGESSReducer {
     }
 
     public var body: some ReducerOf<Self> {
-        Scope(state: \.swiftDiagram, action: \.swiftDiagram) {
-            SwiftDiagramReducer()
-                ._printChanges()
+        Scope(state: \.fileTree, action: \.fileTree) {
+            FileTreeViewReducer()
+        }
+        Scope(state: \.swiftDiagramTree, action: \.swiftDiagramTree) {
+            SwiftDiagramTreeViewReducer()
         }
         Reduce { state, action in
             switch action {
@@ -129,6 +136,7 @@ public struct RAGESSReducer {
                 #endif
 
                 state.rootDirectory = rootDirectory
+                state.fileTree.rootDirectory = rootDirectory
 
                 guard !rootDirectory.allXcodeprojPathsUnderDirectory.isEmpty else {
                     print("ERROR in \(#file) - \(#line): Cannot find `**.xcodeproj`")
@@ -252,6 +260,8 @@ public struct RAGESSReducer {
                         packages = state.packages
                     ] send in
 
+                    await declarationObjectsClient.set(declarationObjects)
+
                     await send(.extractDependenciesResponse(Result {
                         try await dependenciesClient.extractDependencies(
                             declarationObjects: declarationObjects,
@@ -271,8 +281,6 @@ public struct RAGESSReducer {
                 #endif
 
                 state.declarationObjects = hasDependenciesObjects
-
-                state.swiftDiagram = .init(allDeclarationObjects: hasDependenciesObjects)
 
                 print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
                 print("COMPLETE ALL PROCESSES")
@@ -314,7 +322,21 @@ public struct RAGESSReducer {
                         scheduler: self.mainQueue
                     )
 
-            case .swiftDiagram:
+            case let .fileTree(.delegate(delegateAction)):
+                switch delegateAction {
+                case let .popoverCellClicked(objectID: objectID):
+                    guard let clickedObject = state.declarationObjects.first(where: { $0.id == objectID }) else {
+                        return .none
+                    }
+                    print(clickedObject.name)
+                    state.swiftDiagramTree = .init(rootObject: clickedObject, allDeclarationObjects: state.declarationObjects)
+                    return .none
+                }
+
+            case .fileTree:
+                return .none
+
+            case .swiftDiagramTree:
                 return .none
 
             case .minusMagnifyingglassTapped:

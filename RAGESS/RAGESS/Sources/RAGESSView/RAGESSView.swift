@@ -7,6 +7,7 @@
 //
 
 import ComposableArchitecture
+import FileTreeView
 import SwiftDiagramView
 import SwiftUI
 
@@ -26,11 +27,9 @@ public struct RAGESSView: View {
                 sidebar: {
                     Divider()
 
-                    if let rootDirectory = store.rootDirectory {
-                        ScrollView {
-                            FileTreeView(store: store, directory: rootDirectory)
-                        }
-                        .padding(.leading, 20)
+                    if let _ = store.fileTree.rootDirectory {
+                        FileTreeView(store: store.scope(state: \.fileTree, action: \.fileTree))
+                            .padding(.leading, 20)
                     }
 
                     Spacer()
@@ -83,12 +82,13 @@ public struct RAGESSView: View {
                         Divider()
 
                         ScrollView([.horizontal, .vertical]) {
-                            SwiftDiagramView(store: store.scope(state: \.swiftDiagram, action: \.swiftDiagram))
+                            SwiftDiagramTreeView(store: store.scope(state: \.swiftDiagramTree, action: \.swiftDiagramTree))
                                 .scaleEffect(store.swiftDiagramScale)
                                 .frame(
-                                    width: max(store.swiftDiagram.frameWidth * store.swiftDiagramScale, 10),
-                                    height: max(store.swiftDiagram.frameHeight * store.swiftDiagramScale, 10)
+                                    width: max(store.swiftDiagramTree.frameWidth * store.swiftDiagramScale, 10),
+                                    height: max(store.swiftDiagramTree.frameHeight * store.swiftDiagramScale, 10)
                                 )
+                                .padding(300)
                         }
 
                         Spacer()

@@ -42,7 +42,7 @@ public struct RAGESSReducer {
         ]
         var fileTree: FileTreeViewReducer.State = .init()
         var loadingTaskKindBuffer: [LoadingTaskKind] = []
-        var tree: TreeViewReducer.State = .init(allDeclarationObjects: [])
+        var swiftDiagramTree: SwiftDiagramTreeViewReducer.State = .init(allDeclarationObjects: [])
         var swiftDiagramScale: CGFloat = 0.5
         var processStartTime = CFAbsoluteTimeGetCurrent()
 
@@ -64,7 +64,7 @@ public struct RAGESSReducer {
         case startMonitoring
         case detectedDirectoryChange
         case fileTree(FileTreeViewReducer.Action)
-        case tree(TreeViewReducer.Action)
+        case swiftDiagramTree(SwiftDiagramTreeViewReducer.Action)
         case minusMagnifyingglassTapped
         case plusMagnifyingglassTapped
         case binding(BindingAction<State>)
@@ -86,8 +86,8 @@ public struct RAGESSReducer {
         Scope(state: \.fileTree, action: \.fileTree) {
             FileTreeViewReducer()
         }
-        Scope(state: \.tree, action: \.tree) {
-            TreeViewReducer()
+        Scope(state: \.swiftDiagramTree, action: \.swiftDiagramTree) {
+            SwiftDiagramTreeViewReducer()
         }
         Reduce { state, action in
             switch action {
@@ -329,14 +329,14 @@ public struct RAGESSReducer {
                         return .none
                     }
                     print(clickedObject.name)
-                    state.tree = .init(rootObject: clickedObject, allDeclarationObjects: state.declarationObjects)
+                    state.swiftDiagramTree = .init(rootObject: clickedObject, allDeclarationObjects: state.declarationObjects)
                     return .none
                 }
 
             case .fileTree:
                 return .none
 
-            case .tree:
+            case .swiftDiagramTree:
                 return .none
 
             case .minusMagnifyingglassTapped:

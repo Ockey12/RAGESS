@@ -13,7 +13,7 @@ import Foundation
 import TypeDeclaration
 
 @Reducer
-public struct TreeViewReducer {
+public struct SwiftDiagramTreeViewReducer {
     public init() {}
 
     @ObservableState
@@ -70,8 +70,6 @@ public struct TreeViewReducer {
     }
 
     public enum Action {
-        case task
-        case declarationObjectsClientResponse(Result<[any DeclarationObject], Error>)
         case nodes(IdentifiedActionOf<NodeReducer>)
         case arrows(IdentifiedActionOf<ArrowViewReducer>)
     }
@@ -81,21 +79,6 @@ public struct TreeViewReducer {
     public var body: some ReducerOf<Self> {
         Reduce { _, action in
             switch action {
-            case .task:
-                return .run { send in
-                    await send(.declarationObjectsClientResponse(Result {
-                        await declarationObjectsClient.get()
-                    }))
-                }
-
-            case let .declarationObjectsClientResponse(.success(objects)):
-//                state.allDeclarationObjects = objects
-                return .none
-
-            case let .declarationObjectsClientResponse(.failure(error)):
-                print(error)
-                return .none
-
             case .nodes:
                 return .none
 

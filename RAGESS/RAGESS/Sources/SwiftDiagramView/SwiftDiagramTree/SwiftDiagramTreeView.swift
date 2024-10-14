@@ -9,10 +9,10 @@
 import ComposableArchitecture
 import SwiftUI
 
-public struct TreeView: View {
-    let store: StoreOf<TreeViewReducer>
+public struct SwiftDiagramTreeView: View {
+    let store: StoreOf<SwiftDiagramTreeViewReducer>
 
-    public init(store: StoreOf<TreeViewReducer>) {
+    public init(store: StoreOf<SwiftDiagramTreeViewReducer>) {
         self.store = store
     }
 

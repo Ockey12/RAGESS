@@ -87,15 +87,12 @@ public struct RAGESSReducer {
     public var body: some ReducerOf<Self> {
         Scope(state: \.fileTree, action: \.fileTree) {
             FileTreeViewReducer()
-//                ._printChanges()
         }
         Scope(state: \.swiftDiagram, action: \.swiftDiagram) {
             SwiftDiagramReducer()
-//                ._printChanges()
         }
         Scope(state: \.tree, action: \.tree) {
             TreeViewReducer()
-//                ._printChanges()
         }
         Reduce { state, action in
             switch action {
@@ -290,9 +287,6 @@ public struct RAGESSReducer {
 
                 state.declarationObjects = hasDependenciesObjects
 
-//                state.swiftDiagram = .init(allDeclarationObjects: hasDependenciesObjects)
-//                state.tree.allDeclarationObjects = hasDependenciesObjects
-
                 print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
                 print("COMPLETE ALL PROCESSES")
                 print("TIME ELAPSED: \(CFAbsoluteTimeGetCurrent() - state.processStartTime)")
@@ -340,7 +334,6 @@ public struct RAGESSReducer {
                         return .none
                     }
                     print(clickedObject.name)
-//                    state.swiftDiagram.tree.rootObject = clickedObject
                     state.tree = .init(rootObject: clickedObject, allDeclarationObjects: state.declarationObjects)
                     return .none
                 }

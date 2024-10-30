@@ -1,9 +1,9 @@
 //
 //  Enum.swift
 //
-//  
+//
 //  Created by Ockey12 on 2024/10/30
-//  
+//
 //
 
 import Foundation

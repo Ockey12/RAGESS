@@ -1,12 +1,14 @@
 //
-//  Actor.swift
+//  Struct.swift
 //
 //  
 //  Created by Ockey12 on 2024/10/30
 //  
 //
 
-private actor ActorSample: Identifiable {
+import Foundation
+
+private struct StructSample: Identifiable {
     let id: Int
 
     init(id: Int) {

@@ -1,12 +1,14 @@
 //
-//  Actor.swift
+//  Class.swift
 //
 //  
 //  Created by Ockey12 on 2024/10/30
 //  
 //
 
-private actor ActorSample: Identifiable {
+import Foundation
+
+private class ClassSample: SuperClass, Identifiable {
     let id: Int
 
     init(id: Int) {
@@ -21,3 +23,5 @@ private actor ActorSample: Identifiable {
     enum NestedEnum {}
     actor NestedActor {}
 }
+
+private class SuperClass {}

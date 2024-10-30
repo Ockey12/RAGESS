@@ -1,9 +1,9 @@
 //
 //  Function.swift
 //
-//  
+//
 //  Created by Ockey12 on 2024/10/31
-//  
+//
 //
 
 private func FunctionSample() -> Int {

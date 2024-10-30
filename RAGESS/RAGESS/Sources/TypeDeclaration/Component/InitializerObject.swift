@@ -26,6 +26,7 @@ public struct InitializerObject: TypeNestable {
     public var nestingStructs: [StructObject] = []
     public var nestingClasses: [ClassObject] = []
     public var nestingEnums: [EnumObject] = []
+    public var nestingActors: [ActorObject] = []
 
     public var descendantsID: [UUID] {
         var ids: [UUID] = [id]

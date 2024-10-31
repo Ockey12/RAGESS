@@ -1,14 +1,13 @@
 //
 //  ActorView.swift
 //
-//  
+//
 //  Created by Ockey12 on 2024/11/01
-//  
+//
 //
 
 import ComposableArchitecture
 import SwiftUI
-
 
 public struct ActorView: View {
     let store: StoreOf<ActorViewReducer>

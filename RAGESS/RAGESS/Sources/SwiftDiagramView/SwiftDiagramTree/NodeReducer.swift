@@ -557,9 +557,9 @@ public struct NodeReducer {
                 var frameBottomLeadingPoint = CGPoint(
                     x: topLeadingPoint.x,
                     y: topLeadingPoint.y
-                    + borderWidth / 2
-                    + itemHeight * 2
-                    + bottomPaddingForLastText
+                        + borderWidth / 2
+                        + itemHeight * 2
+                        + bottomPaddingForLastText
                 )
 
                 let protocolsFrameTopLeadingPoint = frameBottomLeadingPoint
@@ -567,9 +567,9 @@ public struct NodeReducer {
                     frameBottomLeadingPoint = CGPoint(
                         x: frameBottomLeadingPoint.x,
                         y: frameBottomLeadingPoint.y
-                        + connectionHeight
-                        + itemHeight * CGFloat(conformedProtocolObjects.count)
-                        + bottomPaddingForLastText
+                            + connectionHeight
+                            + itemHeight * CGFloat(conformedProtocolObjects.count)
+                            + bottomPaddingForLastText
                     )
                 }
 
@@ -578,9 +578,9 @@ public struct NodeReducer {
                     frameBottomLeadingPoint = CGPoint(
                         x: frameBottomLeadingPoint.x,
                         y: frameBottomLeadingPoint.y
-                        + connectionHeight
-                        + itemHeight * CGFloat(actorObject.initializers.count)
-                        + bottomPaddingForLastText
+                            + connectionHeight
+                            + itemHeight * CGFloat(actorObject.initializers.count)
+                            + bottomPaddingForLastText
                     )
                 }
 
@@ -589,9 +589,9 @@ public struct NodeReducer {
                     frameBottomLeadingPoint = CGPoint(
                         x: frameBottomLeadingPoint.x,
                         y: frameBottomLeadingPoint.y
-                        + connectionHeight
-                        + itemHeight * CGFloat(actorObject.variables.count)
-                        + bottomPaddingForLastText
+                            + connectionHeight
+                            + itemHeight * CGFloat(actorObject.variables.count)
+                            + bottomPaddingForLastText
                     )
                 }
 

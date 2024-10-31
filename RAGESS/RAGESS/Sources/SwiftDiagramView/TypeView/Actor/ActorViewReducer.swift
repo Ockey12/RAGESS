@@ -1,9 +1,9 @@
 //
 //  ActorViewReducer.swift
 //
-//  
+//
 //  Created by Ockey12 on 2024/11/01
-//  
+//
 //
 
 import ComposableArchitecture
@@ -133,9 +133,9 @@ public struct ActorViewReducer {
                 frameBottomLeadingPoint = CGPoint(
                     x: frameBottomLeadingPoint.x,
                     y: frameBottomLeadingPoint.y
-                    + connectionHeight
-                    + itemHeight * CGFloat(object.initializers.count)
-                    + bottomPaddingForLastText
+                        + connectionHeight
+                        + itemHeight * CGFloat(object.initializers.count)
+                        + bottomPaddingForLastText
                 )
             }
 
@@ -144,9 +144,9 @@ public struct ActorViewReducer {
                 frameBottomLeadingPoint = CGPoint(
                     x: frameBottomLeadingPoint.x,
                     y: frameBottomLeadingPoint.y
-                    + connectionHeight
-                    + itemHeight * CGFloat(object.variables.count)
-                    + bottomPaddingForLastText
+                        + connectionHeight
+                        + itemHeight * CGFloat(object.variables.count)
+                        + bottomPaddingForLastText
                 )
             }
 
@@ -190,7 +190,7 @@ public struct ActorViewReducer {
         Scope(state: \.header, action: \.header) {
             HeaderReducer()
         }
-        Reduce { state, action in
+        Reduce { _, action in
             switch action {
             case .header:
                 return .none

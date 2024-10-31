@@ -200,8 +200,8 @@ struct NodeModel {
             )
             self.bodyWidth = bodyWidth
             frameWidth = bodyWidth
-            + ComponentSizeValues.arrowTerminalWidth * 2
-            + ComponentSizeValues.borderWidth
+                + ComponentSizeValues.arrowTerminalWidth * 2
+                + ComponentSizeValues.borderWidth
         }
 
         var frameHeight: CGFloat = itemHeight * 2 + bottomPadding

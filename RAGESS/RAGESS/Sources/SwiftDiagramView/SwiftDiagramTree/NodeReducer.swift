@@ -525,6 +525,110 @@ public struct NodeReducer {
                     topLeadingPoint: topLeadingPoint,
                     bodyWidth: bodyWidth
                 )
+
+            case let .actor(actorObject):
+                let conformedProtocolObjects = extractConformedProtocolObjects(
+                    by: actorObject,
+                    allDeclarationObjects: allDeclarationObjects
+                )
+                self.conformedProtocolObjects = conformedProtocolObjects
+
+                var allAnnotatedDecl = [actorObject.annotatedDecl]
+                allAnnotatedDecl.append(contentsOf: conformedProtocolObjects.map { $0.annotatedDecl })
+                numberOfConformances = conformedProtocolObjects.count
+
+                allAnnotatedDecl.append(contentsOf: actorObject.initializers.map { $0.annotatedDecl })
+                numberOfInitializers = actorObject.initializers.count
+
+                allAnnotatedDecl.append(contentsOf: actorObject.variables.map { $0.annotatedDecl })
+                numberOfVariables = actorObject.variables.count
+
+                allAnnotatedDecl.append(contentsOf: actorObject.functions.map { $0.annotatedDecl })
+                numberOfFunctions = actorObject.functions.count
+
+                let bodyWidth = max(
+                    calculateMaxTextWidth(allAnnotatedDecl),
+                    ComponentSizeValues.bodyMinWidth
+                )
+                frameWidth = bodyWidth
+                    + ComponentSizeValues.arrowTerminalWidth * 2
+                    + ComponentSizeValues.borderWidth
+
+                var frameBottomLeadingPoint = CGPoint(
+                    x: topLeadingPoint.x,
+                    y: topLeadingPoint.y
+                    + borderWidth / 2
+                    + itemHeight * 2
+                    + bottomPaddingForLastText
+                )
+
+                let protocolsFrameTopLeadingPoint = frameBottomLeadingPoint
+                if !conformedProtocolObjects.isEmpty {
+                    frameBottomLeadingPoint = CGPoint(
+                        x: frameBottomLeadingPoint.x,
+                        y: frameBottomLeadingPoint.y
+                        + connectionHeight
+                        + itemHeight * CGFloat(conformedProtocolObjects.count)
+                        + bottomPaddingForLastText
+                    )
+                }
+
+                let initializersTopLeadingPoint = frameBottomLeadingPoint
+                if !actorObject.initializers.isEmpty {
+                    frameBottomLeadingPoint = CGPoint(
+                        x: frameBottomLeadingPoint.x,
+                        y: frameBottomLeadingPoint.y
+                        + connectionHeight
+                        + itemHeight * CGFloat(actorObject.initializers.count)
+                        + bottomPaddingForLastText
+                    )
+                }
+
+                let variablesTopLeadingPoint = frameBottomLeadingPoint
+                if !actorObject.variables.isEmpty {
+                    frameBottomLeadingPoint = CGPoint(
+                        x: frameBottomLeadingPoint.x,
+                        y: frameBottomLeadingPoint.y
+                        + connectionHeight
+                        + itemHeight * CGFloat(actorObject.variables.count)
+                        + bottomPaddingForLastText
+                    )
+                }
+
+                let functionsTopLeadingPoint = frameBottomLeadingPoint
+
+                header = HeaderReducer.State(
+                    object: actorObject,
+                    topLeadingPoint: topLeadingPoint,
+                    bodyWidth: bodyWidth
+                )
+
+                details = [
+                    DetailReducer.State(
+                        objects: conformedProtocolObjects,
+                        kind: .protocolConformance,
+                        topLeadingPoint: protocolsFrameTopLeadingPoint,
+                        frameWidth: bodyWidth
+                    ),
+                    DetailReducer.State(
+                        objects: actorObject.initializers,
+                        kind: .initializers,
+                        topLeadingPoint: initializersTopLeadingPoint,
+                        frameWidth: bodyWidth
+                    ),
+                    DetailReducer.State(
+                        objects: actorObject.variables,
+                        kind: .variables,
+                        topLeadingPoint: variablesTopLeadingPoint,
+                        frameWidth: bodyWidth
+                    ),
+                    DetailReducer.State(
+                        objects: actorObject.functions,
+                        kind: .functions,
+                        topLeadingPoint: functionsTopLeadingPoint,
+                        frameWidth: bodyWidth
+                    )
+                ]
             }
 
             var frameHeight: CGFloat = itemHeight * 2 + bottomPadding

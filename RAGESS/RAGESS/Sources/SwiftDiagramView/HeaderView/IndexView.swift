@@ -22,6 +22,8 @@ struct IndexView: View {
             return Color(red: 1, green: 0.7, blue: 0)
         case is EnumObject:
             return Color(red: 0, green: 0.7, blue: 0.85)
+        case is ActorObject:
+            return Color("Actor", bundle: .module)
         default:
             fatalError()
         }
@@ -37,6 +39,8 @@ struct IndexView: View {
             return "Class"
         case is EnumObject:
             return "Enum"
+        case is ActorObject:
+            return "Actor"
         default:
             fatalError()
         }
@@ -118,5 +122,15 @@ struct IndexView: View {
             )
         )
         .frame(width: 350, height: 140)
+
+        IndexView(
+            object: ActorObject(
+                name: "SampleActor",
+                nameOffset: 0,
+                fullPath: "",
+                positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
+                offsetRange: 0 ... 1
+            )
+        )
     }
 }

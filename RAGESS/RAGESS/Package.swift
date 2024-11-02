@@ -170,6 +170,7 @@ let package = Package(
                 .product(name: "Dependencies", package: "swift-dependencies")
             ]
         ),
+        .target(name: "Sample"),
         .target(
             name: "SourceFileClient",
             dependencies: [

@@ -174,6 +174,34 @@ struct NodeModel {
             frameWidth = bodyWidth
                 + ComponentSizeValues.arrowTerminalWidth * 2
                 + ComponentSizeValues.borderWidth
+
+        case let .actor(actorObject):
+            let conformedProtocolObjects = extractConformedProtocolObjects(
+                by: actorObject,
+                allDeclarationObjects: allDeclarationObjects
+            )
+
+            var allAnnotatedDecl = [actorObject.annotatedDecl]
+            allAnnotatedDecl.append(contentsOf: conformedProtocolObjects.map { $0.annotatedDecl })
+            numberOfConformances = conformedProtocolObjects.count
+
+            allAnnotatedDecl.append(contentsOf: actorObject.initializers.map { $0.annotatedDecl })
+            numberOfInitializers = actorObject.initializers.count
+
+            allAnnotatedDecl.append(contentsOf: actorObject.variables.map { $0.annotatedDecl })
+            numberOfVariables = actorObject.variables.count
+
+            allAnnotatedDecl.append(contentsOf: actorObject.functions.map { $0.annotatedDecl })
+            numberOfFunctions = actorObject.functions.count
+
+            let bodyWidth = max(
+                calculateMaxTextWidth(allAnnotatedDecl),
+                ComponentSizeValues.bodyMinWidth
+            )
+            self.bodyWidth = bodyWidth
+            frameWidth = bodyWidth
+                + ComponentSizeValues.arrowTerminalWidth * 2
+                + ComponentSizeValues.borderWidth
         }
 
         var frameHeight: CGFloat = itemHeight * 2 + bottomPadding

@@ -1,14 +1,14 @@
 //
-//  ClassObject.swift
+//  StructObject.swift
 //
 //
-//  Created by ockey12 on 2024/05/07.
+//  Created by ockey12 on 2024/05/06.
 //
 
 import Dependencies
 import Foundation
 
-public struct ClassObject: TypeDeclaration {
+public struct StructObject: TypeDeclaration {
     public let id: UUID
     public let name: String
     public let nameOffset: Int
@@ -26,6 +26,7 @@ public struct ClassObject: TypeDeclaration {
     public var nestingStructs: [StructObject] = []
     public var nestingClasses: [ClassObject] = []
     public var nestingEnums: [EnumObject] = []
+    public var nestingActors: [ActorObject] = []
 
     public var descendantsID: [UUID] {
         var ids: [UUID] = [id]

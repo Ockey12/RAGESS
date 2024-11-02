@@ -11,4 +11,5 @@ public protocol TypeNestable: DeclarationObject {
     var nestingStructs: [StructObject] { get set }
     var nestingClasses: [ClassObject] { get set }
     var nestingEnums: [EnumObject] { get set }
+    var nestingActors: [ActorObject] { get set }
 }

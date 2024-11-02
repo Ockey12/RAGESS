@@ -1,15 +1,15 @@
 //
-//  VariableObject.swift
+//  ActorObject.swift
 //
 //
-//  Created by Ockey12 on 2024/05/08
+//  Created by Ockey12 on 2024/10/30
 //
 //
 
 import Dependencies
 import Foundation
 
-public struct VariableObject: TypeNestable {
+public struct ActorObject: TypeDeclaration {
     public let id: UUID
     public let name: String
     public let nameOffset: Int
@@ -19,6 +19,7 @@ public struct VariableObject: TypeNestable {
     public let positionRange: ClosedRange<SourcePosition>
     public let offsetRange: ClosedRange<Int>
 
+    public var initializers: [InitializerObject] = []
     public var variables: [VariableObject] = []
     public var functions: [FunctionObject] = []
 
@@ -26,15 +27,18 @@ public struct VariableObject: TypeNestable {
     public var nestingStructs: [StructObject] = []
     public var nestingClasses: [ClassObject] = []
     public var nestingEnums: [EnumObject] = []
+    public var nestingActors: [ActorObject] = []
 
     public var descendantsID: [UUID] {
         var ids: [UUID] = [id]
+        ids.append(contentsOf: initializers.flatMap { $0.descendantsID })
         ids.append(contentsOf: variables.flatMap { $0.descendantsID })
         ids.append(contentsOf: functions.flatMap { $0.descendantsID })
         ids.append(contentsOf: nestingProtocols.flatMap { $0.descendantsID })
         ids.append(contentsOf: nestingStructs.flatMap { $0.descendantsID })
         ids.append(contentsOf: nestingClasses.flatMap { $0.descendantsID })
         ids.append(contentsOf: nestingEnums.flatMap { $0.descendantsID })
+        ids.append(contentsOf: nestingActors.flatMap { $0.descendantsID })
         return ids
     }
 

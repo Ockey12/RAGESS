@@ -14,6 +14,7 @@ public enum GenericTypeObject: Equatable {
     case `class`(ClassObject)
     case `enum`(EnumObject)
     case `protocol`(ProtocolObject)
+    case `actor`(ActorObject)
 
     var id: UUID {
         switch self {
@@ -25,6 +26,8 @@ public enum GenericTypeObject: Equatable {
             enumObject.id
         case let .protocol(protocolObject):
             protocolObject.id
+        case let .actor(actorObject):
+            actorObject.id
         }
     }
 
@@ -38,6 +41,8 @@ public enum GenericTypeObject: Equatable {
             enumObject.name
         case let .protocol(protocolObject):
             protocolObject.name
+        case let .actor(actorObject):
+            actorObject.name
         }
     }
 
@@ -51,6 +56,8 @@ public enum GenericTypeObject: Equatable {
             enumObject.objectsThatCallThisObject
         case let .protocol(protocolObject):
             protocolObject.objectsThatCallThisObject
+        case let .actor(actorObject):
+            actorObject.objectsThatCallThisObject
         }
     }
 }

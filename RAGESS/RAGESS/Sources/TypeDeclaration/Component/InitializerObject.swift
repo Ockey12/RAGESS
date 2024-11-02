@@ -1,14 +1,15 @@
 //
-//  FunctionObject.swift
+//  InitializerObject.swift
 //
 //
-//  Created by ockey12 on 2024/05/06.
+//  Created by Ockey12 on 2024/05/19
+//
 //
 
 import Dependencies
 import Foundation
 
-public struct FunctionObject: TypeNestable {
+public struct InitializerObject: TypeNestable {
     public let id: UUID
     public let name: String
     public let nameOffset: Int
@@ -25,6 +26,7 @@ public struct FunctionObject: TypeNestable {
     public var nestingStructs: [StructObject] = []
     public var nestingClasses: [ClassObject] = []
     public var nestingEnums: [EnumObject] = []
+    public var nestingActors: [ActorObject] = []
 
     public var descendantsID: [UUID] {
         var ids: [UUID] = [id]

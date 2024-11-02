@@ -113,6 +113,8 @@ private enum TreeGenerator {
             genericTypeObject = .enum(enumObject)
         case let protocolObject as ProtocolObject:
             genericTypeObject = .protocol(protocolObject)
+        case let actorObject as ActorObject:
+            genericTypeObject = .actor(actorObject)
         default:
             #if DEBUG
                 print("ERROR: \(#file) - \(#function): Cannot cast \(rootObject.name) to Type.")
@@ -156,6 +158,8 @@ private enum TreeGenerator {
                     genericTypeObject = .enum(enumObject)
                 case let protocolObject as ProtocolObject:
                     genericTypeObject = .protocol(protocolObject)
+                case let actorObject as ActorObject:
+                    genericTypeObject = .actor(actorObject)
                 default:
                     continue
                 }

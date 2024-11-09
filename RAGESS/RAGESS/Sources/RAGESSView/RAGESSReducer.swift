@@ -376,22 +376,24 @@ extension RAGESSReducer {
         buildSettings: [String: String],
         packages: [PackageObject]
     ) async -> [any DeclarationObject] {
-        var declarationObjects: [any DeclarationObject] = []
-        let allSourceFilePaths = allSourceFiles.map { $0.path }
         let extractor = DeclarationExtractor()
 
-        for sourceFile in allSourceFiles {
-            let declarations = await extractor.extractDeclarations(
-                from: sourceFile,
-                buildSettings: buildSettings,
-                sourceFilePaths: allSourceFilePaths,
-                packages: packages
-            )
+//        for sourceFile in allSourceFiles {
+//            let declarations = await extractor.extractDeclarations(
+//                from: sourceFile,
+//                buildSettings: buildSettings,
+//                sourceFilePaths: allSourceFilePaths,
+//                packages: packages
+//            )
+//
+//            declarationObjects.append(contentsOf: declarations)
+//        }
 
-            declarationObjects.append(contentsOf: declarations)
-        }
-
-        return declarationObjects
+        return await extractor.extractDeclarations(
+            from: allSourceFiles,
+            buildSettings: buildSettings,
+            packages: packages
+        )
     }
 
     func findAppPaths(in directoryPath: String) -> [String] {

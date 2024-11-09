@@ -69,7 +69,7 @@ public struct DeclaredObject: Identifiable, Equatable {
         nameOffset: Int,
         fullPath: String,
         annotatedDecl: String = "",
-        sourceCode: String = "",
+        sourceCode: String,
         rangeInXcode: ClosedRange<SourcePosition>,
         offsetRange: ClosedRange<Int>,
         kind: Kind,

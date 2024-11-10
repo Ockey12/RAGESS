@@ -35,7 +35,7 @@ extension SourceKitClient: DependencyKey {
 
             return response
         },
-        sendParallelCursorInfoRequest: { objects, allSourceFiles in
+        sendParallelCursorInfoRequest: { objects, _ in
             var results = [SourceKitResponse]()
 
             let failures = FailureNames()
@@ -90,6 +90,7 @@ actor FailureNames {
     func append(_ name: String) {
         names.append(name)
     }
+
     func get() -> [String] {
         names
     }

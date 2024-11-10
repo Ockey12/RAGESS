@@ -19,8 +19,8 @@ public struct DebugReducer {
         var sourceFileClient: SourceFileClientDebugger.State
         var typeAnnotationClient: TypeAnnotationDebugger.State
         var kittenClient: SourceKitClientDebugger.State
-        var typeDeclarationExtractor: TypeDeclarationExtractorDebugger.State
-        var dependenciesClient: DependenciesClientDebugger.State
+//        var typeDeclarationExtractor: TypeDeclarationExtractorDebugger.State
+//        var dependenciesClient: DependenciesClientDebugger.State
         var derivedDataMonitor: MonitorClientDebugger.State
 
         var buildSettingsLoading = false
@@ -31,16 +31,16 @@ public struct DebugReducer {
             sourceFileClient: SourceFileClientDebugger.State,
             typeAnnotationClient: TypeAnnotationDebugger.State,
             kittenClient: SourceKitClientDebugger.State,
-            typeDeclarationExtractor: TypeDeclarationExtractorDebugger.State,
-            dependenciesClient: DependenciesClientDebugger.State,
+//            typeDeclarationExtractor: TypeDeclarationExtractorDebugger.State,
+//            dependenciesClient: DependenciesClientDebugger.State,
             derivedDataMonitor: MonitorClientDebugger.State
         ) {
             self.lspClient = lspClient
             self.sourceFileClient = sourceFileClient
             self.typeAnnotationClient = typeAnnotationClient
             self.kittenClient = kittenClient
-            self.typeDeclarationExtractor = typeDeclarationExtractor
-            self.dependenciesClient = dependenciesClient
+//            self.typeDeclarationExtractor = typeDeclarationExtractor
+//            self.dependenciesClient = dependenciesClient
             self.derivedDataMonitor = derivedDataMonitor
         }
     }
@@ -50,8 +50,8 @@ public struct DebugReducer {
         case sourceFileClient(SourceFileClientDebugger.Action)
         case typeAnnotationClient(TypeAnnotationDebugger.Action)
         case kittenClient(SourceKitClientDebugger.Action)
-        case typeDeclarationExtractor(TypeDeclarationExtractorDebugger.Action)
-        case dependenciesClient(DependenciesClientDebugger.Action)
+//        case typeDeclarationExtractor(TypeDeclarationExtractorDebugger.Action)
+//        case dependenciesClient(DependenciesClientDebugger.Action)
         case derivedDataMonitor(MonitorClientDebugger.Action)
     }
 
@@ -68,12 +68,12 @@ public struct DebugReducer {
         Scope(state: \.kittenClient, action: \.kittenClient) {
             SourceKitClientDebugger()
         }
-        Scope(state: \.typeDeclarationExtractor, action: \.typeDeclarationExtractor) {
-            TypeDeclarationExtractorDebugger()
-        }
-        Scope(state: \.dependenciesClient, action: \.dependenciesClient) {
-            DependenciesClientDebugger()
-        }
+//        Scope(state: \.typeDeclarationExtractor, action: \.typeDeclarationExtractor) {
+//            TypeDeclarationExtractorDebugger()
+//        }
+//        Scope(state: \.dependenciesClient, action: \.dependenciesClient) {
+//            DependenciesClientDebugger()
+//        }
         Scope(state: \.derivedDataMonitor, action: \.derivedDataMonitor) {
             MonitorClientDebugger()
         }
@@ -84,14 +84,14 @@ public struct DebugReducer {
 
             case .sourceFileClient(.getSourceFilesButtonTapped):
                 state.kittenClient.packages = []
-                state.typeDeclarationExtractor.packages = []
-                state.dependenciesClient.packages = []
+//                state.typeDeclarationExtractor.packages = []
+//                state.dependenciesClient.packages = []
                 return .none
 
             case let .sourceFileClient(.sourceFileResponse(.success(directory))):
                 state.kittenClient.allFilePathsInProject = getAllSwiftFilePathsInProject(in: directory)
-                state.typeDeclarationExtractor.directory = directory
-                state.dependenciesClient.allSourceFiles = getAllSourceFilesInProject(in: directory)
+//                state.typeDeclarationExtractor.directory = directory
+//                state.dependenciesClient.allSourceFiles = getAllSourceFilesInProject(in: directory)
                 state.buildSettingsLoading = true
                 return .none
 
@@ -109,8 +109,8 @@ public struct DebugReducer {
 
             case let .sourceFileClient(.buildSettingsResponse(.success(buildSettings))):
                 state.kittenClient.buildSettings = buildSettings
-                state.typeDeclarationExtractor.buildSettings = buildSettings
-                state.dependenciesClient.buildSettings = buildSettings
+//                state.typeDeclarationExtractor.buildSettings = buildSettings
+//                state.dependenciesClient.buildSettings = buildSettings
                 state.derivedDataMonitor.buildSettings = buildSettings
                 state.buildSettingsLoading = false
                 state.dumpPackageSwiftLoading = true
@@ -122,8 +122,8 @@ public struct DebugReducer {
 
             case let .sourceFileClient(.dumpPackageResponse(.success(packageObject))):
                 state.kittenClient.packages.append(packageObject)
-                state.typeDeclarationExtractor.packages.append(packageObject)
-                state.dependenciesClient.packages.append(packageObject)
+//                state.typeDeclarationExtractor.packages.append(packageObject)
+//                state.dependenciesClient.packages.append(packageObject)
                 state.dumpPackageSwiftLoading = false
                 print("\nstate.kittenClient.packages.append(packageObject)")
                 dump(state.kittenClient.packages)
@@ -140,14 +140,14 @@ public struct DebugReducer {
             case .typeAnnotationClient:
                 return .none
 
-            case .typeDeclarationExtractor:
-                return .none
+//            case .typeDeclarationExtractor:
+//                return .none
 
             case .kittenClient:
                 return .none
 
-            case .dependenciesClient:
-                return .none
+//            case .dependenciesClient:
+//                return .none
 
             case .derivedDataMonitor:
                 return .none
@@ -220,23 +220,23 @@ public struct DebugView: View {
                 .tabItem { Text("SourceKitClient") }
                 .padding()
 
-                TypeDeclarationExtractorDebugView(
-                    store: store.scope(
-                        state: \.typeDeclarationExtractor,
-                        action: \.typeDeclarationExtractor
-                    )
-                )
-                .tabItem { Text("DeclarationExtractor") }
-                .padding()
+//                TypeDeclarationExtractorDebugView(
+//                    store: store.scope(
+//                        state: \.typeDeclarationExtractor,
+//                        action: \.typeDeclarationExtractor
+//                    )
+//                )
+//                .tabItem { Text("DeclarationExtractor") }
+//                .padding()
 
-                DependenciesClientDebugView(
-                    store: store.scope(
-                        state: \.dependenciesClient,
-                        action: \.dependenciesClient
-                    )
-                )
-                .tabItem { Text("DependenciesClient") }
-                .padding()
+//                DependenciesClientDebugView(
+//                    store: store.scope(
+//                        state: \.dependenciesClient,
+//                        action: \.dependenciesClient
+//                    )
+//                )
+//                .tabItem { Text("DependenciesClient") }
+//                .padding()
 
                 MonitorClientDebugView(
                     store: store.scope(

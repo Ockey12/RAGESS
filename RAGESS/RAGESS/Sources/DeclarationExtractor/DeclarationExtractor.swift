@@ -46,35 +46,55 @@ public enum DeclarationExtractor {
                         $0.path
                     },
                     packages: packages
-               )
+                )
             )
         }
 
         @Dependency(SourceKitClient.self) var sourceKitClient
-        do {
-            let responses = try await sourceKitClient.sendParallelCursorInfoRequest(
-                requestObjects: flattenedObjects,
-                allSourceFiles: sourceFiles
-            )
+//        do {
+//            let responses = try await sourceKitClient.sendParallelCursorInfoRequest(
+//                requestObjects: flattenedObjects,
+//                allSourceFiles: sourceFiles
+//            )
+//
+//            for response in responses {
+//                guard let rootIndex = objects.firstIndex(where: { $0.id == response.request.rootObjectID }) else {
+//                    print("ERROR: \(#file) - \(#function): Cannot find root object of  \(response.request.object.name).")
+//                    continue
+//                }
+//                guard let annotatedDecl = response.response[CursorInfoResponseKeys.fullyAnnotatedDecl.key] as? String else {
+//                    print("ERROR: \(#file) - \(#function): Cannot find `key.fully_annotated_decl` about \(response.request.object.name).")
+//                    continue
+//                }
+//
+//                var annotatedObject = objects[rootIndex][keyPath: response.request.keyPathForRootObject]
+//                annotatedObject.annotatedDecl = annotatedDecl
+//
+//                objects[rootIndex][keyPath: response.request.keyPathForRootObject] = annotatedObject
+//            }
+//        } catch {
+//            print("ERROR: \(#file) - \(#function): Cannot get annotated declaration.")
+//            print(error)
+//        }
+        let responses = await sourceKitClient.sendParallelCursorInfoRequest(
+            requestObjects: flattenedObjects,
+            allSourceFiles: sourceFiles
+        )
 
-            for response in responses {
-                guard let rootIndex = objects.firstIndex(where: { $0.id == response.request.rootObjectID }) else {
-                    print("ERROR: \(#file) - \(#function): Cannot find root object of  \(response.request.object.name).")
-                    continue
-                }
-                guard let annotatedDecl = response.response[CursorInfoResponseKeys.fullyAnnotatedDecl.key] as? String else {
-                    print("ERROR: \(#file) - \(#function): Cannot find `key.fully_annotated_decl` about \(response.request.object.name).")
-                    continue
-                }
-
-                var annotatedObject = objects[rootIndex][keyPath: response.request.keyPathForRootObject]
-                annotatedObject.annotatedDecl = annotatedDecl
-
-                objects[rootIndex][keyPath: response.request.keyPathForRootObject] = annotatedObject
+        for response in responses {
+            guard let rootIndex = objects.firstIndex(where: { $0.id == response.request.rootObjectID }) else {
+                print("ERROR: \(#file) - \(#function): Cannot find root object of  \(response.request.object.name).")
+                continue
             }
-        } catch {
-            print("ERROR: \(#file) - \(#function): Cannot get annotated declaration.")
-            print(error)
+            guard let annotatedDecl = response.response[CursorInfoResponseKeys.fullyAnnotatedDecl.key] as? String else {
+                print("ERROR: \(#file) - \(#function): Cannot find `key.fully_annotated_decl` about \(response.request.object.name).")
+                continue
+            }
+
+            var annotatedObject = objects[rootIndex][keyPath: response.request.keyPathForRootObject]
+            annotatedObject.annotatedDecl = annotatedDecl
+
+            objects[rootIndex][keyPath: response.request.keyPathForRootObject] = annotatedObject
         }
 
         return objects
@@ -89,13 +109,11 @@ public enum DeclarationExtractor {
         sourceFilePaths: [String],
         packages: [PackageObject]
     ) -> [SourceKitRequestObject] {
-
         let keyPathForRootObject: WritableKeyPath<DeclaredObject, DeclaredObject>
 
         if let rootObjectID,
            let parentKeyPathForRootObject,
-           let index
-        {
+           let index {
             switch object.kind {
             case .struct:
                 let partialKeyPath = \DeclaredObject.nestingStructs[index]
@@ -176,6 +194,7 @@ public enum DeclarationExtractor {
                     in: initializerObject,
                     rootObjectID: rootObjectID ?? object.id,
                     parentKeyPathForRootObject: keyPathForRootObject,
+                    index: index,
                     buildSettings: buildSettings,
                     sourceFilePaths: sourceFilePaths,
                     packages: packages
@@ -189,6 +208,7 @@ public enum DeclarationExtractor {
                     in: structObject,
                     rootObjectID: rootObjectID ?? object.id,
                     parentKeyPathForRootObject: keyPathForRootObject,
+                    index: index,
                     buildSettings: buildSettings,
                     sourceFilePaths: sourceFilePaths,
                     packages: packages
@@ -202,6 +222,7 @@ public enum DeclarationExtractor {
                     in: classObject,
                     rootObjectID: rootObjectID ?? object.id,
                     parentKeyPathForRootObject: keyPathForRootObject,
+                    index: index,
                     buildSettings: buildSettings,
                     sourceFilePaths: sourceFilePaths,
                     packages: packages
@@ -215,6 +236,7 @@ public enum DeclarationExtractor {
                     in: enumObject,
                     rootObjectID: rootObjectID ?? object.id,
                     parentKeyPathForRootObject: keyPathForRootObject,
+                    index: index,
                     buildSettings: buildSettings,
                     sourceFilePaths: sourceFilePaths,
                     packages: packages
@@ -228,6 +250,7 @@ public enum DeclarationExtractor {
                     in: protocolObject,
                     rootObjectID: rootObjectID ?? object.id,
                     parentKeyPathForRootObject: keyPathForRootObject,
+                    index: index,
                     buildSettings: buildSettings,
                     sourceFilePaths: sourceFilePaths,
                     packages: packages
@@ -241,6 +264,7 @@ public enum DeclarationExtractor {
                     in: actorObject,
                     rootObjectID: rootObjectID ?? object.id,
                     parentKeyPathForRootObject: keyPathForRootObject,
+                    index: index,
                     buildSettings: buildSettings,
                     sourceFilePaths: sourceFilePaths,
                     packages: packages
@@ -254,6 +278,7 @@ public enum DeclarationExtractor {
                     in: caseObject,
                     rootObjectID: rootObjectID ?? object.id,
                     parentKeyPathForRootObject: keyPathForRootObject,
+                    index: index,
                     buildSettings: buildSettings,
                     sourceFilePaths: sourceFilePaths,
                     packages: packages

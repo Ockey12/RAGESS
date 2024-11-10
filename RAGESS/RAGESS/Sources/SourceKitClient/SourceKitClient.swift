@@ -7,6 +7,7 @@
 
 import Dependencies
 import DependenciesMacros
+import Foundation
 import SourceKittenFramework
 import XcodeObject
 
@@ -22,7 +23,7 @@ public struct SourceKitClient {
     public var sendParallelCursorInfoRequest: @Sendable (
         _ requestObjects: [SourceKitRequestObject],
         _ allSourceFiles: [SourceFile]
-    ) async throws -> [SourceKitResponse]
+    ) async -> [SourceKitResponse] = { _, _ in [] }
 }
 
 extension SourceKitClient: DependencyKey {
@@ -35,55 +36,61 @@ extension SourceKitClient: DependencyKey {
             return response
         },
         sendParallelCursorInfoRequest: { objects, allSourceFiles in
-            let maxConcurrent = 20
+            var results = [SourceKitResponse]()
 
-            return try await withThrowingTaskGroup(of: SourceKitResponse.self) { group in
-                var results = [SourceKitResponse]()
+            let failures = FailureNames()
 
-                for i in 0..<min(maxConcurrent, objects.count) {
-                    let object = objects[i]
-                    guard let sourceFile = allSourceFiles.first(where: { $0.path == object.object.fullPath }) else {
-                        continue
-                    }
+            let start = CFAbsoluteTimeGetCurrent()
+            var absoluteTimes = [start]
+            var times = [CFAbsoluteTime]()
+
+            await withTaskGroup(of: SourceKitResponse?.self) { group in
+                for object in objects {
                     guard let arguments = try? object.argumentsGenerator.generateArguments() else {
-                        #if DEBUG
-                            print("ERROR: \(#file) - \(#function): Could not generate arguments for SourceKit")
-                        #endif
+                        print("ERROR: \(#file) - \(#function): Could not generate SourceKit arguments of \(object.object.name)")
                         continue
                     }
-                    let request = Request.cursorInfo(file: sourceFile.content, offset: ByteCount(object.object.nameOffset), arguments: arguments)
+                    let request = Request.cursorInfo(file: object.object.fullPath, offset: ByteCount(object.object.nameOffset), arguments: arguments)
                     group.addTask {
-                        let response = try await request.asyncSend()
+                        guard let response = try? await request.asyncSend() else {
+                            await failures.append(object.object.name)
+                            return nil
+                        }
                         return SourceKitResponse(request: object, response: response)
                     }
                 }
 
-                var nextIndex = maxConcurrent
-
-                for try await response in group {
-                    results.append(response)
-                    if nextIndex < objects.count {
-                        let object = objects[nextIndex]
-                        guard let sourceFile = allSourceFiles.first(where: { $0.path == object.object.fullPath }) else {
-                            continue
-                        }
-                        guard let arguments = try? object.argumentsGenerator.generateArguments() else {
-                            #if DEBUG
-                                print("ERROR: \(#file) - \(#function): Could not generate arguments for SourceKit")
-                            #endif
-                            continue
-                        }
-                        let request = Request.cursorInfo(file: sourceFile.content, offset: ByteCount(object.object.nameOffset), arguments: arguments)
-                        group.addTask {
-                            let response = try await request.asyncSend()
-                            return SourceKitResponse(request: object, response: response)
-                        }
-                        nextIndex += 1
+                for await response in group {
+                    guard let response else {
+                        continue
                     }
+                    results.append(response)
+                    let lastAbsoluteTime = absoluteTimes.last!
+                    let current = CFAbsoluteTimeGetCurrent()
+                    absoluteTimes.append(current)
+                    let time = current - lastAbsoluteTime
+                    times.append(time)
                 }
+            }
 
-                return results
-            } // withThrowingTaskGroup
+            let end = CFAbsoluteTimeGetCurrent()
+            print("リクエスト終わり: ", end - start)
+            dump(times)
+
+            let failuresResult = await failures.get()
+            dump(failuresResult)
+
+            return results
         } // sendParallelCursorInfoRequest
     )
+}
+
+actor FailureNames {
+    private var names: [String] = []
+    func append(_ name: String) {
+        names.append(name)
+    }
+    func get() -> [String] {
+        names
+    }
 }

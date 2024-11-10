@@ -405,18 +405,20 @@ public struct CompilerArgumentsGenerator {
             .appendingPathComponent("\(moduleName).build/swift-overrides.hmap")
             .path()
 
-        var arguments = ["-vfsoverlay"]
-        arguments.append(NSString(string: derivedDataPath).appendingPathComponent("/Index.noindex/Build/Intermediates.noindex/index-overlay.yaml"))
+        var arguments = [String]()
+//        var arguments = ["-vfsoverlay"]
+//        arguments.append(NSString(string: derivedDataPath).appendingPathComponent("/Index.noindex/Build/Intermediates.noindex/index-overlay.yaml"))
 
-        arguments.append("-module-name")
-        arguments.append(moduleName)
-        arguments.append("-Onone")
-        arguments.append("-enforce-exclusivity=checked")
-        arguments.append(contentsOf: sourceFilePaths)
-        arguments.append("-DSWIFT_PACKAGE")
-        arguments.append("-DDEBUG")
-        arguments.append(contentsOf: getModuleMapPaths(derivedDataPath: derivedDataPath))
-        arguments.append("-DXcode")
+//        arguments.append("-module-name")
+//        arguments.append(moduleName)
+//        arguments.append("-Onone")
+//        arguments.append("-enforce-exclusivity=checked")
+//        arguments.append(contentsOf: sourceFilePaths)
+        arguments.append(targetFilePath)
+//        arguments.append("-DSWIFT_PACKAGE")
+//        arguments.append("-DDEBUG")
+//        arguments.append(contentsOf: getModuleMapPaths(derivedDataPath: derivedDataPath))
+//        arguments.append("-DXcode")
         arguments.append("-sdk")
 
         guard let sdkPath = buildSettings["SDKROOT"] else {
@@ -439,91 +441,91 @@ public struct CompilerArgumentsGenerator {
             throw CompilerArgumentGenerationError.unexpectedSDK
         }
 
-        arguments.append("-g")
-        arguments.append("-module-cache-path")
-        arguments.append(moduleCachePath)
-        arguments.append("-Xfrontend")
-        arguments.append("-serialize-debugging-options")
-        arguments.append("-enable-testing")
-        arguments.append("-swift-version")
+//        arguments.append("-g")
+//        arguments.append("-module-cache-path")
+//        arguments.append(moduleCachePath)
+//        arguments.append("-Xfrontend")
+//        arguments.append("-serialize-debugging-options")
+//        arguments.append("-enable-testing")
+//        arguments.append("-swift-version")
+//
+//        guard let swiftVersion = buildSettings["SWIFT_VERSION"] else {
+//            throw CompilerArgumentGenerationError.notFoundSwiftVersion
+//        }
+//        if swiftVersion.hasSuffix(".0") {
+//            arguments.append(String(swiftVersion.dropLast(2)))
+//        } else {
+//            arguments.append(swiftVersion)
+//        }
+//
+//        arguments.append("-I")
+//        arguments.append(debugPath)
+//        arguments.append("-I")
 
-        guard let swiftVersion = buildSettings["SWIFT_VERSION"] else {
-            throw CompilerArgumentGenerationError.notFoundSwiftVersion
-        }
-        if swiftVersion.hasSuffix(".0") {
-            arguments.append(String(swiftVersion.dropLast(2)))
-        } else {
-            arguments.append(swiftVersion)
-        }
+//        guard let testLibraryPath = buildSettings["TEST_LIBRARY_SEARCH_PATHS"] else {
+//            throw CompilerArgumentGenerationError.notFoundTestLibraryPath
+//        }
+//        arguments.append(testLibraryPath.trimmingCharacters(in: .whitespaces))
+//        arguments.append("-F")
+//        arguments.append(packageFrameworksPath)
+//        arguments.append("-F")
+//        arguments.append(debugPath)
+//        arguments.append("-F")
+//
+//        guard let testFrameworkPath = buildSettings["TEST_FRAMEWORK_SEARCH_PATHS"] else {
+//            throw CompilerArgumentGenerationError.notFoundTestFrameworkPath
+//        }
+//        arguments.append(testFrameworkPath.trimmingCharacters(in: .whitespaces))
+//        arguments.append(contentsOf: getExecutableMacroPaths(derivedDataPath: derivedDataPath))
+//        arguments.append("-Xfrontend")
+//        arguments.append("-experimental-allow-module-with-compiler-errors")
+//        arguments.append("-Xfrontend")
+//        arguments.append("-empty-abi-descriptor")
+//        arguments.append("-Xcc")
+//        arguments.append("-fretain-comments-from-system-headers")
+//        arguments.append("-Xcc")
+//        arguments.append("-Xclang")
+//        arguments.append("-Xcc")
+//        arguments.append("-detailed-preprocessing-record")
+//        arguments.append("-Xcc")
+//        arguments.append("-Xclang")
+//        arguments.append("-Xcc")
+//        arguments.append("-fmodule-format=raw")
+//        arguments.append("-Xcc")
+//        arguments.append("-ferror-limit=10")
+//        arguments.append("-Xcc")
+//        arguments.append("-Xclang")
+//        arguments.append("-Xcc")
+//        arguments.append("-fallow-pch-with-compiler-errors")
+//        arguments.append("-Xcc")
+//        arguments.append("-Xclang")
+//        arguments.append("-Xcc")
+//        arguments.append("-fallow-pcm-with-compiler-errors")
+//        arguments.append("-Xcc")
+//        arguments.append("-Wno-non-modular-include-in-framework-module")
+//        arguments.append("-Xcc")
+//        arguments.append("-Wno-incomplete-umbrella")
+//        arguments.append("-Xcc")
+//        arguments.append("-fmodules-validate-system-headers")
+//        arguments.append("-Xfrontend")
+//        arguments.append("-package-name")
+//        arguments.append("-Xfrontend")
+//        arguments.append(packageName.lowercased())
+//        arguments.append("-Xcc")
+//        arguments.append(overridesHmapPath)
+//        arguments.append(
+//            contentsOf: getIncludePaths(
+//                in: NSString(string: derivedDataPath).appendingPathComponent("/SourcePackages/checkouts"),
+//                ignoredDirectories: ["swift-package-manager"]
+//            )
+//        )
 
-        arguments.append("-I")
-        arguments.append(debugPath)
-        arguments.append("-I")
-
-        guard let testLibraryPath = buildSettings["TEST_LIBRARY_SEARCH_PATHS"] else {
-            throw CompilerArgumentGenerationError.notFoundTestLibraryPath
-        }
-        arguments.append(testLibraryPath.trimmingCharacters(in: .whitespaces))
-        arguments.append("-F")
-        arguments.append(packageFrameworksPath)
-        arguments.append("-F")
-        arguments.append(debugPath)
-        arguments.append("-F")
-
-        guard let testFrameworkPath = buildSettings["TEST_FRAMEWORK_SEARCH_PATHS"] else {
-            throw CompilerArgumentGenerationError.notFoundTestFrameworkPath
-        }
-        arguments.append(testFrameworkPath.trimmingCharacters(in: .whitespaces))
-        arguments.append(contentsOf: getExecutableMacroPaths(derivedDataPath: derivedDataPath))
-        arguments.append("-Xfrontend")
-        arguments.append("-experimental-allow-module-with-compiler-errors")
-        arguments.append("-Xfrontend")
-        arguments.append("-empty-abi-descriptor")
-        arguments.append("-Xcc")
-        arguments.append("-fretain-comments-from-system-headers")
-        arguments.append("-Xcc")
-        arguments.append("-Xclang")
-        arguments.append("-Xcc")
-        arguments.append("-detailed-preprocessing-record")
-        arguments.append("-Xcc")
-        arguments.append("-Xclang")
-        arguments.append("-Xcc")
-        arguments.append("-fmodule-format=raw")
-        arguments.append("-Xcc")
-        arguments.append("-ferror-limit=10")
-        arguments.append("-Xcc")
-        arguments.append("-Xclang")
-        arguments.append("-Xcc")
-        arguments.append("-fallow-pch-with-compiler-errors")
-        arguments.append("-Xcc")
-        arguments.append("-Xclang")
-        arguments.append("-Xcc")
-        arguments.append("-fallow-pcm-with-compiler-errors")
-        arguments.append("-Xcc")
-        arguments.append("-Wno-non-modular-include-in-framework-module")
-        arguments.append("-Xcc")
-        arguments.append("-Wno-incomplete-umbrella")
-        arguments.append("-Xcc")
-        arguments.append("-fmodules-validate-system-headers")
-        arguments.append("-Xfrontend")
-        arguments.append("-package-name")
-        arguments.append("-Xfrontend")
-        arguments.append(packageName.lowercased())
-        arguments.append("-Xcc")
-        arguments.append(overridesHmapPath)
-        arguments.append(
-            contentsOf: getIncludePaths(
-                in: NSString(string: derivedDataPath).appendingPathComponent("/SourcePackages/checkouts"),
-                ignoredDirectories: ["swift-package-manager"]
-            )
-        )
-
-        arguments.append("-Xcc")
-        arguments.append("-DSWIFT_PACKAGE")
-        arguments.append("-Xcc")
-        arguments.append("-DDEBUG=1")
-        arguments.append("-working-directory")
-        arguments.append(getWorkingDirectoryPath(sourceFilePath: targetFilePath))
+//        arguments.append("-Xcc")
+//        arguments.append("-DSWIFT_PACKAGE")
+//        arguments.append("-Xcc")
+//        arguments.append("-DDEBUG=1")
+//        arguments.append("-working-directory")
+//        arguments.append(getWorkingDirectoryPath(sourceFilePath: targetFilePath))
 
         return arguments
     }

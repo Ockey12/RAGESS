@@ -59,7 +59,7 @@ public struct RAGESSReducer {
         case buildSettingsResponse(Result<[String: String], Error>)
         case dumpPackageResponse(Result<PackageObject, Error>)
         case dumpPackageCompleted
-        case extractDeclarationsCompleted([any DeclarationObject])
+        case extractDeclarationsCompleted([DeclaredObject])
         case extractDependenciesResponse(Result<[any DeclarationObject], Error>)
         case startMonitoring
         case detectedDirectoryChange
@@ -239,6 +239,7 @@ public struct RAGESSReducer {
                 }
 
             case let .extractDeclarationsCompleted(declarationObjects):
+                dump(declarationObjects)
                 state.loadingTaskKindBuffer.removeFirst()
 
                 #if DEBUG
@@ -254,23 +255,24 @@ public struct RAGESSReducer {
 
                 state.loadingTaskKindBuffer.append(.extractDependencies)
 
-                return .run {
-                    [
-                        buildSettings = state.buildSettings,
-                        packages = state.packages
-                    ] send in
-
-                    await declarationObjectsClient.set(declarationObjects)
-
-                    await send(.extractDependenciesResponse(Result {
-                        try await dependenciesClient.extractDependencies(
-                            declarationObjects: declarationObjects,
-                            allSourceFiles: allSourceFiles,
-                            buildSettings: buildSettings,
-                            packages: packages
-                        )
-                    }))
-                }
+//                return .run {
+//                    [
+//                        buildSettings = state.buildSettings,
+//                        packages = state.packages
+//                    ] send in
+//
+//                    await declarationObjectsClient.set(declarationObjects)
+//
+//                    await send(.extractDependenciesResponse(Result {
+//                        try await dependenciesClient.extractDependencies(
+//                            declarationObjects: declarationObjects,
+//                            allSourceFiles: allSourceFiles,
+//                            buildSettings: buildSettings,
+//                            packages: packages
+//                        )
+//                    }))
+//                }
+                return .none
 
             case let .extractDependenciesResponse(.success(hasDependenciesObjects)):
                 state.loadingTaskKindBuffer.removeFirst()
@@ -375,23 +377,25 @@ extension RAGESSReducer {
         allSourceFiles: [SourceFile],
         buildSettings: [String: String],
         packages: [PackageObject]
-    ) async -> [any DeclarationObject] {
-        var declarationObjects: [any DeclarationObject] = []
-        let allSourceFilePaths = allSourceFiles.map { $0.path }
-        let extractor = DeclarationExtractor()
+    ) async -> [DeclaredObject] {
+//        let extractor = DeclarationExtractor()
 
-        for sourceFile in allSourceFiles {
-            let declarations = await extractor.extractDeclarations(
-                from: sourceFile,
-                buildSettings: buildSettings,
-                sourceFilePaths: allSourceFilePaths,
-                packages: packages
-            )
+//        for sourceFile in allSourceFiles {
+//            let declarations = await extractor.extractDeclarations(
+//                from: sourceFile,
+//                buildSettings: buildSettings,
+//                sourceFilePaths: allSourceFilePaths,
+//                packages: packages
+//            )
+//
+//            declarationObjects.append(contentsOf: declarations)
+//        }
 
-            declarationObjects.append(contentsOf: declarations)
-        }
-
-        return declarationObjects
+        return await DeclarationExtractor.extractDeclarations(
+            from: allSourceFiles,
+            buildSettings: buildSettings,
+            packages: packages
+        )
     }
 
     func findAppPaths(in directoryPath: String) -> [String] {

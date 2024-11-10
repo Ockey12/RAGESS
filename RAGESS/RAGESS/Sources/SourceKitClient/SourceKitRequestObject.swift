@@ -1,9 +1,9 @@
 //
 //  SourceKitRequestObject.swift
-//  
-//  
+//
+//
 //  Created by Ockey12 on 2024/10/29
-//  
+//
 //
 
 import Foundation
@@ -38,7 +38,7 @@ public struct SourceKitResponse {
     public let request: SourceKitRequestObject
     public let response: [String: SourceKitRepresentable]
 
-    public init(request: SourceKitRequestObject, response: [String : SourceKitRepresentable]) {
+    public init(request: SourceKitRequestObject, response: [String: SourceKitRepresentable]) {
         self.request = request
         self.response = response
     }

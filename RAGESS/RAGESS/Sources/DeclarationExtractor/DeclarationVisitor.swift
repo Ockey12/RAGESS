@@ -29,7 +29,7 @@ final class DeclarationVisitor: SyntaxVisitor {
         #endif
         let positionRange = node.sourceRange(converter: locationConverter)
         let rangeInXcode = SourcePosition(line: positionRange.start.line, utf8index: positionRange.start.column)
-                            ... SourcePosition(line: positionRange.end.line, utf8index: positionRange.end.column)
+            ... SourcePosition(line: positionRange.end.line, utf8index: positionRange.end.column)
         let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
         let currentProtocol = DeclaredObject(
@@ -101,7 +101,7 @@ final class DeclarationVisitor: SyntaxVisitor {
         #endif
         let positionRange = node.sourceRange(converter: locationConverter)
         let rangeInXcode = SourcePosition(line: positionRange.start.line, utf8index: positionRange.start.column)
-                            ... SourcePosition(line: positionRange.end.line, utf8index: positionRange.end.column)
+            ... SourcePosition(line: positionRange.end.line, utf8index: positionRange.end.column)
         let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
         let currentStruct = DeclaredObject(
@@ -173,7 +173,7 @@ final class DeclarationVisitor: SyntaxVisitor {
         #endif
         let positionRange = node.sourceRange(converter: locationConverter)
         let rangeInXcode = SourcePosition(line: positionRange.start.line, utf8index: positionRange.start.column)
-                            ... SourcePosition(line: positionRange.end.line, utf8index: positionRange.end.column)
+            ... SourcePosition(line: positionRange.end.line, utf8index: positionRange.end.column)
         let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
         let currentClass = DeclaredObject(
@@ -245,7 +245,7 @@ final class DeclarationVisitor: SyntaxVisitor {
         #endif
         let positionRange = node.sourceRange(converter: locationConverter)
         let rangeInXcode = SourcePosition(line: positionRange.start.line, utf8index: positionRange.start.column)
-                            ... SourcePosition(line: positionRange.end.line, utf8index: positionRange.end.column)
+            ... SourcePosition(line: positionRange.end.line, utf8index: positionRange.end.column)
         let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
         let currentEnum = DeclaredObject(
@@ -316,7 +316,7 @@ final class DeclarationVisitor: SyntaxVisitor {
         #endif
         let positionRange = node.sourceRange(converter: locationConverter)
         let rangeInXcode = SourcePosition(line: positionRange.start.line, utf8index: positionRange.start.column)
-                            ... SourcePosition(line: positionRange.end.line, utf8index: positionRange.end.column)
+            ... SourcePosition(line: positionRange.end.line, utf8index: positionRange.end.column)
         let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
         let currentActor = DeclaredObject(
@@ -387,7 +387,7 @@ final class DeclarationVisitor: SyntaxVisitor {
         #endif
         let positionRange = node.sourceRange(converter: locationConverter)
         let rangeInXcode = SourcePosition(line: positionRange.start.line, utf8index: positionRange.start.column)
-                            ... SourcePosition(line: positionRange.end.line, utf8index: positionRange.end.column)
+            ... SourcePosition(line: positionRange.end.line, utf8index: positionRange.end.column)
         let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
         let currentInitializer = DeclaredObject(
@@ -461,7 +461,7 @@ final class DeclarationVisitor: SyntaxVisitor {
 
         let positionRange = node.sourceRange(converter: locationConverter)
         let rangeInXcode = SourcePosition(line: positionRange.start.line, utf8index: positionRange.start.column)
-                            ... SourcePosition(line: positionRange.end.line, utf8index: positionRange.end.column)
+            ... SourcePosition(line: positionRange.end.line, utf8index: positionRange.end.column)
         let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
         let currentVariable = DeclaredObject(
@@ -534,7 +534,7 @@ final class DeclarationVisitor: SyntaxVisitor {
         #endif
         let positionRange = node.sourceRange(converter: locationConverter)
         let rangeInXcode = SourcePosition(line: positionRange.start.line, utf8index: positionRange.start.column)
-                            ... SourcePosition(line: positionRange.end.line, utf8index: positionRange.end.column)
+            ... SourcePosition(line: positionRange.end.line, utf8index: positionRange.end.column)
         let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
         let currentFunction = DeclaredObject(
@@ -611,7 +611,7 @@ final class DeclarationVisitor: SyntaxVisitor {
 
         let positionRange = node.sourceRange(converter: locationConverter)
         let rangeInXcode = SourcePosition(line: positionRange.start.line, utf8index: positionRange.start.column)
-                            ... SourcePosition(line: positionRange.end.line, utf8index: positionRange.end.column)
+            ... SourcePosition(line: positionRange.end.line, utf8index: positionRange.end.column)
         let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
         let currentCase = DeclaredObject(

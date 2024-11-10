@@ -8,7 +8,7 @@
 import Dependencies
 import Foundation
 
-public struct EnumObject: TypeDeclaration {
+public struct EnumObject: HasCases {
     public let id: UUID
     public let name: String
     public let nameOffset: Int

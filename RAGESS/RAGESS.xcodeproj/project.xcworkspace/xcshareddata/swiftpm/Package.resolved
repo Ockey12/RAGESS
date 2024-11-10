@@ -154,6 +154,15 @@
       }
     },
     {
+      "identity" : "swift-indexstore",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/kateinoigakukun/swift-indexstore.git",
+      "state" : {
+        "revision" : "9363af98d32247bf953855fc99d1f1f1ef803e43",
+        "version" : "0.3.0"
+      }
+    },
+    {
       "identity" : "swift-llbuild",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-llbuild.git",

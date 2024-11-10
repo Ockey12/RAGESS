@@ -50,6 +50,10 @@ let package = Package(
         .package(
             url: "https://github.com/jpsim/SourceKitten.git",
             .upToNextMinor(from: "0.34.1")
+        ),
+        .package(
+            url: "https://github.com/kateinoigakukun/swift-indexstore.git",
+            .upToNextMinor(from: "0.3.0")
         )
     ],
     targets: [

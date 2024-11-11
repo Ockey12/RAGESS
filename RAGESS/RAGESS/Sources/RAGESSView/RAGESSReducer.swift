@@ -8,6 +8,7 @@
 
 import BuildSettingsClient
 import ComposableArchitecture
+import DebugView
 import DeclarationExtractor
 import DeclarationObjectsClient
 import Dependencies
@@ -45,6 +46,7 @@ public struct RAGESSReducer {
         var swiftDiagramTree: SwiftDiagramTreeViewReducer.State = .init(allDeclarationObjects: [])
         var swiftDiagramScale: CGFloat = 0.5
         var processStartTime = CFAbsoluteTimeGetCurrent()
+        var debugView = DebugReducer.State()
 
         public init(projectRootDirectoryPath: String) {
             self.projectRootDirectoryPath = projectRootDirectoryPath
@@ -67,6 +69,7 @@ public struct RAGESSReducer {
         case swiftDiagramTree(SwiftDiagramTreeViewReducer.Action)
         case minusMagnifyingglassTapped
         case plusMagnifyingglassTapped
+        case debugView(DebugReducer.Action)
         case binding(BindingAction<State>)
     }
 
@@ -89,6 +92,11 @@ public struct RAGESSReducer {
         Scope(state: \.swiftDiagramTree, action: \.swiftDiagramTree) {
             SwiftDiagramTreeViewReducer()
         }
+        #if DEBUG
+        Scope(state: \.debugView, action: \.debugView) {
+            DebugReducer()
+        }
+        #endif
         Reduce { state, action in
             switch action {
             case let .projectDirectorySelectorResponse(.success(urls)):
@@ -345,6 +353,9 @@ public struct RAGESSReducer {
 
             case .plusMagnifyingglassTapped:
                 state.swiftDiagramScale = min(state.swiftDiagramScale + 0.05, 1)
+                return .none
+
+            case .debugView:
                 return .none
 
             case .binding:

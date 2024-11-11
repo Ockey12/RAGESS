@@ -41,11 +41,11 @@ let package = Package(
         ),
         .package(
             url: "https://github.com/pointfreeco/swift-composable-architecture",
-            .upToNextMinor(from: "1.9.2")
+            from: "1.15.2"
         ),
         .package(
             url: "https://github.com/pointfreeco/swift-dependencies",
-            .upToNextMinor(from: "1.2.2")
+            from: "1.4.0"
         ),
         .package(
             url: "https://github.com/jpsim/SourceKitten.git",
@@ -82,6 +82,7 @@ let package = Package(
                 "LSPClient",
                 "SourceFileClient",
                 "SourceKitClient",
+                "SwiftIndexStoreClient",
                 "TypeAnnotationClient",
                 "TypeDeclaration",
                 "DeclarationExtractor",
@@ -161,6 +162,7 @@ let package = Package(
             name: "RAGESSView",
             dependencies: [
                 "BuildSettingsClient",
+                "DebugView",
                 "DeclarationExtractor",
                 "DeclarationObjectsClient",
                 "DependenciesClient",

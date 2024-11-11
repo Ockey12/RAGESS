@@ -1,9 +1,9 @@
 //
-//  File.swift
-//  
-//  
+//  SwiftIndexStoreClientDebugger.swift
+//
+//
 //  Created by Ockey12 on 2024/11/12
-//  
+//
 //
 
 import ComposableArchitecture
@@ -15,12 +15,15 @@ import SwiftUI
 public struct SwiftIndexStoreClientDebugger {
     @ObservableState
     public struct State {
-        var path: String
+        var indexStorePath: String
+        var projectRootPath: String
 
         public init(
-            path: String = "/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz/Index.noindex/DataStore"
+            indexStorePath: String = "/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz/Index.noindex/DataStore",
+            projectRootPath: String = "/Users/onaga/RAGESS"
         ) {
-            self.path = path
+            self.indexStorePath = indexStorePath
+            self.projectRootPath = projectRootPath
         }
     }
 
@@ -33,19 +36,19 @@ public struct SwiftIndexStoreClientDebugger {
         Reduce { state, action in
             switch action {
             case .executeButtonTapped:
-                guard let url = URL(string: state.path) else {
+                guard let indexStoreURL = URL(string: state.indexStorePath) else {
                     assertionFailure()
                     return .none
                 }
                 @Dependency(SwiftIndexStoreClient.self) var client
                 do {
                     let startTime = CFAbsoluteTimeGetCurrent()
-                    let definitions = try client.extractDefinitions(url)
+                    let definitions = try client.extractDefinitions(indexStoreURL, state.projectRootPath)
                     let endTime = CFAbsoluteTimeGetCurrent()
                     print("COMPLETE SwiftIndexStoreClient.extractDefinitions: \(endTime - startTime)S: \(definitions.count) definitions")
-//                    for definition in definitions {
-//                        print("| user = \(definition.usr) | location = \(definition.fullPath):\(definition.line):\(definition.column)")
-//                    }
+                    for definition in definitions {
+                        print("| user = \(definition.usr) | location = \(definition.fullPath):\(definition.line):\(definition.column)")
+                    }
                 } catch {
                     print(error)
                     assertionFailure()
@@ -83,8 +86,19 @@ public struct SwiftIndexStoreClientDebugView: View {
                 Spacer()
             }
 
-            TextField("Index Store path", text: $store.path)
-                .padding(.horizontal)
+            HStack {
+                Text("Index Store")
+                    .font(.system(size: 13))
+                TextField("Index Store path", text: $store.indexStorePath)
+                    .padding(.horizontal)
+            }
+
+            HStack {
+                Text("Project")
+                    .font(.system(size: 13))
+                TextField("project root path", text: $store.projectRootPath)
+                    .padding(.horizontal)
+            }
         }
         .padding()
     }

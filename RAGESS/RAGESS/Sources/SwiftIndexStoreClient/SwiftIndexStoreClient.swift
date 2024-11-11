@@ -1,9 +1,9 @@
 //
-//  File.swift
-//  
-//  
+//  SwiftIndexStoreClient.swift
+//
+//
 //  Created by Ockey12 on 2024/11/11
-//  
+//
 //
 
 import Dependencies
@@ -13,17 +13,20 @@ import SwiftIndexStore
 
 @DependencyClient
 public struct SwiftIndexStoreClient {
-    public var extractDefinitions: (_ indexStorePath: URL) throws -> [IndexStoreSymbol]
+    public var extractDefinitions: (_ indexStoreURL: URL, _ projectRootPath: String) throws -> [IndexStoreSymbol]
 }
 
 extension SwiftIndexStoreClient: DependencyKey {
     public static let liveValue: SwiftIndexStoreClient = .init(
-        extractDefinitions: { indexStorePath in
-            let indexStore = try IndexStore.open(store: indexStorePath, lib: .open())
+        extractDefinitions: { indexStoreURL, projectRootPath in
+            let indexStore = try IndexStore.open(store: indexStoreURL, lib: .open())
             var result = [IndexStoreSymbol]()
             try indexStore.forEachUnits { unit in
                 try indexStore.forEachRecordDependencies(for: unit) { dependency in
-                    guard case let .record(record) = dependency else {
+                    guard case let .record(record) = dependency,
+                          let recordPath = record.filePath,
+                          recordPath.starts(with: projectRootPath)
+                    else {
                         return true
                     }
                     try indexStore.forEachOccurrences(for: record) { occurrence in

@@ -93,9 +93,9 @@ public struct RAGESSReducer {
             SwiftDiagramTreeViewReducer()
         }
         #if DEBUG
-        Scope(state: \.debugView, action: \.debugView) {
-            DebugReducer()
-        }
+            Scope(state: \.debugView, action: \.debugView) {
+                DebugReducer()
+            }
         #endif
         Reduce { state, action in
             switch action {

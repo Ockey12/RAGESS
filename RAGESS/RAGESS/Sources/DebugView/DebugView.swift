@@ -28,9 +28,6 @@ public struct DebugReducer {
         Scope(state: \.swiftIndexStoreClientDebugger, action: \.swiftIndexStoreClientDebugger) {
             SwiftIndexStoreClientDebugger()
         }
-        Reduce { state, action in
-            return .none
-        }
     }
 }
 

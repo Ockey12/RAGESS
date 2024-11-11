@@ -29,8 +29,8 @@ public struct RAGESSView: View {
                     Divider()
 
                     #if DEBUG
-                    DebugView(store: store.scope(state: \.debugView, action: \.debugView))
-                    Divider()
+                        DebugView(store: store.scope(state: \.debugView, action: \.debugView))
+                        Divider()
                     #endif
 
                     if let _ = store.fileTree.rootDirectory {

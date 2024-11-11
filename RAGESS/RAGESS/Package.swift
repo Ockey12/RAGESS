@@ -204,6 +204,13 @@ let package = Package(
             ]
         ),
         .target(
+            name: "SwiftIndexStoreClient",
+            dependencies: [
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                .product(name: "SwiftIndexStore", package: "swift-indexstore")
+            ]
+        ),
+        .target(
             name: "TypeAnnotationClient",
             dependencies: [
                 "LSPClient",

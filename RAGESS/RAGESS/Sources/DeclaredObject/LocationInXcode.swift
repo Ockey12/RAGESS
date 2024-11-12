@@ -1,9 +1,9 @@
 //
-//  File.swift
-//  
-//  
+//  LocationInXcode.swift
+//
+//
 //  Created by Ockey12 on 2024/11/13
-//  
+//
 //
 
 public struct LocationInXcode: Equatable {

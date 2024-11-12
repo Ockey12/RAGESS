@@ -1,9 +1,9 @@
 //
-//  File.swift
-//  
-//  
+//  IndexStoreObject.swift
+//
+//
 //  Created by Ockey12 on 2024/11/13
-//  
+//
 //
 
 import DeclaredObject

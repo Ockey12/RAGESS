@@ -52,7 +52,9 @@ public struct SwiftIndexStoreClientDebugger {
                     print("COMPLETE SwiftIndexStoreClient.extractOccurrences: \(endTime - startTime)S: \(definitions.count) definitions")
                     if state.isPrintValid {
                         for definition in definitions {
-                            print("| \(definition.role.rawValue) | user = \(definition.usr) | location = \(definition.fullPath):\(definition.locationInXcode.line):\(definition.locationInXcode.column)")
+                            print(
+                                "| \(definition.role.rawValue) | user = \(definition.usr) | location = \(definition.fullPath):\(definition.locationInXcode.line):\(definition.locationInXcode.column)"
+                            )
                         }
                     }
                 } catch {

@@ -1,9 +1,9 @@
 //
-//  File.swift
-//  
-//  
+//  DeclaredObject.swift
+//
+//
 //  Created by Ockey12 on 2024/11/13
-//  
+//
 //
 
 import Dependencies
@@ -71,7 +71,7 @@ public struct DeclaredObject: Identifiable, Equatable {
     ) {
         self.usr = usr
         @Dependency(\.uuid) var uuid
-        self.id = uuid()
+        id = uuid()
         self.name = name
         self.nameOffset = nameOffset
         self.fullPath = fullPath

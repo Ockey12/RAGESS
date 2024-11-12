@@ -111,6 +111,12 @@ let package = Package(
             ]
         ),
         .target(
+            name: "DeclaredObject",
+            dependencies: [
+                .product(name: "Dependencies", package: "swift-dependencies")
+            ]
+        ),
+        .target(
             name: "DependenciesClient",
             dependencies: [
                 "SourceKitClient",

@@ -47,12 +47,12 @@ public struct SwiftIndexStoreClientDebugger {
                 @Dependency(SwiftIndexStoreClient.self) var client
                 do {
                     let startTime = CFAbsoluteTimeGetCurrent()
-                    let definitions = try client.extractDefinitions(indexStoreURL, state.projectRootPath)
+                    let definitions = try client.extractOccurrences(indexStoreURL, state.projectRootPath)
                     let endTime = CFAbsoluteTimeGetCurrent()
-                    print("COMPLETE SwiftIndexStoreClient.extractDefinitions: \(endTime - startTime)S: \(definitions.count) definitions")
+                    print("COMPLETE SwiftIndexStoreClient.extractOccurrences: \(endTime - startTime)S: \(definitions.count) definitions")
                     if state.isPrintValid {
                         for definition in definitions {
-                            print("| user = \(definition.usr) | location = \(definition.fullPath):\(definition.line):\(definition.column)")
+                            print("| \(definition.role.rawValue) | user = \(definition.usr) | location = \(definition.fullPath):\(definition.locationInXcode.line):\(definition.locationInXcode.column)")
                         }
                     }
                 } catch {
@@ -87,7 +87,7 @@ public struct SwiftIndexStoreClientDebugView: View {
                             .font(.system(size: 10))
                     }
                 )
-                Text("SwiftIndexStoreClient.extractDefinitions()")
+                Text("SwiftIndexStoreClient.extractOccurrences()")
                     .font(.system(size: 13))
             }
 

@@ -7,8 +7,8 @@
 //
 
 public struct LocationInXcode: Equatable {
-    let line: Int
-    let column: Int
+    public let line: Int
+    public let column: Int
 
     public init(line: Int, column: Int) {
         self.line = line

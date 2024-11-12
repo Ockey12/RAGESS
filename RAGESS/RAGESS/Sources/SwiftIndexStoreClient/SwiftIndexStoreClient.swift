@@ -6,6 +6,7 @@
 //
 //
 
+import DeclaredObject
 import Dependencies
 import DependenciesMacros
 import Foundation
@@ -13,14 +14,14 @@ import SwiftIndexStore
 
 @DependencyClient
 public struct SwiftIndexStoreClient {
-    public var extractDefinitions: (_ indexStoreURL: URL, _ projectRootPath: String) throws -> [IndexStoreSymbol]
+    public var extractOccurrences: (_ indexStoreURL: URL, _ projectRootPath: String) throws -> [IndexStoreObject]
 }
 
 extension SwiftIndexStoreClient: DependencyKey {
     public static let liveValue: SwiftIndexStoreClient = .init(
-        extractDefinitions: { indexStoreURL, projectRootPath in
+        extractOccurrences: { indexStoreURL, projectRootPath in
             let indexStore = try IndexStore.open(store: indexStoreURL, lib: .open())
-            var result = [IndexStoreSymbol]()
+            var result = [IndexStoreObject]()
             try indexStore.forEachUnits { unit in
                 try indexStore.forEachRecordDependencies(for: unit) { dependency in
                     guard case let .record(record) = dependency,
@@ -30,14 +31,22 @@ extension SwiftIndexStoreClient: DependencyKey {
                         return true
                     }
                     try indexStore.forEachOccurrences(for: record) { occurrence in
-                        guard occurrence.roles.contains(.definition),
+                        guard occurrence.roles.contains(.definition) || occurrence.roles.contains(.reference),
                               let usr = occurrence.symbol.usr,
                               let location = occurrence.location.path
                         else {
                             return true
                         }
+
+                        let role: IndexStoreObject.Role = if occurrence.roles.contains(.definition) {
+                            .definition
+                        } else {
+                            .reference
+                        }
+
                         result.append(.init(
                             usr: usr,
+                            role: role,
                             fullPath: location,
                             line: occurrence.location.line,
                             column: occurrence.location.column
@@ -51,18 +60,4 @@ extension SwiftIndexStoreClient: DependencyKey {
             return result
         }
     )
-}
-
-public struct IndexStoreSymbol {
-    public let usr: String
-    public let fullPath: String
-    public let line: Int
-    public let column: Int
-
-    public init(usr: String, fullPath: String, line: Int64, column: Int64) {
-        self.usr = usr
-        self.fullPath = fullPath
-        self.line = Int(line)
-        self.column = Int(column)
-    }
 }

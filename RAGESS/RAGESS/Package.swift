@@ -214,6 +214,7 @@ let package = Package(
         .target(
             name: "SwiftIndexStoreClient",
             dependencies: [
+                "DeclaredObject",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "SwiftIndexStore", package: "swift-indexstore")
             ]

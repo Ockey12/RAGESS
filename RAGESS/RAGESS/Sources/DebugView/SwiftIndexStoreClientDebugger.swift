@@ -17,13 +17,16 @@ public struct SwiftIndexStoreClientDebugger {
     public struct State {
         var indexStorePath: String
         var projectRootPath: String
+        var isPrintValid: Bool
 
         public init(
             indexStorePath: String = "/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz/Index.noindex/DataStore",
-            projectRootPath: String = "/Users/onaga/RAGESS"
+            projectRootPath: String = "/Users/onaga/RAGESS",
+            isPrintValid: Bool = false
         ) {
             self.indexStorePath = indexStorePath
             self.projectRootPath = projectRootPath
+            self.isPrintValid = isPrintValid
         }
     }
 
@@ -33,6 +36,7 @@ public struct SwiftIndexStoreClientDebugger {
     }
 
     public var body: some ReducerOf<Self> {
+        BindingReducer()
         Reduce { state, action in
             switch action {
             case .executeButtonTapped:
@@ -46,8 +50,10 @@ public struct SwiftIndexStoreClientDebugger {
                     let definitions = try client.extractDefinitions(indexStoreURL, state.projectRootPath)
                     let endTime = CFAbsoluteTimeGetCurrent()
                     print("COMPLETE SwiftIndexStoreClient.extractDefinitions: \(endTime - startTime)S: \(definitions.count) definitions")
-                    for definition in definitions {
-                        print("| user = \(definition.usr) | location = \(definition.fullPath):\(definition.line):\(definition.column)")
+                    if state.isPrintValid {
+                        for definition in definitions {
+                            print("| user = \(definition.usr) | location = \(definition.fullPath):\(definition.line):\(definition.column)")
+                        }
                     }
                 } catch {
                     print(error)
@@ -70,7 +76,7 @@ public struct SwiftIndexStoreClientDebugView: View {
     }
 
     public var body: some View {
-        VStack {
+        VStack(alignment: .leading) {
             HStack {
                 Button(
                     action: {
@@ -83,7 +89,11 @@ public struct SwiftIndexStoreClientDebugView: View {
                 )
                 Text("SwiftIndexStoreClient.extractDefinitions()")
                     .font(.system(size: 13))
-                Spacer()
+            }
+
+            Toggle(isOn: $store.isPrintValid) {
+                Text("Enable printing of results")
+                    .font(.system(size: 13))
             }
 
             HStack {

@@ -5,7 +5,6 @@
 //  Created by ockey12 on 2024/05/05.
 //
 
-import DeclaredObject
 import Dependencies
 import SourceKitClient
 import SwiftParser
@@ -14,25 +13,43 @@ import TypeDeclaration
 import XcodeObject
 
 public struct DeclarationExtractor {
+    typealias FullPath = String
+
     public init() {}
 
-    public func extractDeclarations(sourceCode: String, fullPath: String) -> SourceFileObject {
-        let parsedFile = Parser.parse(source: sourceCode)
+    private func extractDeclarations(directory: Directory) -> [FullPath: SourceFile] {
+        var sourceFilesTable = [FullPath: SourceFile]()
+
+        for sourceFile in directory.files {
+            let fileWithAddedObjects = extractDeclarations(sourceFile: sourceFile)
+            sourceFilesTable[fileWithAddedObjects.fullPath] = fileWithAddedObjects
+        }
+
+        for subDirectory in directory.subDirectories {
+            sourceFilesTable.merge(extractDeclarations(directory: subDirectory)) { current, _ in
+                    current
+            }
+        }
+
+        return sourceFilesTable
+    }
+
+    private func extractDeclarations(sourceFile: SourceFile) -> SourceFile {
+        let parsedFile = Parser.parse(source: sourceFile.sourceCode)
         let visitor = DeclarationVisitor(
-            in: fullPath,
+            in: sourceFile.fullPath,
             locatonConverter: SourceLocationConverter(
-                fileName: fullPath,
+                fileName: sourceFile.fullPath,
                 tree: parsedFile
             )
         )
 
         visitor.walk(Syntax(parsedFile))
 
-        return SourceFileObject(
-            fullPath: fullPath,
-            sourceCode: sourceCode,
-            declaredObjects: visitor.extractedDeclarations
-        )
+        var result = sourceFile
+        result.declaredObjects = visitor.extractedDeclarations
+
+        return result
     }
 
     public func extractDeclarations(

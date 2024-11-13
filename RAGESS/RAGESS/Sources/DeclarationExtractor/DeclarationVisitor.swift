@@ -61,9 +61,10 @@ final class DeclarationVisitor: SyntaxVisitor {
             print("- \(buffer.map { $0.name })")
         #endif
 
-        guard let lastItem = buffer.popLast(),
-              let currentProtocol = lastItem as? ProtocolObject else {
-            fatalError("The type of the last element of buffer is not a \(ProtocolObject.self).")
+        guard let currentProtocol = buffer.popLast(),
+              currentProtocol.kind == .protocol
+        else {
+            fatalError("The type of the last element of buffer is not a protocol.")
         }
 
         #if DEBUG
@@ -72,9 +73,8 @@ final class DeclarationVisitor: SyntaxVisitor {
 
         if buffer.count >= 1 {
             // If there is an element in the buffer, the last element in the buffer is the parent of this.
-            guard let lastItem = buffer.popLast(),
-                  var protocolOwner = lastItem as? any TypeNestable else {
-                fatalError("The type of the last element of buffer does not conform to TypeNestable.")
+            guard var protocolOwner = buffer.popLast() else {
+                fatalError("The buffer is empty.")
             }
             #if DEBUG
                 print("buffer[\(buffer.count)].nestingProtocols.append(\(currentProtocol.name))")
@@ -133,9 +133,10 @@ final class DeclarationVisitor: SyntaxVisitor {
             print("- \(buffer.map { $0.name })")
         #endif
 
-        guard let lastItem = buffer.popLast(),
-              let currentStruct = lastItem as? StructObject else {
-            fatalError("The type of the last element of buffer is not a \(StructObject.self).")
+        guard let currentStruct = buffer.popLast(),
+              currentStruct.kind == .struct
+        else {
+            fatalError("The type of the last element of buffer is not a struct.")
         }
 
         #if DEBUG
@@ -144,15 +145,14 @@ final class DeclarationVisitor: SyntaxVisitor {
 
         if buffer.count >= 1 {
             // If there is an element in the buffer, the last element in the buffer is the parent of this.
-            guard let owner = buffer.popLast(),
-                  var ownerTypeObject = owner as? any TypeNestable else {
-                fatalError("The type of the last element of buffer does not conform to TypeNestable.")
+            guard var structOwner = buffer.popLast() else {
+                fatalError("The buffer is empty.")
             }
             #if DEBUG
                 print("buffer[\(buffer.count)].nestingStructs.append(\(currentStruct.name))")
             #endif
-            ownerTypeObject.nestingStructs.append(currentStruct)
-            buffer.append(ownerTypeObject)
+            structOwner.nestingStructs.append(currentStruct)
+            buffer.append(structOwner)
         } else {
             #if DEBUG
                 print("extractedDeclarations.append(\(currentStruct.name))")
@@ -205,9 +205,8 @@ final class DeclarationVisitor: SyntaxVisitor {
             print("- \(buffer.map { $0.name })")
         #endif
 
-        guard let lastItem = buffer.popLast(),
-              let currentClass = lastItem as? ClassObject else {
-            fatalError("The type of the last element of buffer is not a \(ClassObject.self).")
+        guard let currentClass = buffer.popLast() else {
+            fatalError("The type of the last element of buffer is not a class.")
         }
 
         #if DEBUG
@@ -216,15 +215,14 @@ final class DeclarationVisitor: SyntaxVisitor {
 
         if buffer.count >= 1 {
             // If there is an element in the buffer, the last element in the buffer is the parent of this.
-            guard let owner = buffer.popLast(),
-                  var ownerTypeObject = owner as? any TypeNestable else {
-                fatalError("The type of the last element of buffer does not conform to TypeNestable.")
+            guard var classOwner = buffer.popLast() else {
+                fatalError("The buffer is empty.")
             }
             #if DEBUG
                 print("buffer[\(buffer.count)].nestingClasses.append(\(currentClass.name))")
             #endif
-            ownerTypeObject.nestingClasses.append(currentClass)
-            buffer.append(ownerTypeObject)
+            classOwner.nestingClasses.append(currentClass)
+            buffer.append(classOwner)
         } else {
             #if DEBUG
                 print("extractedDeclarations.append(\(currentClass.name))")
@@ -276,9 +274,10 @@ final class DeclarationVisitor: SyntaxVisitor {
             print("- \(buffer.map { $0.name })")
         #endif
 
-        guard let lastItem = buffer.popLast(),
-              let currentEnum = lastItem as? EnumObject else {
-            fatalError("The type of the last element of buffer is not a \(EnumObject.self).")
+        guard let currentEnum = buffer.popLast(),
+              currentEnum.kind == .enum
+        else {
+            fatalError("The type of the last element of buffer is not a enum.")
         }
 
         #if DEBUG
@@ -287,15 +286,14 @@ final class DeclarationVisitor: SyntaxVisitor {
 
         if buffer.count >= 1 {
             // If there is an element in the buffer, the last element in the buffer is the parent of this.
-            guard let owner = buffer.popLast(),
-                  var ownerTypeObject = owner as? any TypeNestable else {
-                fatalError("The type of the last element of buffer does not conform to TypeNestable.")
+            guard var enumOwner = buffer.popLast() else {
+                fatalError("The buffer is empty.")
             }
             #if DEBUG
                 print("buffer[\(buffer.count)].nestingEnums.append(\(currentEnum.name))")
             #endif
-            ownerTypeObject.nestingEnums.append(currentEnum)
-            buffer.append(ownerTypeObject)
+            enumOwner.nestingEnums.append(currentEnum)
+            buffer.append(enumOwner)
         } else {
             #if DEBUG
                 print("extractedDeclarations.append(\(currentEnum.name))")
@@ -347,9 +345,10 @@ final class DeclarationVisitor: SyntaxVisitor {
             print("- \(buffer.map { $0.name })")
         #endif
 
-        guard let lastItem = buffer.popLast(),
-              let currentActor = lastItem as? ActorObject else {
-            fatalError("The type of the last element of buffer is not a \(ActorObject.self).")
+        guard let currentActor = buffer.popLast(),
+              currentActor.kind == .actor
+        else {
+            fatalError("The type of the last element of buffer is not a actor.")
         }
 
         #if DEBUG
@@ -358,15 +357,14 @@ final class DeclarationVisitor: SyntaxVisitor {
 
         if buffer.count >= 1 {
             // If there is an element in the buffer, the last element in the buffer is the parent of this.
-            guard let owner = buffer.popLast(),
-                  var ownerTypeObject = owner as? any TypeNestable else {
-                fatalError("The type of the last element of buffer does not conform to TypeNestable.")
+            guard var actorOwner = buffer.popLast() else {
+                fatalError("The buffer is empty.")
             }
             #if DEBUG
                 print("buffer[\(buffer.count)].nestingActors.append(\(currentActor.name)")
             #endif
-            ownerTypeObject.nestingActors.append(currentActor)
-            buffer.append(ownerTypeObject)
+            actorOwner.nestingActors.append(currentActor)
+            buffer.append(actorOwner)
         } else {
             #if DEBUG
                 print("extractedDeclarations.append(\(currentActor.name))")
@@ -420,9 +418,10 @@ final class DeclarationVisitor: SyntaxVisitor {
             print("- \(buffer.map { $0.name })")
         #endif
 
-        guard let lastItem = buffer.popLast(),
-              let currentInitializer = lastItem as? InitializerObject else {
-            fatalError("The type of the last element of buffer is not a \(InitializerObject.self).")
+        guard let currentInitializer = buffer.popLast(),
+              currentInitializer.kind == .initializer
+        else {
+            fatalError("The type of the last element of buffer is not a initializer.")
         }
 
         #if DEBUG
@@ -431,15 +430,14 @@ final class DeclarationVisitor: SyntaxVisitor {
 
         if buffer.count >= 1 {
             // If there is an element in the buffer, the last element in the buffer is the parent of this.
-            guard let lastItem = buffer.popLast(),
-                  var ownerObject = lastItem as? any Initializable else {
-                fatalError("The type of the last element of buffer does not conform to Initializable.")
+            guard var initializerOwner = buffer.popLast() else {
+                fatalError("The buffer is empty.")
             }
             #if DEBUG
                 print("buffer[\(buffer.count)].functions.append(\(currentInitializer.name))")
             #endif
-            ownerObject.initializers.append(currentInitializer)
-            buffer.append(ownerObject)
+            initializerOwner.initializers.append(currentInitializer)
+            buffer.append(initializerOwner)
         } else {
             fatalError("Cannot find the holder of the initializer.")
         }
@@ -497,9 +495,10 @@ final class DeclarationVisitor: SyntaxVisitor {
             print("- \(buffer.map { $0.name })")
         #endif
 
-        guard let lastItem = buffer.popLast(),
-              let currentVariable = lastItem as? VariableObject else {
-            fatalError("The type of the last element of buffer is not a \(VariableObject.self).")
+        guard let currentVariable = buffer.popLast(),
+              currentVariable.kind == .variable
+        else {
+            fatalError("The type of the last element of buffer is not a variable.")
         }
 
         #if DEBUG
@@ -508,14 +507,14 @@ final class DeclarationVisitor: SyntaxVisitor {
 
         if buffer.count >= 1 {
             // If there is an element in the buffer, the last element in the buffer is the parent of this.
-            guard var ownerObject = buffer.popLast() else {
-                fatalError("The type of the last element of buffer does not conform to DeclarationObject.")
+            guard var variableOwner = buffer.popLast() else {
+                fatalError("The buffer is empty.")
             }
             #if DEBUG
                 print("buffer[\(buffer.count)].variables.append(\(currentVariable.name))")
             #endif
-            ownerObject.variables.append(currentVariable)
-            buffer.append(ownerObject)
+            variableOwner.variables.append(currentVariable)
+            buffer.append(variableOwner)
         } else {
             #if DEBUG
                 print("extractedDeclarations.append(\(currentVariable.name))")
@@ -568,9 +567,10 @@ final class DeclarationVisitor: SyntaxVisitor {
             print("- \(buffer.map { $0.name })")
         #endif
 
-        guard let lastItem = buffer.popLast(),
-              let currentFunction = lastItem as? FunctionObject else {
-            fatalError("The type of the last element of buffer is not a \(FunctionObject.self).")
+        guard let currentFunction = buffer.popLast(),
+              currentFunction.kind == .function
+        else {
+            fatalError("The type of the last element of buffer is not a function.")
         }
 
         #if DEBUG
@@ -579,14 +579,14 @@ final class DeclarationVisitor: SyntaxVisitor {
 
         if buffer.count >= 1 {
             // If there is an element in the buffer, the last element in the buffer is the parent of this.
-            guard var ownerObject = buffer.popLast() else {
-                fatalError("The type of the last element of buffer does not conform to DeclarationObject.")
+            guard var functionOwner = buffer.popLast() else {
+                fatalError("The buffer is empty.")
             }
             #if DEBUG
                 print("buffer[\(buffer.count)].functions.append(\(currentFunction.name))")
             #endif
-            ownerObject.functions.append(currentFunction)
-            buffer.append(ownerObject)
+            functionOwner.functions.append(currentFunction)
+            buffer.append(functionOwner)
         } else {
             #if DEBUG
                 print("extractedDeclarations.append(\(currentFunction.name))")
@@ -648,7 +648,7 @@ final class DeclarationVisitor: SyntaxVisitor {
 }
 
 extension DeclarationVisitor {
-    private func appendToBuffer(_ object: any DeclarationObject) {
+    private func appendToBuffer(_ object: DeclaredObject) {
         #if DEBUG
             print("buffer.append(\(object.name))")
             print("- \(buffer.map { $0.name })")

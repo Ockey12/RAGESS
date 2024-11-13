@@ -93,6 +93,7 @@ let package = Package(
         .target(
             name: "DeclarationExtractor",
             dependencies: [
+                "DeclaredObject",
                 "SourceKitClient",
                 "TypeDeclaration",
                 "XcodeObject",

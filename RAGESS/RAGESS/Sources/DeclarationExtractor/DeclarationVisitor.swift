@@ -5,13 +5,13 @@
 //  Created by ockey12 on 2024/05/05.
 //
 
+import DeclaredObject
 import SwiftSyntax
-import TypeDeclaration
 
 final class DeclarationVisitor: SyntaxVisitor {
     let fullPath: String
-    private(set) var extractedDeclarations: [any DeclarationObject] = []
-    private var buffer: [any DeclarationObject] = []
+    private(set) var extractedDeclarations: [DeclaredObject] = []
+    private var buffer: [DeclaredObject] = []
 
     private let locationConverter: SourceLocationConverter
 
@@ -27,23 +27,19 @@ final class DeclarationVisitor: SyntaxVisitor {
         #if DEBUG
             print("\nvisit(ProtocolDeclSyntax(\(node.name.text)))")
         #endif
-        let positionRange = node.sourceRange(converter: locationConverter)
+        let locationRange = node.sourceRange(converter: locationConverter)
+        let rangeInXcode = LocationInXcode(line: locationRange.start.line, column: locationRange.start.column)
+            ... LocationInXcode(line: locationRange.end.line, column: locationRange.end.column)
         let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
-        let currentProtocol = ProtocolObject(
+        let currentProtocol = DeclaredObject(
             name: node.name.text,
             nameOffset: node.name.trimmedByteRange.offset,
             fullPath: fullPath,
             sourceCode: trimSourceCode(node.description),
-            positionRange: SourcePosition(
-                line: positionRange.start.line,
-                utf8index: positionRange.start.column
-            )
-                ... SourcePosition(
-                    line: positionRange.end.line,
-                    utf8index: positionRange.end.column
-                ),
-            offsetRange: offsetRange
+            rangeInXcode: rangeInXcode,
+            offsetRange: offsetRange,
+            kind: .protocol
         )
 
         appendToBuffer(currentProtocol)
@@ -103,23 +99,19 @@ final class DeclarationVisitor: SyntaxVisitor {
         #if DEBUG
             print("\nvisit(StructDeclSyntax(\(node.name.text)))")
         #endif
-        let positionRange = node.sourceRange(converter: locationConverter)
+        let locationRange = node.sourceRange(converter: locationConverter)
+        let rangeInXcode = LocationInXcode(line: locationRange.start.line, column: locationRange.start.column)
+        ... LocationInXcode(line: locationRange.end.line, column: locationRange.end.column)
         let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
-        let currentStruct = StructObject(
+        let currentStruct = DeclaredObject(
             name: node.name.text,
             nameOffset: node.name.trimmedByteRange.offset,
             fullPath: fullPath,
             sourceCode: trimSourceCode(node.description),
-            positionRange: SourcePosition(
-                line: positionRange.start.line,
-                utf8index: positionRange.start.column
-            )
-                ... SourcePosition(
-                    line: positionRange.end.line,
-                    utf8index: positionRange.end.column
-                ),
-            offsetRange: offsetRange
+            rangeInXcode: rangeInXcode,
+            offsetRange: offsetRange,
+            kind: .struct
         )
 
         appendToBuffer(currentStruct)
@@ -179,23 +171,19 @@ final class DeclarationVisitor: SyntaxVisitor {
         #if DEBUG
             print("\nvisit(ClassDeclSyntax(\(node.name.text)))")
         #endif
-        let positionRange = node.sourceRange(converter: locationConverter)
+        let locationRange = node.sourceRange(converter: locationConverter)
+        let rangeInXcode = LocationInXcode(line: locationRange.start.line, column: locationRange.start.column)
+            ... LocationInXcode(line: locationRange.end.line, column: locationRange.end.column)
         let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
-        let currentClass = ClassObject(
+        let currentClass = DeclaredObject(
             name: node.name.text,
             nameOffset: node.name.trimmedByteRange.offset,
             fullPath: fullPath,
             sourceCode: trimSourceCode(node.description),
-            positionRange: SourcePosition(
-                line: positionRange.start.line,
-                utf8index: positionRange.start.column
-            )
-                ... SourcePosition(
-                    line: positionRange.end.line,
-                    utf8index: positionRange.end.column
-                ),
-            offsetRange: offsetRange
+            rangeInXcode: rangeInXcode,
+            offsetRange: offsetRange,
+            kind: .class
         )
 
         appendToBuffer(currentClass)
@@ -255,23 +243,19 @@ final class DeclarationVisitor: SyntaxVisitor {
         #if DEBUG
             print("\nvisit(EnumDeclSyntax(\(node.name.text)))")
         #endif
-        let positionRange = node.sourceRange(converter: locationConverter)
+        let locationRange = node.sourceRange(converter: locationConverter)
+        let rangeInXcode = LocationInXcode(line: locationRange.start.line, column: locationRange.start.column)
+            ... LocationInXcode(line: locationRange.end.line, column: locationRange.end.column)
         let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
-        let currentEnum = EnumObject(
+        let currentEnum = DeclaredObject(
             name: node.name.text,
             nameOffset: node.name.trimmedByteRange.offset,
             fullPath: fullPath,
             sourceCode: trimSourceCode(node.description),
-            positionRange: SourcePosition(
-                line: positionRange.start.line,
-                utf8index: positionRange.start.column
-            )
-                ... SourcePosition(
-                    line: positionRange.end.line,
-                    utf8index: positionRange.end.column
-                ),
-            offsetRange: offsetRange
+            rangeInXcode: rangeInXcode,
+            offsetRange: offsetRange,
+            kind: .enum
         )
 
         appendToBuffer(currentEnum)
@@ -330,22 +314,19 @@ final class DeclarationVisitor: SyntaxVisitor {
         #if DEBUG
             print("\nvisit(ActorDeclSyntax(\(node.name.text))")
         #endif
-        let positionRange = node.sourceRange(converter: locationConverter)
+        let locationRange = node.sourceRange(converter: locationConverter)
+        let rangeInXcode = LocationInXcode(line: locationRange.start.line, column: locationRange.start.column)
+            ... LocationInXcode(line: locationRange.end.line, column: locationRange.end.column)
         let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
-        let currentActor = ActorObject(
+        let currentActor = DeclaredObject(
             name: node.name.text,
             nameOffset: node.name.trimmedByteRange.offset,
             fullPath: fullPath,
-            positionRange: SourcePosition(
-                line: positionRange.start.line,
-                utf8index: positionRange.start.column
-            )
-                ... SourcePosition(
-                    line: positionRange.end.line,
-                    utf8index: positionRange.end.column
-                ),
-            offsetRange: offsetRange
+            sourceCode: trimSourceCode(node.description),
+            rangeInXcode: rangeInXcode,
+            offsetRange: offsetRange,
+            kind: .actor
         )
 
         appendToBuffer(currentActor)
@@ -404,23 +385,20 @@ final class DeclarationVisitor: SyntaxVisitor {
         #if DEBUG
             print("\nvisit(InitializerDeclSyntax(\(node.description)))")
         #endif
-        let positionRange = node.sourceRange(converter: locationConverter)
+        let locationRange = node.sourceRange(converter: locationConverter)
+
+        let rangeInXcode = LocationInXcode(line: locationRange.start.line, column: locationRange.start.column)
+            ... LocationInXcode(line: locationRange.end.line, column: locationRange.end.column)
         let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
-        let currentInitializer = InitializerObject(
+        let currentInitializer = DeclaredObject(
             name: "init",
             nameOffset: node.initKeyword.trimmedByteRange.offset,
             fullPath: fullPath,
             sourceCode: trimSourceCode(node.description),
-            positionRange: SourcePosition(
-                line: positionRange.start.line,
-                utf8index: positionRange.start.column
-            )
-                ... SourcePosition(
-                    line: positionRange.end.line,
-                    utf8index: positionRange.end.column
-                ),
-            offsetRange: offsetRange
+            rangeInXcode: rangeInXcode,
+            offsetRange: offsetRange,
+            kind: .initializer
         )
 
         appendToBuffer(currentInitializer)
@@ -482,10 +460,12 @@ final class DeclarationVisitor: SyntaxVisitor {
             return .visitChildren
         }
 
-        let positionRange = node.sourceRange(converter: locationConverter)
+        let locationRange = node.sourceRange(converter: locationConverter)
+        let rangeInXcode = LocationInXcode(line: locationRange.start.line, column: locationRange.start.column)
+            ... LocationInXcode(line: locationRange.end.line, column: locationRange.end.column)
         let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
-        let currentVariable = VariableObject(
+        let currentVariable = DeclaredObject(
             // FIXME: This element does not necessarily represent the name of the variable.
             // For example, in the case of Tuple Decomposition, the tuple would be the name of the variable.
             // When `let (a, b, c) = (0, 1, 2)`, the variable name becomes “(a, b, c)”.
@@ -493,15 +473,9 @@ final class DeclarationVisitor: SyntaxVisitor {
             nameOffset: array[0].pattern.trimmed.trimmedByteRange.offset,
             fullPath: fullPath,
             sourceCode: trimSourceCode(node.description),
-            positionRange: SourcePosition(
-                line: positionRange.start.line,
-                utf8index: positionRange.start.column
-            )
-                ... SourcePosition(
-                    line: positionRange.end.line,
-                    utf8index: positionRange.end.column
-                ),
-            offsetRange: offsetRange
+            rangeInXcode: rangeInXcode,
+            offsetRange: offsetRange,
+            kind: .variable
         )
 
         appendToBuffer(currentVariable)
@@ -560,23 +534,19 @@ final class DeclarationVisitor: SyntaxVisitor {
         #if DEBUG
             print("\nvisit(FunctionDeclSyntax(\(node.name.text)))")
         #endif
-        let positionRange = node.sourceRange(converter: locationConverter)
+        let locationRange = node.sourceRange(converter: locationConverter)
+        let rangeInXcode = LocationInXcode(line: locationRange.start.line, column: locationRange.start.column)
+            ... LocationInXcode(line: locationRange.end.line, column: locationRange.end.column)
         let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
-        let currentFunction = FunctionObject(
+        let currentFunction = DeclaredObject(
             name: node.name.text,
             nameOffset: node.name.trimmedByteRange.offset,
             fullPath: fullPath,
             sourceCode: trimSourceCode(node.description),
-            positionRange: SourcePosition(
-                line: positionRange.start.line,
-                utf8index: positionRange.start.column
-            )
-                ... SourcePosition(
-                    line: positionRange.end.line,
-                    utf8index: positionRange.end.column
-                ),
-            offsetRange: offsetRange
+            rangeInXcode: rangeInXcode,
+            offsetRange: offsetRange,
+            kind: .function
         )
 
         appendToBuffer(currentFunction)
@@ -640,31 +610,30 @@ final class DeclarationVisitor: SyntaxVisitor {
 
         #endif
 
-        let positionRange = node.sourceRange(converter: locationConverter)
+        let locationRange = node.sourceRange(converter: locationConverter)
+        let rangeInXcode = LocationInXcode(line: locationRange.start.line, column: locationRange.start.column)
+            ... LocationInXcode(line: locationRange.end.line, column: locationRange.end.column)
         let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
-        let currentCase = EnumObject.CaseObject(
+        let currentCase = DeclaredObject(
+            // FIXME: Extract the actual case name.
+            name: "case",
             nameOffset: node.elements.trimmedByteRange.offset,
             fullPath: fullPath,
             sourceCode: trimSourceCode(node.description),
-            positionRange: SourcePosition(
-                line: positionRange.start.line,
-                utf8index: positionRange.start.column
-            )
-                ... SourcePosition(
-                    line: positionRange.end.line,
-                    utf8index: positionRange.end.column
-                ),
-            offsetRange: offsetRange
+            rangeInXcode: rangeInXcode,
+            offsetRange: offsetRange,
+            kind: .case
         )
 
         guard !buffer.isEmpty else {
             fatalError("The buffer is empty.")
         }
 
-        guard let lastItem = buffer.popLast(),
-              var enumObject = lastItem as? EnumObject else {
-            fatalError("The type of the last element of buffer is not a \(EnumObject.self).")
+        guard var enumObject = buffer.popLast(),
+              enumObject.kind == .enum
+        else {
+            fatalError("The type of the last element of buffer is not a enum.")
         }
 
         enumObject.cases.append(currentCase)

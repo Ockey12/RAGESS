@@ -9,12 +9,13 @@ import Foundation
 
 public struct Directory: Identifiable {
     public var id: String {
-        path
+        fullPath
     }
 
-    public let path: String
+    public let fullPath: String
+    public let keyPathFromRootDirectory: WritableKeyPath<Self, Self>
     public var name: String {
-        NSString(string: path).lastPathComponent
+        NSString(string: fullPath).lastPathComponent
     }
 
     public let subDirectories: [Self]
@@ -38,13 +39,15 @@ public struct Directory: Identifiable {
     public var descriptionJSONString: String?
 
     public init(
-        path: String,
+        fullPath: String,
+        keyPathFromRootDirectory: WritableKeyPath<Self, Self>,
         subDirectories: [Self],
         files: [SourceFile],
         xcodeprojPaths: [String] = [],
         packageSwiftPath: String? = nil
     ) {
-        self.path = path
+        self.fullPath = fullPath
+        self.keyPathFromRootDirectory = keyPathFromRootDirectory
         self.subDirectories = subDirectories
         self.files = files
         self.xcodeprojPaths = xcodeprojPaths

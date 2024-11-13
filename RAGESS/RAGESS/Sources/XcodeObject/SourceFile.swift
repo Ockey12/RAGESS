@@ -13,7 +13,8 @@ public struct SourceFile: Identifiable {
         fullPath
     }
 
-    public var fullPath: String
+    public let fullPath: String
+    public let keyPathFromRootDirectory: WritableKeyPath<Directory, Self>
     public var name: String {
         NSString(string: fullPath).lastPathComponent
     }
@@ -23,10 +24,12 @@ public struct SourceFile: Identifiable {
 
     public init(
         fullPath: String,
+        keyPathFromRootDirectory: WritableKeyPath<Directory, Self>,
         sourceCode: String,
         declaredObjects: [DeclaredObject] = []
     ) {
         self.fullPath = fullPath
+        self.keyPathFromRootDirectory = keyPathFromRootDirectory
         self.sourceCode = sourceCode
         self.declaredObjects = declaredObjects
     }

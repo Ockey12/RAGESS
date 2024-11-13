@@ -20,7 +20,11 @@ public struct SourceFileClient {
 
 extension SourceFileClient: DependencyKey {
     public static let liveValue: Self = {
-        @Sendable func getDirectories(rootPath: String, ignoredDirectories: [String]) -> Directory {
+        @Sendable func getDirectories(
+            rootPath: String,
+            keyPathFromRootDirectory: WritableKeyPath<Directory, Directory>,
+            ignoredDirectories: [String]
+        ) -> Directory {
             let fileManager = FileManager.default
             print(rootPath)
 
@@ -32,9 +36,16 @@ extension SourceFileClient: DependencyKey {
             var isDirectory: ObjCBool = false
 
             guard let paths = try? fileManager.contentsOfDirectory(atPath: rootPath) else {
-                return Directory(path: rootPath, subDirectories: [], files: [])
+                return Directory(
+                    fullPath: rootPath,
+                    keyPathFromRootDirectory: keyPathFromRootDirectory,
+                    subDirectories: [],
+                    files: []
+                )
             }
 
+            var subDirectoryIndex = 0
+            var fileIndex = 0
             for path in paths {
                 let fullPath = NSString(string: rootPath).appendingPathComponent(path)
                 guard fileManager.fileExists(atPath: fullPath, isDirectory: &isDirectory) else {
@@ -50,13 +61,31 @@ extension SourceFileClient: DependencyKey {
                         continue
                     }
 
-                    let subDirectory = getDirectories(rootPath: fullPath, ignoredDirectories: ignoredDirectories)
+                    guard let keyPath = keyPathFromRootDirectory.appending(path: \Directory.subDirectories[subDirectoryIndex])
+                            as? WritableKeyPath<Directory, Directory> else {
+                        continue
+                    }
+                    subDirectoryIndex += 1
+                    let subDirectory = getDirectories(
+                        rootPath: fullPath,
+                        keyPathFromRootDirectory: keyPath,
+                        ignoredDirectories: ignoredDirectories
+                    )
                     subDirectories.append(subDirectory)
                 } else if path.hasSuffix(".swift") {
                     guard let content = try? String(contentsOfFile: fullPath) else {
                         continue
                     }
-                    let file = SourceFile(path: fullPath, content: content)
+                    guard let keyPath = keyPathFromRootDirectory.appending(path: \Directory.files[fileIndex])
+                            as? WritableKeyPath<Directory, SourceFile> else {
+                        continue
+                    }
+                    fileIndex += 1
+                    let file = SourceFile(
+                        fullPath: fullPath,
+                        keyPathFromRootDirectory: keyPath,
+                        sourceCode: content
+                    )
                     files.append(file)
 
                     if file.name == "Package.swift" {
@@ -66,7 +95,8 @@ extension SourceFileClient: DependencyKey {
             }
 
             return Directory(
-                path: rootPath,
+                fullPath: rootPath,
+                keyPathFromRootDirectory: \Directory.self,
                 subDirectories: subDirectories.sorted { $0.name < $1.name },
                 files: files.sorted { $0.name < $1.name },
                 xcodeprojPaths: xcodeprojPaths,
@@ -80,6 +110,7 @@ extension SourceFileClient: DependencyKey {
                     let startTime = CFAbsoluteTimeGetCurrent()
                     let directory = getDirectories(
                         rootPath: rootDirectoryPath,
+                        keyPathFromRootDirectory: \Directory.self,
                         ignoredDirectories: ignoredDirectories
                     )
                     let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime

@@ -65,8 +65,8 @@ public struct TypeAnnotationDebugView: View {
         ScrollView {
             HStack {
                 VStack(alignment: .leading) {
-                    Text("File Path: \(store.sourceFile.path)")
-                    Text(store.sourceFile.content)
+                    Text("File Path: \(store.sourceFile.fullPath)")
+                    Text(store.sourceFile.sourceCode)
                         .padding()
                         .foregroundStyle(.white)
                         .background(.black)

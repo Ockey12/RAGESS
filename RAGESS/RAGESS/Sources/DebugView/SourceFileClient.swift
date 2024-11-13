@@ -149,12 +149,12 @@ public struct SourceFileClientDebugView: View {
                     if let file = store.selectedFile {
                         VStack {
                             HStack {
-                                Text(file.path)
+                                Text(file.fullPath)
                                 Spacer()
                             }
                             ScrollView {
                                 HStack {
-                                    Text(file.content)
+                                    Text(file.sourceCode)
                                         .foregroundStyle(.white)
                                     Spacer()
                                 }

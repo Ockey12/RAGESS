@@ -87,8 +87,8 @@ extension SourceFileClient: DependencyKey {
                     var numberOfLines = printDirectoryContents(directory)
 
                     print("")
-                    for path in directory.allXcodeprojPathsUnderDirectory {
-                        print(path)
+                    for fullPath in directory.allXcodeprojPathsUnderDirectory {
+                        print(fullPath)
                     }
                     print("")
 
@@ -115,7 +115,7 @@ extension SourceFileClient: DependencyKey {
         static func printDirectoryContents(_ directory: Directory) -> Int {
             var numberOfLines = 0
             print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
-            print(directory.path)
+            print(directory.fullPath)
             print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
 
             if let description = directory.descriptionJSONString {
@@ -127,8 +127,8 @@ extension SourceFileClient: DependencyKey {
             }
 
             for sourceFile in directory.files {
-                print("*** \(sourceFile.path) ***")
-                let lines = sourceFile.content.components(separatedBy: "\n")
+                print("*** \(sourceFile.fullPath) ***")
+                let lines = sourceFile.sourceCode.components(separatedBy: "\n")
                 numberOfLines += lines.count
                 for line in lines {
                     print(line)

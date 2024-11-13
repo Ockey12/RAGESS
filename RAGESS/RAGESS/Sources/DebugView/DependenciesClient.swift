@@ -51,7 +51,7 @@ public struct DependenciesClientDebugger {
             case .getDependenciesTapped:
                 state.declarationObjects = []
                 let extractor = DeclarationExtractor()
-                let allSourceFilePaths = state.allSourceFiles.map { $0.path }
+                let allSourceFilePaths = state.allSourceFiles.map { $0.fullPath }
                 return .run {
                     [
                         allSourceFiles = state.allSourceFiles,

@@ -107,7 +107,7 @@ public struct RAGESSReducer {
 
                 #if DEBUG
                     print("Successfully get project root directory path.")
-                    print("╰─\(url.path())")
+                    print("╰─\(url.fullPath())")
                 #endif
 
                 state.projectRootDirectoryPath = url.path()
@@ -375,7 +375,7 @@ extension RAGESSReducer {
     }
 
     func getAllSwiftFilePaths(in directory: Directory) -> [String] {
-        var swiftFilePaths: [String] = directory.files.map { $0.path }
+        var swiftFilePaths: [String] = directory.files.map { $0.fullPath }
         for subDirectory in directory.subDirectories {
             swiftFilePaths.append(contentsOf: getAllSwiftFilePaths(in: subDirectory))
         }
@@ -388,7 +388,7 @@ extension RAGESSReducer {
         packages: [PackageObject]
     ) async -> [any DeclarationObject] {
         var declarationObjects: [any DeclarationObject] = []
-        let allSourceFilePaths = allSourceFiles.map { $0.path }
+        let allSourceFilePaths = allSourceFiles.map { $0.fullPath }
         let extractor = DeclarationExtractor()
 
         for sourceFile in allSourceFiles {

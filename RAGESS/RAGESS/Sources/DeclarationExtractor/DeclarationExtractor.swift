@@ -41,18 +41,18 @@ public struct DeclarationExtractor {
         sourceFilePaths: [String],
         packages: [PackageObject]
     ) async -> [any DeclarationObject] {
-        let parsedFile = Parser.parse(source: sourceFile.content)
+        let parsedFile = Parser.parse(source: sourceFile.sourceCode)
 
         #if DEBUG
             print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
-            print("PATH: \(sourceFile.path)")
+            print("PATH: \(sourceFile.fullPath)")
             print(parsedFile.debugDescription)
         #endif
 
         let visitor = DeclarationVisitor(
-            in: sourceFile.path,
+            in: sourceFile.fullPath,
             locatonConverter: SourceLocationConverter(
-                fileName: sourceFile.path,
+                fileName: sourceFile.fullPath,
                 tree: parsedFile
             )
         )

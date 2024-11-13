@@ -23,7 +23,7 @@ extension TypeAnnotationClient: DependencyKey {
 
         return .init(
             setTypeAnnotations: { sourceFile in
-                let lastPosition = sourceFile.content.lastPosition
+                let lastPosition = sourceFile.sourceCode.lastPosition
                 let range = Position(line: 0, utf16index: 0) ..< lastPosition
                 let inlayHints = try await lspClient.sendInlayHintRequest(sourceFile: sourceFile, range: range)
                 let typeAnnotations = inlayHints.filter { $0.kind == .type }
@@ -32,7 +32,7 @@ extension TypeAnnotationClient: DependencyKey {
                     print("\nType Annotations")
                     dump(typeAnnotations)
                 #endif
-                var annotatedCode = sourceFile.content
+                var annotatedCode = sourceFile.sourceCode
                 for typeAnnotation in typeAnnotations {
                     guard case let .string(additionalString) = typeAnnotation.label else {
                         continue

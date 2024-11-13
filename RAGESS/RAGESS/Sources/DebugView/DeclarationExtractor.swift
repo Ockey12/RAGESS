@@ -46,7 +46,7 @@ public struct TypeDeclarationExtractorDebugger {
                 state.declarationObjects = []
                 let extractor = DeclarationExtractor()
                 let allSourceFiles = getAllSourceFiles(in: state.directory)
-                let allSourceFilePaths = allSourceFiles.map { $0.path }
+                let allSourceFilePaths = allSourceFiles.map { $0.fullPath }
                 return .run {
                     [
                         buildSettings = state.buildSettings,

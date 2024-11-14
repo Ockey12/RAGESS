@@ -53,7 +53,7 @@ public struct LSPClientDebugger {
 
     public var body: some ReducerOf<Self> {
         BindingReducer()
-        Reduce { state, action in
+        Reduce { _, _ in
 //            switch action {
 //            case .sendInitializeRequest:
 //                return .run { [
@@ -109,7 +109,7 @@ public struct LSPClientDebugger {
 //            case .binding:
 //                return .none
 //            }
-            return .none
+            .none
         }
     }
 }

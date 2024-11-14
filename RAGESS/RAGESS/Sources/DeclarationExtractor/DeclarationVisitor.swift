@@ -101,7 +101,7 @@ final class DeclarationVisitor: SyntaxVisitor {
         #endif
         let locationRange = node.sourceRange(converter: locationConverter)
         let rangeInXcode = LocationInXcode(line: locationRange.start.line, column: locationRange.start.column)
-        ... LocationInXcode(line: locationRange.end.line, column: locationRange.end.column)
+            ... LocationInXcode(line: locationRange.end.line, column: locationRange.end.column)
         let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
         let currentStruct = DeclaredObject(

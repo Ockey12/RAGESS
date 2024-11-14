@@ -27,7 +27,7 @@ public struct FileTreeView: View {
     }
 }
 
-//#Preview {
+// #Preview {
 //    FileTreeView(
 //        store: .init(
 //            initialState: FileTreeViewReducer.State(
@@ -98,4 +98,4 @@ public struct FileTreeView: View {
 //            }
 //        )
 //    )
-//}
+// }

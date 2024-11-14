@@ -66,7 +66,7 @@ public struct DeclarationExtractor {
 
         for subDirectory in directory.subDirectories {
             sourceFilesTable.merge(extractDeclarations(directory: subDirectory)) { current, _ in
-                    current
+                current
             }
         }
 

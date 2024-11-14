@@ -230,7 +230,7 @@ struct CellView: View {
     }
 }
 
-//#Preview(traits: .fixedLayout(width: 800, height: 100)) {
+// #Preview(traits: .fixedLayout(width: 800, height: 100)) {
 //    List {
 //        CellView(
 //            store: .init(
@@ -309,4 +309,4 @@ struct CellView: View {
 //        .listRowSeparator(.hidden)
 //    }
 //    .frame(width: 200, height: 200)
-//}
+// }

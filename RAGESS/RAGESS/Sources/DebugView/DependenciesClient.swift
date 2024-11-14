@@ -46,7 +46,7 @@ public struct DependenciesClientDebugger {
     @Dependency(DependenciesClient.self) var dependenciesClient
 
     public var body: some ReducerOf<Self> {
-        Reduce { state, action in
+        Reduce { _, _ in
 //            switch action {
 //            case .getDependenciesTapped:
 //                state.declarationObjects = []
@@ -100,7 +100,7 @@ public struct DependenciesClientDebugger {
 //                print(error)
 //                return .none
 //            }
-            return .none
+            .none
         }
     }
 }

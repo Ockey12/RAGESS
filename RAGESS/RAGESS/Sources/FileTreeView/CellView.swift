@@ -230,81 +230,83 @@ struct CellView: View {
     }
 }
 
-#Preview(traits: .fixedLayout(width: 800, height: 100)) {
-    List {
-        CellView(
-            store: .init(
-                initialState: CellReducer.State(
-                    content: .directory(
-                        Directory(path: "Project/Directory", subDirectories: [], files: [])
-                    ),
-                    leadingPadding: 0,
-                    isExpanding: false
-                ),
-                reducer: {
-                    CellReducer()
-                }
-            )
-        )
-        .listRowSeparator(.hidden)
-
-        CellView(
-            store: .init(
-                initialState: CellReducer.State(
-                    content: .directory(
-                        Directory(path: "Project/Directory", subDirectories: [], files: [])
-                    ),
-                    leadingPadding: 0,
-                    isExpanding: true
-                ),
-                reducer: {
-                    CellReducer()
-                }
-            )
-        )
-        .listRowSeparator(.hidden)
-
-        CellView(
-            store: .init(
-                initialState: CellReducer.State(
-                    content: .directory(
-                        Directory(
-                            path: "Project/Directory",
-                            subDirectories: [
-                                Directory(
-                                    path: "Project/Directory/Directory",
-                                    subDirectories: [],
-                                    files: []
-                                )
-                            ],
-                            files: []
-                        )
-                    ),
-                    leadingPadding: 0,
-                    isExpanding: true
-                ),
-                reducer: {
-                    CellReducer()
-                }
-            )
-        )
-        .listRowSeparator(.hidden)
-
-        CellView(
-            store: .init(
-                initialState: CellReducer.State(
-                    content: .sourceFile(
-                        SourceFile(path: "Project/Directory/File.swift", content: "")
-                    ),
-                    leadingPadding: 0,
-                    isExpanding: true
-                ),
-                reducer: {
-                    CellReducer()
-                }
-            )
-        )
-        .listRowSeparator(.hidden)
-    }
-    .frame(width: 200, height: 200)
-}
+//#Preview(traits: .fixedLayout(width: 800, height: 100)) {
+//    List {
+//        CellView(
+//            store: .init(
+//                initialState: CellReducer.State(
+//                    content: .directory(
+//                        Directory(fullPath: "Project/Directory", keyPathFromRootDirectory: \Directory.self, subDirectories: [], files: [])
+//                    ),
+//                    leadingPadding: 0,
+//                    isExpanding: false
+//                ),
+//                reducer: {
+//                    CellReducer()
+//                }
+//            )
+//        )
+//        .listRowSeparator(.hidden)
+//
+//        CellView(
+//            store: .init(
+//                initialState: CellReducer.State(
+//                    content: .directory(
+//                        Directory(fullPath: "Project/Directory", keyPathFromRootDirectory: \Directory.self, subDirectories: [], files: [])
+//                    ),
+//                    leadingPadding: 0,
+//                    isExpanding: true
+//                ),
+//                reducer: {
+//                    CellReducer()
+//                }
+//            )
+//        )
+//        .listRowSeparator(.hidden)
+//
+//        CellView(
+//            store: .init(
+//                initialState: CellReducer.State(
+//                    content: .directory(
+//                        Directory(
+//                            fullPath: "Project/Directory",
+//                            keyPathFromRootDirectory: \Directory.self,
+//                            subDirectories: [
+//                                Directory(
+//                                    fullPath: "Project/Directory/Directory",
+//                                    keyPathFromRootDirectory: \Directory.self,
+//                                    subDirectories: [],
+//                                    files: []
+//                                )
+//                            ],
+//                            files: []
+//                        )
+//                    ),
+//                    leadingPadding: 0,
+//                    isExpanding: true
+//                ),
+//                reducer: {
+//                    CellReducer()
+//                }
+//            )
+//        )
+//        .listRowSeparator(.hidden)
+//
+//        CellView(
+//            store: .init(
+//                initialState: CellReducer.State(
+//                    content: .sourceFile(
+//                        SourceFile(fullPath: "Project/Directory/File.swift", keyPathFromRootDirectory: \Directory.sourceFiles[0], sourceCode: "")
+//                    ),
+//                    leadingPadding: 0,
+//                    isExpanding: true
+//                ),
+//                reducer: {
+//                    CellReducer()
+//                }
+//            )
+//        )
+//        .listRowSeparator(.hidden)
+//    }
+//    .frame(width: 200, height: 200)
+//}

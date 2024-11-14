@@ -47,11 +47,16 @@ public struct SwiftIndexStoreClientDebugger {
                 @Dependency(SwiftIndexStoreClient.self) var client
                 do {
                     let startTime = CFAbsoluteTimeGetCurrent()
-                    let definitions = try client.extractOccurrences(indexStoreURL, state.projectRootPath)
+                    let indexStoreItems = try client.extractOccurrences(indexStoreURL, state.projectRootPath)
                     let endTime = CFAbsoluteTimeGetCurrent()
-                    print("COMPLETE SwiftIndexStoreClient.extractOccurrences: \(endTime - startTime)S: \(definitions.count) definitions")
+                    print("COMPLETE SwiftIndexStoreClient.extractOccurrences(): \(endTime - startTime) S: \(indexStoreItems.count) items")
+                    let numOfDefinitions = indexStoreItems.filter { $0.role == .definition }.count
+                    let numOfReferences = indexStoreItems.filter { $0.role == .reference }.count
+                    print(numOfDefinitions, "definitions")
+                    print(numOfReferences, "references")
+
                     if state.isPrintValid {
-                        for definition in definitions {
+                        for definition in indexStoreItems {
                             print(
                                 "| \(definition.role.rawValue) | user = \(definition.usr) | location = \(definition.fullPath):\(definition.locationInXcode.line):\(definition.locationInXcode.column)"
                             )
@@ -71,7 +76,7 @@ public struct SwiftIndexStoreClientDebugger {
 }
 
 public struct SwiftIndexStoreClientDebugView: View {
-    @Bindable var store: StoreOf<SwiftIndexStoreClientDebugger>
+    @Bindable private var store: StoreOf<SwiftIndexStoreClientDebugger>
 
     public init(store: StoreOf<SwiftIndexStoreClientDebugger>) {
         self.store = store

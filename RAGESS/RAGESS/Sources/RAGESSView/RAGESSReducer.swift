@@ -107,7 +107,7 @@ public struct RAGESSReducer {
 
                 #if DEBUG
                     print("Successfully get project root directory path.")
-                    print("╰─\(url.fullPath())")
+//                    print("╰─\(url.fullPath())")
                 #endif
 
                 state.projectRootDirectoryPath = url.path()
@@ -392,14 +392,14 @@ extension RAGESSReducer {
         let extractor = DeclarationExtractor()
 
         for sourceFile in allSourceFiles {
-            let declarations = await extractor.extractDeclarations(
-                from: sourceFile,
-                buildSettings: buildSettings,
-                sourceFilePaths: allSourceFilePaths,
-                packages: packages
-            )
+//            let declarations = await extractor.extractDeclarations(
+//                from: sourceFile,
+//                buildSettings: buildSettings,
+//                sourceFilePaths: allSourceFilePaths,
+//                packages: packages
+//            )
 
-            declarationObjects.append(contentsOf: declarations)
+//            declarationObjects.append(contentsOf: declarations)
         }
 
         return declarationObjects

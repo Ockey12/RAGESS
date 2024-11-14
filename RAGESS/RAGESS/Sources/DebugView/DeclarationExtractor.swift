@@ -7,100 +7,135 @@
 
 import ComposableArchitecture
 import DeclarationExtractor
+import SourceFileClient
 import SwiftUI
-import TypeDeclaration
 import XcodeObject
 
 @Reducer
 public struct TypeDeclarationExtractorDebugger {
     @ObservableState
     public struct State {
-        var directory: Directory
-        var buildSettings: [String: String]
-        var packages: [PackageObject]
-        var declarationObjects: [any DeclarationObject]
+        var indexStorePath: String
+        var projectRootPath: String
+        var isPrintValid: Bool
 
         public init(
-            directory: Directory,
-            buildSettings: [String: String],
-            packages: [PackageObject],
-            declarationObjects: [any DeclarationObject]
+            indexStorePath: String = "/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz/Index.noindex/DataStore",
+            projectRootPath: String = "/Users/onaga/RAGESS",
+            isPrintValid: Bool = false
         ) {
-            self.directory = directory
-            self.buildSettings = buildSettings
-            self.packages = packages
-            self.declarationObjects = declarationObjects
+            self.indexStorePath = indexStorePath
+            self.projectRootPath = projectRootPath
+            self.isPrintValid = isPrintValid
         }
     }
 
-    public enum Action {
-        case extractTapped
-        case extractResponse([any DeclarationObject])
-        case extractionCompleted
+    public enum Action: BindableAction {
+        case executeButtonTapped
+        case sourceFileClientResponse(Result<Directory, Error>)
+        case binding(BindingAction<State>)
     }
 
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .extractTapped:
-                state.declarationObjects = []
-                let extractor = DeclarationExtractor()
-                let allSourceFiles = getAllSourceFiles(in: state.directory)
-                let allSourceFilePaths = allSourceFiles.map { $0.fullPath }
-                return .run {
-                    [
-                        buildSettings = state.buildSettings,
-                        packages = state.packages
-                    ] send in
-                    for sourceFile in allSourceFiles {
-                        await send(.extractResponse(
-                            extractor.extractDeclarations(
-                                from: sourceFile,
-                                buildSettings: buildSettings,
-                                sourceFilePaths: allSourceFilePaths,
-                                packages: packages
-                            )
-                        ))
-                    }
-                    await send(.extractionCompleted)
+            case .executeButtonTapped:
+                @Dependency(SourceFileClient.self) var sourceFileClient
+                let rootDirectoryPath = state.projectRootPath
+                return .run { send in
+                    await send(.sourceFileClientResponse(Result {
+                        try sourceFileClient.getXcodeObjects(
+                            rootDirectoryPath: rootDirectoryPath,
+                            ignoredDirectories: [
+                                "build",
+                                ".build",
+                                "DerivedData",
+                                ".git",
+                                ".github",
+                                ".swiftpm"
+                            ]
+                        )
+                    }))
                 }
 
-            case let .extractResponse(objects):
-                state.declarationObjects.append(contentsOf: objects)
-                return .none
+            case let .sourceFileClientResponse(result):
+                switch result {
+                case let .success(directory):
+                    guard let indexStorePath = URL(string: state.indexStorePath) else {
+                        assertionFailure()
+                        return .none
+                    }
+                    var rootDirectory = directory
+                    let extractor = DeclarationExtractor()
+                    do {
+                        let startTime = CFAbsoluteTimeGetCurrent()
+                        let usrTable = try extractor.extractDeclarations(rootDirectory: &rootDirectory, indexStoreURL: indexStorePath)
+                        let endTime = CFAbsoluteTimeGetCurrent()
+                        print("COMPLETE DeclarationExtractor.extractDeclarations(): \(endTime - startTime) S: \(usrTable.count) usrTable items")
+                        if state.isPrintValid {
+                            for (key, value) in usrTable {
+                                print("| user = \(key) | keyPath = \(value)")
+                            }
+                        }
+                    } catch {
+                        print(error)
+                        assertionFailure()
+                    }
+                    return .none
+                case .failure:
+                    assertionFailure()
+                    return .none
+                }
 
-            case .extractionCompleted:
-                print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
-                print("EXTRACT DECLARATIONS COMPLETED")
-                dump(state.declarationObjects)
-                print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=\n")
+            case .binding:
                 return .none
             }
         }
     }
 }
 
-extension TypeDeclarationExtractorDebugger {
-    func getAllSourceFiles(in directory: Directory) -> [SourceFile] {
-        var sourceFiles = directory.files
-        for subDirectory in directory.subDirectories {
-            sourceFiles.append(contentsOf: getAllSourceFiles(in: subDirectory))
-        }
-
-        return sourceFiles
-    }
-}
-
 struct TypeDeclarationExtractorDebugView: View {
-    let store: StoreOf<TypeDeclarationExtractorDebugger>
+    @Bindable private var store: StoreOf<TypeDeclarationExtractorDebugger>
 
     init(store: StoreOf<TypeDeclarationExtractorDebugger>) {
         self.store = store
     }
 
     var body: some View {
-        Button("Extract") {
-            store.send(.extractTapped)
+        VStack(alignment: .leading) {
+            HStack {
+                Button(
+                    action: {
+                        store.send(.executeButtonTapped)
+                    },
+                    label: {
+                        Image(systemName: "play.fill")
+                            .font(.system(size: 10))
+                    }
+                )
+                Text("DeclarationExtractor.extractDeclarations")
+                    .font(.system(size: 13))
+            }
+
+            Toggle(isOn: $store.isPrintValid) {
+                Text("Enable printing of results")
+                    .font(.system(size: 13))
+            }
+
+            HStack {
+                Text("Index Store")
+                    .font(.system(size: 13))
+                TextField("Index Store path", text: $store.indexStorePath)
+                    .padding(.horizontal)
+            }
+
+            HStack {
+                Text("Project")
+                    .font(.system(size: 13))
+                TextField("project root path", text: $store.projectRootPath)
+                    .padding(.horizontal)
+            }
         }
+        .padding()
     }
 }

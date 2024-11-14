@@ -18,12 +18,9 @@ public struct LocationInXcode: Equatable {
 
 extension LocationInXcode: Comparable {
     public static func < (lhs: LocationInXcode, rhs: LocationInXcode) -> Bool {
-        if lhs.line < rhs.line {
-            return true
-        } else if rhs.line < lhs.line {
-            return false
-        } else {
-            return lhs.column < rhs.column
+        if lhs.line != rhs.line {
+            return lhs.line < rhs.line
         }
+        return lhs.column < rhs.column
     }
 }

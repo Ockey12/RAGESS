@@ -95,6 +95,7 @@ let package = Package(
             dependencies: [
                 "DeclaredObject",
                 "SourceKitClient",
+                "SwiftIndexStoreClient",
                 "TypeDeclaration",
                 "XcodeObject",
                 .product(name: "Dependencies", package: "swift-dependencies"),

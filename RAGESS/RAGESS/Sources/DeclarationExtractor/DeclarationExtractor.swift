@@ -5,8 +5,11 @@
 //  Created by ockey12 on 2024/05/05.
 //
 
+import DeclaredObject
 import Dependencies
+import Foundation
 import SourceKitClient
+import SwiftIndexStoreClient
 import SwiftParser
 import SwiftSyntax
 import TypeDeclaration
@@ -14,8 +17,44 @@ import XcodeObject
 
 public struct DeclarationExtractor {
     typealias FullPath = String
+    public typealias USR = String
 
     public init() {}
+
+    public func extractDeclarations(
+        rootDirectory: inout Directory,
+        indexStoreURL: URL
+    ) throws -> [USR: WritableKeyPath<Directory, DeclaredObject>] {
+        var sourceFilesTable = extractDeclarations(directory: rootDirectory)
+
+        @Dependency(SwiftIndexStoreClient.self) var swiftIndexStoreClient
+        let indexStoreObjects = try swiftIndexStoreClient.extractOccurrences(
+            indexStoreURL: indexStoreURL,
+            projectRootPath: rootDirectory.fullPath
+        ).filter {
+            $0.role == .definition
+        }
+
+        // Assign USR to the DeclaredObject of each SourceFile in the SourceFileTable.
+        for object in indexStoreObjects {
+            assignUSR(indexStoreObject: object, sourceFileTable: &sourceFilesTable)
+        }
+
+        var usrTable = [USR: WritableKeyPath<Directory, DeclaredObject>]()
+        for (_, sourceFile) in sourceFilesTable {
+            for (index, object) in sourceFile.declaredObjects.enumerated() {
+                guard let usr = object.usr else {
+                    continue
+                }
+                let keyPathFromRootDirectory = sourceFile.keyPathFromRootDirectory.appending(path: \SourceFile.declaredObjects[index])
+                usrTable[usr] = keyPathFromRootDirectory
+            }
+
+            rootDirectory[keyPath: sourceFile.keyPathFromRootDirectory] = sourceFile
+        }
+
+        return usrTable
+    }
 
     private func extractDeclarations(directory: Directory) -> [FullPath: SourceFile] {
         var sourceFilesTable = [FullPath: SourceFile]()
@@ -52,79 +91,188 @@ public struct DeclarationExtractor {
         return result
     }
 
-    public func extractDeclarations(
-        from sourceFile: SourceFile,
-        buildSettings: [String: String],
-        sourceFilePaths: [String],
-        packages: [PackageObject]
-    ) async -> [any DeclarationObject] {
-        let parsedFile = Parser.parse(source: sourceFile.sourceCode)
+    private func assignUSR(indexStoreObject: IndexStoreObject, sourceFileTable: inout [FullPath: SourceFile]) {
+        guard indexStoreObject.role == .definition,
+              let sourceFile = sourceFileTable[indexStoreObject.fullPath]
+        else {
+            return
+        }
 
-        #if DEBUG
-            print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
-            print("PATH: \(sourceFile.fullPath)")
-            print(parsedFile.debugDescription)
-        #endif
-
-        let visitor = DeclarationVisitor(
-            in: sourceFile.fullPath,
-            locatonConverter: SourceLocationConverter(
-                fileName: sourceFile.fullPath,
-                tree: parsedFile
-            )
-        )
-        visitor.walk(Syntax(parsedFile))
-
-        #if DEBUG
-            print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=\n")
-        #endif
-
-        var result: [any DeclarationObject] = visitor.extractedDeclarations
-
-        for (index, object) in result.enumerated() {
-            if let enumObject = object as? EnumObject {
-                let annotatedEnumObject = await getAnnotatedDeclaration(
-                    enumObject,
-                    buildSettings: buildSettings,
-                    sourceFilePaths: sourceFilePaths,
-                    packages: packages
+        var resultFile = sourceFile
+        for (index, object) in sourceFile.declaredObjects.enumerated() {
+            if object.rangeInXcode.contains(indexStoreObject.locationInXcode) {
+                grantingUSR(
+                    usr: indexStoreObject.usr,
+                    definitionLocation: indexStoreObject.locationInXcode,
+                    declaredObject: &resultFile.declaredObjects[index]
                 )
-                result[index] = annotatedEnumObject
-
-            } else if let typeObject = object as? any TypeDeclaration {
-                let annotatedTypeObject = await getAnnotatedDeclaration(
-                    typeObject,
-                    buildSettings: buildSettings,
-                    sourceFilePaths: sourceFilePaths,
-                    packages: packages
-                )
-                result[index] = annotatedTypeObject
-
-            } else if let typeNestableObject = object as? any TypeNestable {
-                let annotatedTypeNestableObject = await getAnnotatedDeclaration(
-                    typeNestableObject,
-                    buildSettings: buildSettings,
-                    sourceFilePaths: sourceFilePaths,
-                    packages: packages
-                )
-                result[index] = annotatedTypeNestableObject
-
-            } else if let protocolObject = object as? ProtocolObject {
-                let annotatedProtocolObject = await getAnnotatedDeclaration(
-                    protocolObject,
-                    buildSettings: buildSettings,
-                    sourceFilePaths: sourceFilePaths,
-                    packages: packages
-                )
-                result[index] = annotatedProtocolObject
-
-            } else {
-                print("WARNING: \(#file) - \(#function): \(object.name) cannot be applied to any generic `getAnnotatedDeclaration` function.")
+                break
             }
         }
 
-        return result
+        sourceFileTable[indexStoreObject.fullPath] = resultFile
     }
+
+    private func grantingUSR(usr: String, definitionLocation: LocationInXcode, declaredObject: inout DeclaredObject) {
+        // Search from the kind that is most likely to meet the conditions.
+
+        for (index, variableObject) in declaredObject.variables.enumerated() {
+            if variableObject.rangeInXcode.contains(definitionLocation) {
+                grantingUSR(usr: usr, definitionLocation: definitionLocation, declaredObject: &declaredObject.variables[index])
+                return
+            }
+        }
+
+        for (index, functionObject) in declaredObject.functions.enumerated() {
+            if functionObject.rangeInXcode.contains(definitionLocation) {
+                grantingUSR(usr: usr, definitionLocation: definitionLocation, declaredObject: &declaredObject.functions[index])
+                return
+            }
+        }
+
+        for (index, initializerObject) in declaredObject.initializers.enumerated() {
+            if initializerObject.rangeInXcode.contains(definitionLocation) {
+                grantingUSR(usr: usr, definitionLocation: definitionLocation, declaredObject: &declaredObject.initializers[index])
+                return
+            }
+        }
+
+        for (index, caseObject) in declaredObject.cases.enumerated() {
+            if caseObject.rangeInXcode.contains(definitionLocation) {
+                grantingUSR(usr: usr, definitionLocation: definitionLocation, declaredObject: &declaredObject.cases[index])
+                return
+            }
+        }
+
+        for (index, enumObject) in declaredObject.nestingEnums.enumerated() {
+            if enumObject.rangeInXcode.contains(definitionLocation) {
+                grantingUSR(usr: usr, definitionLocation: definitionLocation, declaredObject: &declaredObject.nestingEnums[index])
+                return
+            }
+        }
+
+        for (index, structObject) in declaredObject.nestingStructs.enumerated() {
+            if structObject.rangeInXcode.contains(definitionLocation) {
+                grantingUSR(usr: usr, definitionLocation: definitionLocation, declaredObject: &declaredObject.nestingStructs[index])
+                return
+            }
+        }
+
+        for (index, classObject) in declaredObject.nestingClasses.enumerated() {
+            if classObject.rangeInXcode.contains(definitionLocation) {
+                grantingUSR(usr: usr, definitionLocation: definitionLocation, declaredObject: &declaredObject.nestingClasses[index])
+                return
+            }
+        }
+
+        for (index, actorObject) in declaredObject.nestingActors.enumerated() {
+            if actorObject.rangeInXcode.contains(definitionLocation) {
+                grantingUSR(usr: usr, definitionLocation: definitionLocation, declaredObject: &declaredObject.nestingActors[index])
+                return
+            }
+        }
+
+        for (index, protocolObject) in declaredObject.nestingProtocols.enumerated() {
+            if protocolObject.rangeInXcode.contains(definitionLocation) {
+                grantingUSR(usr: usr, definitionLocation: definitionLocation, declaredObject: &declaredObject.nestingProtocols[index])
+                return
+            }
+        }
+
+        declaredObject.usr = usr
+    }
+
+//    private func findObject(
+//        declaredObject: DeclaredObject,
+//        location: LocationInXcode,
+//        keyPathFromSourceFile: KeyPath<SourceFile, DeclaredObject>
+//    ) -> KeyPath<SourceFile, DeclaredObject> {
+//        for (index, variable) in declaredObject.variables.enumerated() {
+//            if variable.rangeInXcode.contains(location) {
+//                return findObject(
+//                    declaredObject: variable,
+//                    location: location,
+//                    keyPathFromSourceFile: keyPathFromSourceFile.appending(path: \DeclaredObject.variables[index])
+//                )
+//            }
+//        }
+//
+//        return keyPathFromSourceFile
+//    }
+
+//    public func extractDeclarations(
+//        from sourceFile: SourceFile,
+//        buildSettings: [String: String],
+//        sourceFilePaths: [String],
+//        packages: [PackageObject]
+//    ) async -> [any DeclarationObject] {
+//        let parsedFile = Parser.parse(source: sourceFile.sourceCode)
+//
+//        #if DEBUG
+//            print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
+//            print("PATH: \(sourceFile.fullPath)")
+//            print(parsedFile.debugDescription)
+//        #endif
+//
+//        let visitor = DeclarationVisitor(
+//            in: sourceFile.fullPath,
+//            locatonConverter: SourceLocationConverter(
+//                fileName: sourceFile.fullPath,
+//                tree: parsedFile
+//            )
+//        )
+//        visitor.walk(Syntax(parsedFile))
+//
+//        #if DEBUG
+//            print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=\n")
+//        #endif
+//
+//        var result: [any DeclarationObject] = visitor.extractedDeclarations
+//
+//        for (index, object) in result.enumerated() {
+//            if let enumObject = object as? EnumObject {
+//                let annotatedEnumObject = await getAnnotatedDeclaration(
+//                    enumObject,
+//                    buildSettings: buildSettings,
+//                    sourceFilePaths: sourceFilePaths,
+//                    packages: packages
+//                )
+//                result[index] = annotatedEnumObject
+//
+//            } else if let typeObject = object as? any TypeDeclaration {
+//                let annotatedTypeObject = await getAnnotatedDeclaration(
+//                    typeObject,
+//                    buildSettings: buildSettings,
+//                    sourceFilePaths: sourceFilePaths,
+//                    packages: packages
+//                )
+//                result[index] = annotatedTypeObject
+//
+//            } else if let typeNestableObject = object as? any TypeNestable {
+//                let annotatedTypeNestableObject = await getAnnotatedDeclaration(
+//                    typeNestableObject,
+//                    buildSettings: buildSettings,
+//                    sourceFilePaths: sourceFilePaths,
+//                    packages: packages
+//                )
+//                result[index] = annotatedTypeNestableObject
+//
+//            } else if let protocolObject = object as? ProtocolObject {
+//                let annotatedProtocolObject = await getAnnotatedDeclaration(
+//                    protocolObject,
+//                    buildSettings: buildSettings,
+//                    sourceFilePaths: sourceFilePaths,
+//                    packages: packages
+//                )
+//                result[index] = annotatedProtocolObject
+//
+//            } else {
+//                print("WARNING: \(#file) - \(#function): \(object.name) cannot be applied to any generic `getAnnotatedDeclaration` function.")
+//            }
+//        }
+//
+//        return result
+//    }
 
     // Used for `StructObject`, `ClassObject`.
     private func getAnnotatedDeclaration<T: TypeDeclaration>(

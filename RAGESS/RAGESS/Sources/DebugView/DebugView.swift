@@ -16,17 +16,22 @@ public struct DebugReducer {
     @ObservableState
     public struct State {
         var swiftIndexStoreClientDebugger = SwiftIndexStoreClientDebugger.State()
+        var typeDeclarationExtractorDebugger = TypeDeclarationExtractorDebugger.State()
 
         public init() {}
     }
 
     public enum Action {
         case swiftIndexStoreClientDebugger(SwiftIndexStoreClientDebugger.Action)
+        case typeDeclarationExtractorDebugger(TypeDeclarationExtractorDebugger.Action)
     }
 
     public var body: some ReducerOf<Self> {
         Scope(state: \.swiftIndexStoreClientDebugger, action: \.swiftIndexStoreClientDebugger) {
             SwiftIndexStoreClientDebugger()
+        }
+        Scope(state: \.typeDeclarationExtractorDebugger, action: \.typeDeclarationExtractorDebugger) {
+            TypeDeclarationExtractorDebugger()
         }
     }
 }
@@ -44,6 +49,15 @@ public struct DebugView: View {
                 store: store.scope(
                     state: \.swiftIndexStoreClientDebugger,
                     action: \.swiftIndexStoreClientDebugger
+                )
+            )
+
+            Divider()
+
+            TypeDeclarationExtractorDebugView(
+                store: store.scope(
+                    state: \.typeDeclarationExtractorDebugger,
+                    action: \.typeDeclarationExtractorDebugger
                 )
             )
         }

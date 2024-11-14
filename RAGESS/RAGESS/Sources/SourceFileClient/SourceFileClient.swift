@@ -15,7 +15,7 @@ public struct SourceFileClient {
     public var getXcodeObjects: @Sendable (
         _ rootDirectoryPath: String,
         _ ignoredDirectories: [String]
-    ) async throws -> Directory
+    ) throws -> Directory
 }
 
 extension SourceFileClient: DependencyKey {
@@ -61,10 +61,7 @@ extension SourceFileClient: DependencyKey {
                         continue
                     }
 
-                    guard let keyPath = keyPathFromRootDirectory.appending(path: \Directory.subDirectories[subDirectoryIndex])
-                            as? WritableKeyPath<Directory, Directory> else {
-                        continue
-                    }
+                    let keyPath = keyPathFromRootDirectory.appending(path: \Directory.subDirectories[subDirectoryIndex])
                     subDirectoryIndex += 1
                     let subDirectory = getDirectories(
                         rootPath: fullPath,
@@ -76,10 +73,8 @@ extension SourceFileClient: DependencyKey {
                     guard let content = try? String(contentsOfFile: fullPath) else {
                         continue
                     }
-                    guard let keyPath = keyPathFromRootDirectory.appending(path: \Directory.files[fileIndex])
-                            as? WritableKeyPath<Directory, SourceFile> else {
-                        continue
-                    }
+
+                    let keyPath = keyPathFromRootDirectory.appending(path: \Directory.files[fileIndex])
                     fileIndex += 1
                     let file = SourceFile(
                         fullPath: fullPath,
@@ -97,8 +92,8 @@ extension SourceFileClient: DependencyKey {
             return Directory(
                 fullPath: rootPath,
                 keyPathFromRootDirectory: \Directory.self,
-                subDirectories: subDirectories.sorted { $0.name < $1.name },
-                files: files.sorted { $0.name < $1.name },
+                subDirectories: subDirectories,
+                files: files,
                 xcodeprojPaths: xcodeprojPaths,
                 packageSwiftPath: packageSwiftPath
             )

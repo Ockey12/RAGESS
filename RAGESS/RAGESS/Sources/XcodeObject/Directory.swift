@@ -18,8 +18,8 @@ public struct Directory: Identifiable {
         NSString(string: fullPath).lastPathComponent
     }
 
-    public let subDirectories: [Self]
-    public let files: [SourceFile]
+    public var subDirectories: [Self]
+    public var files: [SourceFile]
     public let xcodeprojPaths: [String]
     public var allXcodeprojPathsUnderDirectory: [String] {
         var allPaths = subDirectories.map { $0.allXcodeprojPathsUnderDirectory }.flatMap { $0 }

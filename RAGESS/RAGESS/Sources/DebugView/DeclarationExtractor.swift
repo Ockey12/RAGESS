@@ -37,6 +37,7 @@ public struct TypeDeclarationExtractorDebugger {
     }
 
     public var body: some ReducerOf<Self> {
+        BindingReducer()
         Reduce { state, action in
             switch action {
             case .executeButtonTapped:
@@ -74,7 +75,8 @@ public struct TypeDeclarationExtractorDebugger {
                         print("COMPLETE DeclarationExtractor.extractDeclarations(): \(endTime - startTime) S: \(usrTable.count) usrTable items")
                         if state.isPrintValid {
                             for (key, value) in usrTable {
-                                print("| user = \(key) | keyPath = \(value)")
+                                let object = rootDirectory[keyPath: value]
+                                print("| user = \(key) | name = \(object.name) | location = \(object.fullPath):\(object.rangeInXcode.lowerBound.line):\(object.rangeInXcode.lowerBound.column)|")
                             }
                         }
                     } catch {

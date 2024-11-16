@@ -16,14 +16,14 @@ public struct DebugReducer {
     @ObservableState
     public struct State {
         var swiftIndexStoreClientDebugger = SwiftIndexStoreClientDebugger.State()
-        var typeDeclarationExtractorDebugger = TypeDeclarationExtractorDebugger.State()
+        var typeDeclarationExtractorDebugger = DeclarationExtractorDebugger.State()
 
         public init() {}
     }
 
     public enum Action {
         case swiftIndexStoreClientDebugger(SwiftIndexStoreClientDebugger.Action)
-        case typeDeclarationExtractorDebugger(TypeDeclarationExtractorDebugger.Action)
+        case typeDeclarationExtractorDebugger(DeclarationExtractorDebugger.Action)
     }
 
     public var body: some ReducerOf<Self> {
@@ -31,7 +31,7 @@ public struct DebugReducer {
             SwiftIndexStoreClientDebugger()
         }
         Scope(state: \.typeDeclarationExtractorDebugger, action: \.typeDeclarationExtractorDebugger) {
-            TypeDeclarationExtractorDebugger()
+            DeclarationExtractorDebugger()
         }
     }
 }

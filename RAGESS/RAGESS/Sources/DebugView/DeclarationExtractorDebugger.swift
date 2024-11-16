@@ -1,5 +1,5 @@
 //
-//  DeclarationExtractor.swift
+//  DeclarationExtractorDebugger.swift
 //
 //
 //  Created by ockey12 on 2024/05/05.
@@ -13,7 +13,7 @@ import SwiftUI
 import XcodeObject
 
 @Reducer
-public struct TypeDeclarationExtractorDebugger {
+public struct DeclarationExtractorDebugger {
     @ObservableState
     public struct State {
         var indexStorePath: String
@@ -100,7 +100,7 @@ public struct TypeDeclarationExtractorDebugger {
     }
 }
 
-extension TypeDeclarationExtractorDebugger {
+extension DeclarationExtractorDebugger {
     private func printStructure(directory: Directory, prefix: String, isRoot: Bool, isLast: Bool) {
         if isRoot {
             print("<directory>\(directory.fullPath)")
@@ -110,17 +110,19 @@ extension TypeDeclarationExtractorDebugger {
         }
 
         let files = directory.files.sorted { $0.name < $1.name }
+        let subDirectories = directory.subDirectories.sorted { $0.name < $1.name }
+
         for (index, file) in files.enumerated() {
             let childPrefix = isRoot ? "" : prefix + (isLast ? "    ": "│   ")
+            var isLast = (index == files.endIndex - 1) && (subDirectories.isEmpty)
             printStructure(
                 file: file,
                 prefix: childPrefix,
                 isRoot: false,
-                isLast: index == files.endIndex - 1
+                isLast: isLast
             )
         }
 
-        let subDirectories = directory.subDirectories.sorted { $0.name < $1.name }
         for (index, directory) in subDirectories.enumerated() {
             let childPrefix = isRoot ? "" : prefix + (isLast ? "    ": "│   ")
             printStructure(
@@ -168,11 +170,9 @@ extension TypeDeclarationExtractorDebugger {
 
         if isRoot {
             print(name)
-//            print("\(prefix)\(childObjects.isEmpty ? "" : "│") * \(location)")
         } else {
             let branchSymbol = isLast ? "└── " : "├── "
             print("\(prefix)\(branchSymbol)\(name)")
-//            print("\(prefix)\(isLast ? "    ": "│   ")\(childObjects.isEmpty ? "" : "│") - \(location)")
 
             for (index, usr) in declaredObject.usrs.enumerated() {
                 print("\(prefix)\(isLast ? "    ": "│   ")\(childObjects.isEmpty ? "" : "│") * USR[\(index)] \(usr)")
@@ -193,9 +193,9 @@ extension TypeDeclarationExtractorDebugger {
 }
 
 struct TypeDeclarationExtractorDebugView: View {
-    @Bindable private var store: StoreOf<TypeDeclarationExtractorDebugger>
+    @Bindable private var store: StoreOf<DeclarationExtractorDebugger>
 
-    init(store: StoreOf<TypeDeclarationExtractorDebugger>) {
+    init(store: StoreOf<DeclarationExtractorDebugger>) {
         self.store = store
     }
 

@@ -11,7 +11,7 @@ import Foundation
 
 public struct DeclaredObject: Identifiable, Equatable {
     public let id: UUID
-    public var usr: String?
+    public var usrs: [String]
     public let name: String
     public let nameOffset: Int
     public let fullPath: String
@@ -50,7 +50,7 @@ public struct DeclaredObject: Identifiable, Equatable {
     }
 
     public init(
-        usr: String? = nil,
+        usrs: [String] = [],
         name: String,
         nameOffset: Int,
         fullPath: String,
@@ -69,7 +69,7 @@ public struct DeclaredObject: Identifiable, Equatable {
         nestingProtocols: [Self] = [],
         nestingActors: [Self] = []
     ) {
-        self.usr = usr
+        self.usrs = usrs
         @Dependency(\.uuid) var uuid
         id = uuid()
         self.name = name
@@ -94,7 +94,7 @@ public struct DeclaredObject: Identifiable, Equatable {
 }
 
 public extension DeclaredObject {
-    enum Kind {
+    enum Kind: String {
         case `struct`
         case `class`
         case `enum`

@@ -7,6 +7,7 @@
 
 import ComposableArchitecture
 import DeclarationExtractor
+import DeclaredObject
 import SourceFileClient
 import SwiftUI
 import XcodeObject
@@ -78,6 +79,9 @@ public struct TypeDeclarationExtractorDebugger {
                                 let object = rootDirectory[keyPath: value]
                                 print("| user = \(key) | name = \(object.name) | location = \(object.fullPath):\(object.rangeInXcode.lowerBound.line):\(object.rangeInXcode.lowerBound.column)|")
                             }
+
+                            print("\nDIRECTORY STRUCTURE")
+                            printStructure(directory: rootDirectory, prefix: "", isRoot: true, isLast: true)
                         }
                     } catch {
                         print(error)
@@ -92,6 +96,98 @@ public struct TypeDeclarationExtractorDebugger {
             case .binding:
                 return .none
             }
+        }
+    }
+}
+
+extension TypeDeclarationExtractorDebugger {
+    private func printStructure(directory: Directory, prefix: String, isRoot: Bool, isLast: Bool) {
+        if isRoot {
+            print("<directory>\(directory.fullPath)")
+        } else {
+            let branchSymbol = isLast ? "└── " : "├── "
+            print("\(prefix)\(branchSymbol)<directory>\(directory.fullPath)")
+        }
+
+        let files = directory.files.sorted { $0.name < $1.name }
+        for (index, file) in files.enumerated() {
+            let childPrefix = isRoot ? "" : prefix + (isLast ? "    ": "│   ")
+            printStructure(
+                file: file,
+                prefix: childPrefix,
+                isRoot: false,
+                isLast: index == files.endIndex - 1
+            )
+        }
+
+        let subDirectories = directory.subDirectories.sorted { $0.name < $1.name }
+        for (index, directory) in subDirectories.enumerated() {
+            let childPrefix = isRoot ? "" : prefix + (isLast ? "    ": "│   ")
+            printStructure(
+                directory: directory,
+                prefix: childPrefix,
+                isRoot: false,
+                isLast: index == subDirectories.endIndex - 1
+            )
+        }
+    }
+
+    private func printStructure(file: SourceFile, prefix: String, isRoot: Bool, isLast: Bool) {
+        if isRoot {
+            print("<file>\(file.fullPath)")
+        } else {
+            let branchSymbol = isLast ? "└── " : "├── "
+            print("\(prefix)\(branchSymbol)<file>\(file.fullPath)")
+        }
+
+        let childObjects = file.declaredObjects.sorted { $0.rangeInXcode.lowerBound < $1.rangeInXcode.lowerBound }
+        for (index, child) in childObjects.enumerated() {
+            let childPrefix = isRoot ? "" : prefix + (isLast ? "    ": "│   ")
+            printStructure(
+                declaredObject: child,
+                prefix: childPrefix,
+                isRoot: false,
+                isLast: index == childObjects.endIndex - 1
+            )
+        }
+    }
+
+    private func printStructure(declaredObject: DeclaredObject, prefix: String, isRoot: Bool, isLast: Bool) {
+        let range = declaredObject.rangeInXcode
+        let location = "\(declaredObject.fullPath)(\(range.lowerBound.line):\(range.lowerBound.column) - \(range.upperBound.line):\(range.upperBound.column))"
+        let name = "<\(declaredObject.kind.rawValue)>\(declaredObject.name) \(location)"
+        var childObjects = declaredObject.initializers
+                            + declaredObject.variables
+                            + declaredObject.functions
+                            + declaredObject.cases
+                            + declaredObject.nestingStructs
+                            + declaredObject.nestingClasses
+                            + declaredObject.nestingEnums
+                            + declaredObject.nestingProtocols
+                            + declaredObject.nestingActors
+
+        if isRoot {
+            print(name)
+//            print("\(prefix)\(childObjects.isEmpty ? "" : "│") * \(location)")
+        } else {
+            let branchSymbol = isLast ? "└── " : "├── "
+            print("\(prefix)\(branchSymbol)\(name)")
+//            print("\(prefix)\(isLast ? "    ": "│   ")\(childObjects.isEmpty ? "" : "│") - \(location)")
+
+            for (index, usr) in declaredObject.usrs.enumerated() {
+                print("\(prefix)\(isLast ? "    ": "│   ")\(childObjects.isEmpty ? "" : "│") * USR[\(index)] \(usr)")
+            }
+        }
+
+        childObjects.sort { $0.rangeInXcode.lowerBound < $1.rangeInXcode.lowerBound }
+        for (index, child) in childObjects.enumerated() {
+            let childPrefix = isRoot ? "" : prefix + (isLast ? "    ": "│   ")
+            printStructure(
+                declaredObject: child,
+                prefix: childPrefix,
+                isRoot: false,
+                isLast: index == childObjects.endIndex - 1
+            )
         }
     }
 }

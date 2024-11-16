@@ -43,11 +43,10 @@ public struct DeclarationExtractor {
         var usrTable = [USR: WritableKeyPath<Directory, DeclaredObject>]()
         for (_, sourceFile) in sourceFilesTable {
             for (index, object) in sourceFile.declaredObjects.enumerated() {
-                guard let usr = object.usr else {
-                    continue
-                }
                 let keyPathFromRootDirectory = sourceFile.keyPathFromRootDirectory.appending(path: \SourceFile.declaredObjects[index])
-                usrTable[usr] = keyPathFromRootDirectory
+                for usr in object.usrs {
+                    usrTable[usr] = keyPathFromRootDirectory
+                }
             }
 
             rootDirectory[keyPath: sourceFile.keyPathFromRootDirectory] = sourceFile
@@ -179,7 +178,7 @@ public struct DeclarationExtractor {
             }
         }
 
-        declaredObject.usr = usr
+        declaredObject.usrs.append(usr)
     }
 
 //    private func findObject(

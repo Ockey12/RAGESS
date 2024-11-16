@@ -85,7 +85,7 @@ public struct DeclarationExtractor {
         return result
     }
 
-    private func assignUSR(indexStoreObject: IndexStoreObject, sourceFileTable: inout [FullPath: SourceFile]) -> USRTable  {
+    private func assignUSR(indexStoreObject: IndexStoreObject, sourceFileTable: inout [FullPath: SourceFile]) -> USRTable {
         guard indexStoreObject.role == .definition,
               let sourceFile = sourceFileTable[indexStoreObject.fullPath]
         else {
@@ -118,7 +118,6 @@ public struct DeclarationExtractor {
         declaredObject: inout DeclaredObject,
         fromRootDirectory: WritableKeyPath<Directory, DeclaredObject>
     ) -> WritableKeyPath<Directory, DeclaredObject> {
-
         // Search from the kind that is most likely to meet the conditions.
 
         for (index, variableObject) in declaredObject.variables.enumerated() {

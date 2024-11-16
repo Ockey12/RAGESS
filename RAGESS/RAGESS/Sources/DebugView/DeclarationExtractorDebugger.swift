@@ -77,7 +77,7 @@ public struct DeclarationExtractorDebugger {
                         if state.isPrintValid {
                             for (key, value) in usrTable {
                                 let object = rootDirectory[keyPath: value]
-                                print("| user = \(key) | name = \(object.name) | location = \(object.fullPath):\(object.rangeInXcode.lowerBound.line):\(object.rangeInXcode.lowerBound.column)|")
+                                print("| usr = \(key) | name = \(object.name) | location = \(object.fullPath):\(object.rangeInXcode.lowerBound.line):\(object.rangeInXcode.lowerBound.column)|")
                             }
 
                             print("\nDIRECTORY STRUCTURE")
@@ -113,8 +113,8 @@ extension DeclarationExtractorDebugger {
         let subDirectories = directory.subDirectories.sorted { $0.name < $1.name }
 
         for (index, file) in files.enumerated() {
-            let childPrefix = isRoot ? "" : prefix + (isLast ? "    ": "│   ")
-            var isLast = (index == files.endIndex - 1) && (subDirectories.isEmpty)
+            let childPrefix = isRoot ? "" : prefix + (isLast ? "    " : "│   ")
+            let isLast = (index == files.endIndex - 1) && (subDirectories.isEmpty)
             printStructure(
                 file: file,
                 prefix: childPrefix,
@@ -124,7 +124,7 @@ extension DeclarationExtractorDebugger {
         }
 
         for (index, directory) in subDirectories.enumerated() {
-            let childPrefix = isRoot ? "" : prefix + (isLast ? "    ": "│   ")
+            let childPrefix = isRoot ? "" : prefix + (isLast ? "    " : "│   ")
             printStructure(
                 directory: directory,
                 prefix: childPrefix,
@@ -144,7 +144,7 @@ extension DeclarationExtractorDebugger {
 
         let childObjects = file.declaredObjects.sorted { $0.rangeInXcode.lowerBound < $1.rangeInXcode.lowerBound }
         for (index, child) in childObjects.enumerated() {
-            let childPrefix = isRoot ? "" : prefix + (isLast ? "    ": "│   ")
+            let childPrefix = isRoot ? "" : prefix + (isLast ? "    " : "│   ")
             printStructure(
                 declaredObject: child,
                 prefix: childPrefix,
@@ -159,14 +159,14 @@ extension DeclarationExtractorDebugger {
         let location = "\(declaredObject.fullPath)(\(range.lowerBound.line):\(range.lowerBound.column) - \(range.upperBound.line):\(range.upperBound.column))"
         let name = "<\(declaredObject.kind.rawValue)>\(declaredObject.name) \(location)"
         var childObjects = declaredObject.initializers
-                            + declaredObject.variables
-                            + declaredObject.functions
-                            + declaredObject.cases
-                            + declaredObject.nestingStructs
-                            + declaredObject.nestingClasses
-                            + declaredObject.nestingEnums
-                            + declaredObject.nestingProtocols
-                            + declaredObject.nestingActors
+            + declaredObject.variables
+            + declaredObject.functions
+            + declaredObject.cases
+            + declaredObject.nestingStructs
+            + declaredObject.nestingClasses
+            + declaredObject.nestingEnums
+            + declaredObject.nestingProtocols
+            + declaredObject.nestingActors
 
         if isRoot {
             print(name)
@@ -175,13 +175,13 @@ extension DeclarationExtractorDebugger {
             print("\(prefix)\(branchSymbol)\(name)")
 
             for (index, usr) in declaredObject.usrs.enumerated() {
-                print("\(prefix)\(isLast ? "    ": "│   ")\(childObjects.isEmpty ? "" : "│") * USR[\(index)] \(usr)")
+                print("\(prefix)\(isLast ? "    " : "│   ")\(childObjects.isEmpty ? "" : "│") * USR[\(index)] \(usr)")
             }
         }
 
         childObjects.sort { $0.rangeInXcode.lowerBound < $1.rangeInXcode.lowerBound }
         for (index, child) in childObjects.enumerated() {
-            let childPrefix = isRoot ? "" : prefix + (isLast ? "    ": "│   ")
+            let childPrefix = isRoot ? "" : prefix + (isLast ? "    " : "│   ")
             printStructure(
                 declaredObject: child,
                 prefix: childPrefix,

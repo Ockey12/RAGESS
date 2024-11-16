@@ -16,8 +16,10 @@ import TypeDeclaration
 import XcodeObject
 
 public struct DeclarationExtractor {
-    typealias FullPath = String
+    public typealias FullPath = String
+    public typealias SourceFileTable = [FullPath: SourceFile]
     public typealias USR = String
+    public typealias USRTable = [USR: WritableKeyPath<Directory, DeclaredObject>]
 
     public init() {}
 
@@ -25,8 +27,6 @@ public struct DeclarationExtractor {
         rootDirectory: inout Directory,
         indexStoreURL: URL
     ) throws -> [USR: WritableKeyPath<Directory, DeclaredObject>] {
-        var sourceFilesTable = extractDeclarations(directory: rootDirectory)
-
         @Dependency(SwiftIndexStoreClient.self) var swiftIndexStoreClient
         let indexStoreObjects = try swiftIndexStoreClient.extractOccurrences(
             indexStoreURL: indexStoreURL,
@@ -36,27 +36,22 @@ public struct DeclarationExtractor {
         }
 
         // Assign USR to the DeclaredObject of each SourceFile in the SourceFileTable.
+        var sourceFilesTable = extractDeclarations(directory: rootDirectory)
+        var usrTable = USRTable()
         for object in indexStoreObjects {
-            assignUSR(indexStoreObject: object, sourceFileTable: &sourceFilesTable)
-        }
-
-        var usrTable = [USR: WritableKeyPath<Directory, DeclaredObject>]()
-        for (_, sourceFile) in sourceFilesTable {
-            for (index, object) in sourceFile.declaredObjects.enumerated() {
-                let keyPathFromRootDirectory = sourceFile.keyPathFromRootDirectory.appending(path: \SourceFile.declaredObjects[index])
-                for usr in object.usrs {
-                    usrTable[usr] = keyPathFromRootDirectory
-                }
+            usrTable.merge(assignUSR(indexStoreObject: object, sourceFileTable: &sourceFilesTable)) { current, _ in
+                current
             }
-
+        }
+        for (_, sourceFile) in sourceFilesTable {
             rootDirectory[keyPath: sourceFile.keyPathFromRootDirectory] = sourceFile
         }
 
         return usrTable
     }
 
-    private func extractDeclarations(directory: Directory) -> [FullPath: SourceFile] {
-        var sourceFilesTable = [FullPath: SourceFile]()
+    private func extractDeclarations(directory: Directory) -> SourceFileTable {
+        var sourceFilesTable = SourceFileTable()
 
         for sourceFile in directory.files {
             let fileWithAddedObjects = extractDeclarations(sourceFile: sourceFile)
@@ -90,95 +85,144 @@ public struct DeclarationExtractor {
         return result
     }
 
-    private func assignUSR(indexStoreObject: IndexStoreObject, sourceFileTable: inout [FullPath: SourceFile]) {
+    private func assignUSR(indexStoreObject: IndexStoreObject, sourceFileTable: inout [FullPath: SourceFile]) -> USRTable  {
         guard indexStoreObject.role == .definition,
               let sourceFile = sourceFileTable[indexStoreObject.fullPath]
         else {
-            return
+            return [:]
         }
 
         var resultFile = sourceFile
+        var usrTable = USRTable()
         for (index, object) in sourceFile.declaredObjects.enumerated() {
             if object.rangeInXcode.contains(indexStoreObject.locationInXcode) {
-                grantingUSR(
+                let fromRootDirectory = assignUSR(
                     usr: indexStoreObject.usr,
                     definitionLocation: indexStoreObject.locationInXcode,
-                    declaredObject: &resultFile.declaredObjects[index]
+                    declaredObject: &resultFile.declaredObjects[index],
+                    fromRootDirectory: resultFile.keyPathFromRootDirectory.appending(path: \.declaredObjects[index])
                 )
+                usrTable[indexStoreObject.usr] = fromRootDirectory
                 break
             }
         }
 
         sourceFileTable[indexStoreObject.fullPath] = resultFile
+
+        return usrTable
     }
 
-    private func grantingUSR(usr: String, definitionLocation: LocationInXcode, declaredObject: inout DeclaredObject) {
+    private func assignUSR(
+        usr: String,
+        definitionLocation: LocationInXcode,
+        declaredObject: inout DeclaredObject,
+        fromRootDirectory: WritableKeyPath<Directory, DeclaredObject>
+    ) -> WritableKeyPath<Directory, DeclaredObject> {
+
         // Search from the kind that is most likely to meet the conditions.
 
         for (index, variableObject) in declaredObject.variables.enumerated() {
             if variableObject.rangeInXcode.contains(definitionLocation) {
-                grantingUSR(usr: usr, definitionLocation: definitionLocation, declaredObject: &declaredObject.variables[index])
-                return
+                return assignUSR(
+                    usr: usr,
+                    definitionLocation: definitionLocation,
+                    declaredObject: &declaredObject.variables[index],
+                    fromRootDirectory: fromRootDirectory.appending(path: \.variables[index])
+                )
             }
         }
 
         for (index, functionObject) in declaredObject.functions.enumerated() {
             if functionObject.rangeInXcode.contains(definitionLocation) {
-                grantingUSR(usr: usr, definitionLocation: definitionLocation, declaredObject: &declaredObject.functions[index])
-                return
+                return assignUSR(
+                    usr: usr,
+                    definitionLocation: definitionLocation,
+                    declaredObject: &declaredObject.functions[index],
+                    fromRootDirectory: fromRootDirectory.appending(path: \.functions[index])
+                )
             }
         }
 
         for (index, initializerObject) in declaredObject.initializers.enumerated() {
             if initializerObject.rangeInXcode.contains(definitionLocation) {
-                grantingUSR(usr: usr, definitionLocation: definitionLocation, declaredObject: &declaredObject.initializers[index])
-                return
+                return assignUSR(
+                    usr: usr,
+                    definitionLocation: definitionLocation,
+                    declaredObject: &declaredObject.initializers[index],
+                    fromRootDirectory: fromRootDirectory.appending(path: \.initializers[index])
+                )
             }
         }
 
         for (index, caseObject) in declaredObject.cases.enumerated() {
             if caseObject.rangeInXcode.contains(definitionLocation) {
-                grantingUSR(usr: usr, definitionLocation: definitionLocation, declaredObject: &declaredObject.cases[index])
-                return
+                return assignUSR(
+                    usr: usr,
+                    definitionLocation: definitionLocation,
+                    declaredObject: &declaredObject.cases[index],
+                    fromRootDirectory: fromRootDirectory.appending(path: \.cases[index])
+                )
             }
         }
 
         for (index, enumObject) in declaredObject.nestingEnums.enumerated() {
             if enumObject.rangeInXcode.contains(definitionLocation) {
-                grantingUSR(usr: usr, definitionLocation: definitionLocation, declaredObject: &declaredObject.nestingEnums[index])
-                return
+                return assignUSR(
+                    usr: usr,
+                    definitionLocation: definitionLocation,
+                    declaredObject: &declaredObject.nestingEnums[index],
+                    fromRootDirectory: fromRootDirectory.appending(path: \.nestingEnums[index])
+                )
             }
         }
 
         for (index, structObject) in declaredObject.nestingStructs.enumerated() {
             if structObject.rangeInXcode.contains(definitionLocation) {
-                grantingUSR(usr: usr, definitionLocation: definitionLocation, declaredObject: &declaredObject.nestingStructs[index])
-                return
+                return assignUSR(
+                    usr: usr,
+                    definitionLocation: definitionLocation,
+                    declaredObject: &declaredObject.nestingStructs[index],
+                    fromRootDirectory: fromRootDirectory.appending(path: \.nestingStructs[index])
+                )
             }
         }
 
         for (index, classObject) in declaredObject.nestingClasses.enumerated() {
             if classObject.rangeInXcode.contains(definitionLocation) {
-                grantingUSR(usr: usr, definitionLocation: definitionLocation, declaredObject: &declaredObject.nestingClasses[index])
-                return
+                return assignUSR(
+                    usr: usr,
+                    definitionLocation: definitionLocation,
+                    declaredObject: &declaredObject.nestingClasses[index],
+                    fromRootDirectory: fromRootDirectory.appending(path: \.nestingClasses[index])
+                )
             }
         }
 
         for (index, actorObject) in declaredObject.nestingActors.enumerated() {
             if actorObject.rangeInXcode.contains(definitionLocation) {
-                grantingUSR(usr: usr, definitionLocation: definitionLocation, declaredObject: &declaredObject.nestingActors[index])
-                return
+                return assignUSR(
+                    usr: usr,
+                    definitionLocation: definitionLocation,
+                    declaredObject: &declaredObject.nestingActors[index],
+                    fromRootDirectory: fromRootDirectory.appending(path: \.nestingActors[index])
+                )
             }
         }
 
         for (index, protocolObject) in declaredObject.nestingProtocols.enumerated() {
             if protocolObject.rangeInXcode.contains(definitionLocation) {
-                grantingUSR(usr: usr, definitionLocation: definitionLocation, declaredObject: &declaredObject.nestingProtocols[index])
-                return
+                return assignUSR(
+                    usr: usr,
+                    definitionLocation: definitionLocation,
+                    declaredObject: &declaredObject.nestingProtocols[index],
+                    fromRootDirectory: fromRootDirectory.appending(path: \.nestingProtocols[index])
+                )
             }
         }
 
         declaredObject.usrs.append(usr)
+
+        return fromRootDirectory
     }
 
 //    private func findObject(

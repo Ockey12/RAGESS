@@ -58,7 +58,7 @@ public struct SwiftIndexStoreClientDebugger {
                     if state.isPrintValid {
                         for definition in indexStoreItems {
                             print(
-                                "| \(definition.role.rawValue) | user = \(definition.usr) | location = \(definition.fullPath):\(definition.locationInXcode.line):\(definition.locationInXcode.column)"
+                                "| \(definition.role.rawValue) | usr = \(definition.usr) | location = \(definition.fullPath)(\(definition.locationInXcode.line):\(definition.locationInXcode.column))"
                             )
                         }
                     }

@@ -9,6 +9,7 @@ import ComposableArchitecture
 import DeclarationExtractor
 import DeclaredObject
 import SourceFileClient
+import SwiftIndexStoreClient
 import SwiftUI
 import XcodeObject
 
@@ -73,7 +74,7 @@ public struct DeclarationExtractorDebugger {
                         let startTime = CFAbsoluteTimeGetCurrent()
                         let usrTable = try extractor.extractDeclarations(rootDirectory: &rootDirectory, indexStoreURL: indexStorePath)
                         let endTime = CFAbsoluteTimeGetCurrent()
-                        print("COMPLETE DeclarationExtractor.extractDeclarations(): \(endTime - startTime) S: \(usrTable.count) usrTable items")
+                        print("\nCOMPLETE DeclarationExtractor.extractDeclarations(): \(endTime - startTime) S: \(usrTable.count) usrTable items")
                         if state.isPrintValid {
                             for (key, value) in usrTable {
                                 let object = rootDirectory[keyPath: value]
@@ -82,6 +83,12 @@ public struct DeclarationExtractorDebugger {
 
                             print("\nDIRECTORY STRUCTURE")
                             printStructure(directory: rootDirectory, prefix: "", isRoot: true, isLast: true)
+
+                            printUnusedDefinitionUSR(
+                                indexStoreURL: indexStorePath,
+                                projectRootPath: state.projectRootPath,
+                                usrTable: usrTable
+                            )
                         }
                     } catch {
                         print(error)
@@ -188,6 +195,26 @@ extension DeclarationExtractorDebugger {
                 isRoot: false,
                 isLast: index == childObjects.endIndex - 1
             )
+        }
+    }
+
+    private func printUnusedDefinitionUSR(indexStoreURL: URL, projectRootPath: String, usrTable: USRTable) {
+        @Dependency(\.swiftIndexStoreClient) var swiftIndexStoreClient
+        guard let unusedUSR = try? swiftIndexStoreClient.extractOccurrences(
+            indexStoreURL: indexStoreURL,
+            projectRootPath: projectRootPath
+        ).filter(
+            { $0.role == .definition }
+        ).filter(
+            { !usrTable.keys.contains($0.usr) }
+        ) else {
+            assertionFailure()
+            return
+        }
+
+        print("\n\(unusedUSR.count) unused USRs")
+        for usr in unusedUSR {
+            print("| usr = \(usr.usr) | location = \(usr.fullPath)(\(usr.locationInXcode.line):\(usr.locationInXcode.column)) |")
         }
     }
 }

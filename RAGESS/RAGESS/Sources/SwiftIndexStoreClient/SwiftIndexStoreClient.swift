@@ -61,3 +61,15 @@ extension SwiftIndexStoreClient: DependencyKey {
         }
     )
 }
+
+extension SwiftIndexStoreClient: TestDependencyKey {
+    public static let testValue = Self()
+    public static let previewValue = Self()
+}
+
+extension DependencyValues {
+    public var swiftIndexStoreClient: SwiftIndexStoreClient {
+        get { self[SwiftIndexStoreClient.self] }
+        set { self[SwiftIndexStoreClient.self] = newValue }
+    }
+}

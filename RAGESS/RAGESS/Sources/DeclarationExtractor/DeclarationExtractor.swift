@@ -16,11 +16,6 @@ import TypeDeclaration
 import XcodeObject
 
 public struct DeclarationExtractor {
-    public typealias FullPath = String
-    public typealias SourceFileTable = [FullPath: SourceFile]
-    public typealias USR = String
-    public typealias USRTable = [USR: WritableKeyPath<Directory, DeclaredObject>]
-
     public init() {}
 
     public func extractDeclarations(

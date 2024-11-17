@@ -18,31 +18,42 @@ import XcodeObject
 public struct DeclarationExtractor {
     public init() {}
 
+    public struct Response {
+        public let rootDirectory: Directory
+        public let usrTable: USRTable
+        public let indexStoreObjects: [IndexStoreObject]
+    }
+
     public func extractDeclarations(
-        rootDirectory: inout Directory,
+        rootDirectory: Directory,
         indexStoreURL: URL
-    ) throws -> [USR: WritableKeyPath<Directory, DeclaredObject>] {
+    ) throws -> Response {
         @Dependency(SwiftIndexStoreClient.self) var swiftIndexStoreClient
         let indexStoreObjects = try swiftIndexStoreClient.extractOccurrences(
             indexStoreURL: indexStoreURL,
             projectRootPath: rootDirectory.fullPath
-        ).filter {
-            $0.role == .definition
-        }
+        )
 
         // Assign USR to the DeclaredObject of each SourceFile in the SourceFileTable.
+        let definitions = indexStoreObjects.filter { $0.role == .definition }
         var sourceFilesTable = extractDeclarations(directory: rootDirectory)
         var usrTable = USRTable()
-        for object in indexStoreObjects {
+        for object in definitions {
             usrTable.merge(assignUSR(indexStoreObject: object, sourceFileTable: &sourceFilesTable)) { current, _ in
                 current
             }
         }
+
+        var resultRootDirectory = rootDirectory
         for (_, sourceFile) in sourceFilesTable {
-            rootDirectory[keyPath: sourceFile.keyPathFromRootDirectory] = sourceFile
+            resultRootDirectory[keyPath: sourceFile.keyPathFromRootDirectory] = sourceFile
         }
 
-        return usrTable
+        return Response(
+            rootDirectory: resultRootDirectory,
+            usrTable: usrTable,
+            indexStoreObjects: indexStoreObjects
+        )
     }
 
     private func extractDeclarations(directory: Directory) -> SourceFileTable {

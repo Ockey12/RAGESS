@@ -63,31 +63,31 @@ public struct DeclarationExtractorDebugger {
 
             case let .sourceFileClientResponse(result):
                 switch result {
-                case let .success(directory):
+                case let .success(rootDirectory):
                     guard let indexStorePath = URL(string: state.indexStorePath) else {
                         assertionFailure()
                         return .none
                     }
-                    var rootDirectory = directory
+                    
                     let extractor = DeclarationExtractor()
                     do {
                         let startTime = CFAbsoluteTimeGetCurrent()
-                        let usrTable = try extractor.extractDeclarations(rootDirectory: &rootDirectory, indexStoreURL: indexStorePath)
+                        let response = try extractor.extractDeclarations(rootDirectory: rootDirectory, indexStoreURL: indexStorePath)
                         let endTime = CFAbsoluteTimeGetCurrent()
-                        print("\nCOMPLETE DeclarationExtractor.extractDeclarations(): \(endTime - startTime) S: \(usrTable.count) usrTable items")
+                        print("\nCOMPLETE DeclarationExtractor.extractDeclarations(): \(endTime - startTime) S: \(response.usrTable.count) usrTable items")
                         if state.isPrintValid {
-                            for (key, value) in usrTable {
-                                let object = rootDirectory[keyPath: value]
+                            for (key, value) in response.usrTable {
+                                let object = response.rootDirectory[keyPath: value]
                                 print("| usr = \(key) | name = \(object.name) | location = \(object.fullPath):\(object.rangeInXcode.lowerBound.line):\(object.rangeInXcode.lowerBound.column)|")
                             }
 
                             print("\nDIRECTORY STRUCTURE")
-                            printStructure(directory: rootDirectory, prefix: "", isRoot: true, isLast: true)
+                            printStructure(directory: response.rootDirectory, prefix: "", isRoot: true, isLast: true)
 
                             printUnusedDefinitionUSR(
                                 indexStoreURL: indexStorePath,
                                 projectRootPath: state.projectRootPath,
-                                usrTable: usrTable
+                                usrTable: response.usrTable
                             )
                         }
                     } catch {

@@ -10,6 +10,7 @@ import Dependencies
 import Foundation
 import SourceKitClient
 import SwiftIndexStoreClient
+import SwiftIndexStoreObject
 import SwiftParser
 import SwiftSyntax
 import TypeDeclaration

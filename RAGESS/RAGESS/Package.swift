@@ -96,6 +96,7 @@ let package = Package(
                 "DeclaredObject",
                 "SourceKitClient",
                 "SwiftIndexStoreClient",
+                "SwiftIndexStoreObject",
                 "TypeDeclaration",
                 "XcodeObject",
                 .product(name: "Dependencies", package: "swift-dependencies"),
@@ -217,10 +218,12 @@ let package = Package(
             name: "SwiftIndexStoreClient",
             dependencies: [
                 "DeclaredObject",
+                "SwiftIndexStoreObject",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "SwiftIndexStore", package: "swift-indexstore")
             ]
         ),
+        .target(name: "SwiftIndexStoreObject"),
         .target(
             name: "TypeAnnotationClient",
             dependencies: [

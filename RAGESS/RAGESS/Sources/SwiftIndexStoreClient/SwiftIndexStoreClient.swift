@@ -11,6 +11,7 @@ import Dependencies
 import DependenciesMacros
 import Foundation
 import SwiftIndexStore
+import SwiftIndexStoreObject
 
 @DependencyClient
 public struct SwiftIndexStoreClient {

@@ -12,8 +12,21 @@ import SwiftIndexStoreObject
 import XcodeObject
 
 public enum DependenciesExtractor {
-    public static func extract(indexStoreObjects: [IndexStoreObject], usrTable: USRTable, rootDirectory: Directory) {
+    public static func extract(indexStoreObjects: [IndexStoreObject], usrTable: USRTable, rootDirectory: Directory) -> [DependencyObject] {
         let references = indexStoreObjects.filter { $0.role == .reference }
+
+        var dependencyTable = [DependencyObject]()
+        for reference in references {
+            guard let callerUSRs = findCaller(indexStoreObject: reference, rootDirectory: rootDirectory) else {
+                continue
+            }
+
+            for callerUSR in callerUSRs {
+                dependencyTable.append(.init(calleeUSR: reference.usr, callerUSR: callerUSR))
+            }
+        }
+
+        return dependencyTable
     }
 
     private static func findCaller(indexStoreObject: IndexStoreObject, rootDirectory: Directory) -> [USR]? {

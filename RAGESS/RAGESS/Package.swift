@@ -78,6 +78,7 @@ let package = Package(
                 "BuildSettingsClient",
                 "DumpPackageClient",
                 "DependenciesClient",
+                "DependenciesExtractor",
                 "MonitorClient",
                 "LSPClient",
                 "SourceFileClient",

@@ -68,7 +68,7 @@ public struct DeclarationExtractorDebugger {
                         assertionFailure()
                         return .none
                     }
-                    
+
                     let extractor = DeclarationExtractor()
                     do {
                         let startTime = CFAbsoluteTimeGetCurrent()

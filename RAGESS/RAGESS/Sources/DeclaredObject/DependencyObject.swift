@@ -1,9 +1,9 @@
 //
-//  File.swift
-//  
-//  
+//  DependencyObject.swift
+//
+//
 //  Created by Ockey12 on 2024/11/17
-//  
+//
 //
 
 public struct DependencyObject {

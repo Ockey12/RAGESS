@@ -68,8 +68,8 @@ extension SwiftIndexStoreClient: TestDependencyKey {
     public static let previewValue = Self()
 }
 
-extension DependencyValues {
-    public var swiftIndexStoreClient: SwiftIndexStoreClient {
+public extension DependencyValues {
+    var swiftIndexStoreClient: SwiftIndexStoreClient {
         get { self[SwiftIndexStoreClient.self] }
         set { self[SwiftIndexStoreClient.self] = newValue }
     }

@@ -1,9 +1,9 @@
 //
 //  DependenciesExtractor.swift
 //
-//  
+//
 //  Created by Ockey12 on 2024/11/17
-//  
+//
 //
 
 import DeclaredObject
@@ -50,7 +50,7 @@ public enum DependenciesExtractor {
 
         switch name {
         case let .directory(name):
-            guard let subDirectory = directory.subDirectories.first(where: { $0.name == name}) else {
+            guard let subDirectory = directory.subDirectories.first(where: { $0.name == name }) else {
                 return nil
             }
             return findSourceFile(in: subDirectory, filePath: filePath)
@@ -93,13 +93,13 @@ public enum DependenciesExtractor {
 
     private static func findObject(object: DeclaredObject, targetLocation: LocationInXcode) -> DeclaredObject? {
         var childObjects: [DeclaredObject] = object.initializers
-                                            + object.variables
-                                            + object.functions
-                                            + object.cases
-                                            + object.nestingStructs
-                                            + object.nestingClasses
-                                            + object.nestingProtocols
-                                            + object.nestingActors
+            + object.variables
+            + object.functions
+            + object.cases
+            + object.nestingStructs
+            + object.nestingClasses
+            + object.nestingProtocols
+            + object.nestingActors
 
         childObjects.sort(by: { $0.rangeInXcode.lowerBound < $1.rangeInXcode.lowerBound })
         if let caller = childObjects.first(where: { $0.rangeInXcode.contains(targetLocation) }) {

@@ -1,9 +1,9 @@
 //
 //  DependenciesExtractorDebugger.swift
 //
-//  
+//
 //  Created by Ockey12 on 2024/11/19
-//  
+//
 //
 
 import ComposableArchitecture

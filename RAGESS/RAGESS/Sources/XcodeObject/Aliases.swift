@@ -1,9 +1,9 @@
 //
 //  Aliases.swift
-//  
-//  
+//
+//
 //  Created by Ockey12 on 2024/11/16
-//  
+//
 //
 
 import DeclaredObject

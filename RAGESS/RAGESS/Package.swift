@@ -131,6 +131,14 @@ let package = Package(
             ]
         ),
         .target(
+            name: "DependenciesExtractor",
+            dependencies: [
+                "DeclaredObject",
+                "SwiftIndexStoreObject",
+                "XcodeObject"
+            ]
+        ),
+        .target(
             name: "DumpPackageClient",
             dependencies: [
                 "CommandClient",

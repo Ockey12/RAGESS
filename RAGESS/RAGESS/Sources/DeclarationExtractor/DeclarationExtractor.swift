@@ -22,6 +22,7 @@ public struct DeclarationExtractor {
     public struct Response {
         public let rootDirectory: Directory
         public let usrTable: USRTable
+        public let sourceFileTable: [String: WritableKeyPath<Directory, SourceFile>]
         public let indexStoreObjects: [IndexStoreObject]
     }
 
@@ -50,9 +51,12 @@ public struct DeclarationExtractor {
             resultRootDirectory[keyPath: sourceFile.keyPathFromRootDirectory] = sourceFile
         }
 
+        let sourceFileKeyPathTable = sourceFilesTable.mapValues { $0.keyPathFromRootDirectory }
+
         return Response(
             rootDirectory: resultRootDirectory,
             usrTable: usrTable,
+            sourceFileTable: sourceFileKeyPathTable,
             indexStoreObjects: indexStoreObjects
         )
     }

@@ -8,10 +8,10 @@
 
 public struct DependencyObject {
     public let calleeUSR: String
-    public let callerUSR: String
+    public let callerUSRs: [String]
 
-    public init(calleeUSR: String, callerUSR: String) {
+    public init(calleeUSR: String, callerUSRs: [String]) {
         self.calleeUSR = calleeUSR
-        self.callerUSR = callerUSR
+        self.callerUSRs = callerUSRs
     }
 }

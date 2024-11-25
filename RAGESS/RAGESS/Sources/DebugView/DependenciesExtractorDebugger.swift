@@ -84,6 +84,7 @@ public struct DependenciesExtractorDebugger {
                         let dependenciesTable = DependenciesExtractor.extract(
                             indexStoreObjects: response.indexStoreObjects,
                             usrTable: response.usrTable,
+                            sourceFileTable: response.sourceFileTable,
                             rootDirectory: response.rootDirectory
                         )
 

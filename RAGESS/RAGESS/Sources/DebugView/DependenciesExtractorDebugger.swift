@@ -89,7 +89,26 @@ public struct DependenciesExtractorDebugger {
                         )
 
                         let endTime = CFAbsoluteTimeGetCurrent()
-                        print("\nCOMPLETE DependenciesExtractor.extract(): \(endTime - startTime) S: \(dependenciesTable.count) dependenciesTable items")
+                        print("\nCOMPLETE DependenciesExtractor.extract(): \(endTime - startTime) S: \(dependenciesTable.count) dependenciesTable items\n")
+
+                        if state.isPrintValid {
+                            for dependencyObject in dependenciesTable {
+                                guard let callerUSR = dependencyObject.callerUSRs.first else {
+                                    continue
+                                }
+                                guard let callerKeyPath = response.usrTable[callerUSR] else {
+                                    continue
+                                }
+                                guard let calleeKeyPath = response.usrTable[dependencyObject.calleeUSR] else {
+                                    continue
+                                }
+                                let caller = response.rootDirectory[keyPath: callerKeyPath]
+                                let callee = response.rootDirectory[keyPath: calleeKeyPath]
+
+                                print("CALLEE: \(callee.name) \(callee.fullPath)(\(callee.rangeInXcode.lowerBound.line):\(callee.rangeInXcode.lowerBound.column))")
+                                print("CALLER: \(caller.name) \(caller.fullPath)(\(caller.rangeInXcode.lowerBound.line):\(caller.rangeInXcode.lowerBound.column))\n")
+                            }
+                        }
                     } catch {
                         print(error)
                         assertionFailure()

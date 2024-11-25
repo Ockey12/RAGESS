@@ -48,7 +48,7 @@ public enum DependenciesExtractor {
         let sourceFile = rootDirectory[keyPath: sourceFileKeyPath]
 
         guard let declaredObject = sourceFile.declaredObjects.first(
-            where: { $0.rangeInXcode.contains(indexStoreObject.locationInXcode)}
+            where: { $0.rangeInXcode.contains(indexStoreObject.locationInXcode) }
         ) else {
             return nil
         }

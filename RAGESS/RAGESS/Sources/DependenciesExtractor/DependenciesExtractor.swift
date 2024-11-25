@@ -30,9 +30,6 @@ public enum DependenciesExtractor {
                 continue
             }
 
-//            for callerUSR in callerUSRs {
-//                dependencies.append(.init(calleeUSR: reference.usr, callerUSR: callerUSR))
-//            }
             dependencies.append(.init(calleeUSR: reference.usr, callerUSRs: callerUSRs))
         }
 
@@ -117,83 +114,5 @@ public enum DependenciesExtractor {
         }
 
         return declaredObject.usrs
-    }
-
-//    private static func findSourceFile(
-//        in rootDirectory: Directory,
-//        filePath: String,
-//        sourceFileTable: [String: WritableKeyPath<Directory, SourceFileTable>]
-//    ) -> SourceFile? {
-//        guard let sourceFile = sourceFileTable[filePath] else {
-//            return nil
-//        }
-//
-//        return rootDirectory[keyPath: sourceFile.keyPathFromRootDirectory]
-//        guard let name = findName(rootPath: directory.fullPath, filePath: filePath) else {
-//            return nil
-//        }
-//
-//        switch name {
-//        case let .directory(name):
-//            guard let subDirectory = directory.subDirectories.first(where: { $0.name == name }) else {
-//                return nil
-//            }
-//            return findSourceFile(in: subDirectory, filePath: filePath)
-//
-//        case let .sourceFile(name):
-//            return directory.files.first(where: { $0.name == name })
-//        }
-//    }
-
-    private static func findName(rootPath: String, filePath: String) -> Name? {
-        guard let rootURL = URL(string: rootPath.replacingOccurrences(of: " ", with: "%20")),
-              let fileURL = URL(string: filePath.replacingOccurrences(of: " ", with: "%20")) else {
-            return nil
-        }
-
-        let rootURLComponents = rootURL.pathComponents
-        let fileURLComponents = fileURL.pathComponents
-
-        guard let lastIndex = fileURLComponents.firstIndex(where: { rootURLComponents.last == $0 }) else {
-            return nil
-        }
-
-        let directoryNameIndex = lastIndex + 1
-        guard fileURLComponents.count > directoryNameIndex else {
-            return nil
-        }
-
-        let name = fileURLComponents[directoryNameIndex]
-        if directoryNameIndex == fileURLComponents.endIndex - 1 {
-            return .sourceFile(name)
-        } else {
-            return .directory(name)
-        }
-    }
-
-    private enum Name {
-        case directory(String)
-        case sourceFile(String)
-    }
-
-    private static func findObject(object: DeclaredObject, targetLocation: LocationInXcode) -> DeclaredObject? {
-        var childObjects: [DeclaredObject] = object.initializers
-            + object.variables
-            + object.functions
-            + object.cases
-            + object.nestingStructs
-            + object.nestingClasses
-            + object.nestingProtocols
-            + object.nestingActors
-
-        childObjects.sort(by: { $0.rangeInXcode.lowerBound < $1.rangeInXcode.lowerBound })
-        if let caller = childObjects.first(where: { $0.rangeInXcode.contains(targetLocation) }) {
-            return findObject(object: caller, targetLocation: targetLocation)
-        }
-
-        guard object.rangeInXcode.contains(targetLocation) else {
-            return nil
-        }
-        return object
     }
 }

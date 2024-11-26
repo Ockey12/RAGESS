@@ -106,9 +106,9 @@ public struct RAGESSReducer {
                         return .none
                     }
 
-#if DEBUG
-                    print("Successfully get project root directory path.")
-#endif
+                    #if DEBUG
+                        print("Successfully get project root directory path.")
+                    #endif
 
                     state.projectRootDirectoryPath = url.path()
 
@@ -140,11 +140,11 @@ public struct RAGESSReducer {
                 case let .success(rootDirectory):
                     state.loadingTaskKindBuffer.removeFirst()
 
-#if DEBUG
-                    print(".sourceFileResponse(.success(rootDirectory))")
-                    print("state.loadingTaskKindBuffer.removeFirst(): \(state.loadingTaskKindBuffer)")
-                    dump(rootDirectory)
-#endif
+                    #if DEBUG
+                        print(".sourceFileResponse(.success(rootDirectory))")
+                        print("state.loadingTaskKindBuffer.removeFirst(): \(state.loadingTaskKindBuffer)")
+                        dump(rootDirectory)
+                    #endif
 
                     state.rootDirectory = rootDirectory
                     state.fileTree.rootDirectory = rootDirectory
@@ -191,11 +191,11 @@ public struct RAGESSReducer {
                     state.buildSettings = buildSettings
                     state.loadingTaskKindBuffer.removeFirst()
 
-#if DEBUG
-                    print("Successfully get buildsettings.")
-                    print("state.loadingTaskKindBuffer.removeFirst(): \(state.loadingTaskKindBuffer)")
-                    dump(buildSettings)
-#endif
+                    #if DEBUG
+                        print("Successfully get buildsettings.")
+                        print("state.loadingTaskKindBuffer.removeFirst(): \(state.loadingTaskKindBuffer)")
+                        dump(buildSettings)
+                    #endif
                     return .none
 
                 case let .failure(error):
@@ -209,11 +209,11 @@ public struct RAGESSReducer {
                     state.packages.append(packageObject)
                     state.loadingTaskKindBuffer.removeFirst()
 
-#if DEBUG
-                    print("Successfully dump `PackageObject`.")
-                    print("state.loadingTaskKindBuffer.removeFirst(): \(state.loadingTaskKindBuffer)")
-                    dump(packageObject)
-#endif
+                    #if DEBUG
+                        print("Successfully dump `PackageObject`.")
+                        print("state.loadingTaskKindBuffer.removeFirst(): \(state.loadingTaskKindBuffer)")
+                        dump(packageObject)
+                    #endif
 
                     return .none
 

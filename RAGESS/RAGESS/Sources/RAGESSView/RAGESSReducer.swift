@@ -57,7 +57,6 @@ public struct RAGESSReducer {
         case projectDirectorySelectorResponse(Result<[URL], Error>)
         case extractSourceFiles
         case sourceFileResponse(Result<Directory, Error>)
-        case sourceFileSelected(SourceFile)
         case buildSettingsResponse(Result<[String: String], Error>)
         case dumpPackageResponse(Result<PackageObject, Error>)
         case dumpPackageCompleted
@@ -99,24 +98,26 @@ public struct RAGESSReducer {
         #endif
         Reduce { state, action in
             switch action {
-            case let .projectDirectorySelectorResponse(.success(urls)):
-                guard let url = urls.first else {
-                    print("ERROR in \(#file) - \(#line): Cannot find `urls.first`")
+            case let .projectDirectorySelectorResponse(result):
+                switch result {
+                case let .success(urls):
+                    guard let url = urls.first else {
+                        print("ERROR in \(#file) - \(#line): Cannot find `urls.first`")
+                        return .none
+                    }
+
+#if DEBUG
+                    print("Successfully get project root directory path.")
+#endif
+
+                    state.projectRootDirectoryPath = url.path()
+
+                    return .send(.extractSourceFiles)
+
+                case let .failure(error):
+                    print(error)
                     return .none
                 }
-
-                #if DEBUG
-                    print("Successfully get project root directory path.")
-//                    print("╰─\(url.fullPath())")
-                #endif
-
-                state.projectRootDirectoryPath = url.path()
-
-                return .send(.extractSourceFiles)
-
-            case let .projectDirectorySelectorResponse(.failure(error)):
-                print(error)
-                return .none
 
             case .extractSourceFiles:
                 state.processStartTime = CFAbsoluteTimeGetCurrent()
@@ -127,93 +128,99 @@ public struct RAGESSReducer {
                     ignoredDirectories = state.ignoredDirectories
                 ] send in
                     await send(.sourceFileResponse(Result {
-                        try await sourceFileClient.getXcodeObjects(
+                        try sourceFileClient.getXcodeObjects(
                             rootDirectoryPath: projectRootDirectoryPath,
                             ignoredDirectories: ignoredDirectories
                         )
                     }))
                 }
 
-            case let .sourceFileResponse(.success(rootDirectory)):
-                state.loadingTaskKindBuffer.removeFirst()
+            case let .sourceFileResponse(result):
+                switch result {
+                case let .success(rootDirectory):
+                    state.loadingTaskKindBuffer.removeFirst()
 
-                #if DEBUG
+#if DEBUG
                     print(".sourceFileResponse(.success(rootDirectory))")
                     print("state.loadingTaskKindBuffer.removeFirst(): \(state.loadingTaskKindBuffer)")
                     dump(rootDirectory)
-                #endif
+#endif
 
-                state.rootDirectory = rootDirectory
-                state.fileTree.rootDirectory = rootDirectory
+                    state.rootDirectory = rootDirectory
+                    state.fileTree.rootDirectory = rootDirectory
 
-                guard !rootDirectory.allXcodeprojPathsUnderDirectory.isEmpty else {
-                    print("ERROR in \(#file) - \(#line): Cannot find `**.xcodeproj`")
+                    guard !rootDirectory.allXcodeprojPathsUnderDirectory.isEmpty else {
+                        print("ERROR in \(#file) - \(#line): Cannot find `**.xcodeproj`")
+                        return .none
+                    }
+
+                    state.loadingTaskKindBuffer.append(.buildSettings)
+                    state.loadingTaskKindBuffer.append(
+                        contentsOf: Array(
+                            repeating: .dumpPackage,
+                            count: rootDirectory.allPackageSwiftPath.count
+                        )
+                    )
+
+                    return .run { send in
+                        await send(.buildSettingsResponse(Result {
+                            try await buildSettingsClient.getSettings(
+                                xcodeprojPath: rootDirectory.allXcodeprojPathsUnderDirectory[0]
+                            )
+                        }))
+
+                        for packageSwiftPath in rootDirectory.allPackageSwiftPath {
+                            let packageDirectoryPath = NSString(string: packageSwiftPath)
+                                .deletingLastPathComponent
+                            await send(.dumpPackageResponse(Result {
+                                try await dumpPackageClient.dumpPackage(currentDirectory: packageDirectoryPath)
+                            }))
+                        }
+
+                        await send(.dumpPackageCompleted)
+                    }
+
+                case let .failure(error):
+                    print(error)
                     return .none
                 }
 
-                state.loadingTaskKindBuffer.append(.buildSettings)
-                state.loadingTaskKindBuffer.append(
-                    contentsOf: Array(
-                        repeating: .dumpPackage,
-                        count: rootDirectory.allPackageSwiftPath.count
-                    )
-                )
+            case let .buildSettingsResponse(result):
+                switch result {
+                case let .success(buildSettings):
+                    state.buildSettings = buildSettings
+                    state.loadingTaskKindBuffer.removeFirst()
 
-                return .run { send in
-                    await send(.buildSettingsResponse(Result {
-                        try await buildSettingsClient.getSettings(
-                            xcodeprojPath: rootDirectory.allXcodeprojPathsUnderDirectory[0]
-                        )
-                    }))
-
-                    for packageSwiftPath in rootDirectory.allPackageSwiftPath {
-                        let packageDirectoryPath = NSString(string: packageSwiftPath)
-                            .deletingLastPathComponent
-                        await send(.dumpPackageResponse(Result {
-                            try await dumpPackageClient.dumpPackage(currentDirectory: packageDirectoryPath)
-                        }))
-                    }
-
-                    await send(.dumpPackageCompleted)
-                }
-
-            case let .sourceFileResponse(.failure(error)):
-                print(error)
-                return .none
-
-            case let .sourceFileSelected(sourceFile):
-                return .none
-
-            case let .buildSettingsResponse(.success(buildSettings)):
-                state.buildSettings = buildSettings
-                state.loadingTaskKindBuffer.removeFirst()
-
-                #if DEBUG
+#if DEBUG
                     print("Successfully get buildsettings.")
                     print("state.loadingTaskKindBuffer.removeFirst(): \(state.loadingTaskKindBuffer)")
                     dump(buildSettings)
-                #endif
-                return .none
+#endif
+                    return .none
 
-            case let .buildSettingsResponse(.failure(error)):
-                print(error)
-                return .none
+                case let .failure(error):
+                    print(error)
+                    return .none
+                }
 
-            case let .dumpPackageResponse(.success(packageObject)):
-                state.packages.append(packageObject)
-                state.loadingTaskKindBuffer.removeFirst()
+            case let .dumpPackageResponse(result):
+                switch result {
+                case let .success(packageObject):
+                    state.packages.append(packageObject)
+                    state.loadingTaskKindBuffer.removeFirst()
 
-                #if DEBUG
+#if DEBUG
                     print("Successfully dump `PackageObject`.")
                     print("state.loadingTaskKindBuffer.removeFirst(): \(state.loadingTaskKindBuffer)")
                     dump(packageObject)
-                #endif
+#endif
 
-                return .none
+                    return .none
 
-            case let .dumpPackageResponse(.failure(error)):
-                print(error)
-                return .none
+                case let .failure(error):
+                    print(error)
+                    return .none
+                }
 
             case .dumpPackageCompleted:
                 state.loadingTaskKindBuffer.removeAll(where: { $0 == .dumpPackage })

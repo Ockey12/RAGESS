@@ -128,7 +128,7 @@ public struct RAGESSReducer {
                     ignoredDirectories = state.ignoredDirectories
                 ] send in
                     await send(.sourceFileResponse(Result {
-                        try sourceFileClient.getXcodeObjects(
+                        try sourceFileClient.getRootDirectory(
                             rootDirectoryPath: projectRootDirectoryPath,
                             ignoredDirectories: ignoredDirectories
                         )

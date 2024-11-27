@@ -12,7 +12,7 @@ import XcodeObject
 
 @DependencyClient
 public struct SourceFileClient {
-    public var getXcodeObjects: @Sendable (
+    public var getRootDirectory: @Sendable (
         _ rootDirectoryPath: String,
         _ ignoredDirectories: [String]
     ) throws -> Directory
@@ -26,7 +26,9 @@ extension SourceFileClient: DependencyKey {
             ignoredDirectories: [String]
         ) -> Directory {
             let fileManager = FileManager.default
+            #if DEBUG
             print(rootPath)
+            #endif
 
             var subDirectories: [Directory] = []
             var files: [SourceFile] = []
@@ -100,36 +102,28 @@ extension SourceFileClient: DependencyKey {
         }
 
         return .init(
-            getXcodeObjects: { rootDirectoryPath, ignoredDirectories in
+            getRootDirectory: { rootDirectoryPath, ignoredDirectories in
                 #if DEBUG
                     let startTime = CFAbsoluteTimeGetCurrent()
-                    let directory = getDirectories(
+                    let rootDirectory = getDirectories(
                         rootPath: rootDirectoryPath,
                         keyPathFromRootDirectory: \Directory.self,
                         ignoredDirectories: ignoredDirectories
                     )
                     let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
 
-                    var numberOfLines = printDirectoryContents(directory)
-
-                    print("")
-                    for fullPath in directory.allXcodeprojPathsUnderDirectory {
-                        print(fullPath)
-                    }
-                    print("")
-
                     print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
-                    print("NUMBER OF LINES: \(numberOfLines)")
+                    print("NUMBER OF LINES: \(totalLines(in: rootDirectory))")
                     print("TIME ELAPSED: \(timeElapsed)")
                     print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
 
-                    return directory
+                    return rootDirectory
                 #else
-                    let directory = getDirectories(
+                    let rootDirectory = getRootDirectory(
                         rootPath: rootDirectoryPath,
                         ignoredDirectories: ignoredDirectories
                     )
-                    return directory
+                    return rootDirectory
                 #endif
             }
         )
@@ -138,31 +132,40 @@ extension SourceFileClient: DependencyKey {
 
 #if DEBUG
     extension SourceFileClient {
-        static func printDirectoryContents(_ directory: Directory) -> Int {
+        static func totalLines(in directory: Directory) -> Int {
             var numberOfLines = 0
-            print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
-            print(directory.fullPath)
-            print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
-
-            if let description = directory.descriptionJSONString {
-                let lines = description.components(separatedBy: "\n")
-                for line in lines {
-                    print(line)
-                }
-                print()
+            
+            for file in directory.files {
+                numberOfLines += countLines(in: file)
             }
 
-            for sourceFile in directory.files {
-                print("*** \(sourceFile.fullPath) ***")
-                let lines = sourceFile.sourceCode.components(separatedBy: "\n")
-                numberOfLines += lines.count
-                for line in lines {
-                    print(line)
-                }
-                print()
-            }
             for subDirectory in directory.subDirectories {
-                numberOfLines += printDirectoryContents(subDirectory)
+                numberOfLines += totalLines(in: subDirectory)
+            }
+
+            return numberOfLines
+        }
+
+        static func countLines(in file: SourceFile) -> Int {
+            var numberOfLines = 0
+            let sourceCode = file.sourceCode
+            var currentIndex = sourceCode.startIndex
+            var isInStringLiteral = false
+
+            while currentIndex < sourceCode.endIndex {
+                let currentChar = sourceCode[currentIndex]
+
+                if currentChar == "\"" {
+                    isInStringLiteral.toggle()
+                    currentIndex = sourceCode.index(after: currentIndex)
+                    continue
+                }
+
+                if currentChar == "\n" && !isInStringLiteral {
+                    numberOfLines += 1
+                }
+
+                currentIndex = sourceCode.index(after: currentIndex)
             }
 
             return numberOfLines

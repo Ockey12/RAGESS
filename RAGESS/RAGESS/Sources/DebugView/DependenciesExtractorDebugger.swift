@@ -48,7 +48,7 @@ public struct DependenciesExtractorDebugger {
                 let rootDirectoryPath = state.projectRootPath
                 return .run { send in
                     await send(.sourceFileClientResponse(Result {
-                        try sourceFileClient.getXcodeObjects(
+                        try sourceFileClient.getRootDirectory(
                             rootDirectoryPath: rootDirectoryPath,
                             ignoredDirectories: [
                                 "build",

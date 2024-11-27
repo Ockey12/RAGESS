@@ -59,7 +59,7 @@ public struct SourceFileClientDebugger {
                 state.selectedFile = nil
                 return .run { [rootPath = state.rootPath] send in
                     await send(.sourceFileResponse(Result {
-                        try await sourceFileClient.getXcodeObjects(
+                        try sourceFileClient.getRootDirectory(
                             rootDirectoryPath: rootPath,
                             ignoredDirectories: [".build", "DerivedData", ".git"]
                         )

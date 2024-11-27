@@ -69,10 +69,9 @@ public struct DeclarationExtractorDebugger {
                         return .none
                     }
 
-                    let extractor = DeclarationExtractor()
                     do {
                         let startTime = CFAbsoluteTimeGetCurrent()
-                        let response = try extractor.extractDeclarations(rootDirectory: rootDirectory, indexStoreURL: indexStorePath)
+                        let response = try DeclarationExtractor.extractDeclarations(rootDirectory: rootDirectory, indexStoreURL: indexStorePath)
                         let endTime = CFAbsoluteTimeGetCurrent()
                         print("\nCOMPLETE DeclarationExtractor.extractDeclarations(): \(endTime - startTime) S: \(response.usrTable.count) usrTable items")
                         if state.isPrintValid {

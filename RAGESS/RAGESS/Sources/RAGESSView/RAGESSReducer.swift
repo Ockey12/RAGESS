@@ -396,7 +396,7 @@ extension RAGESSReducer {
     ) async -> [any DeclarationObject] {
         var declarationObjects: [any DeclarationObject] = []
         let allSourceFilePaths = allSourceFiles.map { $0.fullPath }
-        let extractor = DeclarationExtractor()
+//        let extractor = DeclarationExtractor()
 
         for sourceFile in allSourceFiles {
 //            let declarations = await extractor.extractDeclarations(

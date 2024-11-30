@@ -10,16 +10,16 @@ import BuildSettingsClient
 import ComposableArchitecture
 import DebugView
 import DeclarationExtractor
-import DeclarationObjectsClient
+import DeclaredObject
 import Dependencies
-import DependenciesClient
+import DependenciesExtractor
 import DumpPackageClient
 import FileTreeView
 import Foundation
 import MonitorClient
 import SourceFileClient
 import SwiftDiagramView
-import TypeDeclaration
+//import TypeDeclaration
 import XcodeObject
 
 @Reducer
@@ -32,7 +32,8 @@ public struct RAGESSReducer {
         var rootDirectory: Directory?
         var buildSettings: [String: String] = [:]
         var packages: [PackageObject] = []
-        var declarationObjects: [any DeclarationObject] = []
+//        var declarationObjects: [any DeclarationObject] = []
+        let indexStorePath = "/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz/Index.noindex/DataStore"
         let ignoredDirectories = [
             "build",
             ".build",
@@ -60,8 +61,11 @@ public struct RAGESSReducer {
         case buildSettingsResponse(Result<[String: String], Error>)
         case dumpPackageResponse(Result<PackageObject, Error>)
         case dumpPackageCompleted
-        case extractDeclarationsCompleted([any DeclarationObject])
-        case extractDependenciesResponse(Result<[any DeclarationObject], Error>)
+        case declarationExtractorResponse(Result<DeclarationExtractor.Response, Error>)
+        case dependenciesExtractorCompleted([DependencyObject])
+
+//        case extractDeclarationsCompleted([any DeclarationObject])
+//        case extractDependenciesResponse(Result<[any DeclarationObject], Error>)
         case startMonitoring
         case detectedDirectoryChange
         case fileTree(FileTreeViewReducer.Action)
@@ -76,8 +80,7 @@ public struct RAGESSReducer {
     @Dependency(SourceFileClient.self) var sourceFileClient
     @Dependency(BuildSettingsClient.self) var buildSettingsClient
     @Dependency(DumpPackageClient.self) var dumpPackageClient
-    @Dependency(DeclarationObjectsClient.self) var declarationObjectsClient
-    @Dependency(DependenciesClient.self) var dependenciesClient
+    @Dependency(\.swiftIndexStoreClient) private var indexStoreClient
     @Dependency(\.mainQueue) var mainQueue
 
     enum CancelID {
@@ -211,75 +214,39 @@ public struct RAGESSReducer {
                     assertionFailure()
                     return .none
                 }
-                let allSourceFiles = getAllSourceFiles(in: rootDirectory)
+                guard let indexStoreURL = URL(string: state.indexStorePath) else {
+                    return .none
+                }
 
                 state.loadingTaskKindBuffer.append(.extractDeclarations)
 
-                return .run {
-                    [
-                        buildSettings = state.buildSettings,
-                        packages = state.packages
-                    ] send in
-
-                    let declarationObjects = await extractDeclarations(
-                        allSourceFiles: allSourceFiles,
-                        buildSettings: buildSettings,
-                        packages: packages
-                    )
-
-                    await send(.extractDeclarationsCompleted(declarationObjects))
-                }
-
-            case let .extractDeclarationsCompleted(declarationObjects):
-                state.loadingTaskKindBuffer.removeFirst()
-
-                guard let rootDirectory = state.rootDirectory else {
-                    assertionFailure()
-                    return .none
-                }
-                let allSourceFiles = getAllSourceFiles(in: rootDirectory)
-
-                state.loadingTaskKindBuffer.append(.extractDependencies)
-
-                return .run {
-                    [
-                        buildSettings = state.buildSettings,
-                        packages = state.packages
-                    ] send in
-
-                    await declarationObjectsClient.set(declarationObjects)
-
-                    await send(.extractDependenciesResponse(Result {
-                        try await dependenciesClient.extractDependencies(
-                            declarationObjects: declarationObjects,
-                            allSourceFiles: allSourceFiles,
-                            buildSettings: buildSettings,
-                            packages: packages
-                        )
+                return .run { send in
+                    await send(.declarationExtractorResponse(Result {
+                        try DeclarationExtractor.extractDeclarations(rootDirectory: rootDirectory, indexStoreURL: indexStoreURL)
                     }))
                 }
 
-            case let .extractDependenciesResponse(result):
+            case let .declarationExtractorResponse(result):
                 switch result {
-                case let .success(objects):
-                    return .none
+                case let .success(response):
+                    state.rootDirectory = response.rootDirectory
+                    return .send(.dependenciesExtractorCompleted(
+                        DependenciesExtractor.extract(
+                            indexStoreObjects: response.indexStoreObjects,
+                            usrTable: response.usrTable,
+                            sourceFileTable: response.sourceFileTable,
+                            rootDirectory: response.rootDirectory
+                        )
+                    ))
 
                 case let .failure(error):
                     print(error)
                     assertionFailure()
                     return .none
                 }
-            case let .extractDependenciesResponse(.success(hasDependenciesObjects)):
-                state.loadingTaskKindBuffer.removeFirst()
-                state.declarationObjects = hasDependenciesObjects
 
-                print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
-                print("COMPLETE ALL PROCESSES")
-                print("TIME ELAPSED: \(CFAbsoluteTimeGetCurrent() - state.processStartTime)")
-                print("NUMBER OF DECLARATION OBJECTS: \(state.declarationObjects.count)")
-                print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
-
-                return .send(.startMonitoring)
+            case let .dependenciesExtractorCompleted(dependencyObjects):
+                return .none
 
             case .startMonitoring:
                 guard let buildDirectoryPath = state.buildSettings["BUILD_DIR"] else {
@@ -310,15 +277,16 @@ public struct RAGESSReducer {
                     )
 
             case let .fileTree(.delegate(delegateAction)):
-                switch delegateAction {
-                case let .popoverCellClicked(objectID: objectID):
-                    guard let clickedObject = state.declarationObjects.first(where: { $0.id == objectID }) else {
-                        return .none
-                    }
-                    print(clickedObject.name)
-                    state.swiftDiagramTree = .init(rootObject: clickedObject, allDeclarationObjects: state.declarationObjects)
-                    return .none
-                }
+//                switch delegateAction {
+//                case let .popoverCellClicked(objectID: objectID):
+//                    guard let clickedObject = state.declarationObjects.first(where: { $0.id == objectID }) else {
+//                        return .none
+//                    }
+//                    print(clickedObject.name)
+//                    state.swiftDiagramTree = .init(rootObject: clickedObject, allDeclarationObjects: state.declarationObjects)
+//                    return .none
+//                }
+                return .none
 
             case .fileTree:
                 return .none
@@ -345,45 +313,6 @@ public struct RAGESSReducer {
 }
 
 extension RAGESSReducer {
-    func getAllSourceFiles(in directory: Directory) -> [SourceFile] {
-        var files = directory.files
-        for subDirectory in directory.subDirectories {
-            files.append(contentsOf: getAllSourceFiles(in: subDirectory))
-        }
-        return files
-    }
-
-    func getAllSwiftFilePaths(in directory: Directory) -> [String] {
-        var swiftFilePaths: [String] = directory.files.map { $0.fullPath }
-        for subDirectory in directory.subDirectories {
-            swiftFilePaths.append(contentsOf: getAllSwiftFilePaths(in: subDirectory))
-        }
-        return swiftFilePaths
-    }
-
-    func extractDeclarations(
-        allSourceFiles: [SourceFile],
-        buildSettings: [String: String],
-        packages: [PackageObject]
-    ) async -> [any DeclarationObject] {
-        var declarationObjects: [any DeclarationObject] = []
-        let allSourceFilePaths = allSourceFiles.map { $0.fullPath }
-//        let extractor = DeclarationExtractor()
-
-        for sourceFile in allSourceFiles {
-//            let declarations = await extractor.extractDeclarations(
-//                from: sourceFile,
-//                buildSettings: buildSettings,
-//                sourceFilePaths: allSourceFilePaths,
-//                packages: packages
-//            )
-
-//            declarationObjects.append(contentsOf: declarations)
-        }
-
-        return declarationObjects
-    }
-
     func findAppPaths(in directoryPath: String) -> [String] {
         let fileManager = FileManager.default
         let directoryURL = URL(filePath: directoryPath)

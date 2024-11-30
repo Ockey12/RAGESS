@@ -182,8 +182,9 @@ let package = Package(
                 "BuildSettingsClient",
                 "DebugView",
                 "DeclarationExtractor",
+                "DeclaredObject",
                 "DeclarationObjectsClient",
-                "DependenciesClient",
+                "DependenciesExtractor",
                 "DumpPackageClient",
                 "FileTreeView",
                 "MonitorClient",
@@ -232,7 +233,12 @@ let package = Package(
                 .product(name: "SwiftIndexStore", package: "swift-indexstore")
             ]
         ),
-        .target(name: "SwiftIndexStoreObject"),
+        .target(
+            name: "SwiftIndexStoreObject",
+            dependencies: [
+                "DeclaredObject"
+            ]
+        ),
         .target(
             name: "TypeAnnotationClient",
             dependencies: [

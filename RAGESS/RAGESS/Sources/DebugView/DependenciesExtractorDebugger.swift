@@ -80,7 +80,7 @@ public struct DependenciesExtractorDebugger {
                         print(numOfDefinitions, "definitions")
                         print(numOfReferences, "references")
 
-                        let dependenciesTable = DependenciesExtractor.extract(
+                        let dependencies = DependenciesExtractor.extract(
                             indexStoreObjects: response.indexStoreObjects,
                             usrTable: response.usrTable,
                             sourceFileTable: response.sourceFileTable,
@@ -88,10 +88,10 @@ public struct DependenciesExtractorDebugger {
                         )
 
                         let endTime = CFAbsoluteTimeGetCurrent()
-                        print("\nCOMPLETE DependenciesExtractor.extract(): \(endTime - startTime) S: \(dependenciesTable.count) dependenciesTable items\n")
+                        print("\nCOMPLETE DependenciesExtractor.extract(): \(endTime - startTime) S: \(dependencies.count) dependenciesTable items\n")
 
                         if state.isPrintValid {
-                            for dependencyObject in dependenciesTable {
+                            for dependencyObject in dependencies {
                                 guard let callerUSR = dependencyObject.callerUSRs.first else {
                                     continue
                                 }

@@ -102,13 +102,9 @@ public struct RAGESSReducer {
                 switch result {
                 case let .success(urls):
                     guard let url = urls.first else {
-                        print("ERROR in \(#file) - \(#line): Cannot find `urls.first`")
+                        assertionFailure()
                         return .none
                     }
-
-                    #if DEBUG
-                        print("Successfully get project root directory path.")
-                    #endif
 
                     state.projectRootDirectoryPath = url.path()
 
@@ -116,6 +112,7 @@ public struct RAGESSReducer {
 
                 case let .failure(error):
                     print(error)
+                    assertionFailure()
                     return .none
                 }
 
@@ -140,17 +137,11 @@ public struct RAGESSReducer {
                 case let .success(rootDirectory):
                     state.loadingTaskKindBuffer.removeFirst()
 
-                    #if DEBUG
-                        print(".sourceFileResponse(.success(rootDirectory))")
-                        print("state.loadingTaskKindBuffer.removeFirst(): \(state.loadingTaskKindBuffer)")
-                        dump(rootDirectory)
-                    #endif
-
                     state.rootDirectory = rootDirectory
                     state.fileTree.rootDirectory = rootDirectory
 
                     guard !rootDirectory.allXcodeprojPathsUnderDirectory.isEmpty else {
-                        print("ERROR in \(#file) - \(#line): Cannot find `**.xcodeproj`")
+                        assertionFailure()
                         return .none
                     }
 
@@ -165,6 +156,7 @@ public struct RAGESSReducer {
                     return .run { send in
                         await send(.buildSettingsResponse(Result {
                             try await buildSettingsClient.getSettings(
+                                // TODO: support for multiple xcodeproj
                                 xcodeprojPath: rootDirectory.allXcodeprojPathsUnderDirectory[0]
                             )
                         }))
@@ -182,6 +174,7 @@ public struct RAGESSReducer {
 
                 case let .failure(error):
                     print(error)
+                    assertionFailure()
                     return .none
                 }
 
@@ -190,16 +183,11 @@ public struct RAGESSReducer {
                 case let .success(buildSettings):
                     state.buildSettings = buildSettings
                     state.loadingTaskKindBuffer.removeFirst()
-
-                    #if DEBUG
-                        print("Successfully get buildsettings.")
-                        print("state.loadingTaskKindBuffer.removeFirst(): \(state.loadingTaskKindBuffer)")
-                        dump(buildSettings)
-                    #endif
                     return .none
 
                 case let .failure(error):
                     print(error)
+                    assertionFailure()
                     return .none
                 }
 
@@ -208,30 +196,19 @@ public struct RAGESSReducer {
                 case let .success(packageObject):
                     state.packages.append(packageObject)
                     state.loadingTaskKindBuffer.removeFirst()
-
-                    #if DEBUG
-                        print("Successfully dump `PackageObject`.")
-                        print("state.loadingTaskKindBuffer.removeFirst(): \(state.loadingTaskKindBuffer)")
-                        dump(packageObject)
-                    #endif
-
                     return .none
 
                 case let .failure(error):
                     print(error)
+                    assertionFailure()
                     return .none
                 }
 
             case .dumpPackageCompleted:
                 state.loadingTaskKindBuffer.removeAll(where: { $0 == .dumpPackage })
 
-                #if DEBUG
-                    print("Successfully dump all `PackageObject`.")
-                    print("state.loadingTaskKindBuffer.removeFirst(): \(state.loadingTaskKindBuffer)")
-                #endif
-
                 guard let rootDirectory = state.rootDirectory else {
-                    print("ERROR in \(#file) - \(#line): Cannot find `State.rootDirectory`")
+                    assertionFailure()
                     return .none
                 }
                 let allSourceFiles = getAllSourceFiles(in: rootDirectory)
@@ -256,13 +233,8 @@ public struct RAGESSReducer {
             case let .extractDeclarationsCompleted(declarationObjects):
                 state.loadingTaskKindBuffer.removeFirst()
 
-                #if DEBUG
-                    print("Successfully extract declaration objects.")
-                    print("state.loadingTaskKindBuffer.removeFirst(): \(state.loadingTaskKindBuffer)")
-                #endif
-
                 guard let rootDirectory = state.rootDirectory else {
-                    print("ERROR in \(#file) - \(#line): Cannot find `State.rootDirectory`")
+                    assertionFailure()
                     return .none
                 }
                 let allSourceFiles = getAllSourceFiles(in: rootDirectory)
@@ -287,14 +259,18 @@ public struct RAGESSReducer {
                     }))
                 }
 
+            case let .extractDependenciesResponse(result):
+                switch result {
+                case let .success(objects):
+                    return .none
+
+                case let .failure(error):
+                    print(error)
+                    assertionFailure()
+                    return .none
+                }
             case let .extractDependenciesResponse(.success(hasDependenciesObjects)):
                 state.loadingTaskKindBuffer.removeFirst()
-
-                #if DEBUG
-                    print("Successfully extract dependencies.")
-                    print("state.loadingTaskKindBuffer.removeFirst(): \(state.loadingTaskKindBuffer)")
-                #endif
-
                 state.declarationObjects = hasDependenciesObjects
 
                 print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
@@ -305,19 +281,15 @@ public struct RAGESSReducer {
 
                 return .send(.startMonitoring)
 
-            case let .extractDependenciesResponse(.failure(error)):
-                print(error)
-                return .none
-
             case .startMonitoring:
                 guard let buildDirectoryPath = state.buildSettings["BUILD_DIR"] else {
-                    print("ERROR in \(#file) - \(#line): Cannot find \"BUILD_DIR\" key.")
+                    assertionFailure()
                     return .none
                 }
                 let appPaths = findAppPaths(in: buildDirectoryPath)
 
                 guard !appPaths.isEmpty else {
-                    print("ERROR in \(#file) - \(#line): Cannot find \".app\" directory.")
+                    assertionFailure()
                     return .none
                 }
 

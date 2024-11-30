@@ -33,7 +33,6 @@ public struct RAGESSReducer {
         var buildSettings: [String: String] = [:]
         var packages: [PackageObject] = []
 //        var declarationObjects: [any DeclarationObject] = []
-        let indexStorePath = "/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz/Index.noindex/DataStore"
         let ignoredDirectories = [
             "build",
             ".build",
@@ -214,9 +213,19 @@ public struct RAGESSReducer {
                     assertionFailure()
                     return .none
                 }
-                guard let indexStoreURL = URL(string: state.indexStorePath) else {
+
+                // example: BUILD_DIR: ~/Library/Developer/Xcode/DerivedData/<project hash>/Build/Products
+                guard let buildProductsPath = state.buildSettings["BUILD_DIR"] else {
+                    assertionFailure()
                     return .none
                 }
+                guard let derivedDataURL = URL(string: buildProductsPath)?.deletingLastPathComponent().deletingLastPathComponent() else {
+                    assertionFailure()
+                    return .none
+                }
+                let indexStoreURL = derivedDataURL
+                                    .appendingPathComponent("Index.noindex")
+                                    .appendingPathComponent("DataStore")
 
                 state.loadingTaskKindBuffer.append(.extractDeclarations)
 

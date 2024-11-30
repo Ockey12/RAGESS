@@ -27,7 +27,7 @@ extension SourceFileClient: DependencyKey {
         ) -> Directory {
             let fileManager = FileManager.default
             #if DEBUG
-            print(rootPath)
+                print(rootPath)
             #endif
 
             var subDirectories: [Directory] = []
@@ -134,7 +134,7 @@ extension SourceFileClient: DependencyKey {
     extension SourceFileClient {
         static func totalLines(in directory: Directory) -> Int {
             var numberOfLines = 0
-            
+
             for file in directory.files {
                 numberOfLines += countLines(in: file)
             }

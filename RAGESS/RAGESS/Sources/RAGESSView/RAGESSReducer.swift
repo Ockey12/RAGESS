@@ -19,7 +19,8 @@ import Foundation
 import MonitorClient
 import SourceFileClient
 import SwiftDiagramView
-//import TypeDeclaration
+
+// import TypeDeclaration
 import XcodeObject
 
 @Reducer
@@ -224,8 +225,8 @@ public struct RAGESSReducer {
                     return .none
                 }
                 let indexStoreURL = derivedDataURL
-                                    .appendingPathComponent("Index.noindex")
-                                    .appendingPathComponent("DataStore")
+                    .appendingPathComponent("Index.noindex")
+                    .appendingPathComponent("DataStore")
 
                 state.loadingTaskKindBuffer.append(.extractDeclarations)
 

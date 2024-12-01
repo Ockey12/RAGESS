@@ -82,24 +82,28 @@ public struct FileTreeViewReducer {
                     index += 1
 
                     state.cells.insert(
-                        contentsOf: IdentifiedArrayOf(uniqueElements: directory.files.map {
-                            CellReducer.State(content: .sourceFile($0), leadingPadding: leadingPadding + 37)
-                        }),
+                        contentsOf: IdentifiedArrayOf(uniqueElements: directory.files
+                            .map { CellReducer.State(content: .sourceFile($0), leadingPadding: leadingPadding + 37) }
+                            .sorted(by: { $0.name < $1.name })
+                        ),
                         at: index
                     )
 
                     index += directory.files.count
 
                     state.cells.insert(
-                        contentsOf: IdentifiedArrayOf(uniqueElements: directory.subDirectories.map {
-                            let padding = leadingPadding +
-                                (
-                                    $0.files.isEmpty && $0.subDirectories.isEmpty
-                                        ? 37
-                                        : 22
-                                )
-                            return CellReducer.State(content: .directory($0), leadingPadding: padding)
-                        }),
+                        contentsOf: IdentifiedArrayOf(uniqueElements: directory.subDirectories
+                            .map {
+                                let padding = leadingPadding +
+                                    (
+                                        $0.files.isEmpty && $0.subDirectories.isEmpty
+                                            ? 37
+                                            : 22
+                                    )
+                                return CellReducer.State(content: .directory($0), leadingPadding: padding)
+                            }
+                            .sorted(by: { $0.name < $1.name })
+                        ),
                         at: index
                     )
 
@@ -112,9 +116,6 @@ public struct FileTreeViewReducer {
 
                     removeChildrenCell(directory: directory, state: &state)
 
-                    return .none
-
-                case let .nameClicked(content):
                     return .none
 
                 case let .popoverCellClicked(objectID: objectID):

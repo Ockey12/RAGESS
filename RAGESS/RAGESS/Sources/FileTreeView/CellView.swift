@@ -78,7 +78,6 @@ public struct CellReducer {
         public enum Delegate {
             case childrenExpanded(content: Content, leadingPadding: CGFloat)
             case childrenCollapsed(content: Content)
-            case nameClicked(Content)
             case popoverCellClicked(objectID: UUID)
         }
     }

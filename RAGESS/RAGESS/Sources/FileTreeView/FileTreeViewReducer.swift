@@ -62,7 +62,7 @@ public struct FileTreeViewReducer {
         case delegate(Delegate)
 
         public enum Delegate {
-            case popoverCellClicked(objectID: UUID)
+            case popoverCellClicked(firstUSR: String)
         }
     }
 
@@ -118,8 +118,8 @@ public struct FileTreeViewReducer {
 
                     return .none
 
-                case let .popoverCellClicked(objectID: objectID):
-                    return .send(.delegate(.popoverCellClicked(objectID: objectID)))
+                case let .popoverCellClicked(firstUSR: firstUSR):
+                    return .send(.delegate(.popoverCellClicked(firstUSR: firstUSR)))
                 }
 
             case .cells:

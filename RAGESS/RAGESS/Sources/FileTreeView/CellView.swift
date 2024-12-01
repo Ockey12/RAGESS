@@ -78,7 +78,7 @@ public struct CellReducer {
         public enum Delegate {
             case childrenExpanded(content: Content, leadingPadding: CGFloat)
             case childrenCollapsed(content: Content)
-            case popoverCellClicked(objectID: UUID)
+            case popoverCellClicked(firstUSR: String)
         }
     }
 
@@ -108,8 +108,8 @@ public struct CellReducer {
             case .children:
                 return .none
 
-            case let .destination(.presented(.popover(.delegate(.cellClicked(objectID: objectID))))):
-                return .send(.delegate(.popoverCellClicked(objectID: objectID)))
+            case let .destination(.presented(.popover(.delegate(.cellClicked(firstUSR: firstUSR))))):
+                return .send(.delegate(.popoverCellClicked(firstUSR: firstUSR)))
 
             case .destination:
                 return .none

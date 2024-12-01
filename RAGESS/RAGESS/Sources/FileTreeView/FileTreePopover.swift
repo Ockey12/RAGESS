@@ -38,7 +38,7 @@ public struct FileTreePopoverReducer {
         case delegate(Delegate)
 
         public enum Delegate {
-            case cellClicked(objectID: UUID)
+            case cellClicked(firstUSR: String)
         }
     }
 
@@ -47,8 +47,8 @@ public struct FileTreePopoverReducer {
             switch action {
             case let .cells(.element(id: _, action: .delegate(delegateAction))):
                 switch delegateAction {
-                case let .clicked(objectID: objectID):
-                    return .send(.delegate(.cellClicked(objectID: objectID)))
+                case let .clicked(firstUSR: firstUSR):
+                    return .send(.delegate(.cellClicked(firstUSR: firstUSR)))
                 }
 
             case .cells:

@@ -288,8 +288,8 @@ public struct RAGESSReducer {
                     )
 
             case let .fileTree(.delegate(delegateAction)):
-//                switch delegateAction {
-//                case let .popoverCellClicked(objectID: objectID):
+                switch delegateAction {
+                case let .popoverCellClicked(firstUSR: firstUSR):
 //                    guard let clickedObject = state.declarationObjects.first(where: { $0.id == objectID }) else {
 //                        return .none
 //                    }
@@ -298,6 +298,7 @@ public struct RAGESSReducer {
 //                    return .none
 //                }
                 return .none
+                }
 
             case .fileTree:
                 return .none

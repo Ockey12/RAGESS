@@ -135,8 +135,15 @@ let package = Package(
             name: "DependenciesExtractor",
             dependencies: [
                 "DeclaredObject",
+                "DependencyObject",
                 "SwiftIndexStoreObject",
                 "XcodeObject"
+            ]
+        ),
+        .target(
+            name: "DependencyObject",
+            dependencies: [
+                "SwiftIndexStoreObject"
             ]
         ),
         .target(
@@ -184,6 +191,7 @@ let package = Package(
                 "DeclaredObject",
                 "DeclarationObjectsClient",
                 "DependenciesExtractor",
+                "DependencyObject",
                 "DumpPackageClient",
                 "FileTreeView",
                 "MonitorClient",

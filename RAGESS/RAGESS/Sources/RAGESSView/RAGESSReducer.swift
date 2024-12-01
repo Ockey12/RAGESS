@@ -13,6 +13,7 @@ import DeclarationExtractor
 import DeclaredObject
 import Dependencies
 import DependenciesExtractor
+import DependencyObject
 import DumpPackageClient
 import FileTreeView
 import Foundation

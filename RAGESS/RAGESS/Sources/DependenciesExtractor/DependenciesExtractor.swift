@@ -7,6 +7,7 @@
 //
 
 import DeclaredObject
+import DependencyObject
 import Foundation
 import SwiftIndexStoreObject
 import XcodeObject
@@ -18,7 +19,7 @@ public enum DependenciesExtractor {
         sourceFileTable: [String: WritableKeyPath<Directory, SourceFile>],
         rootDirectory: Directory
     ) -> [DependencyObject] {
-        let references = indexStoreObjects.filter { $0.role == .reference }
+        let references = indexStoreObjects.filter { $0.roles.contains(.reference) }
 
         var dependencies = [DependencyObject]()
         for reference in references {
@@ -30,7 +31,7 @@ public enum DependenciesExtractor {
                 continue
             }
 
-            dependencies.append(.init(calleeUSR: reference.usr, callerUSRs: callerUSRs))
+            dependencies.append(.init(calleeUSR: reference.usr, callerUSRs: callerUSRs, roles: reference.roles))
         }
 
         return dependencies

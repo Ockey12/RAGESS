@@ -35,7 +35,7 @@ public enum DeclarationExtractor {
         )
 
         // Assign USR to the DeclaredObject of each SourceFile in the SourceFileTable.
-        let definitions = indexStoreObjects.filter { $0.role == .definition }
+        let definitions = indexStoreObjects.filter { $0.roles.contains(.definition) }
         var sourceFilesTable = extractDeclarations(directory: rootDirectory)
         var usrTable = USRTable()
         for object in definitions {
@@ -95,7 +95,7 @@ public enum DeclarationExtractor {
     }
 
     private static func assignUSR(indexStoreObject: IndexStoreObject, sourceFileTable: inout [FullPath: SourceFile]) -> USRTable {
-        guard indexStoreObject.role == .definition,
+        guard indexStoreObject.roles.contains(.definition),
               let sourceFile = sourceFileTable[indexStoreObject.fullPath]
         else {
             return [:]

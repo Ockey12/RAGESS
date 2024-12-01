@@ -39,15 +39,19 @@ extension SwiftIndexStoreClient: DependencyKey {
                             return true
                         }
 
-                        let role: IndexStoreObject.Role = if occurrence.roles.contains(.definition) {
-                            .definition
-                        } else {
-                            .reference
+                        var roles: [IndexStoreObject.Role] = []
+                        if occurrence.roles.contains(.definition) {
+                            roles.append(.definition)
+                        } else if occurrence.roles.contains(.reference) {
+                            roles.append(.reference)
+                            if occurrence.roles.contains(.baseOf) {
+                                roles.append(.baseOf)
+                            }
                         }
 
                         result.append(.init(
                             usr: usr,
-                            role: role,
+                            roles: roles,
                             fullPath: location,
                             line: occurrence.location.line,
                             column: occurrence.location.column

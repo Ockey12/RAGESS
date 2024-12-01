@@ -10,18 +10,19 @@ import DeclaredObject
 
 public struct IndexStoreObject {
     public let usr: String
-    public let role: Role
+    public let roles: [Role]
     public let fullPath: String
     public let locationInXcode: LocationInXcode
 
     public enum Role: String {
         case definition
         case reference
+        case baseOf
     }
 
-    public init(usr: String, role: Role, fullPath: String, line: Int64, column: Int64) {
+    public init(usr: String, roles: [Role], fullPath: String, line: Int64, column: Int64) {
         self.usr = usr
-        self.role = role
+        self.roles = roles
         self.fullPath = fullPath
         locationInXcode = .init(line: Int(line), column: Int(column))
     }

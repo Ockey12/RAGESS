@@ -55,7 +55,7 @@ public struct RAGESSView: View {
 
                             Divider()
 
-                            Text(store.projectRootDirectoryPath)
+                            Text(store.extractedData.projectRootDirectoryPath)
                                 .padding()
 
                             Spacer()

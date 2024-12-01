@@ -19,6 +19,7 @@ import Foundation
 import MonitorClient
 import SourceFileClient
 import SwiftDiagramView
+import SwiftIndexStoreObject
 
 // import TypeDeclaration
 import XcodeObject
@@ -29,11 +30,27 @@ public struct RAGESSReducer {
 
     @ObservableState
     public struct State {
-        var projectRootDirectoryPath: String
-        var rootDirectory: Directory?
-        var buildSettings: [String: String] = [:]
-        var packages: [PackageObject] = []
-//        var declarationObjects: [any DeclarationObject] = []
+        struct ExtractedData {
+            var projectRootDirectoryPath: String = ""
+            var rootDirectory: Directory?
+            var buildSettings: [String: String] = [:]
+            var packages: [PackageObject] = []
+            var usrTable: [String: WritableKeyPath<Directory, DeclaredObject>] = [:]
+            var sourceFileTable: [String: WritableKeyPath<Directory, SourceFile>] = [:]
+            var indexStoreObjects: [IndexStoreObject] = []
+            var dependencyObjects: [DependencyObject] = []
+
+            mutating func reset() {
+                rootDirectory = nil
+                buildSettings = [:]
+                packages = []
+                usrTable = [:]
+                sourceFileTable = [:]
+                indexStoreObjects = []
+            }
+        }
+
+        var extractedData: ExtractedData = .init()
         let ignoredDirectories = [
             "build",
             ".build",
@@ -49,9 +66,7 @@ public struct RAGESSReducer {
         var processStartTime = CFAbsoluteTimeGetCurrent()
         var debugView = DebugReducer.State()
 
-        public init(projectRootDirectoryPath: String) {
-            self.projectRootDirectoryPath = projectRootDirectoryPath
-        }
+        public init() {}
     }
 
     public enum Action: BindableAction {
@@ -109,7 +124,7 @@ public struct RAGESSReducer {
                         return .none
                     }
 
-                    state.projectRootDirectoryPath = url.path()
+                    state.extractedData.projectRootDirectoryPath = url.path()
 
                     return .send(.extractSourceFiles)
 
@@ -124,7 +139,7 @@ public struct RAGESSReducer {
                 state.loadingTaskKindBuffer.append(.sourceFiles)
 
                 return .run { [
-                    projectRootDirectoryPath = state.projectRootDirectoryPath,
+                    projectRootDirectoryPath = state.extractedData.projectRootDirectoryPath,
                     ignoredDirectories = state.ignoredDirectories
                 ] send in
                     await send(.sourceFileResponse(Result {
@@ -139,9 +154,6 @@ public struct RAGESSReducer {
                 switch result {
                 case let .success(rootDirectory):
                     state.loadingTaskKindBuffer.removeFirst()
-
-//                    state.rootDirectory = rootDirectory
-//                    state.fileTree.rootDirectory = rootDirectory
 
                     guard !rootDirectory.allXcodeprojPathsUnderDirectory.isEmpty else {
                         assertionFailure()
@@ -184,7 +196,7 @@ public struct RAGESSReducer {
             case let .buildSettingsResponse(result):
                 switch result {
                 case let .success(buildSettings):
-                    state.buildSettings = buildSettings
+                    state.extractedData.buildSettings = buildSettings
                     state.loadingTaskKindBuffer.removeFirst()
                     return .none
 
@@ -197,7 +209,7 @@ public struct RAGESSReducer {
             case let .dumpPackageResponse(result):
                 switch result {
                 case let .success(packageObject):
-                    state.packages.append(packageObject)
+                    state.extractedData.packages.append(packageObject)
                     state.loadingTaskKindBuffer.removeFirst()
                     return .none
 
@@ -210,13 +222,8 @@ public struct RAGESSReducer {
             case let .dumpPackageCompleted(rootDirectory: rootDirectory):
                 state.loadingTaskKindBuffer.removeAll(where: { $0 == .dumpPackage })
 
-//                guard let rootDirectory = state.rootDirectory else {
-//                    assertionFailure()
-//                    return .none
-//                }
-
                 // example: BUILD_DIR: ~/Library/Developer/Xcode/DerivedData/<project hash>/Build/Products
-                guard let buildProductsPath = state.buildSettings["BUILD_DIR"] else {
+                guard let buildProductsPath = state.extractedData.buildSettings["BUILD_DIR"] else {
                     assertionFailure()
                     return .none
                 }
@@ -239,8 +246,13 @@ public struct RAGESSReducer {
             case let .declarationExtractorResponse(result):
                 switch result {
                 case let .success(response):
-                    state.rootDirectory = response.rootDirectory
+                    state.extractedData.rootDirectory = response.rootDirectory
+                    state.extractedData.usrTable = response.usrTable
+                    state.extractedData.sourceFileTable = response.sourceFileTable
+                    state.extractedData.indexStoreObjects = response.indexStoreObjects
+
                     state.fileTree.rootDirectory = response.rootDirectory
+
                     return .send(.dependenciesExtractorCompleted(
                         DependenciesExtractor.extract(
                             indexStoreObjects: response.indexStoreObjects,
@@ -257,10 +269,11 @@ public struct RAGESSReducer {
                 }
 
             case let .dependenciesExtractorCompleted(dependencyObjects):
+                state.extractedData.dependencyObjects = dependencyObjects
                 return .none
 
             case .startMonitoring:
-                guard let buildDirectoryPath = state.buildSettings["BUILD_DIR"] else {
+                guard let buildDirectoryPath = state.extractedData.buildSettings["BUILD_DIR"] else {
                     assertionFailure()
                     return .none
                 }
@@ -295,9 +308,16 @@ public struct RAGESSReducer {
 //                    }
 //                    print(clickedObject.name)
 //                    state.swiftDiagramTree = .init(rootObject: clickedObject, allDeclarationObjects: state.declarationObjects)
-//                    return .none
-//                }
-                return .none
+
+                    guard let objectKeyPath = state.extractedData.usrTable[firstUSR],
+                          let rootDirectory = state.extractedData.rootDirectory
+                    else {
+                        assertionFailure()
+                        return .none
+                    }
+                    let selectedObject = rootDirectory[keyPath: objectKeyPath]
+                    print("Selected: \(selectedObject.name)")
+                    return .none
                 }
 
             case .fileTree:

@@ -7,10 +7,8 @@
 //
 
 import ComposableArchitecture
-import DeclarationObjectsClient
 import Dependencies
 import SwiftUI
-import TypeDeclaration
 import XcodeObject
 
 @Reducer
@@ -70,12 +68,9 @@ public struct CellReducer {
         }
     }
 
-    @Dependency(DeclarationObjectsClient.self) var declarationObjectsClient
-
     public indirect enum Action {
         case expandButtonTapped
         case nameClicked
-        case declarationObjectsResponse([any DeclarationObject])
         case children(IdentifiedActionOf<CellReducer>)
         case destination(PresentationAction<Destination.Action>)
         case delegate(Delegate)
@@ -106,13 +101,9 @@ public struct CellReducer {
                 )
 
             case .nameClicked:
-                return .run { send in
-                    let declarationObjects = await declarationObjectsClient.get()
-                    await send(.declarationObjectsResponse(declarationObjects))
+                if case .sourceFile = state.content {
+                    state.destination = .popover(FileTreePopoverReducer.State(content: state.content))
                 }
-
-            case let .declarationObjectsResponse(objects):
-                state.destination = .popover(FileTreePopoverReducer.State(content: state.content, declarationObjects: objects))
                 return .none
 
             case .children:
@@ -225,7 +216,7 @@ struct CellView: View {
                 action: \.destination.popover
             )
         ) { popoverStore in
-            FileTreePopoverContent(store: popoverStore)
+            FileTreePopoverContentView(store: popoverStore)
         }
     }
 }

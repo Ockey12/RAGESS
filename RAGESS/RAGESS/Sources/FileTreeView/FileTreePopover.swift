@@ -7,8 +7,8 @@
 //
 
 import ComposableArchitecture
+import DeclaredObject
 import SwiftUI
-import TypeDeclaration
 
 @Reducer
 public struct FileTreePopoverReducer {
@@ -17,19 +17,19 @@ public struct FileTreePopoverReducer {
         let content: Content
         var cells: IdentifiedArrayOf<FileTreePopoverCellReducer.State>
 
-        public init(content: Content, declarationObjects: [any DeclarationObject]) {
+        public init(content: Content) {
             self.content = content
 
-            var objects: [any DeclarationObject] = []
             switch content {
-            case let .directory(directory):
+            case .directory:
+                cells = []
                 break
             case let .sourceFile(sourceFile):
-                objects = declarationObjects.filter { sourceFile.fullPath == $0.fullPath }
+                let objects = sourceFile.declaredObjects.sorted(by: { $0.rangeInXcode.lowerBound < $1.rangeInXcode.lowerBound })
+                cells = .init(uniqueElements: objects.map {
+                    FileTreePopoverCellReducer.State(declaredObject: $0)
+                })
             }
-            cells = .init(uniqueElements: objects.map {
-                FileTreePopoverCellReducer.State(declarationObject: $0)
-            })
         }
     }
 
@@ -64,7 +64,7 @@ public struct FileTreePopoverReducer {
     }
 }
 
-public struct FileTreePopoverContent: View {
+public struct FileTreePopoverContentView: View {
     let store: StoreOf<FileTreePopoverReducer>
 
     public init(store: StoreOf<FileTreePopoverReducer>) {

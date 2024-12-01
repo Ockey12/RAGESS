@@ -60,7 +60,7 @@ public struct RAGESSReducer {
         case sourceFileResponse(Result<Directory, Error>)
         case buildSettingsResponse(Result<[String: String], Error>)
         case dumpPackageResponse(Result<PackageObject, Error>)
-        case dumpPackageCompleted
+        case dumpPackageCompleted(rootDirectory: Directory)
         case declarationExtractorResponse(Result<DeclarationExtractor.Response, Error>)
         case dependenciesExtractorCompleted([DependencyObject])
 
@@ -140,8 +140,8 @@ public struct RAGESSReducer {
                 case let .success(rootDirectory):
                     state.loadingTaskKindBuffer.removeFirst()
 
-                    state.rootDirectory = rootDirectory
-                    state.fileTree.rootDirectory = rootDirectory
+//                    state.rootDirectory = rootDirectory
+//                    state.fileTree.rootDirectory = rootDirectory
 
                     guard !rootDirectory.allXcodeprojPathsUnderDirectory.isEmpty else {
                         assertionFailure()
@@ -172,7 +172,7 @@ public struct RAGESSReducer {
                             }))
                         }
 
-                        await send(.dumpPackageCompleted)
+                        await send(.dumpPackageCompleted(rootDirectory: rootDirectory))
                     }
 
                 case let .failure(error):
@@ -207,13 +207,13 @@ public struct RAGESSReducer {
                     return .none
                 }
 
-            case .dumpPackageCompleted:
+            case let .dumpPackageCompleted(rootDirectory: rootDirectory):
                 state.loadingTaskKindBuffer.removeAll(where: { $0 == .dumpPackage })
 
-                guard let rootDirectory = state.rootDirectory else {
-                    assertionFailure()
-                    return .none
-                }
+//                guard let rootDirectory = state.rootDirectory else {
+//                    assertionFailure()
+//                    return .none
+//                }
 
                 // example: BUILD_DIR: ~/Library/Developer/Xcode/DerivedData/<project hash>/Build/Products
                 guard let buildProductsPath = state.buildSettings["BUILD_DIR"] else {
@@ -240,6 +240,7 @@ public struct RAGESSReducer {
                 switch result {
                 case let .success(response):
                     state.rootDirectory = response.rootDirectory
+                    state.fileTree.rootDirectory = response.rootDirectory
                     return .send(.dependenciesExtractorCompleted(
                         DependenciesExtractor.extract(
                             indexStoreObjects: response.indexStoreObjects,

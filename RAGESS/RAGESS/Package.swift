@@ -228,6 +228,7 @@ let package = Package(
             dependencies: [
                 "DeclarationObjectsClient",
                 "TypeDeclaration",
+                "DeclaredObject",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "Dependencies", package: "swift-dependencies")
             ]

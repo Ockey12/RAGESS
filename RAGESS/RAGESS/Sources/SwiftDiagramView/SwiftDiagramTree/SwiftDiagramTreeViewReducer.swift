@@ -105,7 +105,7 @@ private enum TreeGenerator {
     ) -> NodeModel {
         let calleeDependencies = dependencyObjects.filteringWhereCallee(declaredObject)
         let callerDependencies = dependencyObjects.filteringWhereCaller(declaredObject)
-        let baseOfs = callerDependencies.filter({ $0.roles.contains(.baseOf) })
+        let baseOfs = callerDependencies.filter { $0.roles.contains(.baseOf) }
 
         let baseObjects: [DeclaredObject] = baseOfs.compactMap { dependency in
             guard let calleeUSRKeyPath = usrTable[dependency.calleeUSR] else {
@@ -114,13 +114,11 @@ private enum TreeGenerator {
             return rootDirectory[keyPath: calleeUSRKeyPath]
         }
 
-        let hasSuperClass: Bool = {
-            baseObjects.contains(where: { $0.kind == .class })
-        }()
+        let hasSuperClass: Bool = baseObjects.contains(where: { $0.kind == .class })
 
         let numberOfParentProtocols: Int = {
             if declaredObject.kind == .protocol {
-                return baseObjects.filter({ $0.kind == .protocol }).count
+                return baseObjects.filter { $0.kind == .protocol }.count
             } else {
                 return 0
             }
@@ -130,7 +128,7 @@ private enum TreeGenerator {
             if declaredObject.kind == .protocol {
                 return 0
             } else {
-                return baseObjects.filter({ $0.kind == .protocol}).count
+                return baseObjects.filter { $0.kind == .protocol }.count
             }
         }()
 
@@ -404,5 +402,3 @@ private enum ArrowsStateGenerator {
         return arrowsState
     }
 }
-
-

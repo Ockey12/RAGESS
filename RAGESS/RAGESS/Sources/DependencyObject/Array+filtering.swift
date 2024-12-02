@@ -1,9 +1,9 @@
 //
 //  Array+filtering.swift
 //
-//  
+//
 //  Created by Ockey12 on 2024/12/03
-//  
+//
 //
 
 import DeclaredObject
@@ -11,14 +11,14 @@ import DeclaredObject
 public extension Array where Element == DependencyObject {
     func filteringWhereCallee(_ declaredObject: DeclaredObject) -> [DependencyObject] {
         let usrSet = Set(declaredObject.usrs)
-        return self.filter { dependency in
+        return filter { dependency in
             usrSet.contains(dependency.calleeUSR)
         }
     }
 
     func filteringWhereCaller(_ declaredObject: DeclaredObject) -> [DependencyObject] {
         let usrSet = Set(declaredObject.usrs)
-        return self.filter { dependency in
+        return filter { dependency in
             usrSet.contains(dependency.callerUSRs)
         }
     }

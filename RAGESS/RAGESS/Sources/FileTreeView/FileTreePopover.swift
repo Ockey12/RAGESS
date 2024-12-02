@@ -23,7 +23,6 @@ public struct FileTreePopoverReducer {
             switch content {
             case .directory:
                 cells = []
-                break
             case let .sourceFile(sourceFile):
                 let objects = sourceFile.declaredObjects.sorted(by: { $0.rangeInXcode.lowerBound < $1.rangeInXcode.lowerBound })
                 cells = .init(uniqueElements: objects.map {

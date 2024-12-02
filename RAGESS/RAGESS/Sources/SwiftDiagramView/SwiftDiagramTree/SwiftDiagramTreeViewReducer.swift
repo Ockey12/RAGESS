@@ -7,10 +7,10 @@
 //
 
 import ComposableArchitecture
-import DeclarationObjectsClient
-import Dependencies
+import DeclaredObject
+import DependencyObject
 import Foundation
-import TypeDeclaration
+import XcodeObject
 
 @Reducer
 public struct SwiftDiagramTreeViewReducer {
@@ -18,7 +18,7 @@ public struct SwiftDiagramTreeViewReducer {
 
     @ObservableState
     public struct State {
-        let rootObject: (any DeclarationObject)?
+        let rootObject: DeclaredObject?
         var nodes: IdentifiedArrayOf<NodeReducer.State>
         var arrows: IdentifiedArrayOf<ArrowViewReducer.State>
         let allDeclarationObjects: [any DeclarationObject]
@@ -74,8 +74,6 @@ public struct SwiftDiagramTreeViewReducer {
         case arrows(IdentifiedActionOf<ArrowViewReducer>)
     }
 
-    @Dependency(DeclarationObjectsClient.self) var declarationObjectsClient
-
     public var body: some ReducerOf<Self> {
         Reduce { _, action in
             switch action {
@@ -98,48 +96,86 @@ public struct SwiftDiagramTreeViewReducer {
 let verticalPadding: CGFloat = 500
 
 private enum TreeGenerator {
-    /// Return  a root node.
-    static func generateTree(
-        rootObject: any DeclarationObject,
-        allDeclarationObjects: [any DeclarationObject]
-    ) -> NodeModel? {
-        let genericTypeObject: GenericTypeObject
-        switch rootObject {
-        case let structObject as StructObject:
-            genericTypeObject = .struct(structObject)
-        case let classObject as ClassObject:
-            genericTypeObject = .class(classObject)
-        case let enumObject as EnumObject:
-            genericTypeObject = .enum(enumObject)
-        case let protocolObject as ProtocolObject:
-            genericTypeObject = .protocol(protocolObject)
-        case let actorObject as ActorObject:
-            genericTypeObject = .actor(actorObject)
-        default:
-            #if DEBUG
-                print("ERROR: \(#file) - \(#function): Cannot cast \(rootObject.name) to Type.")
-            #endif
-            return nil
+    private static func convertToNodeModel(
+        from declaredObject: DeclaredObject,
+        rootDirectory: Directory,
+        usrTable: [String: KeyPath<Directory, DeclaredObject>],
+        dependencyObjects: [DependencyObject],
+        parentID: UUID?
+    ) -> NodeModel {
+        let calleeDependencies = dependencyObjects.filterWhereCallee(declaredObject)
+        let callerDependencies = dependencyObjects.filterWhereCaller(declaredObject)
+        let baseOfs = callerDependencies.filter({ $0.roles.contains(.baseOf) })
+
+        let baseObjects: [DeclaredObject] = baseOfs.compactMap { dependency in
+            guard let calleeUSRKeyPath = usrTable[dependency.calleeUSR] else {
+                return nil
+            }
+            return rootDirectory[keyPath: calleeUSRKeyPath]
         }
 
-        let rootNode = NodeModel(
-            object: genericTypeObject,
-            parentID: nil,
-            allDeclarationObjects: allDeclarationObjects
+        let hasSuperClass: Bool = {
+            baseObjects.contains(where: { $0.kind == .class })
+        }()
+
+        let numberOfParentProtocols: Int = {
+            if declaredObject.kind == .protocol {
+                return baseObjects.filter({ $0.kind == .protocol }).count
+            } else {
+                return 0
+            }
+        }()
+
+        let numberOfConformances: Int = {
+            if declaredObject.kind == .protocol {
+                return 0
+            } else {
+                return baseObjects.filter({ $0.kind == .protocol}).count
+            }
+        }()
+
+        return NodeModel(
+            object: declaredObject,
+            parentID: parentID,
+            hasSuperClass: hasSuperClass,
+            numberOfParentProtocols: numberOfParentProtocols,
+            numberOfConformances: numberOfConformances
         )
+    }
+
+    /// Return  a root node.
+    static func generateTree(
+        rootDirectory: Directory,
+        rootObjectKeyPath: KeyPath<Directory, DeclaredObject>,
+        usrTable: [String: KeyPath<Directory, DeclaredObject>],
+        dependencyObjects: [DependencyObject]
+    ) -> NodeModel? {
+        let rootObject = rootDirectory[keyPath: rootObjectKeyPath]
+
+        let rootNode = Self.convertToNodeModel(
+            from: rootObject,
+            rootDirectory: rootDirectory,
+            usrTable: usrTable,
+            dependencyObjects: dependencyObjects,
+            parentID: nil
+        )
+
         var queue: [NodeModel] = [rootNode]
         var allNodes: [NodeModel] = [rootNode]
         var didVisitObjectsID: Set<UUID> = [rootNode.object.id]
 
         while !queue.isEmpty {
             let node = queue.removeFirst()
-            let dependencies = node.object.objectsThatCallThisObject
+            let dependencies = dependencyObjects.filterWhereCallee(node.object)
             didVisitObjectsID.insert(node.object.id)
 
             for dependency in dependencies {
-                guard let callerObject = allDeclarationObjects.first(where: { $0.id == dependency.callerObject.rootObjectID }) else {
+                guard let callerUSR = dependency.callerUSRs.first,
+                      let callerKeyPath = usrTable[callerUSR]
+                else {
                     continue
                 }
+                let callerObject = rootDirectory[keyPath: callerKeyPath]
                 guard node.object.id != callerObject.id else {
                     continue
                 }
@@ -148,26 +184,12 @@ private enum TreeGenerator {
                 }
                 didVisitObjectsID.insert(callerObject.id)
 
-                let genericTypeObject: GenericTypeObject
-                switch callerObject {
-                case let structObject as StructObject:
-                    genericTypeObject = .struct(structObject)
-                case let classObject as ClassObject:
-                    genericTypeObject = .class(classObject)
-                case let enumObject as EnumObject:
-                    genericTypeObject = .enum(enumObject)
-                case let protocolObject as ProtocolObject:
-                    genericTypeObject = .protocol(protocolObject)
-                case let actorObject as ActorObject:
-                    genericTypeObject = .actor(actorObject)
-                default:
-                    continue
-                }
-
-                let child = NodeModel(
-                    object: genericTypeObject,
-                    parentID: node.object.id,
-                    allDeclarationObjects: allDeclarationObjects
+                let child = Self.convertToNodeModel(
+                    from: callerObject,
+                    rootDirectory: rootDirectory,
+                    usrTable: usrTable,
+                    dependencyObjects: dependencyObjects,
+                    parentID: node.object.id
                 )
                 queue.append(child)
                 allNodes.append(child)
@@ -380,5 +402,21 @@ private enum ArrowsStateGenerator {
         } // for node
 
         return arrowsState
+    }
+}
+
+extension Array where Element == DependencyObject {
+    func filterWhereCallee(_ declaredObject: DeclaredObject) -> [DependencyObject] {
+        let usrSet = Set(declaredObject.usrs)
+        return self.filter { dependency in
+            usrSet.contains(dependency.calleeUSR)
+        }
+    }
+
+    func filterWhereCaller(_ declaredObject: DeclaredObject) -> [DependencyObject] {
+        let usrSet = Set(declaredObject.usrs)
+        return self.filter { dependency in
+            usrSet.contains(dependency.callerUSRs)
+        }
     }
 }

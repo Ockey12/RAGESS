@@ -47,6 +47,7 @@ struct NodeModel {
 
         // set bodyWidth and frameWidth
         var allAnnotatedDecl = [object.annotatedDecl ?? object.name]
+        // TODO: protocol and super class width
         allAnnotatedDecl.append(contentsOf: object.initializers.map { $0.annotatedDecl ?? $0.name })
         allAnnotatedDecl.append(contentsOf: object.variables.map { $0.annotatedDecl ?? $0.name })
         allAnnotatedDecl.append(contentsOf: object.functions.map { $0.annotatedDecl ?? $0.name })

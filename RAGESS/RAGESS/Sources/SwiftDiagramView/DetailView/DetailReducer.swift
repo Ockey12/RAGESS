@@ -7,9 +7,9 @@
 //
 
 import ComposableArchitecture
+import DeclaredObject
 import Dependencies
 import Foundation
-import TypeDeclaration
 
 @Reducer
 public struct DetailReducer {
@@ -35,7 +35,7 @@ public struct DetailReducer {
         }
 
         public init(
-            objects: [any DeclarationObject],
+            objects: [DeclaredObject],
             kind: DetailKind,
             topLeadingPoint: CGPoint,
             frameWidth: CGFloat
@@ -74,7 +74,7 @@ public struct DetailReducer {
 
         public enum Delegate {
             case clickedCell(
-                object: any DeclarationObject,
+                object: DeclaredObject,
                 leadingArrowTerminalPoint: CGPoint,
                 trailingArrowTerminalPoint: CGPoint
             )

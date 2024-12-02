@@ -7,8 +7,8 @@
 //
 
 import ComposableArchitecture
+import DeclaredObject
 import Foundation
-import TypeDeclaration
 
 @Reducer
 public struct TextCellReducer {
@@ -23,7 +23,7 @@ public struct TextCellReducer {
             object.id
         }
 
-        let object: any DeclarationObject
+        let object: DeclaredObject
         var topLeadingPoint: CGPoint
         var leadingArrowTerminalPoint: CGPoint {
             CGPoint(

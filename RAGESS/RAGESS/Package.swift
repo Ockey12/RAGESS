@@ -143,6 +143,7 @@ let package = Package(
         .target(
             name: "DependencyObject",
             dependencies: [
+                "DeclaredObject",
                 "SwiftIndexStoreObject"
             ]
         ),

@@ -103,8 +103,8 @@ private enum TreeGenerator {
         dependencyObjects: [DependencyObject],
         parentID: UUID?
     ) -> NodeModel {
-        let calleeDependencies = dependencyObjects.filterWhereCallee(declaredObject)
-        let callerDependencies = dependencyObjects.filterWhereCaller(declaredObject)
+        let calleeDependencies = dependencyObjects.filteringWhereCallee(declaredObject)
+        let callerDependencies = dependencyObjects.filteringWhereCaller(declaredObject)
         let baseOfs = callerDependencies.filter({ $0.roles.contains(.baseOf) })
 
         let baseObjects: [DeclaredObject] = baseOfs.compactMap { dependency in
@@ -166,7 +166,7 @@ private enum TreeGenerator {
 
         while !queue.isEmpty {
             let node = queue.removeFirst()
-            let dependencies = dependencyObjects.filterWhereCallee(node.object)
+            let dependencies = dependencyObjects.filteringWhereCallee(node.object)
             didVisitObjectsID.insert(node.object.id)
 
             for dependency in dependencies {
@@ -405,18 +405,4 @@ private enum ArrowsStateGenerator {
     }
 }
 
-extension Array where Element == DependencyObject {
-    func filterWhereCallee(_ declaredObject: DeclaredObject) -> [DependencyObject] {
-        let usrSet = Set(declaredObject.usrs)
-        return self.filter { dependency in
-            usrSet.contains(dependency.calleeUSR)
-        }
-    }
 
-    func filterWhereCaller(_ declaredObject: DeclaredObject) -> [DependencyObject] {
-        let usrSet = Set(declaredObject.usrs)
-        return self.filter { dependency in
-            usrSet.contains(dependency.callerUSRs)
-        }
-    }
-}

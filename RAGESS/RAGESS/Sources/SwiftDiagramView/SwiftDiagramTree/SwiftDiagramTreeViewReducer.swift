@@ -141,6 +141,28 @@ private enum TreeGenerator {
         )
     }
 
+    private static func findRootTypeObject(
+        rootDirectory: Directory,
+        targetKeyPath: KeyPath<Directory, DeclaredObject>,
+        usrTable: [String: KeyPath<Directory, DeclaredObject>]
+    ) -> DeclaredObject? {
+        var object = rootDirectory[keyPath: targetKeyPath]
+
+        while true {
+            switch object.kind {
+            case .struct, .class, .enum, .protocol, .actor:
+                return object
+            case .initializer, .variable, .function, .case:
+                guard let parentUSR = object.parentUSRs.first,
+                      let parentKeyPath = usrTable[parentUSR]
+                else {
+                    return nil
+                }
+                object = rootDirectory[keyPath: parentKeyPath]
+            }
+        }
+    }
+
     /// Return  a root node.
     static func generateTree(
         rootDirectory: Directory,
@@ -173,17 +195,23 @@ private enum TreeGenerator {
                 else {
                     continue
                 }
-                let callerObject = rootDirectory[keyPath: callerKeyPath]
-                guard node.object.id != callerObject.id else {
+
+                let callerRootObject = findRootTypeObject(
+                    rootDirectory: rootDirectory,
+                    targetKeyPath: callerKeyPath,
+                    usrTable: usrTable
+                )
+                guard let callerRootObject,
+                      node.object.id != callerRootObject.id,
+                      !didVisitObjectsID.contains(callerRootObject.id)
+                else {
                     continue
                 }
-                guard !didVisitObjectsID.contains(callerObject.id) else {
-                    continue
-                }
-                didVisitObjectsID.insert(callerObject.id)
+
+                didVisitObjectsID.insert(callerRootObject.id)
 
                 let child = Self.convertToNodeModel(
-                    from: callerObject,
+                    from: callerRootObject,
                     rootDirectory: rootDirectory,
                     usrTable: usrTable,
                     dependencyObjects: dependencyObjects,

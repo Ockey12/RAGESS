@@ -11,7 +11,38 @@ import Foundation
 
 public struct DeclaredObject: Identifiable, Equatable {
     public let id: UUID
-    public var usrs: [String]
+    public var usrs: [String] {
+        didSet {
+            for i in initializers.indices {
+                initializers[i].parentUSRs = usrs
+            }
+            for i in variables.indices {
+                variables[i].parentUSRs = usrs
+            }
+            for i in functions.indices {
+                functions[i].parentUSRs = usrs
+            }
+            for i in cases.indices {
+                cases[i].parentUSRs = usrs
+            }
+            for i in nestingStructs.indices {
+                nestingStructs[i].parentUSRs = usrs
+            }
+            for i in nestingClasses.indices {
+                nestingClasses[i].parentUSRs = usrs
+            }
+            for i in nestingEnums.indices {
+                nestingEnums[i].parentUSRs = usrs
+            }
+            for i in nestingProtocols.indices {
+                nestingProtocols[i].parentUSRs = usrs
+            }
+            for i in nestingActors.indices {
+                nestingActors[i].parentUSRs = usrs
+            }
+        }
+    }
+
     public let name: String
     public let nameOffset: Int
     public let fullPath: String
@@ -31,6 +62,8 @@ public struct DeclaredObject: Identifiable, Equatable {
     public var nestingEnums: [Self]
     public var nestingProtocols: [Self]
     public var nestingActors: [Self]
+
+    public var parentUSRs: [String]
 
     public var descendantsID: [UUID] {
         var ids: [UUID] = [id]
@@ -67,7 +100,8 @@ public struct DeclaredObject: Identifiable, Equatable {
         nestingClasses: [Self] = [],
         nestingEnums: [Self] = [],
         nestingProtocols: [Self] = [],
-        nestingActors: [Self] = []
+        nestingActors: [Self] = [],
+        parentUSRs: [String] = []
     ) {
         self.usrs = usrs
         @Dependency(\.uuid) var uuid
@@ -90,6 +124,8 @@ public struct DeclaredObject: Identifiable, Equatable {
         self.nestingEnums = nestingEnums
         self.nestingProtocols = nestingProtocols
         self.nestingActors = nestingActors
+
+        self.parentUSRs = parentUSRs
     }
 }
 

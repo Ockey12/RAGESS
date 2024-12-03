@@ -213,7 +213,7 @@ private enum TreeGenerator {
     #if DEBUG
         static func printTree(parentNode: NodeModel, level: Int = 0) {
             let indent = String(repeating: "  ", count: level)
-            print("\(indent)\(parentNode.object.name), id: \(parentNode.id), parentID: \(parentNode.parentID)")
+            print("\(indent)\(parentNode.object.name), id: \(parentNode.id), parentID: \(parentNode.parentID?.uuidString ?? "nil")")
 
             for child in parentNode.children {
                 printTree(parentNode: child, level: level + 1)
@@ -223,7 +223,9 @@ private enum TreeGenerator {
 
     static func generateNodesState(
         rootNode: NodeModel,
-        allDeclarationObjects: [any DeclarationObject]
+        rootDirectory: Directory,
+        usrTable: [String: KeyPath<Directory, DeclaredObject>],
+        dependencyObjects: [DependencyObject]
     ) -> [NodeReducer.State] {
         var queue: [NodeModel] = [rootNode]
         var allNodes: [NodeModel] = [rootNode]
@@ -240,14 +242,16 @@ private enum TreeGenerator {
             x: 0,
             y: 0
         )
-        var nodesState: [NodeReducer.State] = []
+        var nodeStates: [NodeReducer.State] = []
         for node in allNodes {
             if node.id == rootNode.id {
                 // root node
-                nodesState.append(
-                    NodeReducer.State(
+                nodeStates.append(
+                    .init(
                         object: node.object,
-                        allDeclarationObjects: allDeclarationObjects,
+                        rootDirectory: rootDirectory,
+                        usrTable: usrTable,
+                        dependencyObjects: dependencyObjects,
                         topLeadingPoint: CGPoint(
                             x: 0,
                             y: node.subtreeHeight / 2 - node.frameHeight / 2
@@ -255,25 +259,13 @@ private enum TreeGenerator {
                         subtreeTopLeadingPoint: CGPoint(x: 0, y: 0)
                     )
                 )
-
                 currentSubtreeTopLeadingPoint.x += node.frameWidth + horizontalPadding
-                #if DEBUG
-                    print("\nRoot Node")
-                    print(node.object.name)
-                    print("  topLeadingPoint: \(nodesState.last!.topLeadingPoint)")
-                    print("  W: \(node.frameWidth), H: \(node.frameHeight)")
-                    print("  State W: \(nodesState.last!.frameWidth), H: \(nodesState.last!.frameHeight)")
-                    print("  subtreeHeight: \(node.subtreeHeight)\n")
-                #endif
                 continue
-            } // if
+            }
 
             if currentParentID != node.parentID,
                let parentID = node.parentID {
-                guard let parent = nodesState.first(where: { $0.id == parentID }) else {
-                    #if DEBUG
-                        print("ERROR: \(#file) - \(#function): Couldn't find parent node.")
-                    #endif
+                guard let parent = nodeStates.first(where: { $0.id == parentID }) else {
                     break
                 }
                 currentParentID = parentID
@@ -281,14 +273,14 @@ private enum TreeGenerator {
                     x: parent.topLeadingPoint.x + parent.frameWidth + horizontalPadding,
                     y: parent.subtreeTopLeadingPoint.y
                 )
-                print("parentID changed: \(parentID)")
-                print("new currentBottomPoint: \(currentSubtreeTopLeadingPoint)\n")
             }
 
-            nodesState.append(
-                NodeReducer.State(
+            nodeStates.append(
+                .init(
                     object: node.object,
-                    allDeclarationObjects: allDeclarationObjects,
+                    rootDirectory: rootDirectory,
+                    usrTable: usrTable,
+                    dependencyObjects: dependencyObjects,
                     topLeadingPoint: CGPoint(
                         x: currentSubtreeTopLeadingPoint.x,
                         y: currentSubtreeTopLeadingPoint.y + node.subtreeHeight / 2 - node.frameHeight / 2
@@ -297,20 +289,10 @@ private enum TreeGenerator {
                 )
             )
 
-            #if DEBUG
-                print(node.object.name)
-                print("  topLeadingPoint: \(nodesState.last!.topLeadingPoint)")
-                print("  W: \(node.frameWidth), H: \(node.frameHeight)")
-                print("  State W: \(nodesState.last!.frameWidth), H: \(nodesState.last!.frameHeight)")
-                print("  subtreeHeight: \(node.subtreeHeight)\n")
-            #endif
-
             currentSubtreeTopLeadingPoint.y += node.subtreeHeight + verticalPadding
-            print("increment currentBottomPoint.y: \(currentSubtreeTopLeadingPoint)\n")
         }
 
-        print("end \(#function)\n")
-        return nodesState
+        return nodeStates
     }
 }
 

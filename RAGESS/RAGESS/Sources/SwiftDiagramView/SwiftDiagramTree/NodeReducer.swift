@@ -9,6 +9,7 @@
 import ComposableArchitecture
 import DeclaredObject
 import DependencyObject
+import Foundation
 import XcodeObject
 
 @Reducer

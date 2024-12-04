@@ -6,11 +6,11 @@
 //
 //
 
-//import ComposableArchitecture
-//import SwiftUI
-//import TypeDeclaration
+// import ComposableArchitecture
+// import SwiftUI
+// import TypeDeclaration
 //
-//public struct EnumView: View {
+// public struct EnumView: View {
 //    let store: StoreOf<EnumViewReducer>
 //
 //    public init(store: StoreOf<EnumViewReducer>) {
@@ -39,9 +39,9 @@
 //                }
 //        )
 //    }
-//}
+// }
 //
-//#Preview {
+// #Preview {
 //    var enumObject = EnumObject(
 //        name: "DebugEnum",
 //        nameOffset: 0,
@@ -197,4 +197,4 @@
 //        )
 //    }
 //    .frame(width: 3500, height: 2000)
-//}
+// }

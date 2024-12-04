@@ -31,8 +31,9 @@ struct TextCellView: View {
             }
     }
 }
+
 //
-//#Preview {
+// #Preview {
 //    let protocolObject = ProtocolObject(
 //        name: "SampleProtocol",
 //        nameOffset: 0,
@@ -52,4 +53,4 @@ struct TextCellView: View {
 //            reducer: { TextCellReducer() }
 //        )
 //    )
-//}
+// }

@@ -37,7 +37,7 @@ struct HeaderViewWithoutIndex: View {
     }
 }
 
-//#Preview {
+// #Preview {
 //    let protocolObject = ProtocolObject(
 //        name: "SampleProtocol",
 //        nameOffset: 0,
@@ -64,4 +64,4 @@ struct HeaderViewWithoutIndex: View {
 //    }
 //    .frame(width: 1000)
 //    .padding()
-//}
+// }

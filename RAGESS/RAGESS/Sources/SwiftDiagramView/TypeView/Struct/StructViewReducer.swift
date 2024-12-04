@@ -6,12 +6,12 @@
 //
 //
 
-//import ComposableArchitecture
-//import Foundation
-//import TypeDeclaration
+// import ComposableArchitecture
+// import Foundation
+// import TypeDeclaration
 //
-//@Reducer
-//public struct StructViewReducer {
+// @Reducer
+// public struct StructViewReducer {
 //    public init() {}
 //
 //    @ObservableState
@@ -242,4 +242,4 @@
 //            DetailReducer()
 //        }
 //    }
-//}
+// }

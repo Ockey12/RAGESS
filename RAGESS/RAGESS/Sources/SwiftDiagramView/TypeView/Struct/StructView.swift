@@ -6,11 +6,11 @@
 //
 //
 
-//import ComposableArchitecture
-//import SwiftUI
-//import TypeDeclaration
+// import ComposableArchitecture
+// import SwiftUI
+// import TypeDeclaration
 //
-//public struct StructView: View {
+// public struct StructView: View {
 //    let store: StoreOf<StructViewReducer>
 //
 //    public init(store: StoreOf<StructViewReducer>) {
@@ -39,9 +39,9 @@
 //                }
 //        )
 //    }
-//}
+// }
 //
-//#Preview {
+// #Preview {
 //    var structObject = StructObject(
 //        name: "DebugStruct",
 //        nameOffset: 0,
@@ -190,9 +190,9 @@
 //        .border(.pink)
 //    }
 //    .frame(width: 3500, height: 2000)
-//}
+// }
 //
-//#Preview {
+// #Preview {
 //    let structObject = StructObject(
 //        name: "DebugStruct",
 //        nameOffset: 0,
@@ -220,4 +220,4 @@
 ////        .border(.pink)
 //    }
 //    .frame(width: 3500, height: 2000)
-//}
+// }

@@ -6,12 +6,12 @@
 //
 //
 
-//import ComposableArchitecture
-//import Foundation
-//import TypeDeclaration
+// import ComposableArchitecture
+// import Foundation
+// import TypeDeclaration
 //
-//@Reducer
-//public struct EnumViewReducer {
+// @Reducer
+// public struct EnumViewReducer {
 //    public init() {}
 //
 //    @ObservableState
@@ -267,4 +267,4 @@
 //            DetailReducer()
 //        }
 //    }
-//}
+// }

@@ -52,7 +52,7 @@ struct DetailView: View {
     }
 }
 
-//#Preview {
+// #Preview {
 //    let functionObjects = [
 //        FunctionObject(
 //            name: "Function1",
@@ -93,4 +93,4 @@ struct DetailView: View {
 //        .padding()
 //    }
 //    .frame(width: 900, height: 800)
-//}
+// }

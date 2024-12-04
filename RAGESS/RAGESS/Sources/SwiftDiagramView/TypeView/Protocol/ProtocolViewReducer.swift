@@ -6,12 +6,12 @@
 //
 //
 
-//import ComposableArchitecture
-//import Foundation
-//import TypeDeclaration
+// import ComposableArchitecture
+// import Foundation
+// import TypeDeclaration
 //
-//@Reducer
-//public struct ProtocolViewReducer {
+// @Reducer
+// public struct ProtocolViewReducer {
 //    public init() {}
 //
 //    @ObservableState
@@ -249,4 +249,4 @@
 //            DetailReducer()
 //        }
 //    }
-//}
+// }

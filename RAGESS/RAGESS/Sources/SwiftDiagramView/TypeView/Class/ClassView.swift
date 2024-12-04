@@ -6,11 +6,11 @@
 //
 //
 
-//import ComposableArchitecture
-//import SwiftUI
-//import TypeDeclaration
+// import ComposableArchitecture
+// import SwiftUI
+// import TypeDeclaration
 //
-//public struct ClassView: View {
+// public struct ClassView: View {
 //    let store: StoreOf<ClassViewReducer>
 //
 //    public init(store: StoreOf<ClassViewReducer>) {
@@ -39,9 +39,9 @@
 //                }
 //        )
 //    }
-//}
+// }
 //
-//#Preview {
+// #Preview {
 //    var subClass = ClassObject(
 //        name: "SubClass",
 //        nameOffset: 0,
@@ -215,4 +215,4 @@
 //        )
 //    }
 //    .frame(width: 3500, height: 2300)
-//}
+// }

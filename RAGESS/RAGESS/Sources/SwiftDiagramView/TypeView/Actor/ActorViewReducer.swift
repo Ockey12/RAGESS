@@ -6,12 +6,12 @@
 //
 //
 
-//import ComposableArchitecture
-//import Foundation
-//import TypeDeclaration
+// import ComposableArchitecture
+// import Foundation
+// import TypeDeclaration
 //
-//@Reducer
-//public struct ActorViewReducer {
+// @Reducer
+// public struct ActorViewReducer {
 //    public init() {}
 //
 //    @ObservableState
@@ -203,4 +203,4 @@
 //            DetailReducer()
 //        }
 //    }
-//}
+// }

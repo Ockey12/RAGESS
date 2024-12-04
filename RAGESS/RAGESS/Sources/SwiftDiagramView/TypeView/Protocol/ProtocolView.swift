@@ -6,11 +6,11 @@
 //
 //
 
-//import ComposableArchitecture
-//import SwiftUI
-//import TypeDeclaration
+// import ComposableArchitecture
+// import SwiftUI
+// import TypeDeclaration
 //
-//public struct ProtocolView: View {
+// public struct ProtocolView: View {
 //    let store: StoreOf<ProtocolViewReducer>
 //
 //    public init(store: StoreOf<ProtocolViewReducer>) {
@@ -39,9 +39,9 @@
 //                }
 //        )
 //    }
-//}
+// }
 //
-//#Preview {
+// #Preview {
 //    var protocolObject = ProtocolObject(
 //        name: "DebugProtocol",
 //        nameOffset: 0,
@@ -189,4 +189,4 @@
 //        )
 //    }
 //    .frame(width: 3500, height: 2300)
-//}
+// }

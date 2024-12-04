@@ -75,7 +75,7 @@ struct IndexView: View {
     }
 }
 
-//#Preview {
+// #Preview {
 //    Group {
 //        IndexView(
 //            object: ProtocolObject(
@@ -135,4 +135,4 @@ struct IndexView: View {
 //            )
 //        )
 //    }
-//}
+// }

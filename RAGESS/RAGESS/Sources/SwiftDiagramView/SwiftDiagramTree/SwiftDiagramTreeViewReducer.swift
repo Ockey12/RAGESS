@@ -32,10 +32,10 @@ public struct SwiftDiagramTreeViewReducer {
             guard let rootObjectKeyPath,
                   let rootDirectory,
                   let rootNode = TreeGenerator.generate(
-                    rootDirectory: rootDirectory,
-                    rootObjectKeyPath: rootObjectKeyPath,
-                    usrTable: usrTable,
-                    dependencyObjects: dependencyObjects
+                      rootDirectory: rootDirectory,
+                      rootObjectKeyPath: rootObjectKeyPath,
+                      usrTable: usrTable,
+                      dependencyObjects: dependencyObjects
                   )
             else {
                 nodes = []

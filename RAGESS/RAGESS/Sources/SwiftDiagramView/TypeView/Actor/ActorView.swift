@@ -6,10 +6,10 @@
 //
 //
 
-//import ComposableArchitecture
-//import SwiftUI
+// import ComposableArchitecture
+// import SwiftUI
 //
-//public struct ActorView: View {
+// public struct ActorView: View {
 //    let store: StoreOf<ActorViewReducer>
 //
 //    public init(store: StoreOf<ActorViewReducer>) {
@@ -29,4 +29,4 @@
 //        .frame(width: store.frameWidth, height: store.frameHeight)
 //        .offset(x: store.topLeadingPoint.x, y: store.topLeadingPoint.y)
 //    }
-//}
+// }

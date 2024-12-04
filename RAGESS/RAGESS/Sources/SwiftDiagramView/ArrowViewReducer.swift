@@ -7,8 +7,8 @@
 //
 
 import ComposableArchitecture
+import DependencyObject
 import Foundation
-import TypeDeclaration
 
 @Reducer
 public struct ArrowViewReducer {
@@ -17,8 +17,7 @@ public struct ArrowViewReducer {
     @ObservableState
     public struct State: Identifiable {
         public var id: UUID
-        var startPointRootObjectID: UUID
-        var endPointRootObjectID: UUID
+        var dependency: DependencyObject
 
         var leadingStartPoint: CGPoint
         var trailingStartPoint: CGPoint
@@ -70,8 +69,7 @@ public struct ArrowViewReducer {
         }
 
         public init(
-            startPointRootObjectID: UUID,
-            endPointRootObjectID: UUID,
+            dependency: DependencyObject,
             leadingStartPoint: CGPoint,
             trailingStartPoint: CGPoint,
             leadingEndPoint: CGPoint,
@@ -79,8 +77,7 @@ public struct ArrowViewReducer {
         ) {
             @Dependency(\.uuid) var uuid
             id = uuid()
-            self.startPointRootObjectID = startPointRootObjectID
-            self.endPointRootObjectID = endPointRootObjectID
+            self.dependency = dependency
 
             self.leadingStartPoint = leadingStartPoint
             beforeDragLeadingStartPoint = leadingStartPoint

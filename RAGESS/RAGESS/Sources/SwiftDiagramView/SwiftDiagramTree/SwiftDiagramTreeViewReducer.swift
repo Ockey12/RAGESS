@@ -126,7 +126,6 @@ private enum TreeGenerator {
         dependencyObjects: [DependencyObject],
         parentID: UUID?
     ) -> NodeModel {
-        let calleeDependencies = dependencyObjects.filteringWhereCallee(declaredObject)
         let callerDependencies = dependencyObjects.filteringWhereCaller(declaredObject)
         let baseOfs = callerDependencies.filter { $0.roles.contains(.baseOf) }
 
@@ -162,28 +161,6 @@ private enum TreeGenerator {
             numberOfParentProtocols: numberOfParentProtocols,
             numberOfConformances: numberOfConformances
         )
-    }
-
-    private static func findRootTypeObject(
-        rootDirectory: Directory,
-        targetKeyPath: KeyPath<Directory, DeclaredObject>,
-        usrTable: [String: KeyPath<Directory, DeclaredObject>]
-    ) -> DeclaredObject? {
-        var object = rootDirectory[keyPath: targetKeyPath]
-
-        while true {
-            switch object.kind {
-            case .struct, .class, .enum, .protocol, .actor:
-                return object
-            case .initializer, .variable, .function, .case:
-                guard let parentUSR = object.parentUSRs.first,
-                      let parentKeyPath = usrTable[parentUSR]
-                else {
-                    return nil
-                }
-                object = rootDirectory[keyPath: parentKeyPath]
-            }
-        }
     }
 
     /// Return  a root node.
@@ -347,81 +324,64 @@ private enum TreeGenerator {
 }
 
 private enum ArrowsStateGenerator {
-    static func generate(nodes: [NodeReducer.State]) -> [ArrowViewReducer.State] {
-        var arrowsState: [ArrowViewReducer.State] = []
+    static func generate(
+        nodes: [NodeReducer.State],
+        rootDirectory: Directory,
+        usrTable: [String: KeyPath<Directory, DeclaredObject>],
+        dependencyObjects: [DependencyObject]
+    ) -> [ArrowViewReducer.State] {
+        var arrowStates: [ArrowViewReducer.State] = []
 
         for node in nodes {
-            for dependency in node.object.objectsThatCallThisObject {
-                if dependency.definitionObject.rootObjectID == dependency.callerObject.rootObjectID {
+            let calleeDependencies = dependencyObjects.filteringWhereCallee(node.object)
+            for dependency in calleeDependencies {
+                guard let calleeKeyPath = usrTable[dependency.calleeUSR],
+                      let callerUSR = dependency.callerUSRs.first,
+                      let callerKeyPath = usrTable[callerUSR],
+                      rootDirectory.findRootTypeObject(targetKeyPath: calleeKeyPath, usrTable: usrTable)
+                      != rootDirectory.findRootTypeObject(targetKeyPath: callerKeyPath, usrTable: usrTable)
+                else {
                     continue
                 }
-                let callerID: UUID
-                var leadingStartPoint: CGPoint = .zero
-                var trailingStartPoint: CGPoint = .zero
 
-                switch dependency.kind {
-                case .protocolInheritance, .classInheritance, .protocolConformance:
-                    callerID = dependency.callerObject.rootObjectID
+                // set start point coordinate
+                let leadingStartPoint: CGPoint
+                let trailingStartPoint: CGPoint
+                if node.object.usrs.contains(dependency.calleeUSR) {
+                    // This object itself is referenced, so the header becomes the starting point of the arrow.
                     leadingStartPoint = node.header.leadingArrowTerminalPoint
                     trailingStartPoint = node.header.trailingArrowTerminalPoint
-
-                case .declarationReference, .identifierType:
-                    callerID = dependency.callerObject.leafObjectID
-
-                    if node.id == dependency.definitionObject.leafObjectID {
-                        leadingStartPoint = node.header.leadingArrowTerminalPoint
-                        trailingStartPoint = node.header.trailingArrowTerminalPoint
-                    } else {
-                        for definitionDetail in node.details {
-                            for text in definitionDetail.texts {
-                                if text.id == dependency.definitionObject.leafObjectID {
-                                    leadingStartPoint = text.leadingArrowTerminalPoint
-                                    trailingStartPoint = text.trailingArrowTerminalPoint
-                                }
-                            }
-                        }
-                    }
-                    if trailingStartPoint == .zero {
-                        #if DEBUG
-                            print("ERROR: \(#file) - \(#function): Couldn't find definition of \(dependency.definitionObject.keyPath).")
-                        #endif
-                        continue
-                    }
-                }
-
-                var leadingEndPoint: CGPoint = .zero
-                var trailingEndPoint: CGPoint = .zero
-                var isFoundCaller = false
-                for caller in nodes {
-                    for detail in caller.details {
+                } else {
+                    details: for detail in node.details {
                         for text in detail.texts {
-                            if text.id == callerID {
-                                leadingEndPoint = text.leadingArrowTerminalPoint
-                                trailingEndPoint = text.trailingArrowTerminalPoint
-                                isFoundCaller = true
-                                break
+                            if text.object.usrs.contains(dependency.calleeUSR) {
+                                leadingStartPoint = text.leadingArrowTerminalPoint
+                                trailingStartPoint = text.trailingArrowTerminalPoint
+                                break details
                             }
                         }
-                        if isFoundCaller {
-                            break
-                        }
-                    }
-                    if isFoundCaller {
-                        break
                     }
                 }
 
-                if !isFoundCaller {
-                    #if DEBUG
-                        print("ERROR: \(#file) - \(#function): Couldn't find caller of \(dependency.definitionObject.keyPath).")
-                    #endif
+                // set end point coordinate
+                let leadingEndPoint: CGPoint
+                let trailingEndPoint: CGPoint
+                guard let caller = nodes.first(where: { $0.object.descendantsUSRs.contains(dependency.callerUSRs) }) else {
+                    assertionFailure()
                     continue
                 }
-
-                arrowsState.append(
+                details: for detail in caller.details {
+                    for text in detail.texts {
+                        if text.object.descendantsUSRs.contains(dependency.callerUSRs) {
+                            leadingEndPoint = text.leadingArrowTerminalPoint
+                            trailingEndPoint = text.trailingArrowTerminalPoint
+                            break details
+                        }
+                    }
+                }
+                arrowStates.append(
                     .init(
-                        startPointRootObjectID: dependency.definitionObject.rootObjectID,
-                        endPointRootObjectID: dependency.callerObject.rootObjectID,
+                        dependency: dependency,
                         leadingStartPoint: leadingStartPoint,
                         trailingStartPoint: trailingStartPoint,
                         leadingEndPoint: leadingEndPoint,
@@ -431,6 +391,6 @@ private enum ArrowsStateGenerator {
             } // for dependency
         } // for node
 
-        return arrowsState
+        return arrowStates
     }
 }

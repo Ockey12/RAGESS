@@ -82,6 +82,22 @@ public struct DeclaredObject: Identifiable, Equatable {
         return ids
     }
 
+    public var descendantsUSRs: [String] {
+        var usrs: [String] = usrs
+
+        usrs.append(contentsOf: initializers.flatMap { $0.descendantsUSRs })
+        usrs.append(contentsOf: variables.flatMap { $0.descendantsUSRs })
+        usrs.append(contentsOf: functions.flatMap { $0.descendantsUSRs })
+        usrs.append(contentsOf: cases.flatMap { $0.descendantsUSRs })
+
+        usrs.append(contentsOf: nestingStructs.flatMap { $0.descendantsUSRs })
+        usrs.append(contentsOf: nestingClasses.flatMap { $0.descendantsUSRs })
+        usrs.append(contentsOf: nestingEnums.flatMap { $0.descendantsUSRs })
+        usrs.append(contentsOf: nestingProtocols.flatMap { $0.descendantsUSRs })
+        usrs.append(contentsOf: nestingActors.flatMap { $0.descendantsUSRs })
+        return usrs
+    }
+
     public init(
         usrs: [String] = [],
         name: String,

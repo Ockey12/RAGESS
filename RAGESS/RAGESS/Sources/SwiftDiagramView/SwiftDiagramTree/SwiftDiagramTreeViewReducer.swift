@@ -18,54 +18,48 @@ public struct SwiftDiagramTreeViewReducer {
 
     @ObservableState
     public struct State {
-        let rootObject: DeclaredObject?
         var nodes: IdentifiedArrayOf<NodeReducer.State>
         var arrows: IdentifiedArrayOf<ArrowViewReducer.State>
-        let allDeclarationObjects: [any DeclarationObject]
         public let frameWidth: CGFloat
         public let frameHeight: CGFloat
 
-        public init(rootObject: (any DeclarationObject)? = nil, allDeclarationObjects: [any DeclarationObject]) {
-            self.rootObject = rootObject
-            self.allDeclarationObjects = allDeclarationObjects
-
-            guard let rootObject else {
+        public init(
+            rootObjectKeyPath: KeyPath<Directory, DeclaredObject>? = nil,
+            rootDirectory: Directory,
+            usrTable: [String: KeyPath<Directory, DeclaredObject>],
+            dependencyObjects: [DependencyObject]
+        ) {
+            guard let rootObjectKeyPath,
+                  let rootNode = TreeGenerator.generate(
+                    rootDirectory: rootDirectory,
+                    rootObjectKeyPath: rootObjectKeyPath,
+                    usrTable: usrTable,
+                    dependencyObjects: dependencyObjects
+                  )
+            else {
                 nodes = []
                 arrows = []
                 frameWidth = 0
                 frameHeight = 0
                 return
             }
-
-            let rootNode = TreeGenerator.generateTree(rootObject: rootObject, allDeclarationObjects: allDeclarationObjects)
-
-            guard let rootNode else {
-                nodes = []
-                arrows = []
-                frameWidth = 0
-                frameHeight = 0
-                return
-            }
-            #if DEBUG
-                print("printTree(parentNode: rootNode)")
-                TreeGenerator.printTree(parentNode: rootNode)
-            #endif
 
             frameHeight = rootNode.subtreeHeight
-            let nodesState = TreeGenerator.generateNodesState(rootNode: rootNode, allDeclarationObjects: allDeclarationObjects)
-            frameWidth = nodesState.map { $0.topLeadingPoint.x + $0.frameWidth }.max() ?? 0
-            nodes = .init(uniqueElements: nodesState)
-            let arrowsState = ArrowsStateGenerator.generate(nodes: nodesState)
+            let nodeStates = TreeGenerator.generateNodeStates(
+                rootNode: rootNode,
+                rootDirectory: rootDirectory,
+                usrTable: usrTable,
+                dependencyObjects: dependencyObjects
+            )
+            frameWidth = nodeStates.map { $0.topLeadingPoint.x + $0.frameWidth }.max() ?? 0
+            nodes = .init(uniqueElements: nodeStates)
+            let arrowsState = ArrowsStateGenerator.generate(
+                nodes: nodeStates,
+                rootDirectory: rootDirectory,
+                usrTable: usrTable,
+                dependencyObjects: dependencyObjects
+            )
             arrows = .init(uniqueElements: arrowsState)
-            #if DEBUG
-                for node in nodes {
-                    print(node.object.name)
-                    print("  topLeadingPoint: \(node.topLeadingPoint)")
-                    print("  W: \(node.frameWidth), H: \(node.frameWidth)")
-                }
-                print("frameWidth: \(frameWidth)")
-                print("frameHeight: \(frameHeight)")
-            #endif
         }
     }
 
@@ -164,7 +158,7 @@ private enum TreeGenerator {
     }
 
     /// Return  a root node.
-    static func generateTree(
+    static func generate(
         rootDirectory: Directory,
         rootObjectKeyPath: KeyPath<Directory, DeclaredObject>,
         usrTable: [String: KeyPath<Directory, DeclaredObject>],
@@ -248,7 +242,7 @@ private enum TreeGenerator {
         }
     #endif
 
-    static func generateNodesState(
+    static func generateNodeStates(
         rootNode: NodeModel,
         rootDirectory: Directory,
         usrTable: [String: KeyPath<Directory, DeclaredObject>],
@@ -345,8 +339,8 @@ private enum ArrowsStateGenerator {
                 }
 
                 // set start point coordinate
-                let leadingStartPoint: CGPoint
-                let trailingStartPoint: CGPoint
+                var leadingStartPoint: CGPoint = .zero
+                var trailingStartPoint: CGPoint = .zero
                 if node.object.usrs.contains(dependency.calleeUSR) {
                     // This object itself is referenced, so the header becomes the starting point of the arrow.
                     leadingStartPoint = node.header.leadingArrowTerminalPoint
@@ -364,8 +358,8 @@ private enum ArrowsStateGenerator {
                 }
 
                 // set end point coordinate
-                let leadingEndPoint: CGPoint
-                let trailingEndPoint: CGPoint
+                var leadingEndPoint: CGPoint = .zero
+                var trailingEndPoint: CGPoint = .zero
                 guard let caller = nodes.first(where: { $0.object.descendantsUSRs.contains(dependency.callerUSRs) }) else {
                     assertionFailure()
                     continue

@@ -62,7 +62,12 @@ public struct RAGESSReducer {
         ]
         var fileTree: FileTreeViewReducer.State = .init()
         var loadingTaskKindBuffer: [LoadingTaskKind] = []
-        var swiftDiagramTree: SwiftDiagramTreeViewReducer.State = .init(allDeclarationObjects: [])
+        var swiftDiagramTree: SwiftDiagramTreeViewReducer.State = .init(
+            rootObjectKeyPath: nil,
+            rootDirectory: nil,
+            usrTable: [:],
+            dependencyObjects: []
+        )
         var swiftDiagramScale: CGFloat = 0.5
         var processStartTime = CFAbsoluteTimeGetCurrent()
         var debugView = DebugReducer.State()

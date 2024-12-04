@@ -203,7 +203,7 @@ extension DeclarationExtractorDebugger {
             indexStoreURL: indexStoreURL,
             projectRootPath: projectRootPath
         ).filter(
-            { $0.role == .definition }
+            { $0.roles.contains(.definition) }
         ).filter(
             { !usrTable.keys.contains($0.usr) }
         ) else {

@@ -75,8 +75,8 @@ public struct DependenciesExtractorDebugger {
 
                         let response = try DeclarationExtractor.extractDeclarations(rootDirectory: rootDirectory, indexStoreURL: indexStorePath)
                         print("\nCOMPLETE DeclarationExtractor.extractDeclarations(): \(CFAbsoluteTimeGetCurrent() - startTime) S: \(response.usrTable.count) usrTable items")
-                        let numOfDefinitions = response.indexStoreObjects.filter { $0.role == .definition }.count
-                        let numOfReferences = response.indexStoreObjects.filter { $0.role == .reference }.count
+                        let numOfDefinitions = response.indexStoreObjects.filter { $0.roles.contains(.definition) }.count
+                        let numOfReferences = response.indexStoreObjects.filter { $0.roles.contains(.reference) }.count
                         print(numOfDefinitions, "definitions")
                         print(numOfReferences, "references")
 

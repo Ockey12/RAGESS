@@ -50,15 +50,15 @@ public struct SwiftIndexStoreClientDebugger {
                     let indexStoreItems = try client.extractOccurrences(indexStoreURL, state.projectRootPath)
                     let endTime = CFAbsoluteTimeGetCurrent()
                     print("COMPLETE SwiftIndexStoreClient.extractOccurrences(): \(endTime - startTime) S: \(indexStoreItems.count) items")
-                    let numOfDefinitions = indexStoreItems.filter { $0.role == .definition }.count
-                    let numOfReferences = indexStoreItems.filter { $0.role == .reference }.count
+                    let numOfDefinitions = indexStoreItems.filter { $0.roles.contains(.definition) }.count
+                    let numOfReferences = indexStoreItems.filter { $0.roles.contains(.reference) }.count
                     print(numOfDefinitions, "definitions")
                     print(numOfReferences, "references")
 
                     if state.isPrintValid {
                         for definition in indexStoreItems {
                             print(
-                                "| \(definition.role.rawValue) | usr = \(definition.usr) | location = \(definition.fullPath)(\(definition.locationInXcode.line):\(definition.locationInXcode.column))"
+                                "| \(definition.roles.description) | usr = \(definition.usr) | location = \(definition.fullPath)(\(definition.locationInXcode.line):\(definition.locationInXcode.column))"
                             )
                         }
                     }

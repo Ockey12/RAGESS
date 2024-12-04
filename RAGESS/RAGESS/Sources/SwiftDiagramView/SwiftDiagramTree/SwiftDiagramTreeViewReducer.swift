@@ -24,12 +24,13 @@ public struct SwiftDiagramTreeViewReducer {
         public let frameHeight: CGFloat
 
         public init(
-            rootObjectKeyPath: KeyPath<Directory, DeclaredObject>? = nil,
-            rootDirectory: Directory,
+            rootObjectKeyPath: KeyPath<Directory, DeclaredObject>?,
+            rootDirectory: Directory?,
             usrTable: [String: KeyPath<Directory, DeclaredObject>],
             dependencyObjects: [DependencyObject]
         ) {
             guard let rootObjectKeyPath,
+                  let rootDirectory,
                   let rootNode = TreeGenerator.generate(
                     rootDirectory: rootDirectory,
                     rootObjectKeyPath: rootObjectKeyPath,

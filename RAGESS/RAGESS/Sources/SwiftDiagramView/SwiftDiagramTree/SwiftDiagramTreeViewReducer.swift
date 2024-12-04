@@ -95,6 +95,29 @@ public struct SwiftDiagramTreeViewReducer {
 
 let verticalPadding: CGFloat = 500
 
+extension Directory {
+    func findRootTypeObject(
+        targetKeyPath: KeyPath<Directory, DeclaredObject>,
+        usrTable: [String: KeyPath<Directory, DeclaredObject>]
+    ) -> DeclaredObject? {
+        var object = self[keyPath: targetKeyPath]
+
+        while true {
+            switch object.kind {
+            case .struct, .class, .enum, .protocol, .actor:
+                return object
+            case .initializer, .variable, .function, .case:
+                guard let parentUSR = object.parentUSRs.first,
+                      let parentKeyPath = usrTable[parentUSR]
+                else {
+                    return nil
+                }
+                object = self[keyPath: parentKeyPath]
+            }
+        }
+    }
+}
+
 private enum TreeGenerator {
     private static func convertToNodeModel(
         from declaredObject: DeclaredObject,
@@ -196,8 +219,7 @@ private enum TreeGenerator {
                     continue
                 }
 
-                let callerRootObject = findRootTypeObject(
-                    rootDirectory: rootDirectory,
+                let callerRootObject = rootDirectory.findRootTypeObject(
                     targetKeyPath: callerKeyPath,
                     usrTable: usrTable
                 )

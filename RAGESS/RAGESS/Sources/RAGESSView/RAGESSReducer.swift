@@ -309,12 +309,6 @@ public struct RAGESSReducer {
             case let .fileTree(.delegate(delegateAction)):
                 switch delegateAction {
                 case let .popoverCellClicked(firstUSR: firstUSR):
-//                    guard let clickedObject = state.declarationObjects.first(where: { $0.id == objectID }) else {
-//                        return .none
-//                    }
-//                    print(clickedObject.name)
-//                    state.swiftDiagramTree = .init(rootObject: clickedObject, allDeclarationObjects: state.declarationObjects)
-
                     guard let objectKeyPath = state.extractedData.usrTable[firstUSR],
                           let rootDirectory = state.extractedData.rootDirectory
                     else {
@@ -323,6 +317,16 @@ public struct RAGESSReducer {
                     }
                     let selectedObject = rootDirectory[keyPath: objectKeyPath]
                     print("Selected: \(selectedObject.name)")
+
+                    let startTime = CFAbsoluteTimeGetCurrent()
+                    state.swiftDiagramTree = .init(
+                        rootObjectKeyPath: objectKeyPath,
+                        rootDirectory: rootDirectory,
+                        usrTable: state.extractedData.usrTable,
+                        dependencyObjects: state.extractedData.dependencyObjects
+                    )
+                    print("Node States Generated: \(CFAbsoluteTimeGetCurrent() - startTime) S")
+
                     return .none
                 }
 

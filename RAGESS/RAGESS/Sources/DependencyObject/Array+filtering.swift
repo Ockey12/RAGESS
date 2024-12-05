@@ -18,8 +18,12 @@ public extension Array where Element == DependencyObject {
 
     func filteringWhereCaller(_ declaredObject: DeclaredObject) -> [DependencyObject] {
         let usrSet = Set(declaredObject.usrs)
+
         return filter { dependency in
-            usrSet.contains(dependency.callerUSRs)
+            guard let callerFirstUSR = dependency.callerUSRs.first else {
+                return false
+            }
+            return usrSet.contains(callerFirstUSR)
         }
     }
 

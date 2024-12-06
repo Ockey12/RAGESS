@@ -1,0 +1,173 @@
+//
+//  DependenciesExtractorDebugger.swift
+//
+//
+//  Created by Ockey12 on 2024/11/19
+//
+//
+
+import ComposableArchitecture
+import DeclarationExtractor
+import DependenciesExtractor
+import Foundation
+import SourceFileClient
+import SwiftUI
+import XcodeObject
+
+@Reducer
+public struct DependenciesExtractorDebugger {
+    @ObservableState
+    public struct State {
+        var indexStorePath: String
+        var projectRootPath: String
+        var isPrintValid: Bool
+
+        public init(
+            indexStorePath: String = "/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz/Index.noindex/DataStore",
+            projectRootPath: String = "/Users/onaga/RAGESS",
+            isPrintValid: Bool = false
+        ) {
+            self.indexStorePath = indexStorePath
+            self.projectRootPath = projectRootPath
+            self.isPrintValid = isPrintValid
+        }
+    }
+
+    public enum Action: BindableAction {
+        case executeButtonTapped
+        case sourceFileClientResponse(Result<Directory, Error>)
+        case binding(BindingAction<State>)
+    }
+
+    public var body: some ReducerOf<Self> {
+        BindingReducer()
+        Reduce { state, action in
+            switch action {
+            case .executeButtonTapped:
+                @Dependency(SourceFileClient.self) var sourceFileClient
+                let rootDirectoryPath = state.projectRootPath
+                return .run { send in
+                    await send(.sourceFileClientResponse(Result {
+                        try sourceFileClient.getRootDirectory(
+                            rootDirectoryPath: rootDirectoryPath,
+                            ignoredDirectories: [
+                                "build",
+                                ".build",
+                                "DerivedData",
+                                ".git",
+                                ".github",
+                                ".swiftpm"
+                            ]
+                        )
+                    }))
+                }
+
+            case let .sourceFileClientResponse(result):
+                switch result {
+                case let .success(rootDirectory):
+                    guard let indexStorePath = URL(string: state.indexStorePath) else {
+                        assertionFailure()
+                        return .none
+                    }
+
+                    do {
+                        let startTime = CFAbsoluteTimeGetCurrent()
+
+                        let response = try DeclarationExtractor.extractDeclarations(rootDirectory: rootDirectory, indexStoreURL: indexStorePath)
+                        print("\nCOMPLETE DeclarationExtractor.extractDeclarations(): \(CFAbsoluteTimeGetCurrent() - startTime) S: \(response.usrTable.count) usrTable items")
+                        let numOfDefinitions = response.indexStoreObjects.filter { $0.roles.contains(.definition) }.count
+                        let numOfReferences = response.indexStoreObjects.filter { $0.roles.contains(.reference) }.count
+                        print(numOfDefinitions, "definitions")
+                        print(numOfReferences, "references")
+
+                        let dependencies = DependenciesExtractor.extract(
+                            indexStoreObjects: response.indexStoreObjects,
+                            usrTable: response.usrTable,
+                            sourceFileTable: response.sourceFileTable,
+                            rootDirectory: response.rootDirectory
+                        )
+
+                        let endTime = CFAbsoluteTimeGetCurrent()
+                        print("\nCOMPLETE DependenciesExtractor.extract(): \(endTime - startTime) S: \(dependencies.count) dependenciesTable items\n")
+
+                        if state.isPrintValid {
+                            for dependencyObject in dependencies {
+                                guard let callerUSR = dependencyObject.callerUSRs.first else {
+                                    continue
+                                }
+                                guard let callerKeyPath = response.usrTable[callerUSR] else {
+                                    continue
+                                }
+                                guard let calleeKeyPath = response.usrTable[dependencyObject.calleeUSR] else {
+                                    continue
+                                }
+                                let caller = response.rootDirectory[keyPath: callerKeyPath]
+                                let callee = response.rootDirectory[keyPath: calleeKeyPath]
+
+                                print("CALLEE: \(callee.name) \(callee.fullPath)(\(callee.rangeInXcode.lowerBound.line):\(callee.rangeInXcode.lowerBound.column))")
+                                print("CALLER: \(caller.name) \(caller.fullPath)(\(caller.rangeInXcode.lowerBound.line):\(caller.rangeInXcode.lowerBound.column))\n")
+                            }
+                        }
+                    } catch {
+                        print(error)
+                        assertionFailure()
+                    }
+                    return .none
+
+                case .failure:
+                    assertionFailure()
+                    return .none
+                }
+
+            case .binding:
+                return .none
+            }
+        }
+    }
+}
+
+public struct DependenciesExtractorDebugView: View {
+    @Bindable private var store: StoreOf<DependenciesExtractorDebugger>
+
+    public init(store: StoreOf<DependenciesExtractorDebugger>) {
+        self.store = store
+    }
+
+    public var body: some View {
+        VStack(alignment: .leading) {
+            HStack {
+                Button(
+                    action: {
+                        store.send(.executeButtonTapped)
+                    },
+                    label: {
+                        Image(systemName: "play.fill")
+                            .font(.system(size: 10))
+                    }
+                )
+                Text("DependenciesExtractor.extract()")
+                    .font(.system(size: 13))
+            }
+
+            Toggle(isOn: $store.isPrintValid) {
+                Text("Enable printing of results")
+                    .font(.system(size: 13))
+            }
+
+            HStack {
+                Text("Index Store")
+                    .font(.system(size: 13))
+                TextField("Index Store path", text: $store.indexStorePath)
+                    .padding(.horizontal)
+            }
+
+            HStack {
+                Text("Project")
+                    .font(.system(size: 13))
+                TextField("project root path", text: $store.projectRootPath)
+                    .padding(.horizontal)
+            }
+        }
+        .padding()
+    }
+}

@@ -7,10 +7,8 @@
 //
 
 import ComposableArchitecture
-import DeclarationObjectsClient
 import Dependencies
 import SwiftUI
-import TypeDeclaration
 import XcodeObject
 
 @Reducer
@@ -70,12 +68,9 @@ public struct CellReducer {
         }
     }
 
-    @Dependency(DeclarationObjectsClient.self) var declarationObjectsClient
-
     public indirect enum Action {
         case expandButtonTapped
         case nameClicked
-        case declarationObjectsResponse([any DeclarationObject])
         case children(IdentifiedActionOf<CellReducer>)
         case destination(PresentationAction<Destination.Action>)
         case delegate(Delegate)
@@ -83,8 +78,7 @@ public struct CellReducer {
         public enum Delegate {
             case childrenExpanded(content: Content, leadingPadding: CGFloat)
             case childrenCollapsed(content: Content)
-            case nameClicked(Content)
-            case popoverCellClicked(objectID: UUID)
+            case popoverCellClicked(firstUSR: String)
         }
     }
 
@@ -106,20 +100,16 @@ public struct CellReducer {
                 )
 
             case .nameClicked:
-                return .run { send in
-                    let declarationObjects = await declarationObjectsClient.get()
-                    await send(.declarationObjectsResponse(declarationObjects))
+                if case .sourceFile = state.content {
+                    state.destination = .popover(FileTreePopoverReducer.State(content: state.content))
                 }
-
-            case let .declarationObjectsResponse(objects):
-                state.destination = .popover(FileTreePopoverReducer.State(content: state.content, declarationObjects: objects))
                 return .none
 
             case .children:
                 return .none
 
-            case let .destination(.presented(.popover(.delegate(.cellClicked(objectID: objectID))))):
-                return .send(.delegate(.popoverCellClicked(objectID: objectID)))
+            case let .destination(.presented(.popover(.delegate(.cellClicked(firstUSR: firstUSR))))):
+                return .send(.delegate(.popoverCellClicked(firstUSR: firstUSR)))
 
             case .destination:
                 return .none
@@ -225,86 +215,88 @@ struct CellView: View {
                 action: \.destination.popover
             )
         ) { popoverStore in
-            FileTreePopoverContent(store: popoverStore)
+            FileTreePopoverContentView(store: popoverStore)
         }
     }
 }
 
-#Preview(traits: .fixedLayout(width: 800, height: 100)) {
-    List {
-        CellView(
-            store: .init(
-                initialState: CellReducer.State(
-                    content: .directory(
-                        Directory(path: "Project/Directory", subDirectories: [], files: [])
-                    ),
-                    leadingPadding: 0,
-                    isExpanding: false
-                ),
-                reducer: {
-                    CellReducer()
-                }
-            )
-        )
-        .listRowSeparator(.hidden)
-
-        CellView(
-            store: .init(
-                initialState: CellReducer.State(
-                    content: .directory(
-                        Directory(path: "Project/Directory", subDirectories: [], files: [])
-                    ),
-                    leadingPadding: 0,
-                    isExpanding: true
-                ),
-                reducer: {
-                    CellReducer()
-                }
-            )
-        )
-        .listRowSeparator(.hidden)
-
-        CellView(
-            store: .init(
-                initialState: CellReducer.State(
-                    content: .directory(
-                        Directory(
-                            path: "Project/Directory",
-                            subDirectories: [
-                                Directory(
-                                    path: "Project/Directory/Directory",
-                                    subDirectories: [],
-                                    files: []
-                                )
-                            ],
-                            files: []
-                        )
-                    ),
-                    leadingPadding: 0,
-                    isExpanding: true
-                ),
-                reducer: {
-                    CellReducer()
-                }
-            )
-        )
-        .listRowSeparator(.hidden)
-
-        CellView(
-            store: .init(
-                initialState: CellReducer.State(
-                    content: .sourceFile(
-                        SourceFile(path: "Project/Directory/File.swift", content: "")
-                    ),
-                    leadingPadding: 0,
-                    isExpanding: true
-                ),
-                reducer: {
-                    CellReducer()
-                }
-            )
-        )
-        .listRowSeparator(.hidden)
-    }
-    .frame(width: 200, height: 200)
-}
+// #Preview(traits: .fixedLayout(width: 800, height: 100)) {
+//    List {
+//        CellView(
+//            store: .init(
+//                initialState: CellReducer.State(
+//                    content: .directory(
+//                        Directory(fullPath: "Project/Directory", keyPathFromRootDirectory: \Directory.self, subDirectories: [], files: [])
+//                    ),
+//                    leadingPadding: 0,
+//                    isExpanding: false
+//                ),
+//                reducer: {
+//                    CellReducer()
+//                }
+//            )
+//        )
+//        .listRowSeparator(.hidden)
+//
+//        CellView(
+//            store: .init(
+//                initialState: CellReducer.State(
+//                    content: .directory(
+//                        Directory(fullPath: "Project/Directory", keyPathFromRootDirectory: \Directory.self, subDirectories: [], files: [])
+//                    ),
+//                    leadingPadding: 0,
+//                    isExpanding: true
+//                ),
+//                reducer: {
+//                    CellReducer()
+//                }
+//            )
+//        )
+//        .listRowSeparator(.hidden)
+//
+//        CellView(
+//            store: .init(
+//                initialState: CellReducer.State(
+//                    content: .directory(
+//                        Directory(
+//                            fullPath: "Project/Directory",
+//                            keyPathFromRootDirectory: \Directory.self,
+//                            subDirectories: [
+//                                Directory(
+//                                    fullPath: "Project/Directory/Directory",
+//                                    keyPathFromRootDirectory: \Directory.self,
+//                                    subDirectories: [],
+//                                    files: []
+//                                )
+//                            ],
+//                            files: []
+//                        )
+//                    ),
+//                    leadingPadding: 0,
+//                    isExpanding: true
+//                ),
+//                reducer: {
+//                    CellReducer()
+//                }
+//            )
+//        )
+//        .listRowSeparator(.hidden)
+//
+//        CellView(
+//            store: .init(
+//                initialState: CellReducer.State(
+//                    content: .sourceFile(
+//                        SourceFile(fullPath: "Project/Directory/File.swift", keyPathFromRootDirectory: \Directory.sourceFiles[0], sourceCode: "")
+//                    ),
+//                    leadingPadding: 0,
+//                    isExpanding: true
+//                ),
+//                reducer: {
+//                    CellReducer()
+//                }
+//            )
+//        )
+//        .listRowSeparator(.hidden)
+//    }
+//    .frame(width: 200, height: 200)
+// }

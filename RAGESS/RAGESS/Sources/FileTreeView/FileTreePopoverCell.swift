@@ -7,18 +7,18 @@
 //
 
 import ComposableArchitecture
+import DeclaredObject
 import SwiftUI
-import TypeDeclaration
 
 @Reducer
 public struct FileTreePopoverCellReducer {
     @ObservableState
     public struct State: Identifiable {
         public var id: UUID {
-            declarationObject.id
+            declaredObject.id
         }
 
-        let declarationObject: any DeclarationObject
+        let declaredObject: DeclaredObject
     }
 
     public enum Action {
@@ -26,7 +26,7 @@ public struct FileTreePopoverCellReducer {
         case delegate(Delegate)
 
         public enum Delegate {
-            case clicked(objectID: UUID)
+            case clicked(firstUSR: String)
         }
     }
 
@@ -34,7 +34,10 @@ public struct FileTreePopoverCellReducer {
         Reduce { state, action in
             switch action {
             case .clicked:
-                return .send(.delegate(.clicked(objectID: state.declarationObject.id)))
+                guard let firstUSR = state.declaredObject.usrs.first else {
+                    return .none
+                }
+                return .send(.delegate(.clicked(firstUSR: firstUSR)))
 
             case .delegate:
                 return .none
@@ -47,7 +50,7 @@ struct FileTreePopoverCell: View {
     let store: StoreOf<FileTreePopoverCellReducer>
 
     var body: some View {
-        Text(store.declarationObject.annotatedDecl)
+        Text(store.declaredObject.annotatedDecl ?? store.declaredObject.name)
             .onTapGesture {
                 store.send(.clicked)
             }

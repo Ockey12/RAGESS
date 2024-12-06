@@ -7,8 +7,8 @@
 //
 
 import ComposableArchitecture
+import DeclaredObject
 import Foundation
-import TypeDeclaration
 
 @Reducer
 public struct HeaderReducer {
@@ -16,11 +16,7 @@ public struct HeaderReducer {
 
     @ObservableState
     public struct State: Equatable {
-        public static func == (lhs: HeaderReducer.State, rhs: HeaderReducer.State) -> Bool {
-            lhs.object.id == rhs.object.id
-        }
-
-        var object: any HasHeader
+        var object: DeclaredObject
         var text: TextCellReducer.State
         var topLeadingPoint: CGPoint
         var leadingArrowTerminalPoint: CGPoint {
@@ -50,7 +46,7 @@ public struct HeaderReducer {
         var bodyWidth: CGFloat
 
         public init(
-            object: any HasHeader,
+            object: DeclaredObject,
             topLeadingPoint: CGPoint,
             bodyWidth: CGFloat
         ) {

@@ -41,15 +41,19 @@ let package = Package(
         ),
         .package(
             url: "https://github.com/pointfreeco/swift-composable-architecture",
-            .upToNextMinor(from: "1.9.2")
+            from: "1.15.2"
         ),
         .package(
             url: "https://github.com/pointfreeco/swift-dependencies",
-            .upToNextMinor(from: "1.2.2")
+            from: "1.4.0"
         ),
         .package(
             url: "https://github.com/jpsim/SourceKitten.git",
             .upToNextMinor(from: "0.34.1")
+        ),
+        .package(
+            url: "https://github.com/kateinoigakukun/swift-indexstore.git",
+            .upToNextMinor(from: "0.3.0")
         )
     ],
     targets: [
@@ -74,10 +78,12 @@ let package = Package(
                 "BuildSettingsClient",
                 "DumpPackageClient",
                 "DependenciesClient",
+                "DependenciesExtractor",
                 "MonitorClient",
                 "LSPClient",
                 "SourceFileClient",
                 "SourceKitClient",
+                "SwiftIndexStoreClient",
                 "TypeAnnotationClient",
                 "TypeDeclaration",
                 "DeclarationExtractor",
@@ -88,7 +94,10 @@ let package = Package(
         .target(
             name: "DeclarationExtractor",
             dependencies: [
+                "DeclaredObject",
                 "SourceKitClient",
+                "SwiftIndexStoreClient",
+                "SwiftIndexStoreObject",
                 "TypeDeclaration",
                 "XcodeObject",
                 .product(name: "Dependencies", package: "swift-dependencies"),
@@ -106,6 +115,12 @@ let package = Package(
             ]
         ),
         .target(
+            name: "DeclaredObject",
+            dependencies: [
+                .product(name: "Dependencies", package: "swift-dependencies")
+            ]
+        ),
+        .target(
             name: "DependenciesClient",
             dependencies: [
                 "SourceKitClient",
@@ -114,6 +129,22 @@ let package = Package(
                 .product(name: "Dependencies", package: "swift-dependencies"),
                 .product(name: "DependenciesMacros", package: "swift-dependencies"),
                 .product(name: "SwiftSyntax", package: "swift-syntax")
+            ]
+        ),
+        .target(
+            name: "DependenciesExtractor",
+            dependencies: [
+                "DeclaredObject",
+                "DependencyObject",
+                "SwiftIndexStoreObject",
+                "XcodeObject"
+            ]
+        ),
+        .target(
+            name: "DependencyObject",
+            dependencies: [
+                "DeclaredObject",
+                "SwiftIndexStoreObject"
             ]
         ),
         .target(
@@ -128,8 +159,7 @@ let package = Package(
         .target(
             name: "FileTreeView",
             dependencies: [
-                "DeclarationObjectsClient",
-                "TypeDeclaration",
+                "DeclaredObject",
                 "XcodeObject",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "Dependencies", package: "swift-dependencies")
@@ -157,14 +187,18 @@ let package = Package(
             name: "RAGESSView",
             dependencies: [
                 "BuildSettingsClient",
+                "DebugView",
                 "DeclarationExtractor",
+                "DeclaredObject",
                 "DeclarationObjectsClient",
-                "DependenciesClient",
+                "DependenciesExtractor",
+                "DependencyObject",
                 "DumpPackageClient",
                 "FileTreeView",
                 "MonitorClient",
                 "SourceFileClient",
                 "SwiftDiagramView",
+                "SwiftIndexStoreObject",
                 "XcodeObject",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "Dependencies", package: "swift-dependencies")
@@ -193,10 +227,25 @@ let package = Package(
         .target(
             name: "SwiftDiagramView",
             dependencies: [
-                "DeclarationObjectsClient",
-                "TypeDeclaration",
+                "DeclaredObject",
+                "DependencyObject",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "Dependencies", package: "swift-dependencies")
+            ]
+        ),
+        .target(
+            name: "SwiftIndexStoreClient",
+            dependencies: [
+                "DeclaredObject",
+                "SwiftIndexStoreObject",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                .product(name: "SwiftIndexStore", package: "swift-indexstore")
+            ]
+        ),
+        .target(
+            name: "SwiftIndexStoreObject",
+            dependencies: [
+                "DeclaredObject"
             ]
         ),
         .target(
@@ -216,7 +265,10 @@ let package = Package(
                 .product(name: "LSPBindings", package: "sourcekit-lsp")
             ]
         ),
-        .target(name: "XcodeObject"),
+        .target(
+            name: "XcodeObject",
+            dependencies: ["DeclaredObject"]
+        ),
         .testTarget(
             name: "LSPClientTests",
             dependencies: [

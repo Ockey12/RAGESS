@@ -53,62 +53,63 @@ public struct LSPClientDebugger {
 
     public var body: some ReducerOf<Self> {
         BindingReducer()
-        Reduce { state, action in
-            switch action {
-            case .sendInitializeRequest:
-                return .run { [
-                    serverPath = state.serverPathString,
-                    projectRootPathString = state.rootPathString
-                ] _ in
-                    try await lspClient.sendInitializeRequest(
-                        serverPath: serverPath,
-                        projectRootPathString: projectRootPathString
-                    )
-                }
-
-            case .sendInitializedNotification:
-                return .run { _ in
-                    try await lspClient.sendInitializedNotification()
-                }
-
-            case .sendDidOpenNotification:
-                return .run { [
-                    filePathString = state.filePathString,
-                    sourceCode = state.sourceCode
-                ] _ in
-                    try await lspClient.sendDidOpenNotification(
-                        filePathString: filePathString,
-                        sourceCode: sourceCode
-                    )
-                }
-
-            case .inlayHintRequestTapped:
-                return .run { [
-                    filePathString = state.filePathString,
-                    sourceCode = state.sourceCode
-                ] _ in
-                    try await lspClient.sendInlayHintRequest(
-                        sourceFile: SourceFile(path: filePathString, content: sourceCode),
-                        range: Position(line: 0, utf16index: 0) ..< sourceCode.lastPosition
-                    )
-                }
-
-            case .sendDefinitionRequest:
-                return .run { [
-                    filePathString = state.filePathString,
-                    line = state.line,
-                    column = state.column
-                ] _ in
-                    let position = Position(line: line, utf16index: column)
-                    try await lspClient.sendDefinitionRequest(
-                        filePathString: filePathString,
-                        position: position
-                    )
-                }
-
-            case .binding:
-                return .none
-            }
+        Reduce { _, _ in
+//            switch action {
+//            case .sendInitializeRequest:
+//                return .run { [
+//                    serverPath = state.serverPathString,
+//                    projectRootPathString = state.rootPathString
+//                ] _ in
+//                    try await lspClient.sendInitializeRequest(
+//                        serverPath: serverPath,
+//                        projectRootPathString: projectRootPathString
+//                    )
+//                }
+//
+//            case .sendInitializedNotification:
+//                return .run { _ in
+//                    try await lspClient.sendInitializedNotification()
+//                }
+//
+//            case .sendDidOpenNotification:
+//                return .run { [
+//                    filePathString = state.filePathString,
+//                    sourceCode = state.sourceCode
+//                ] _ in
+//                    try await lspClient.sendDidOpenNotification(
+//                        filePathString: filePathString,
+//                        sourceCode: sourceCode
+//                    )
+//                }
+//
+//            case .inlayHintRequestTapped:
+//                return .run { [
+//                    filePathString = state.filePathString,
+//                    sourceCode = state.sourceCode
+//                ] _ in
+//                    try await lspClient.sendInlayHintRequest(
+//                        sourceFile: SourceFile(path: filePathString, content: sourceCode),
+//                        range: Position(line: 0, utf16index: 0) ..< sourceCode.lastPosition
+//                    )
+//                }
+//
+//            case .sendDefinitionRequest:
+//                return .run { [
+//                    filePathString = state.filePathString,
+//                    line = state.line,
+//                    column = state.column
+//                ] _ in
+//                    let position = Position(line: line, utf16index: column)
+//                    try await lspClient.sendDefinitionRequest(
+//                        filePathString: filePathString,
+//                        position: position
+//                    )
+//                }
+//
+//            case .binding:
+//                return .none
+//            }
+            .none
         }
     }
 }

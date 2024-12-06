@@ -12,17 +12,23 @@ import XcodeObject
 
 @DependencyClient
 public struct SourceFileClient {
-    public var getXcodeObjects: @Sendable (
+    public var getRootDirectory: @Sendable (
         _ rootDirectoryPath: String,
         _ ignoredDirectories: [String]
-    ) async throws -> Directory
+    ) throws -> Directory
 }
 
 extension SourceFileClient: DependencyKey {
     public static let liveValue: Self = {
-        @Sendable func getDirectories(rootPath: String, ignoredDirectories: [String]) -> Directory {
+        @Sendable func getDirectories(
+            rootPath: String,
+            keyPathFromRootDirectory: WritableKeyPath<Directory, Directory>,
+            ignoredDirectories: [String]
+        ) -> Directory {
             let fileManager = FileManager.default
-            print(rootPath)
+            #if DEBUG
+                print(rootPath)
+            #endif
 
             var subDirectories: [Directory] = []
             var files: [SourceFile] = []
@@ -32,9 +38,16 @@ extension SourceFileClient: DependencyKey {
             var isDirectory: ObjCBool = false
 
             guard let paths = try? fileManager.contentsOfDirectory(atPath: rootPath) else {
-                return Directory(path: rootPath, subDirectories: [], files: [])
+                return Directory(
+                    fullPath: rootPath,
+                    keyPathFromRootDirectory: keyPathFromRootDirectory,
+                    subDirectories: [],
+                    files: []
+                )
             }
 
+            var subDirectoryIndex = 0
+            var fileIndex = 0
             for path in paths {
                 let fullPath = NSString(string: rootPath).appendingPathComponent(path)
                 guard fileManager.fileExists(atPath: fullPath, isDirectory: &isDirectory) else {
@@ -50,13 +63,26 @@ extension SourceFileClient: DependencyKey {
                         continue
                     }
 
-                    let subDirectory = getDirectories(rootPath: fullPath, ignoredDirectories: ignoredDirectories)
+                    let keyPath = keyPathFromRootDirectory.appending(path: \Directory.subDirectories[subDirectoryIndex])
+                    subDirectoryIndex += 1
+                    let subDirectory = getDirectories(
+                        rootPath: fullPath,
+                        keyPathFromRootDirectory: keyPath,
+                        ignoredDirectories: ignoredDirectories
+                    )
                     subDirectories.append(subDirectory)
                 } else if path.hasSuffix(".swift") {
                     guard let content = try? String(contentsOfFile: fullPath) else {
                         continue
                     }
-                    let file = SourceFile(path: fullPath, content: content)
+
+                    let keyPath = keyPathFromRootDirectory.appending(path: \Directory.files[fileIndex])
+                    fileIndex += 1
+                    let file = SourceFile(
+                        fullPath: fullPath,
+                        keyPathFromRootDirectory: keyPath,
+                        sourceCode: content
+                    )
                     files.append(file)
 
                     if file.name == "Package.swift" {
@@ -66,44 +92,39 @@ extension SourceFileClient: DependencyKey {
             }
 
             return Directory(
-                path: rootPath,
-                subDirectories: subDirectories.sorted { $0.name < $1.name },
-                files: files.sorted { $0.name < $1.name },
+                fullPath: rootPath,
+                keyPathFromRootDirectory: \Directory.self,
+                subDirectories: subDirectories,
+                files: files,
                 xcodeprojPaths: xcodeprojPaths,
                 packageSwiftPath: packageSwiftPath
             )
         }
 
         return .init(
-            getXcodeObjects: { rootDirectoryPath, ignoredDirectories in
+            getRootDirectory: { rootDirectoryPath, ignoredDirectories in
                 #if DEBUG
                     let startTime = CFAbsoluteTimeGetCurrent()
-                    let directory = getDirectories(
+                    let rootDirectory = getDirectories(
                         rootPath: rootDirectoryPath,
+                        keyPathFromRootDirectory: \Directory.self,
                         ignoredDirectories: ignoredDirectories
                     )
                     let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
 
-                    var numberOfLines = printDirectoryContents(directory)
-
-                    print("")
-                    for path in directory.allXcodeprojPathsUnderDirectory {
-                        print(path)
-                    }
-                    print("")
-
                     print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
-                    print("NUMBER OF LINES: \(numberOfLines)")
+                    print("NUMBER OF LINES: \(totalLines(in: rootDirectory))")
                     print("TIME ELAPSED: \(timeElapsed)")
                     print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
 
-                    return directory
+                    return rootDirectory
                 #else
-                    let directory = getDirectories(
+                    let rootDirectory = getDirectories(
                         rootPath: rootDirectoryPath,
+                        keyPathFromRootDirectory: \Directory.self,
                         ignoredDirectories: ignoredDirectories
                     )
-                    return directory
+                    return rootDirectory
                 #endif
             }
         )
@@ -112,31 +133,40 @@ extension SourceFileClient: DependencyKey {
 
 #if DEBUG
     extension SourceFileClient {
-        static func printDirectoryContents(_ directory: Directory) -> Int {
+        static func totalLines(in directory: Directory) -> Int {
             var numberOfLines = 0
-            print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
-            print(directory.path)
-            print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
 
-            if let description = directory.descriptionJSONString {
-                let lines = description.components(separatedBy: "\n")
-                for line in lines {
-                    print(line)
-                }
-                print()
+            for file in directory.files {
+                numberOfLines += countLines(in: file)
             }
 
-            for sourceFile in directory.files {
-                print("*** \(sourceFile.path) ***")
-                let lines = sourceFile.content.components(separatedBy: "\n")
-                numberOfLines += lines.count
-                for line in lines {
-                    print(line)
-                }
-                print()
-            }
             for subDirectory in directory.subDirectories {
-                numberOfLines += printDirectoryContents(subDirectory)
+                numberOfLines += totalLines(in: subDirectory)
+            }
+
+            return numberOfLines
+        }
+
+        static func countLines(in file: SourceFile) -> Int {
+            var numberOfLines = 0
+            let sourceCode = file.sourceCode
+            var currentIndex = sourceCode.startIndex
+            var isInStringLiteral = false
+
+            while currentIndex < sourceCode.endIndex {
+                let currentChar = sourceCode[currentIndex]
+
+                if currentChar == "\"" {
+                    isInStringLiteral.toggle()
+                    currentIndex = sourceCode.index(after: currentIndex)
+                    continue
+                }
+
+                if currentChar == "\n" && !isInStringLiteral {
+                    numberOfLines += 1
+                }
+
+                currentIndex = sourceCode.index(after: currentIndex)
             }
 
             return numberOfLines

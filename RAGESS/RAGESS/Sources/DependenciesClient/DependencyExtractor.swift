@@ -24,18 +24,18 @@ struct DependencyExtractor {
     ) async {
         print("\(#filePath) - \(#function)")
 
-        let allSourceFilePaths = allSourceFiles.map { $0.path }
+        let allSourceFilePaths = allSourceFiles.map { $0.fullPath }
 
         #if DEBUG
             print("--- allSourceFilePaths ---")
-            for path in allSourceFilePaths {
-                print("    \(path)")
+            for fullPath in allSourceFilePaths {
+                print("    \(fullPath)")
             }
         #endif
 
         for sourceFile in allSourceFiles {
             let generator = CompilerArgumentsGenerator(
-                targetFilePath: sourceFile.path,
+                targetFilePath: sourceFile.fullPath,
                 buildSettings: buildSettings,
                 sourceFilePaths: allSourceFilePaths,
                 packages: packages
@@ -51,7 +51,7 @@ struct DependencyExtractor {
                 )
             } catch {
                 print("\(#filePath) - \(#function)")
-                print("\(error): Cannot generate compiler arguments about \(sourceFile.path).\n")
+                print("\(error): Cannot generate compiler arguments about \(sourceFile.fullPath).\n")
                 continue
             }
         }
@@ -65,13 +65,13 @@ struct DependencyExtractor {
     ) async {
         #if DEBUG
             print("\(#filePath) - \(#function)")
-            print("from \(sourceFile.path)")
+            print("from \(sourceFile.fullPath)")
         #endif
 
-        let parsedFile = Parser.parse(source: sourceFile.content)
+        let parsedFile = Parser.parse(source: sourceFile.sourceCode)
         let visitor = Visitor(
             locationConverter: SourceLocationConverter(
-                fileName: sourceFile.path,
+                fileName: sourceFile.fullPath,
                 tree: parsedFile
             )
         )
@@ -88,7 +88,7 @@ struct DependencyExtractor {
                 print("referenceOffset: \(referenceOffset)")
             #endif
             await extractDependencyObject(
-                sourceFilePath: sourceFile.path,
+                sourceFilePath: sourceFile.fullPath,
                 callerOffset: referenceOffset,
                 offsetKind: .reference,
                 declarationObjects: &declarationObjects,
@@ -102,7 +102,7 @@ struct DependencyExtractor {
                 print("identifierTypeOffset: \(identifierTypeOffset)")
             #endif
             await extractDependencyObject(
-                sourceFilePath: sourceFile.path,
+                sourceFilePath: sourceFile.fullPath,
                 callerOffset: identifierTypeOffset,
                 offsetKind: .identifierType,
                 declarationObjects: &declarationObjects,
@@ -116,7 +116,7 @@ struct DependencyExtractor {
                 print("inheritOffset: \(inheritOffset)")
             #endif
             await extractDependencyObject(
-                sourceFilePath: sourceFile.path,
+                sourceFilePath: sourceFile.fullPath,
                 callerOffset: inheritOffset,
                 offsetKind: .inherit,
                 declarationObjects: &declarationObjects,

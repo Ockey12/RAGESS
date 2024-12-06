@@ -7,6 +7,7 @@
 //
 
 import ComposableArchitecture
+import DebugView
 import FileTreeView
 import SwiftDiagramView
 import SwiftUI
@@ -26,6 +27,11 @@ public struct RAGESSView: View {
             NavigationSplitView(
                 sidebar: {
                     Divider()
+
+                    #if DEBUG
+                        DebugView(store: store.scope(state: \.debugView, action: \.debugView))
+                        Divider()
+                    #endif
 
                     if let _ = store.fileTree.rootDirectory {
                         FileTreeView(store: store.scope(state: \.fileTree, action: \.fileTree))
@@ -49,7 +55,7 @@ public struct RAGESSView: View {
 
                             Divider()
 
-                            Text(store.projectRootDirectoryPath)
+                            Text(store.extractedData.projectRootDirectoryPath)
                                 .padding()
 
                             Spacer()

@@ -357,6 +357,10 @@ private enum ArrowsStateGenerator {
                         }
                     }
                 }
+                guard leadingStartPoint != .zero,
+                      trailingStartPoint != .zero else {
+                    continue
+                }
 
                 // set end point coordinate
                 var leadingEndPoint: CGPoint = .zero
@@ -374,6 +378,11 @@ private enum ArrowsStateGenerator {
                         }
                     }
                 }
+                guard leadingEndPoint != .zero,
+                      trailingEndPoint != .zero else {
+                    continue
+                }
+
                 arrowStates.append(
                     .init(
                         dependency: dependency,

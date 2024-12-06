@@ -119,8 +119,9 @@ extension SourceFileClient: DependencyKey {
 
                     return rootDirectory
                 #else
-                    let rootDirectory = getRootDirectory(
+                    let rootDirectory = getDirectories(
                         rootPath: rootDirectoryPath,
+                        keyPathFromRootDirectory: \Directory.self,
                         ignoredDirectories: ignoredDirectories
                     )
                     return rootDirectory

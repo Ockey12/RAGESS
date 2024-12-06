@@ -48,6 +48,7 @@ struct NodeModel {
         // set bodyWidth and frameWidth
         var allAnnotatedDecl = [object.annotatedDecl ?? object.name]
         // TODO: protocol and super class width
+        allAnnotatedDecl.append(contentsOf: object.attributes.map { $0.annotatedDecl ?? $0.name })
         allAnnotatedDecl.append(contentsOf: object.initializers.map { $0.annotatedDecl ?? $0.name })
         allAnnotatedDecl.append(contentsOf: object.variables.map { $0.annotatedDecl ?? $0.name })
         allAnnotatedDecl.append(contentsOf: object.functions.map { $0.annotatedDecl ?? $0.name })
@@ -63,6 +64,9 @@ struct NodeModel {
 
         // set frameHeight
         var frameHeight: CGFloat = itemHeight * 2 + bottomPadding
+        if !object.attributes.isEmpty {
+            frameHeight += connectionHeight + itemHeight * CGFloat(object.attributes.count) + bottomPadding
+        }
         if hasSuperClass {
             frameHeight += connectionHeight + itemHeight + bottomPadding
         }

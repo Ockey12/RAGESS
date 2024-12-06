@@ -13,6 +13,9 @@ public struct DeclaredObject: Identifiable, Equatable {
     public let id: UUID
     public var usrs: [String] {
         didSet {
+            for i in attributes.indices {
+                attributes[i].parentUSRs = usrs
+            }
             for i in initializers.indices {
                 initializers[i].parentUSRs = usrs
             }
@@ -70,6 +73,8 @@ public struct DeclaredObject: Identifiable, Equatable {
     public var descendantsID: [UUID] {
         var ids: [UUID] = [id]
 
+        ids.append(contentsOf: attributes.flatMap { $0.descendantsID })
+
         ids.append(contentsOf: initializers.flatMap { $0.descendantsID })
         ids.append(contentsOf: variables.flatMap { $0.descendantsID })
         ids.append(contentsOf: functions.flatMap { $0.descendantsID })
@@ -86,6 +91,8 @@ public struct DeclaredObject: Identifiable, Equatable {
 
     public var descendantsUSRs: [String] {
         var usrs: [String] = usrs
+
+        usrs.append(contentsOf: attributes.flatMap { $0.descendantsUSRs })
 
         usrs.append(contentsOf: initializers.flatMap { $0.descendantsUSRs })
         usrs.append(contentsOf: variables.flatMap { $0.descendantsUSRs })

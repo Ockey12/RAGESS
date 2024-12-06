@@ -69,6 +69,7 @@ public struct NodeReducer {
             // set bodyWidth and frameWidth
             var allAnnotatedDecl = [object.annotatedDecl ?? object.name]
             allAnnotatedDecl.append(contentsOf: abstractObjects.map { $0.annotatedDecl ?? $0.name })
+            allAnnotatedDecl.append(contentsOf: object.attributes.map { $0.annotatedDecl ?? $0.name })
             allAnnotatedDecl.append(contentsOf: object.initializers.map { $0.annotatedDecl ?? $0.name })
             allAnnotatedDecl.append(contentsOf: object.variables.map { $0.annotatedDecl ?? $0.name })
             allAnnotatedDecl.append(contentsOf: object.functions.map { $0.annotatedDecl ?? $0.name })
@@ -97,6 +98,24 @@ public struct NodeReducer {
                     + itemHeight * 2
                     + bottomPaddingForLastText
             )
+
+            if !object.attributes.isEmpty {
+                details.append(
+                    .init(
+                        objects: object.attributes,
+                        kind: .attribute,
+                        topLeadingPoint: frameBottomLeadingPoint,
+                        frameWidth: bodyWidth
+                    )
+                )
+                frameBottomLeadingPoint = CGPoint(
+                    x: frameBottomLeadingPoint.x,
+                    y: frameBottomLeadingPoint.y
+                        + connectionHeight
+                        + itemHeight * CGFloat(object.attributes.count)
+                        + bottomPaddingForLastText
+                )
+            }
 
             if hasSuperClass,
                let superClass = abstractObjects.first(where: { $0.kind == .class }) {

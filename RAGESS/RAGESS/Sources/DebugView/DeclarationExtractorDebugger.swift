@@ -164,7 +164,8 @@ extension DeclarationExtractorDebugger {
         let range = declaredObject.rangeInXcode
         let location = "\(declaredObject.fullPath)(\(range.lowerBound.line):\(range.lowerBound.column) - \(range.upperBound.line):\(range.upperBound.column))"
         let name = "<\(declaredObject.kind.rawValue)>\(declaredObject.name) \(location)"
-        var childObjects = declaredObject.initializers
+        var childObjects = declaredObject.attributes
+            + declaredObject.initializers
             + declaredObject.variables
             + declaredObject.functions
             + declaredObject.cases

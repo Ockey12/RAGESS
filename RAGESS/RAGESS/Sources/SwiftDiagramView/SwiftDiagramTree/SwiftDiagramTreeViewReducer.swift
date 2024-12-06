@@ -101,7 +101,7 @@ extension Directory {
             switch object.kind {
             case .struct, .class, .enum, .protocol, .actor:
                 return object
-            case .initializer, .variable, .function, .case:
+            case .initializer, .variable, .function, .case, .attribute:
                 guard let parentUSR = object.parentUSRs.first,
                       let parentKeyPath = usrTable[parentUSR]
                 else {

@@ -52,6 +52,8 @@ public struct DeclaredObject: Identifiable, Equatable {
     public let offsetRange: ClosedRange<Int>
     public let kind: Kind
 
+    public var attributes: [Self]
+
     public var initializers: [Self]
     public var variables: [Self]
     public var functions: [Self]
@@ -108,6 +110,7 @@ public struct DeclaredObject: Identifiable, Equatable {
         rangeInXcode: ClosedRange<LocationInXcode>,
         offsetRange: ClosedRange<Int>,
         kind: Kind,
+        attributes: [Self] = [],
         initializers: [Self] = [],
         variables: [Self] = [],
         functions: [Self] = [],
@@ -130,6 +133,8 @@ public struct DeclaredObject: Identifiable, Equatable {
         self.rangeInXcode = rangeInXcode
         self.offsetRange = offsetRange
         self.kind = kind
+
+        self.attributes = attributes
 
         self.initializers = initializers
         self.variables = variables
@@ -157,5 +162,7 @@ public extension DeclaredObject {
         case variable
         case function
         case `case`
+
+        case attribute
     }
 }

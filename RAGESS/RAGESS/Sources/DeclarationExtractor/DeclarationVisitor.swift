@@ -645,6 +645,33 @@ final class DeclarationVisitor: SyntaxVisitor {
 
         return .visitChildren
     }
+
+    // MARK: Attribute
+
+    override func visit(_ node: AttributeSyntax) -> SyntaxVisitorContinueKind {
+        if !buffer.isEmpty,
+           var owner = buffer.popLast() {
+            let locationRange = node.sourceRange(converter: locationConverter)
+            let rangeInXcode = LocationInXcode(line: locationRange.start.line, column: locationRange.start.column)
+                ... LocationInXcode(line: locationRange.end.line, column: locationRange.end.column)
+            let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
+
+            owner.attributes.append(
+                DeclaredObject(
+                    name: node.trimmed.description,
+                    nameOffset: node.trimmedByteRange.offset,
+                    fullPath: fullPath,
+                    sourceCode: trimSourceCode(node.description),
+                    rangeInXcode: rangeInXcode,
+                    offsetRange: offsetRange,
+                    kind: .attribute
+                )
+            )
+            buffer.append(owner)
+        }
+
+        return .visitChildren
+    }
 }
 
 extension DeclarationVisitor {

@@ -80,14 +80,12 @@ public struct RAGESSReducer {
         case projectDirectorySelectorResponse(Result<[URL], Error>)
         case extractSourceFiles
         case sourceFileResponse(Result<Directory, Error>)
-        case buildSettingsResponse(Result<[String: String], Error>)
-        case dumpPackageResponse(Result<PackageObject, Error>)
-        case dumpPackageCompleted(rootDirectory: Directory)
+//        case buildSettingsResponse(Result<[String: String], Error>)
+//        case dumpPackageResponse(Result<PackageObject, Error>)
+//        case dumpPackageCompleted(rootDirectory: Directory)
         case declarationExtractorResponse(Result<DeclarationExtractor.Response, Error>)
         case dependenciesExtractorCompleted([DependencyObject])
 
-//        case extractDeclarationsCompleted([any DeclarationObject])
-//        case extractDependenciesResponse(Result<[any DeclarationObject], Error>)
         case startMonitoring
         case detectedDirectoryChange
         case fileTree(FileTreeViewReducer.Action)
@@ -144,7 +142,7 @@ public struct RAGESSReducer {
 
             case .extractSourceFiles:
                 state.processStartTime = CFAbsoluteTimeGetCurrent()
-                state.loadingTaskKindBuffer.append(.sourceFiles)
+//                state.loadingTaskKindBuffer.append(.sourceFiles)
 
                 return .run { [
                     projectRootDirectoryPath = state.extractedData.projectRootDirectoryPath,
@@ -161,38 +159,49 @@ public struct RAGESSReducer {
             case let .sourceFileResponse(result):
                 switch result {
                 case let .success(rootDirectory):
-                    state.loadingTaskKindBuffer.removeFirst()
+//                    state.loadingTaskKindBuffer.removeFirst()
 
                     guard !rootDirectory.allXcodeprojPathsUnderDirectory.isEmpty else {
                         assertionFailure()
                         return .none
                     }
 
-                    state.loadingTaskKindBuffer.append(.buildSettings)
-                    state.loadingTaskKindBuffer.append(
-                        contentsOf: Array(
-                            repeating: .dumpPackage,
-                            count: rootDirectory.allPackageSwiftPath.count
-                        )
-                    )
+//                    state.loadingTaskKindBuffer.append(.buildSettings)
+//                    state.loadingTaskKindBuffer.append(
+//                        contentsOf: Array(
+//                            repeating: .dumpPackage,
+//                            count: rootDirectory.allPackageSwiftPath.count
+//                        )
+//                    )
+                    guard let derivedDataURL = URL(string: state.derivedDataPath) else {
+                        assertionFailure()
+                        return .none
+                    }
+                    let indexStoreURL = derivedDataURL
+                        .appendingPathComponent("Index.noindex")
+                        .appendingPathComponent("DataStore")
+
 
                     return .run { send in
-                        await send(.buildSettingsResponse(Result {
-                            try await buildSettingsClient.getSettings(
-                                // TODO: support for multiple xcodeproj
-                                xcodeprojPath: rootDirectory.allXcodeprojPathsUnderDirectory[0]
-                            )
+                        await send(.declarationExtractorResponse(Result {
+                            try DeclarationExtractor.extractDeclarations(rootDirectory: rootDirectory, indexStoreURL: indexStoreURL)
                         }))
-
-                        for packageSwiftPath in rootDirectory.allPackageSwiftPath {
-                            let packageDirectoryPath = NSString(string: packageSwiftPath)
-                                .deletingLastPathComponent
-                            await send(.dumpPackageResponse(Result {
-                                try await dumpPackageClient.dumpPackage(currentDirectory: packageDirectoryPath)
-                            }))
-                        }
-
-                        await send(.dumpPackageCompleted(rootDirectory: rootDirectory))
+//                        await send(.buildSettingsResponse(Result {
+//                            try await buildSettingsClient.getSettings(
+//                                // TODO: support for multiple xcodeproj
+//                                xcodeprojPath: rootDirectory.allXcodeprojPathsUnderDirectory[0]
+//                            )
+//                        }))
+//
+//                        for packageSwiftPath in rootDirectory.allPackageSwiftPath {
+//                            let packageDirectoryPath = NSString(string: packageSwiftPath)
+//                                .deletingLastPathComponent
+//                            await send(.dumpPackageResponse(Result {
+//                                try await dumpPackageClient.dumpPackage(currentDirectory: packageDirectoryPath)
+//                            }))
+//                        }
+//
+//                        await send(.dumpPackageCompleted(rootDirectory: rootDirectory))
                     }
 
                 case let .failure(error):
@@ -201,55 +210,55 @@ public struct RAGESSReducer {
                     return .none
                 }
 
-            case let .buildSettingsResponse(result):
-                switch result {
-                case let .success(buildSettings):
-                    state.extractedData.buildSettings = buildSettings
-                    state.loadingTaskKindBuffer.removeFirst()
-                    return .none
+//            case let .buildSettingsResponse(result):
+//                switch result {
+//                case let .success(buildSettings):
+//                    state.extractedData.buildSettings = buildSettings
+//                    state.loadingTaskKindBuffer.removeFirst()
+//                    return .none
+//
+//                case let .failure(error):
+//                    print(error)
+//                    assertionFailure()
+//                    return .none
+//                }
+//
+//            case let .dumpPackageResponse(result):
+//                switch result {
+//                case let .success(packageObject):
+//                    state.extractedData.packages.append(packageObject)
+//                    state.loadingTaskKindBuffer.removeFirst()
+//                    return .none
+//
+//                case let .failure(error):
+//                    print(error)
+//                    assertionFailure()
+//                    return .none
+//                }
 
-                case let .failure(error):
-                    print(error)
-                    assertionFailure()
-                    return .none
-                }
-
-            case let .dumpPackageResponse(result):
-                switch result {
-                case let .success(packageObject):
-                    state.extractedData.packages.append(packageObject)
-                    state.loadingTaskKindBuffer.removeFirst()
-                    return .none
-
-                case let .failure(error):
-                    print(error)
-                    assertionFailure()
-                    return .none
-                }
-
-            case let .dumpPackageCompleted(rootDirectory: rootDirectory):
-                state.loadingTaskKindBuffer.removeAll(where: { $0 == .dumpPackage })
-
-                // example: BUILD_DIR: ~/Library/Developer/Xcode/DerivedData/<project hash>/Build/Products
-                guard let buildProductsPath = state.extractedData.buildSettings["BUILD_DIR"] else {
-                    assertionFailure()
-                    return .none
-                }
-                guard let derivedDataURL = URL(string: buildProductsPath)?.deletingLastPathComponent().deletingLastPathComponent() else {
-                    assertionFailure()
-                    return .none
-                }
-                let indexStoreURL = derivedDataURL
-                    .appendingPathComponent("Index.noindex")
-                    .appendingPathComponent("DataStore")
-
-                state.loadingTaskKindBuffer.append(.extractDeclarations)
-
-                return .run { send in
-                    await send(.declarationExtractorResponse(Result {
-                        try DeclarationExtractor.extractDeclarations(rootDirectory: rootDirectory, indexStoreURL: indexStoreURL)
-                    }))
-                }
+//            case let .dumpPackageCompleted(rootDirectory: rootDirectory):
+//                state.loadingTaskKindBuffer.removeAll(where: { $0 == .dumpPackage })
+//
+//                // example: BUILD_DIR: ~/Library/Developer/Xcode/DerivedData/<project hash>/Build/Products
+//                guard let buildProductsPath = state.extractedData.buildSettings["BUILD_DIR"] else {
+//                    assertionFailure()
+//                    return .none
+//                }
+//                guard let derivedDataURL = URL(string: buildProductsPath)?.deletingLastPathComponent().deletingLastPathComponent() else {
+//                    assertionFailure()
+//                    return .none
+//                }
+//                let indexStoreURL = derivedDataURL
+//                    .appendingPathComponent("Index.noindex")
+//                    .appendingPathComponent("DataStore")
+//
+//                state.loadingTaskKindBuffer.append(.extractDeclarations)
+//
+//                return .run { send in
+//                    await send(.declarationExtractorResponse(Result {
+//                        try DeclarationExtractor.extractDeclarations(rootDirectory: rootDirectory, indexStoreURL: indexStoreURL)
+//                    }))
+//                }
 
             case let .declarationExtractorResponse(result):
                 switch result {
@@ -278,6 +287,7 @@ public struct RAGESSReducer {
 
             case let .dependenciesExtractorCompleted(dependencyObjects):
                 state.extractedData.dependencyObjects = dependencyObjects
+                print("EXTRACT COMPLETED: \(CFAbsoluteTimeGetCurrent() - state.processStartTime) S")
                 return .none
 
             case .startMonitoring:

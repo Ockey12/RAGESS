@@ -181,7 +181,6 @@ public struct RAGESSReducer {
                         .appendingPathComponent("Index.noindex")
                         .appendingPathComponent("DataStore")
 
-
                     return .run { send in
                         await send(.declarationExtractorResponse(Result {
                             try DeclarationExtractor.extractDeclarations(rootDirectory: rootDirectory, indexStoreURL: indexStoreURL)

@@ -51,6 +51,7 @@ public struct RAGESSReducer {
             }
         }
 
+        var derivedDataPath: String = "/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz"
         var extractedData: ExtractedData = .init()
         let ignoredDirectories = [
             "build",
@@ -109,6 +110,7 @@ public struct RAGESSReducer {
     }
 
     public var body: some ReducerOf<Self> {
+        BindingReducer()
         Scope(state: \.fileTree, action: \.fileTree) {
             FileTreeViewReducer()
         }

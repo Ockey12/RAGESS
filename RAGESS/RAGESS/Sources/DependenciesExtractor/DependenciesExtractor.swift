@@ -84,6 +84,12 @@ public enum DependenciesExtractor {
             }
         }
 
+        for attributeObject in declaredObject.attributes {
+            if attributeObject.rangeInXcode.contains(location) {
+                return findUSR(location: location, declaredObject: attributeObject)
+            }
+        }
+
         for enumObject in declaredObject.nestingEnums {
             if enumObject.rangeInXcode.contains(location) {
                 return findUSR(location: location, declaredObject: enumObject)

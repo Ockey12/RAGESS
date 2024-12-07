@@ -13,6 +13,9 @@ public struct DeclaredObject: Identifiable, Equatable {
     public let id: UUID
     public var usrs: [String] {
         didSet {
+            for i in attributes.indices {
+                attributes[i].parentUSRs = usrs
+            }
             for i in initializers.indices {
                 initializers[i].parentUSRs = usrs
             }
@@ -52,6 +55,8 @@ public struct DeclaredObject: Identifiable, Equatable {
     public let offsetRange: ClosedRange<Int>
     public let kind: Kind
 
+    public var attributes: [Self]
+
     public var initializers: [Self]
     public var variables: [Self]
     public var functions: [Self]
@@ -67,6 +72,8 @@ public struct DeclaredObject: Identifiable, Equatable {
 
     public var descendantsID: [UUID] {
         var ids: [UUID] = [id]
+
+        ids.append(contentsOf: attributes.flatMap { $0.descendantsID })
 
         ids.append(contentsOf: initializers.flatMap { $0.descendantsID })
         ids.append(contentsOf: variables.flatMap { $0.descendantsID })
@@ -84,6 +91,8 @@ public struct DeclaredObject: Identifiable, Equatable {
 
     public var descendantsUSRs: [String] {
         var usrs: [String] = usrs
+
+        usrs.append(contentsOf: attributes.flatMap { $0.descendantsUSRs })
 
         usrs.append(contentsOf: initializers.flatMap { $0.descendantsUSRs })
         usrs.append(contentsOf: variables.flatMap { $0.descendantsUSRs })
@@ -108,6 +117,7 @@ public struct DeclaredObject: Identifiable, Equatable {
         rangeInXcode: ClosedRange<LocationInXcode>,
         offsetRange: ClosedRange<Int>,
         kind: Kind,
+        attributes: [Self] = [],
         initializers: [Self] = [],
         variables: [Self] = [],
         functions: [Self] = [],
@@ -130,6 +140,8 @@ public struct DeclaredObject: Identifiable, Equatable {
         self.rangeInXcode = rangeInXcode
         self.offsetRange = offsetRange
         self.kind = kind
+
+        self.attributes = attributes
 
         self.initializers = initializers
         self.variables = variables
@@ -157,5 +169,7 @@ public extension DeclaredObject {
         case variable
         case function
         case `case`
+
+        case attribute
     }
 }

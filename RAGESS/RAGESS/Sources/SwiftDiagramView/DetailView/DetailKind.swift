@@ -7,6 +7,7 @@
 //
 
 public enum DetailKind {
+    case attribute
     case parentProtocol
     case superClass
     case protocolConformance
@@ -18,6 +19,8 @@ public enum DetailKind {
 
     var text: String {
         switch self {
+        case .attribute:
+            "Attribute"
         case .parentProtocol:
             "Parent Protocol"
         case .superClass:

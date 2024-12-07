@@ -173,6 +173,17 @@ public enum DeclarationExtractor {
             }
         }
 
+        for (index, attributeObject) in declaredObject.attributes.enumerated() {
+            if attributeObject.rangeInXcode.contains(definitionLocation) {
+                return assignUSR(
+                    usr: usr,
+                    definitionLocation: definitionLocation,
+                    declaredObject: &declaredObject.attributes[index],
+                    fromRootDirectory: fromRootDirectory.appending(path: \.attributes[index])
+                )
+            }
+        }
+
         for (index, enumObject) in declaredObject.nestingEnums.enumerated() {
             if enumObject.rangeInXcode.contains(definitionLocation) {
                 return assignUSR(

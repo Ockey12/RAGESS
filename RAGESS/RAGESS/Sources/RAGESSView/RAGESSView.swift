@@ -28,7 +28,11 @@ public struct RAGESSView: View {
                 sidebar: {
                     Divider()
 
+                    TextField("DerivedData path", text: $store.derivedDataPath)
+                        .padding(.horizontal)
+
                     #if DEBUG
+                        Divider()
                         DebugView(store: store.scope(state: \.debugView, action: \.debugView))
                         Divider()
                     #endif

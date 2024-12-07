@@ -229,6 +229,9 @@ public struct NodeReducer {
 
             // set frameHeight
             var frameHeight: CGFloat = itemHeight * 2 + bottomPadding
+            if !object.attributes.isEmpty {
+                frameHeight += connectionHeight + itemHeight * CGFloat(object.attributes.count) + bottomPadding
+            }
             if hasSuperClass {
                 frameHeight += connectionHeight + itemHeight + bottomPadding
             }

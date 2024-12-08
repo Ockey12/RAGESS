@@ -25,7 +25,9 @@ struct HeaderView: View {
         }
         .frame(
             width: store.bodyWidth + ComponentSizeValues.arrowTerminalWidth * 2,
-            height: 300
+            height: ComponentSizeValues.itemHeight * 2
+                + ComponentSizeValues.bottomPaddingForLastText
+                + ComponentSizeValues.connectionHeight
         )
     }
 }

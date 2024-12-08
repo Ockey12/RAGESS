@@ -31,7 +31,9 @@ struct HeaderViewWithoutIndex: View {
         } // ZStack
         .frame(
             width: store.bodyWidth + ComponentSizeValues.arrowTerminalWidth * 2,
-            height: 210
+            height: ComponentSizeValues.itemHeight
+                + ComponentSizeValues.bottomPaddingForLastText
+                + ComponentSizeValues.connectionHeight
         )
     }
 }

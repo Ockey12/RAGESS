@@ -88,8 +88,6 @@ public struct SwiftDiagramTreeViewReducer {
     }
 }
 
-let verticalPadding: CGFloat = 500
-
 extension Directory {
     func findRootTypeObject(
         targetKeyPath: KeyPath<Directory, DeclaredObject>,
@@ -251,7 +249,7 @@ private enum TreeGenerator {
     ) -> [NodeReducer.State] {
         var queue: [NodeModel] = [rootNode]
         var allNodes: [NodeModel] = [rootNode]
-        let horizontalPadding: CGFloat = 1000
+        let horizontalPadding = ComponentSizeValues.horizontalPaddingBetweenCombinedDiagrams
 
         while !queue.isEmpty {
             let node = queue.removeFirst()
@@ -311,7 +309,7 @@ private enum TreeGenerator {
                 )
             )
 
-            currentSubtreeTopLeadingPoint.y += node.subtreeHeight + verticalPadding
+            currentSubtreeTopLeadingPoint.y += node.subtreeHeight + ComponentSizeValues.verticalPaddingBetweenCombinedDiagrams
         }
 
         return nodeStates
@@ -366,7 +364,6 @@ private enum ArrowsStateGenerator {
                 var leadingEndPoint: CGPoint = .zero
                 var trailingEndPoint: CGPoint = .zero
                 guard let caller = nodes.first(where: { $0.object.descendantsUSRs.contains(dependency.callerUSRs) }) else {
-                    assertionFailure()
                     continue
                 }
                 details: for detail in caller.details {

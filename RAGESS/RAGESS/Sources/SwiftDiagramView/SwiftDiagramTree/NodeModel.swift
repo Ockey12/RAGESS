@@ -24,7 +24,8 @@ struct NodeModel {
     let frameHeight: CGFloat
 
     var subtreeHeight: CGFloat {
-        max(
+        let verticalPadding = ComponentSizeValues.verticalPaddingBetweenCombinedDiagrams
+        return max(
             frameHeight,
             children.reduce(0) { $0 + $1.subtreeHeight + verticalPadding } - verticalPadding
         )

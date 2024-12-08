@@ -69,7 +69,7 @@ public struct RAGESSReducer {
             usrTable: [:],
             dependencyObjects: []
         )
-        var swiftDiagramScale: CGFloat = 0.5
+        var swiftDiagramScale: CGFloat = 1
         var processStartTime = CFAbsoluteTimeGetCurrent()
         var debugView = DebugReducer.State()
 
@@ -348,11 +348,11 @@ public struct RAGESSReducer {
                 return .none
 
             case .minusMagnifyingglassTapped:
-                state.swiftDiagramScale = max(state.swiftDiagramScale - 0.05, 0.05)
+                state.swiftDiagramScale = max(round((state.swiftDiagramScale - 0.1) * 10) / 10, 0.1)
                 return .none
 
             case .plusMagnifyingglassTapped:
-                state.swiftDiagramScale = min(state.swiftDiagramScale + 0.05, 1)
+                state.swiftDiagramScale = min(round((state.swiftDiagramScale + 0.1) * 10) / 10, 2)
                 return .none
 
             case .debugView:

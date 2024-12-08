@@ -8,7 +8,6 @@
 
 import ComposableArchitecture
 import SwiftUI
-import TypeDeclaration
 
 struct DetailView: View {
     let store: StoreOf<DetailReducer>

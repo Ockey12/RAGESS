@@ -30,4 +30,7 @@ enum ComponentSizeValues {
     static let headerIndexWidth: CGFloat = 300/4
 
     static let typeRowsSpacing: CGFloat = 100/4
+
+    static let verticalPaddingBetweenCombinedDiagrams: CGFloat = 500/4
+    static let horizontalPaddingBetweenCombinedDiagrams: CGFloat = 1000/4
 }

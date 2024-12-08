@@ -229,6 +229,7 @@ let package = Package(
             dependencies: [
                 "DeclaredObject",
                 "DependencyObject",
+                "XcodeObject",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "Dependencies", package: "swift-dependencies")
             ]

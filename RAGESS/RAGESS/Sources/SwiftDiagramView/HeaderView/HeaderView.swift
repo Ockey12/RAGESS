@@ -7,8 +7,8 @@
 //
 
 import ComposableArchitecture
+import DeclaredObject
 import SwiftUI
-import TypeDeclaration
 
 struct HeaderView: View {
     let store: StoreOf<HeaderReducer>
@@ -28,6 +28,27 @@ struct HeaderView: View {
             height: 300
         )
     }
+}
+
+#Preview {
+    HeaderView(
+        store: .init(
+            initialState: HeaderReducer.State(
+                object: .init(
+                    name: "Sample",
+                    nameOffset: 0,
+                    fullPath: "",
+                    sourceCode: "",
+                    rangeInXcode: LocationInXcode(line: 0, column: 0) ... LocationInXcode(line: 1, column: 1),
+                    offsetRange: 0 ... 1,
+                    kind: .struct
+                ),
+                topLeadingPoint: .init(x: 0, y: 0),
+                bodyWidth: 800
+            ),
+            reducer: { HeaderReducer() }
+        )
+    )
 }
 
 // #Preview {

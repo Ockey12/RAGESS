@@ -6,58 +6,58 @@
 //
 //
 
-import Foundation
-import TypeDeclaration
-
-public enum GenericTypeObject: Equatable {
-    case `struct`(StructObject)
-    case `class`(ClassObject)
-    case `enum`(EnumObject)
-    case `protocol`(ProtocolObject)
-    case `actor`(ActorObject)
-
-    var id: UUID {
-        switch self {
-        case let .struct(structObject):
-            structObject.id
-        case let .class(classObject):
-            classObject.id
-        case let .enum(enumObject):
-            enumObject.id
-        case let .protocol(protocolObject):
-            protocolObject.id
-        case let .actor(actorObject):
-            actorObject.id
-        }
-    }
-
-    var name: String {
-        switch self {
-        case let .struct(structObject):
-            structObject.name
-        case let .class(classObject):
-            classObject.name
-        case let .enum(enumObject):
-            enumObject.name
-        case let .protocol(protocolObject):
-            protocolObject.name
-        case let .actor(actorObject):
-            actorObject.name
-        }
-    }
-
-    var objectsThatCallThisObject: [DependencyObject] {
-        switch self {
-        case let .struct(structObject):
-            structObject.objectsThatCallThisObject
-        case let .class(classObject):
-            classObject.objectsThatCallThisObject
-        case let .enum(enumObject):
-            enumObject.objectsThatCallThisObject
-        case let .protocol(protocolObject):
-            protocolObject.objectsThatCallThisObject
-        case let .actor(actorObject):
-            actorObject.objectsThatCallThisObject
-        }
-    }
-}
+//import Foundation
+//import TypeDeclaration
+//
+//public enum GenericTypeObject: Equatable {
+//    case `struct`(StructObject)
+//    case `class`(ClassObject)
+//    case `enum`(EnumObject)
+//    case `protocol`(ProtocolObject)
+//    case `actor`(ActorObject)
+//
+//    var id: UUID {
+//        switch self {
+//        case let .struct(structObject):
+//            structObject.id
+//        case let .class(classObject):
+//            classObject.id
+//        case let .enum(enumObject):
+//            enumObject.id
+//        case let .protocol(protocolObject):
+//            protocolObject.id
+//        case let .actor(actorObject):
+//            actorObject.id
+//        }
+//    }
+//
+//    var name: String {
+//        switch self {
+//        case let .struct(structObject):
+//            structObject.name
+//        case let .class(classObject):
+//            classObject.name
+//        case let .enum(enumObject):
+//            enumObject.name
+//        case let .protocol(protocolObject):
+//            protocolObject.name
+//        case let .actor(actorObject):
+//            actorObject.name
+//        }
+//    }
+//
+//    var objectsThatCallThisObject: [DependencyObject] {
+//        switch self {
+//        case let .struct(structObject):
+//            structObject.objectsThatCallThisObject
+//        case let .class(classObject):
+//            classObject.objectsThatCallThisObject
+//        case let .enum(enumObject):
+//            enumObject.objectsThatCallThisObject
+//        case let .protocol(protocolObject):
+//            protocolObject.objectsThatCallThisObject
+//        case let .actor(actorObject):
+//            actorObject.objectsThatCallThisObject
+//        }
+//    }
+//}

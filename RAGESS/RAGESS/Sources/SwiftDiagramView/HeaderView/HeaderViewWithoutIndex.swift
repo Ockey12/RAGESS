@@ -8,7 +8,6 @@
 
 import ComposableArchitecture
 import SwiftUI
-import TypeDeclaration
 
 struct HeaderViewWithoutIndex: View {
     let store: StoreOf<HeaderReducer>

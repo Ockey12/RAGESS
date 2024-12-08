@@ -6,12 +6,12 @@
 //
 //
 
-//import TypeDeclaration
+// import TypeDeclaration
 //
-//func extractParentProtocolObjects(
+// func extractParentProtocolObjects(
 //    by childProtocolObject: ProtocolObject,
 //    allDeclarationObjects: [any DeclarationObject]
-//) -> [ProtocolObject] {
+// ) -> [ProtocolObject] {
 //    let protocolInheritanceDependencies = childProtocolObject.objectsThatAreCalledByThisObject.filter {
 //        $0.kind == .protocolInheritance
 //    }
@@ -19,4 +19,4 @@
 //    return protocolInheritanceDependencies.compactMap { dependency in
 //        allDeclarationObjects.first(where: { $0.id == dependency.definitionObject.rootObjectID }) as? ProtocolObject
 //    }
-//}
+// }

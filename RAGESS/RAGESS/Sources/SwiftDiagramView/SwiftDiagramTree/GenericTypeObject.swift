@@ -6,10 +6,10 @@
 //
 //
 
-//import Foundation
-//import TypeDeclaration
+// import Foundation
+// import TypeDeclaration
 //
-//public enum GenericTypeObject: Equatable {
+// public enum GenericTypeObject: Equatable {
 //    case `struct`(StructObject)
 //    case `class`(ClassObject)
 //    case `enum`(EnumObject)
@@ -60,4 +60,4 @@
 //            actorObject.objectsThatCallThisObject
 //        }
 //    }
-//}
+// }

@@ -165,6 +165,8 @@ public extension DeclaredObject {
         case `protocol`
         case `actor`
 
+        case `extension`
+
         case initializer
         case variable
         case function

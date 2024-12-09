@@ -377,6 +377,46 @@ final class DeclarationVisitor: SyntaxVisitor {
         }
     }
 
+    // MARK: ExtensionDeclSyntax
+
+    override func visit(_ node: ExtensionDeclSyntax) -> SyntaxVisitorContinueKind {
+        print("\nextendedType: \(node.trimmed.extendedType)")
+        print("genericWhereClause: \(node.trimmed.genericWhereClause?.description ?? "nil")")
+
+        let locationRange = node.sourceRange(converter: locationConverter)
+        let rangeInXcode = LocationInXcode(line: locationRange.start.line, column: locationRange.start.column)
+            ... LocationInXcode(line: locationRange.end.line, column: locationRange.end.column)
+        let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
+
+        appendToBuffer(
+            .init(
+                name: "\(node.trimmed.extendedType) \(node.trimmed.genericWhereClause?.description ?? "")",
+                nameOffset: node.trimmed.extendedType.trimmedByteRange.offset,
+                fullPath: fullPath,
+                sourceCode: trimSourceCode(node.description),
+                rangeInXcode: rangeInXcode,
+                offsetRange: offsetRange,
+                kind: .extension
+            )
+        )
+
+        return .visitChildren
+    }
+
+    override func visitPost(_ node: ExtensionDeclSyntax) {
+        guard !buffer.isEmpty else {
+            fatalError("The buffer is empty.")
+        }
+
+        guard let currentExtension = buffer.popLast(),
+              currentExtension.kind == .extension
+        else {
+            fatalError("The type of the last element of buffer is not a extension.")
+        }
+
+        extractedDeclarations.append(currentExtension)
+    }
+
     // MARK: InitializerDeclSyntax
 
     override func visit(_ node: InitializerDeclSyntax) -> SyntaxVisitorContinueKind {

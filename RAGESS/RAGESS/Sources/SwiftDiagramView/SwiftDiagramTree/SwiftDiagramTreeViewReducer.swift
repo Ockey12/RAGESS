@@ -97,7 +97,7 @@ extension Directory {
 
         while true {
             switch object.kind {
-            case .struct, .class, .enum, .protocol, .actor:
+            case .struct, .class, .enum, .protocol, .actor, .extension:
                 return object
             case .initializer, .variable, .function, .case, .attribute:
                 guard let parentUSR = object.parentUSRs.first,

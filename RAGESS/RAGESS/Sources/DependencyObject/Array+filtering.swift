@@ -10,7 +10,7 @@ import DeclaredObject
 
 public extension Array where Element == DependencyObject {
     func filteringWhereCallee(_ declaredObject: DeclaredObject) -> [DependencyObject] {
-        let usrSet = Set(declaredObject.usrs)
+        let usrSet = Set(declaredObject.descendantsUSRs)
         return filter { dependency in
             usrSet.contains(dependency.calleeUSR)
         }

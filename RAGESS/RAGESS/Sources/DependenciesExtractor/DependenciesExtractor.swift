@@ -62,61 +62,111 @@ public enum DependenciesExtractor {
 
         for variableObject in declaredObject.variables {
             if variableObject.rangeInXcode.contains(location) {
-                return findUSR(location: location, declaredObject: variableObject)
+                let childUSRs = findUSR(location: location, declaredObject: variableObject)
+                if childUSRs.isEmpty {
+                    return declaredObject.usrs
+                } else {
+                    return childUSRs
+                }
             }
         }
 
         for functionObject in declaredObject.functions {
             if functionObject.rangeInXcode.contains(location) {
-                return findUSR(location: location, declaredObject: functionObject)
+                let childUSRs = findUSR(location: location, declaredObject: functionObject)
+                if childUSRs.isEmpty {
+                    return declaredObject.usrs
+                } else {
+                    return childUSRs
+                }
             }
         }
 
         for initializerObject in declaredObject.initializers {
             if initializerObject.rangeInXcode.contains(location) {
-                return findUSR(location: location, declaredObject: initializerObject)
+                let childUSRs = findUSR(location: location, declaredObject: initializerObject)
+                if childUSRs.isEmpty {
+                    return declaredObject.usrs
+                } else {
+                    return childUSRs
+                }
             }
         }
 
         for caseObject in declaredObject.cases {
             if caseObject.rangeInXcode.contains(location) {
-                return findUSR(location: location, declaredObject: caseObject)
+                let childUSRs = findUSR(location: location, declaredObject: caseObject)
+                if childUSRs.isEmpty {
+                    return declaredObject.usrs
+                } else {
+                    return childUSRs
+                }
             }
         }
 
         for attributeObject in declaredObject.attributes {
             if attributeObject.rangeInXcode.contains(location) {
-                return findUSR(location: location, declaredObject: attributeObject)
+                let childUSRs = findUSR(location: location, declaredObject: attributeObject)
+                if childUSRs.isEmpty {
+                    return declaredObject.usrs
+                } else {
+                    return childUSRs
+                }
             }
         }
 
         for enumObject in declaredObject.nestingEnums {
             if enumObject.rangeInXcode.contains(location) {
-                return findUSR(location: location, declaredObject: enumObject)
+                let childUSRs = findUSR(location: location, declaredObject: enumObject)
+                if childUSRs.isEmpty {
+                    return declaredObject.usrs
+                } else {
+                    return childUSRs
+                }
             }
         }
 
         for structObject in declaredObject.nestingStructs {
             if structObject.rangeInXcode.contains(location) {
-                return findUSR(location: location, declaredObject: structObject)
+                let childUSRs = findUSR(location: location, declaredObject: structObject)
+                if childUSRs.isEmpty {
+                    return declaredObject.usrs
+                } else {
+                    return childUSRs
+                }
             }
         }
 
         for classObject in declaredObject.nestingClasses {
             if classObject.rangeInXcode.contains(location) {
-                return findUSR(location: location, declaredObject: classObject)
+                let childUSRs = findUSR(location: location, declaredObject: classObject)
+                if childUSRs.isEmpty {
+                    return declaredObject.usrs
+                } else {
+                    return childUSRs
+                }
             }
         }
 
         for actorObject in declaredObject.nestingActors {
             if actorObject.rangeInXcode.contains(location) {
-                return findUSR(location: location, declaredObject: actorObject)
+                let childUSRs = findUSR(location: location, declaredObject: actorObject)
+                if childUSRs.isEmpty {
+                    return declaredObject.usrs
+                } else {
+                    return childUSRs
+                }
             }
         }
 
         for protocolObject in declaredObject.nestingProtocols {
             if protocolObject.rangeInXcode.contains(location) {
-                return findUSR(location: location, declaredObject: protocolObject)
+                let childUSRs = findUSR(location: location, declaredObject: protocolObject)
+                if childUSRs.isEmpty {
+                    return declaredObject.usrs
+                } else {
+                    return childUSRs
+                }
             }
         }
 

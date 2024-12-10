@@ -24,6 +24,8 @@ struct IndexView: View {
             return Color(red: 0.7, green: 0.7, blue: 0.7)
         case .actor:
             return Color("Actor", bundle: .module)
+        case .extension:
+            return .clear
         default:
             assertionFailure()
             return .clear
@@ -42,6 +44,8 @@ struct IndexView: View {
             return "Protocol"
         case .actor:
             return "Actor"
+        case .extension:
+            return "Extension"
         default:
             assertionFailure()
             return ""

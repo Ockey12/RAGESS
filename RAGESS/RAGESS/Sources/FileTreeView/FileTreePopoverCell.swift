@@ -50,7 +50,7 @@ struct FileTreePopoverCell: View {
     let store: StoreOf<FileTreePopoverCellReducer>
 
     var body: some View {
-        Text(store.declaredObject.annotatedDecl ?? store.declaredObject.name)
+        Text(store.declaredObject.declaration)
             .onTapGesture {
                 store.send(.clicked)
             }

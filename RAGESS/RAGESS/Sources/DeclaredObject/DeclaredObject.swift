@@ -117,6 +117,47 @@ public struct DeclaredObject: Identifiable, Equatable {
         return usrs
     }
 
+    public private(set) var enclosingTypeNames: [String]
+
+    mutating public func addOuterEnclosingTypeName(_ name: String) {
+        enclosingTypeNames.insert(name, at: 0)
+        for i in nestingStructs.indices {
+            nestingStructs[i].addOuterEnclosingTypeName(name)
+        }
+        for i in nestingClasses.indices {
+            nestingClasses[i].addOuterEnclosingTypeName(name)
+        }
+        for i in nestingEnums.indices {
+            nestingEnums[i].addOuterEnclosingTypeName(name)
+        }
+        for i in nestingProtocols.indices {
+            nestingProtocols[i].addOuterEnclosingTypeName(name)
+        }
+        for i in nestingActors.indices {
+            nestingActors[i].addOuterEnclosingTypeName(name)
+        }
+    }
+
+    public var declaration: String {
+        var declaration = ""
+        switch kind {
+        case .struct, .class, .enum, .protocol, .actor, .extension:
+            declaration += kind.rawValue + " "
+        case .variable:
+            // TODO: "let"
+            declaration += "var "
+        case .function:
+            declaration += "func "
+        case .initializer, .case, .attribute:
+            break
+        }
+        for enclosingTypeName in enclosingTypeNames {
+            declaration += enclosingTypeName + "."
+        }
+        declaration += "\(name)"
+        return declaration
+    }
+
     public init(
         usrs: [String] = [],
         name: String,
@@ -137,7 +178,8 @@ public struct DeclaredObject: Identifiable, Equatable {
         nestingEnums: [Self] = [],
         nestingProtocols: [Self] = [],
         nestingActors: [Self] = [],
-        parentUSRs: [String] = []
+        parentUSRs: [String] = [],
+        enclosingTypeNames: [String] = []
     ) {
         self.usrs = usrs
         @Dependency(\.uuid) var uuid
@@ -164,6 +206,7 @@ public struct DeclaredObject: Identifiable, Equatable {
         self.nestingActors = nestingActors
 
         self.parentUSRs = parentUSRs
+        self.enclosingTypeNames = enclosingTypeNames
     }
 }
 

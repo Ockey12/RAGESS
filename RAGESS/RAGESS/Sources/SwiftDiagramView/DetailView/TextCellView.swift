@@ -13,7 +13,7 @@ struct TextCellView: View {
     let store: StoreOf<TextCellReducer>
 
     var body: some View {
-        Text(store.object.annotatedDecl ?? store.object.name)
+        Text(store.object.declaration)
             .font(.system(size: ComponentSizeValues.fontSize))
             .foregroundStyle(.black)
             .padding(.leading, ComponentSizeValues.textLeadingPadding)

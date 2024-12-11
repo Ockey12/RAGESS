@@ -109,6 +109,7 @@ public struct CellReducer {
                 return .none
 
             case let .destination(.presented(.popover(.delegate(.cellClicked(firstUSR: firstUSR))))):
+                state.destination = nil
                 return .send(.delegate(.popoverCellClicked(firstUSR: firstUSR)))
 
             case .destination:
@@ -161,7 +162,7 @@ struct CellView: View {
                !directory.files.isEmpty || !directory.subDirectories.isEmpty {
                 Button(
                     action: {
-                        store.send(.expandButtonTapped)
+                        store.send(.expandButtonTapped, animation: .easeInOut)
                     },
                     label: {
                         if store.isExpanding {
@@ -215,7 +216,11 @@ struct CellView: View {
                 action: \.destination.popover
             )
         ) { popoverStore in
-            FileTreePopoverContentView(store: popoverStore)
+            ScrollView {
+                FileTreePopoverContentView(store: popoverStore)
+                    .frame(minWidth: 300, maxWidth: 1500, minHeight: 50, maxHeight: 1500, alignment: .topLeading)
+                    .padding(.vertical, 10)
+            }
         }
     }
 }

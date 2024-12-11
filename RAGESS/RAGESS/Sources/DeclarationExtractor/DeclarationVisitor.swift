@@ -48,7 +48,7 @@ final class DeclarationVisitor: SyntaxVisitor {
         guard !buffer.isEmpty else {
             fatalError("The buffer is empty.")
         }
-        guard let currentProtocol = buffer.popLast(),
+        guard var currentProtocol = buffer.popLast(),
               currentProtocol.kind == .protocol
         else {
             fatalError("The type of the last element of buffer is not a protocol.")
@@ -59,6 +59,7 @@ final class DeclarationVisitor: SyntaxVisitor {
             guard var protocolOwner = buffer.popLast() else {
                 fatalError("The buffer is empty.")
             }
+            currentProtocol.addOuterEnclosingTypeName(protocolOwner.name)
             protocolOwner.nestingProtocols.append(currentProtocol)
             buffer.append(protocolOwner)
         } else {
@@ -93,7 +94,7 @@ final class DeclarationVisitor: SyntaxVisitor {
         guard !buffer.isEmpty else {
             fatalError("The buffer is empty.")
         }
-        guard let currentStruct = buffer.popLast(),
+        guard var currentStruct = buffer.popLast(),
               currentStruct.kind == .struct
         else {
             fatalError("The type of the last element of buffer is not a struct.")
@@ -104,6 +105,7 @@ final class DeclarationVisitor: SyntaxVisitor {
             guard var structOwner = buffer.popLast() else {
                 fatalError("The buffer is empty.")
             }
+            currentStruct.addOuterEnclosingTypeName(structOwner.name)
             structOwner.nestingStructs.append(currentStruct)
             buffer.append(structOwner)
         } else {
@@ -138,7 +140,7 @@ final class DeclarationVisitor: SyntaxVisitor {
         guard !buffer.isEmpty else {
             fatalError("The buffer is empty.")
         }
-        guard let currentClass = buffer.popLast() else {
+        guard var currentClass = buffer.popLast() else {
             fatalError("The type of the last element of buffer is not a class.")
         }
 
@@ -147,6 +149,7 @@ final class DeclarationVisitor: SyntaxVisitor {
             guard var classOwner = buffer.popLast() else {
                 fatalError("The buffer is empty.")
             }
+            currentClass.addOuterEnclosingTypeName(classOwner.name)
             classOwner.nestingClasses.append(currentClass)
             buffer.append(classOwner)
         } else {
@@ -180,7 +183,7 @@ final class DeclarationVisitor: SyntaxVisitor {
         guard !buffer.isEmpty else {
             fatalError("The buffer is empty.")
         }
-        guard let currentEnum = buffer.popLast(),
+        guard var currentEnum = buffer.popLast(),
               currentEnum.kind == .enum
         else {
             fatalError("The type of the last element of buffer is not a enum.")
@@ -191,6 +194,7 @@ final class DeclarationVisitor: SyntaxVisitor {
             guard var enumOwner = buffer.popLast() else {
                 fatalError("The buffer is empty.")
             }
+            currentEnum.addOuterEnclosingTypeName(enumOwner.name)
             enumOwner.nestingEnums.append(currentEnum)
             buffer.append(enumOwner)
         } else {
@@ -224,7 +228,7 @@ final class DeclarationVisitor: SyntaxVisitor {
         guard !buffer.isEmpty else {
             fatalError("The buffer is empty.")
         }
-        guard let currentActor = buffer.popLast(),
+        guard var currentActor = buffer.popLast(),
               currentActor.kind == .actor
         else {
             fatalError("The type of the last element of buffer is not a actor.")
@@ -235,6 +239,7 @@ final class DeclarationVisitor: SyntaxVisitor {
             guard var actorOwner = buffer.popLast() else {
                 fatalError("The buffer is empty.")
             }
+            currentActor.addOuterEnclosingTypeName(actorOwner.name)
             actorOwner.nestingActors.append(currentActor)
             buffer.append(actorOwner)
         } else {

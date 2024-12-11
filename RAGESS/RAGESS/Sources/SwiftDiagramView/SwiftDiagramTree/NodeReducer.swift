@@ -67,13 +67,13 @@ public struct NodeReducer {
             let abstractProtocols = abstractObjects.filter { $0.kind == .protocol }
 
             // set bodyWidth and frameWidth
-            var allAnnotatedDecl = [object.annotatedDecl ?? object.name]
-            allAnnotatedDecl.append(contentsOf: abstractObjects.map { $0.annotatedDecl ?? $0.name })
-            allAnnotatedDecl.append(contentsOf: object.attributes.map { $0.annotatedDecl ?? $0.name })
-            allAnnotatedDecl.append(contentsOf: object.initializers.map { $0.annotatedDecl ?? $0.name })
-            allAnnotatedDecl.append(contentsOf: object.variables.map { $0.annotatedDecl ?? $0.name })
-            allAnnotatedDecl.append(contentsOf: object.functions.map { $0.annotatedDecl ?? $0.name })
-            allAnnotatedDecl.append(contentsOf: object.cases.map { $0.annotatedDecl ?? $0.name })
+            var allAnnotatedDecl = [object.declaration]
+            allAnnotatedDecl.append(contentsOf: abstractObjects.map { $0.declaration })
+            allAnnotatedDecl.append(contentsOf: object.attributes.map { $0.declaration })
+            allAnnotatedDecl.append(contentsOf: object.initializers.map { $0.declaration })
+            allAnnotatedDecl.append(contentsOf: object.variables.map { $0.declaration })
+            allAnnotatedDecl.append(contentsOf: object.functions.map { $0.declaration })
+            allAnnotatedDecl.append(contentsOf: object.cases.map { $0.declaration })
             let bodyWidth = max(
                 calculateMaxTextWidth(allAnnotatedDecl),
                 ComponentSizeValues.bodyMinWidth

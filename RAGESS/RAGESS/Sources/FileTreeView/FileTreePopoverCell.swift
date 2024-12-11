@@ -48,11 +48,19 @@ public struct FileTreePopoverCellReducer {
 
 struct FileTreePopoverCell: View {
     let store: StoreOf<FileTreePopoverCellReducer>
+    @State private var onHover = false
 
     var body: some View {
         Text(store.declaredObject.declaration)
+            .frame(height: 30)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 15)
+            .background(onHover ? .gray : .clear)
             .onTapGesture {
                 store.send(.clicked)
+            }
+            .onHover { onHover in
+                self.onHover = onHover
             }
     }
 }

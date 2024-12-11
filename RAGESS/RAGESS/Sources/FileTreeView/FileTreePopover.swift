@@ -73,7 +73,7 @@ public struct FileTreePopoverContentView: View {
     }
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: 30) {
+        VStack(alignment: .leading, spacing: 5) {
             ForEach(store.scope(state: \.cells, action: \.cells)) { cellStore in
                 FileTreePopoverCell(store: cellStore)
             }

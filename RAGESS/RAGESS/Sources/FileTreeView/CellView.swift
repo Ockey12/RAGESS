@@ -219,7 +219,7 @@ struct CellView: View {
             ScrollView {
                 FileTreePopoverContentView(store: popoverStore)
                     .frame(minWidth: 300, maxWidth: 1500, minHeight: 50, maxHeight: 1500, alignment: .topLeading)
-                    .padding(20)
+                    .padding(.vertical, 10)
             }
         }
     }

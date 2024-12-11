@@ -24,7 +24,9 @@ public struct FileTreePopoverReducer {
             case .directory:
                 cells = []
             case let .sourceFile(sourceFile):
-                let objects = sourceFile.declaredObjects.sorted(by: { $0.rangeInXcode.lowerBound < $1.rangeInXcode.lowerBound })
+                let objects = sourceFile.declaredObjects
+                    .flatMap { $0.withNestingTypes }
+                    .sorted(by: { $0.rangeInXcode.lowerBound < $1.rangeInXcode.lowerBound })
                 cells = .init(uniqueElements: objects.map {
                     FileTreePopoverCellReducer.State(declaredObject: $0)
                 })

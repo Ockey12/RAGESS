@@ -68,6 +68,16 @@ public struct DeclaredObject: Identifiable, Equatable {
     public var nestingProtocols: [Self]
     public var nestingActors: [Self]
 
+    public var withNestingTypes: [Self] {
+        var types = [self]
+        types.append(contentsOf: nestingStructs.flatMap { $0.withNestingTypes })
+        types.append(contentsOf: nestingClasses.flatMap { $0.withNestingTypes })
+        types.append(contentsOf: nestingEnums.flatMap { $0.withNestingTypes })
+        types.append(contentsOf: nestingProtocols.flatMap { $0.withNestingTypes })
+        types.append(contentsOf: nestingActors.flatMap { $0.withNestingTypes })
+        return types
+    }
+
     public var parentUSRs: [String]
 
     public var descendantsID: [UUID] {

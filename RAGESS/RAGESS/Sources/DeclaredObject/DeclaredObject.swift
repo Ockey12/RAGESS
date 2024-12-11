@@ -119,7 +119,7 @@ public struct DeclaredObject: Identifiable, Equatable {
 
     public private(set) var enclosingTypeNames: [String]
 
-    mutating public func addOuterEnclosingTypeName(_ name: String) {
+    public mutating func addOuterEnclosingTypeName(_ name: String) {
         enclosingTypeNames.insert(name, at: 0)
         for i in nestingStructs.indices {
             nestingStructs[i].addOuterEnclosingTypeName(name)

@@ -49,11 +49,11 @@ struct NodeModel {
         // set bodyWidth and frameWidth
         var allAnnotatedDecl = [object.declaration]
         // TODO: protocol and super class width
-        allAnnotatedDecl.append(contentsOf: object.attributes.map { $0.declaration})
-        allAnnotatedDecl.append(contentsOf: object.initializers.map { $0.declaration})
-        allAnnotatedDecl.append(contentsOf: object.variables.map { $0.declaration})
+        allAnnotatedDecl.append(contentsOf: object.attributes.map { $0.declaration })
+        allAnnotatedDecl.append(contentsOf: object.initializers.map { $0.declaration })
+        allAnnotatedDecl.append(contentsOf: object.variables.map { $0.declaration })
         allAnnotatedDecl.append(contentsOf: object.functions.map { $0.declaration })
-        allAnnotatedDecl.append(contentsOf: object.cases.map { $0.declaration})
+        allAnnotatedDecl.append(contentsOf: object.cases.map { $0.declaration })
         print("")
         dump(allAnnotatedDecl)
         let bodyWidth = max(

@@ -68,12 +68,12 @@ public struct NodeReducer {
 
             // set bodyWidth and frameWidth
             var allAnnotatedDecl = [object.declaration]
-            allAnnotatedDecl.append(contentsOf: abstractObjects.map { $0.declaration})
-            allAnnotatedDecl.append(contentsOf: object.attributes.map { $0.declaration})
-            allAnnotatedDecl.append(contentsOf: object.initializers.map { $0.declaration})
-            allAnnotatedDecl.append(contentsOf: object.variables.map { $0.declaration})
-            allAnnotatedDecl.append(contentsOf: object.functions.map { $0.declaration})
-            allAnnotatedDecl.append(contentsOf: object.cases.map { $0.declaration})
+            allAnnotatedDecl.append(contentsOf: abstractObjects.map { $0.declaration })
+            allAnnotatedDecl.append(contentsOf: object.attributes.map { $0.declaration })
+            allAnnotatedDecl.append(contentsOf: object.initializers.map { $0.declaration })
+            allAnnotatedDecl.append(contentsOf: object.variables.map { $0.declaration })
+            allAnnotatedDecl.append(contentsOf: object.functions.map { $0.declaration })
+            allAnnotatedDecl.append(contentsOf: object.cases.map { $0.declaration })
             let bodyWidth = max(
                 calculateMaxTextWidth(allAnnotatedDecl),
                 ComponentSizeValues.bodyMinWidth

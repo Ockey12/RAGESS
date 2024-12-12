@@ -11,8 +11,6 @@ import SwiftUI
 
 struct ArrowView: View {
     let store: StoreOf<ArrowViewReducer>
-//    let startPoint: CGPoint
-//    let endPoint: CGPoint
 
     var body: some View {
         let path = Path { path in
@@ -29,18 +27,18 @@ struct ArrowView: View {
             )
 
             let firstAngle = atan2(firstTipPoint.y - store.startPoint.y, firstTipPoint.x - store.startPoint.x)
-            let firstTipPoint1 = CGPoint(
+            let firstTipNegativePoint = CGPoint(
                 x: firstTipPoint.x - arrowSize * cos(firstAngle - CGFloat.pi / 6),
                 y: firstTipPoint.y - arrowSize * sin(firstAngle - CGFloat.pi / 6)
             )
-            let firstTipPoint2 = CGPoint(
+            let firstTipPositivePoint = CGPoint(
                 x: firstTipPoint.x - arrowSize * cos(firstAngle + CGFloat.pi / 6),
                 y: firstTipPoint.y - arrowSize * sin(firstAngle + CGFloat.pi / 6)
             )
             path.move(to: firstTipPoint)
-            path.addLine(to: firstTipPoint1)
+            path.addLine(to: firstTipNegativePoint)
             path.move(to: firstTipPoint)
-            path.addLine(to: firstTipPoint2)
+            path.addLine(to: firstTipPositivePoint)
 
             // second
             let secondTipPoint = CGPoint(
@@ -49,18 +47,18 @@ struct ArrowView: View {
             )
 
             let secondAngle = atan2(secondTipPoint.y - store.startPoint.y, secondTipPoint.x - store.startPoint.x)
-            let secondTipPoint1 = CGPoint(
+            let secondTipNegativePoint = CGPoint(
                 x: secondTipPoint.x - arrowSize * cos(secondAngle - CGFloat.pi / 6),
                 y: secondTipPoint.y - arrowSize * sin(secondAngle - CGFloat.pi / 6)
             )
-            let secondTipPoint2 = CGPoint(
+            let secondTipPositivePoint = CGPoint(
                 x: secondTipPoint.x - arrowSize * cos(secondAngle + CGFloat.pi / 6),
                 y: secondTipPoint.y - arrowSize * sin(secondAngle + CGFloat.pi / 6)
             )
             path.move(to: secondTipPoint)
-            path.addLine(to: secondTipPoint1)
+            path.addLine(to: secondTipNegativePoint)
             path.move(to: secondTipPoint)
-            path.addLine(to: secondTipPoint2)
+            path.addLine(to: secondTipPositivePoint)
         }
 
         path.stroke(Color("Arrow", bundle: .module), lineWidth: 3)

@@ -29,7 +29,8 @@ struct IndexView: View {
         case .actor:
             return Color("ActorIndex", bundle: .module)
         case .extension:
-            return .clear
+//            return .clear
+            return Color("ExtensionIndex", bundle: .module)
         default:
             assertionFailure()
             return .clear

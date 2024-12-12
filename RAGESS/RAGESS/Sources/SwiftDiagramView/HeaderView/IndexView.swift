@@ -20,7 +20,8 @@ struct IndexView: View {
         case .class:
             return Color(red: 1, green: 0.7, blue: 0)
         case .enum:
-            return Color(red: 0, green: 0.7, blue: 0.85)
+//            return Color(red: 0, green: 0.7, blue: 0.85)
+            return Color("EnumIndex", bundle: .module)
         case .protocol:
             return Color(red: 0.7, green: 0.7, blue: 0.7)
         case .actor:

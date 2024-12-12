@@ -38,6 +38,6 @@ struct ArrowView: View {
             path.addLine(to: arrowPoint2)
         }
 
-        path.stroke(Color.black, lineWidth: 10)
+        path.stroke(Color("Arrow", bundle: .module), lineWidth: 10)
     }
 }

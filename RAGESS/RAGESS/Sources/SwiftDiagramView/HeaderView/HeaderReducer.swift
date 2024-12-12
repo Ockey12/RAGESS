@@ -74,7 +74,7 @@ public struct HeaderReducer {
         Scope(state: \.text, action: \.text) {
             TextCellReducer()
         }
-        Reduce { state, action in
+        Reduce { _, action in
             switch action {
             case let .text(.delegate(delegateAction)):
                 switch delegateAction {

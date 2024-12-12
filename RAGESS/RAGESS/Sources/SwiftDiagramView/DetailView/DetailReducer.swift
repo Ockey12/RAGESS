@@ -78,7 +78,7 @@ public struct DetailReducer {
     }
 
     public var body: some ReducerOf<Self> {
-        Reduce { state, action in
+        Reduce { _, action in
             switch action {
             case let .texts(.element(id: _, action: .delegate(delegateAction))):
                 switch delegateAction {

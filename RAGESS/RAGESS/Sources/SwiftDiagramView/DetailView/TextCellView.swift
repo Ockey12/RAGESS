@@ -30,9 +30,9 @@ struct TextCellView: View {
                 .padding(.leading, ComponentSizeValues.textLeadingPadding)
                 .frame(width: store.bodyWidth, height: ComponentSizeValues.itemHeight, alignment: .leading)
                 .background(onHover ? Color("SelectedCell", bundle: .module) : .clear)
-#if DEBUG
+            #if DEBUG
                 .border(.red)
-#endif
+            #endif
 
             Rectangle()
                 .frame(width: ComponentSizeValues.arrowTerminalWidth, height: ComponentSizeValues.arrowTerminalHeight)
@@ -46,9 +46,10 @@ struct TextCellView: View {
             store.send(.clicked)
         }
         .popover(
-            item: $store.scope(state: \.destination?.popover, action: \.destination.popover)) { popoverStore in
-                TextCellPopoverContentView(store: popoverStore)
-            }
+            item: $store.scope(state: \.destination?.popover, action: \.destination.popover)
+        ) { popoverStore in
+            TextCellPopoverContentView(store: popoverStore)
+        }
     }
 }
 

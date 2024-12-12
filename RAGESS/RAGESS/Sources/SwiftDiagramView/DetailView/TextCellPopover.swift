@@ -1,9 +1,9 @@
 //
 //  TextCellPopover.swift
 //
-//  
+//
 //  Created by Ockey12 on 2024/12/12
-//  
+//
 //
 
 import ComposableArchitecture
@@ -47,8 +47,10 @@ public struct TextCellPopoverContentView: View {
             Text(store.object.fullPath)
                 .font(.system(size: ComponentSizeValues.fontSize))
 
-            Text("Line: \(store.object.rangeInXcode.lowerBound.line) Col: \(store.object.rangeInXcode.lowerBound.column) - Line: \(store.object.rangeInXcode.upperBound.line) Col: \(store.object.rangeInXcode.upperBound.column)")
-                .font(.system(size: ComponentSizeValues.fontSize))
+            Text(
+                "Line: \(store.object.rangeInXcode.lowerBound.line) Col: \(store.object.rangeInXcode.lowerBound.column) - Line: \(store.object.rangeInXcode.upperBound.line) Col: \(store.object.rangeInXcode.upperBound.column)"
+            )
+            .font(.system(size: ComponentSizeValues.fontSize))
 
             HStack {
                 Spacer()

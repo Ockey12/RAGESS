@@ -75,6 +75,7 @@ public struct TextCellReducer {
             case let .destination(.presented(.popover(.delegate(delegateAction)))):
                 switch delegateAction {
                 case let .showImpactScopeButtonClicked(calleeUSR):
+                    state.destination = nil
                     return .send(.delegate(.showImpactScopeButtonClicked(calleeUSR: calleeUSR)))
                 }
 

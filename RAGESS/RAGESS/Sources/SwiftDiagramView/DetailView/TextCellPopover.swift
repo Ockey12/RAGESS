@@ -50,16 +50,20 @@ public struct TextCellPopoverContentView: View {
             Text("Line: \(store.object.rangeInXcode.lowerBound.line) Col: \(store.object.rangeInXcode.lowerBound.column) - Line: \(store.object.rangeInXcode.upperBound.line) Col: \(store.object.rangeInXcode.upperBound.column)")
                 .font(.system(size: ComponentSizeValues.fontSize))
 
-            Button(
-                action: {
-                    store.send(.showImpactScopeButtonClicked)
-                },
-                label: {
-                    Text("Show Impact Scope")
-                        .font(.system(size: ComponentSizeValues.fontSize))
-                }
-            )
-            .frame(maxWidth: 400, alignment: .center)
+            HStack {
+                Spacer()
+                Button(
+                    action: {
+                        store.send(.showImpactScopeButtonClicked)
+                    },
+                    label: {
+                        Text("Show Impact Scope")
+                            .font(.system(size: ComponentSizeValues.fontSize))
+                    }
+                )
+                .frame(maxWidth: 600, alignment: .center)
+                Spacer()
+            }
         }
         .padding(15)
     }

@@ -18,17 +18,19 @@ struct DetailView: View {
                 frameWidth: store.frameWidth,
                 numberOfItems: store.texts.count
             )
-            .foregroundStyle(.white)
+            .foregroundStyle(Color("Component", bundle: .module))
 
             DetailFrameShape(
                 frameWidth: store.frameWidth,
                 numberOfItems: store.texts.count
             )
             .stroke(lineWidth: ComponentSizeValues.borderWidth)
-            .fill(.black)
+            .fill(Color("ComponentBorder", bundle: .module))
 
             Text(store.kind.text)
                 .font(.system(size: ComponentSizeValues.fontSize))
+                .bold()
+                .foregroundStyle(Color("ComponentKindFont", bundle: .module))
                 .frame(
                     width: store.frameWidth + ComponentSizeValues.arrowTerminalWidth * 2,
                     height: ComponentSizeValues.itemHeight

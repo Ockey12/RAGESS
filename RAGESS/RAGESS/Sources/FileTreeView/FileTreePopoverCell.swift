@@ -55,7 +55,7 @@ struct FileTreePopoverCell: View {
             .frame(height: 30)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 15)
-            .background(onHover ? .gray : .clear)
+            .background(onHover ? Color("SelectedCell", bundle: .module) : .clear)
             .onTapGesture {
                 store.send(.clicked)
             }

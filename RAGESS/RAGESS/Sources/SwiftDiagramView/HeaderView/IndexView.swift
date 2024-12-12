@@ -15,17 +15,17 @@ struct IndexView: View {
     var indexColor: Color {
         switch object.kind {
         case .struct:
-            return Color(red: 0.15, green: 1, blue: 0)
+            return Color("StructIndex", bundle: .module)
         case .class:
-            return Color(red: 1, green: 0.7, blue: 0)
+            return Color("ClassIndex", bundle: .module)
         case .enum:
-            return Color(red: 0, green: 0.7, blue: 0.85)
+            return Color("EnumIndex", bundle: .module)
         case .protocol:
-            return Color(red: 0.7, green: 0.7, blue: 0.7)
+            return Color("ProtocolIndex", bundle: .module)
         case .actor:
-            return Color("Actor", bundle: .module)
+            return Color("ActorIndex", bundle: .module)
         case .extension:
-            return .clear
+            return Color("ExtensionIndex", bundle: .module)
         default:
             assertionFailure()
             return .clear
@@ -63,7 +63,7 @@ struct IndexView: View {
 
             IndexFrameShape()
                 .stroke(lineWidth: ComponentSizeValues.borderWidth)
-                .fill(.black)
+                .fill(Color("ComponentBorder", bundle: .module))
                 .frame(
                     width: ComponentSizeValues.headerIndexWidth,
                     height: ComponentSizeValues.itemHeight
@@ -71,6 +71,7 @@ struct IndexView: View {
 
             Text(text)
                 .font(.system(size: ComponentSizeValues.fontSize))
+                .foregroundColor(Color("IndexFont", bundle: .module))
                 .frame(
                     width: ComponentSizeValues.headerIndexWidth,
                     height: ComponentSizeValues.itemHeight

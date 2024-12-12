@@ -262,7 +262,7 @@ public struct NodeReducer {
         case delegate(Delegate)
 
         public enum Delegate {
-            case showImpactScopeButtonClicked(firstUSR: String)
+            case showImpactScopeButtonClicked(calleeUSR: [String])
         }
     }
 
@@ -274,8 +274,8 @@ public struct NodeReducer {
             switch action {
             case let .header(.delegate(delegateAction)):
                 switch delegateAction {
-                case let .showImpactScopeButtonClicked(firstUSR: firstUSR):
-                    return .send(.delegate(.showImpactScopeButtonClicked(firstUSR: firstUSR)))
+                case let .showImpactScopeButtonClicked(calleeUSR: calleeUSR):
+                    return .send(.delegate(.showImpactScopeButtonClicked(calleeUSR: calleeUSR)))
                 }
 
             case .header:
@@ -283,8 +283,8 @@ public struct NodeReducer {
 
             case let .details(.element(id: _, action: .delegate(delegateAction))):
                 switch delegateAction {
-                case let .showImpactScopeButtonClicked(firstUSR: firstUSR):
-                    return .send(.delegate(.showImpactScopeButtonClicked(firstUSR: firstUSR)))
+                case let .showImpactScopeButtonClicked(calleeUSR: calleeUSR):
+                    return .send(.delegate(.showImpactScopeButtonClicked(calleeUSR: calleeUSR)))
                 }
 
             case .details:

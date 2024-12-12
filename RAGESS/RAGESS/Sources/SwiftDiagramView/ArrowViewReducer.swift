@@ -29,6 +29,12 @@ public struct ArrowViewReducer {
         var beforeDragLeadingEndPoint: CGPoint
         var beforeDragTrailingEndPoint: CGPoint
 
+        var isShow: Bool = false
+
+        var opacity: Double {
+            isShow ? 1 : 0
+        }
+
         var startPoint: CGPoint {
             let combinations = [
                 (leadingStartPoint, leadingEndPoint),

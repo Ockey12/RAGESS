@@ -73,7 +73,7 @@ public struct DetailReducer {
         case delegate(Delegate)
 
         public enum Delegate {
-            case showImpactScopeButtonClicked(firstUSR: String)
+            case showImpactScopeButtonClicked(calleeUSR: [String])
         }
     }
 
@@ -82,8 +82,8 @@ public struct DetailReducer {
             switch action {
             case let .texts(.element(id: _, action: .delegate(delegateAction))):
                 switch delegateAction {
-                case let .showImpactScopeButtonClicked(firstUSR: firstUSR):
-                    return .send(.delegate(.showImpactScopeButtonClicked(firstUSR: firstUSR)))
+                case let .showImpactScopeButtonClicked(calleeUSR: calleeUSR):
+                    return .send(.delegate(.showImpactScopeButtonClicked(calleeUSR: calleeUSR)))
                 }
 
             case .texts:

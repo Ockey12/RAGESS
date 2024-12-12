@@ -28,6 +28,7 @@ public struct SwiftDiagramTreeView: View {
 
             ForEach(store.scope(state: \.arrows, action: \.arrows)) { arrowStore in
                 ArrowView(store: arrowStore)
+                    .opacity(arrowStore.opacity)
             }
         }
         .frame(

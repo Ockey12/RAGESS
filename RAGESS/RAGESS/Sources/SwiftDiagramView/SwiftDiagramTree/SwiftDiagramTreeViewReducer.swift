@@ -70,12 +70,20 @@ public struct SwiftDiagramTreeViewReducer {
     }
 
     public var body: some ReducerOf<Self> {
-        Reduce { _, action in
+        Reduce { state, action in
             switch action {
             case let .nodes(.element(id: _, action: .delegate(delegateAction))):
                 switch delegateAction {
-                case let .showImpactScopeButtonClicked(firstUSR: firstUSR):
-                    print(firstUSR)
+                case let .showImpactScopeButtonClicked(calleeUSR: calleeUSR):
+                    state.arrows = .init(uniqueElements: state.arrows.map {
+                        var arrowState = $0
+                        if calleeUSR.contains($0.dependency.calleeUSR) {
+                            arrowState.isShow = true
+                        } else {
+                            arrowState.isShow = false
+                        }
+                        return arrowState
+                    })
                     return .none
                 }
 

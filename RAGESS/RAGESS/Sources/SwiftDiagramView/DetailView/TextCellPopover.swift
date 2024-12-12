@@ -22,7 +22,7 @@ public struct TextCellPopoverReducer {
         case delegate(Delegate)
 
         public enum Delegate {
-            case showImpactScopeButtonClicked(firstUSR: String)
+            case showImpactScopeButtonClicked(calleeUSR: [String])
         }
     }
 
@@ -30,10 +30,7 @@ public struct TextCellPopoverReducer {
         Reduce { state, action in
             switch action {
             case .showImpactScopeButtonClicked:
-                guard let firstUSR = state.object.usrs.first else {
-                    return .none
-                }
-                return .send(.delegate(.showImpactScopeButtonClicked(firstUSR: firstUSR)))
+                return .send(.delegate(.showImpactScopeButtonClicked(calleeUSR: state.object.usrs)))
 
             case .delegate:
                 return .none

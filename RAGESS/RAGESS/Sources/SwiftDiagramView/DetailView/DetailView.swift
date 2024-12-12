@@ -29,6 +29,8 @@ struct DetailView: View {
 
             Text(store.kind.text)
                 .font(.system(size: ComponentSizeValues.fontSize))
+                .bold()
+                .foregroundStyle(Color("ComponentKindFont", bundle: .module))
                 .frame(
                     width: store.frameWidth + ComponentSizeValues.arrowTerminalWidth * 2,
                     height: ComponentSizeValues.itemHeight

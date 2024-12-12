@@ -72,6 +72,13 @@ public struct SwiftDiagramTreeViewReducer {
     public var body: some ReducerOf<Self> {
         Reduce { _, action in
             switch action {
+            case let .nodes(.element(id: _, action: .delegate(delegateAction))):
+                switch delegateAction {
+                case let .showImpactScopeButtonClicked(firstUSR: firstUSR):
+                    print(firstUSR)
+                    return .none
+                }
+
             case .nodes:
                 return .none
 

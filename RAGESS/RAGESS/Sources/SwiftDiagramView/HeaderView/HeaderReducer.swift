@@ -66,10 +66,7 @@ public struct HeaderReducer {
         case delegate(Delegate)
 
         public enum Delegate {
-            case clicked(
-                leadingArrowTerminalPoint: CGPoint,
-                trailingArrowTerminalPoint: CGPoint
-            )
+            case showImpactScopeButtonClicked(firstUSR: String)
         }
     }
 
@@ -79,11 +76,11 @@ public struct HeaderReducer {
         }
         Reduce { state, action in
             switch action {
-            case .text(.clicked):
-                return .send(.delegate(.clicked(
-                    leadingArrowTerminalPoint: state.leadingArrowTerminalPoint,
-                    trailingArrowTerminalPoint: state.trailingArrowTerminalPoint
-                )))
+            case let .text(.delegate(delegateAction)):
+                switch delegateAction {
+                case let .showImpactScopeButtonClicked(firstUSR: firstUSR):
+                    return .send(.delegate(.showImpactScopeButtonClicked(firstUSR: firstUSR)))
+                }
 
             case .text:
                 return .none

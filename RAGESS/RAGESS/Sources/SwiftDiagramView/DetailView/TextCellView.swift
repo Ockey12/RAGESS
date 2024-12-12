@@ -47,7 +47,7 @@ struct TextCellView: View {
         }
         .popover(
             item: $store.scope(state: \.destination?.popover, action: \.destination.popover)) { popoverStore in
-                Text(popoverStore.fullPath)
+                TextCellPopoverContentView(store: popoverStore)
             }
     }
 }

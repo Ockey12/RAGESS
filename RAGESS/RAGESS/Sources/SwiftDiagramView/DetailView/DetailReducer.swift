@@ -73,26 +73,18 @@ public struct DetailReducer {
         case delegate(Delegate)
 
         public enum Delegate {
-            case clickedCell(
-                object: DeclaredObject,
-                leadingArrowTerminalPoint: CGPoint,
-                trailingArrowTerminalPoint: CGPoint
-            )
+            case showImpactScopeButtonClicked(firstUSR: String)
         }
     }
 
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case let .texts(.element(id: id, action: .clicked)):
-                guard let clickedCell = state.texts[id: id] else {
-                    return .none
+            case let .texts(.element(id: _, action: .delegate(delegateAction))):
+                switch delegateAction {
+                case let .showImpactScopeButtonClicked(firstUSR: firstUSR):
+                    return .send(.delegate(.showImpactScopeButtonClicked(firstUSR: firstUSR)))
                 }
-                return .send(.delegate(.clickedCell(
-                    object: clickedCell.object,
-                    leadingArrowTerminalPoint: clickedCell.leadingArrowTerminalPoint,
-                    trailingArrowTerminalPoint: clickedCell.trailingArrowTerminalPoint
-                )))
 
             case .texts:
                 return .none

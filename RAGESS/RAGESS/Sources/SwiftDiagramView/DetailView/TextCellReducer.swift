@@ -56,17 +56,32 @@ public struct TextCellReducer {
     public enum Action {
         case clicked
         case destination(PresentationAction<Destination.Action>)
+        case delegate(Delegate)
+
+        public enum Delegate {
+            case showImpactScopeButtonClicked(firstUSR: String)
+        }
     }
 
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
             case .clicked:
-                print(state.object.name)
-                state.destination = .popover(TextCellPopoverReducer.State(fullPath: state.object.fullPath))
+                state.destination = .popover(
+                    TextCellPopoverReducer.State(object: state.object)
+                )
                 return .none
 
+            case let .destination(.presented(.popover(.delegate(delegateAction)))):
+                switch delegateAction {
+                case let .showImpactScopeButtonClicked(firstUSR):
+                    return .send(.delegate(.showImpactScopeButtonClicked(firstUSR: firstUSR)))
+                }
+
             case .destination:
+                return .none
+
+            case .delegate:
                 return .none
             }
         }

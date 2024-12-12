@@ -15,7 +15,8 @@ struct IndexView: View {
     var indexColor: Color {
         switch object.kind {
         case .struct:
-            return Color(red: 0.15, green: 1, blue: 0)
+//            return Color(red: 0.15, green: 1, blue: 0)
+            return Color("StructIndex", bundle: .module)
         case .class:
             return Color(red: 1, green: 0.7, blue: 0)
         case .enum:

@@ -11,24 +11,36 @@ import SwiftUI
 
 struct TextCellView: View {
     let store: StoreOf<TextCellReducer>
+    @State private var onHover = false
 
     var body: some View {
-        Text(store.object.declaration)
-            .font(.system(size: ComponentSizeValues.fontSize))
-            .foregroundStyle(Color("TextCellFont", bundle: .module))
-            .padding(.leading, ComponentSizeValues.textLeadingPadding)
-            .offset(x: ComponentSizeValues.arrowTerminalWidth)
-            .frame(
-                width: store.bodyWidth + ComponentSizeValues.arrowTerminalWidth * 2,
-                height: ComponentSizeValues.itemHeight,
-                alignment: .leading
-            )
-        #if DEBUG
-            .border(.red)
-        #endif
-            .onTapGesture {
-                store.send(.clicked)
-            }
+        HStack(spacing: 0) {
+            Rectangle()
+                .frame(width: ComponentSizeValues.arrowTerminalWidth, height: ComponentSizeValues.arrowTerminalHeight)
+                .padding(.vertical, ComponentSizeValues.oneVerticalLineWithoutArrow)
+                .foregroundStyle(onHover ? Color("SelectedCell", bundle: .module) : .clear)
+
+            Text(store.object.declaration)
+                .font(.system(size: ComponentSizeValues.fontSize))
+                .foregroundStyle(Color("TextCellFont", bundle: .module))
+                .padding(.leading, ComponentSizeValues.textLeadingPadding)
+                .frame(width: store.bodyWidth, alignment: .leading)
+                .background(onHover ? Color("SelectedCell", bundle: .module) : .clear)
+#if DEBUG
+                .border(.red)
+#endif
+                .onTapGesture {
+                    store.send(.clicked)
+                }
+
+            Rectangle()
+                .frame(width: ComponentSizeValues.arrowTerminalWidth, height: ComponentSizeValues.arrowTerminalHeight)
+                .padding(.vertical, ComponentSizeValues.oneVerticalLineWithoutArrow)
+                .foregroundStyle(onHover ? Color("SelectedCell", bundle: .module) : .clear)
+        }
+        .onHover { onHover in
+            self.onHover = onHover
+        }
     }
 }
 

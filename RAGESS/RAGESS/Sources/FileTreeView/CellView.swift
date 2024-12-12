@@ -69,8 +69,8 @@ public struct CellReducer {
     }
 
     public indirect enum Action {
-        case expandButtonTapped
-        case nameClicked
+        case directoryClicked
+        case fileClicked
         case children(IdentifiedActionOf<CellReducer>)
         case destination(PresentationAction<Destination.Action>)
         case delegate(Delegate)
@@ -85,7 +85,7 @@ public struct CellReducer {
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .expandButtonTapped:
+            case .directoryClicked:
                 state.isExpanding.toggle()
                 return .send(
                     state.isExpanding
@@ -99,7 +99,7 @@ public struct CellReducer {
                     animation: .easeInOut
                 )
 
-            case .nameClicked:
+            case .fileClicked:
                 if case .sourceFile = state.content {
                     state.destination = .popover(FileTreePopoverReducer.State(content: state.content))
                 }
@@ -160,27 +160,19 @@ struct CellView: View {
         HStack(spacing: 0) {
             if case let .directory(directory) = store.content,
                !directory.files.isEmpty || !directory.subDirectories.isEmpty {
-                Button(
-                    action: {
-                        store.send(.expandButtonTapped, animation: .easeInOut)
-                    },
-                    label: {
-                        if store.isExpanding {
-                            Image(systemName: "chevron.down")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 8, height: 8)
-                                .frame(width: 15, height: 15)
-                        } else {
-                            Image(systemName: "chevron.right")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 8, height: 8)
-                                .frame(width: 15, height: 15)
-                        }
-                    }
-                )
-                .buttonStyle(BorderlessButtonStyle())
+                if store.isExpanding {
+                    Image(systemName: "chevron.down")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 8, height: 8)
+                        .frame(width: 15, height: 15)
+                } else {
+                    Image(systemName: "chevron.right")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 8, height: 8)
+                        .frame(width: 15, height: 15)
+                }
             }
 
             switch store.content {
@@ -208,7 +200,12 @@ struct CellView: View {
         .frame(height: 20)
         .padding(.leading, store.leadingPadding)
         .onTapGesture {
-            store.send(.nameClicked)
+            switch store.content {
+            case .directory:
+                store.send(.directoryClicked, animation: .easeInOut)
+            case .sourceFile:
+                store.send(.fileClicked, animation: .easeInOut)
+            }
         }
         .popover(
             item: $store.scope(

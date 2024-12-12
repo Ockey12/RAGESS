@@ -68,6 +68,19 @@ public struct ArrowViewReducer {
             return endPoint
         }
 
+        var startPointSide: Side {
+            if startPoint == leadingStartPoint {
+                return .leading
+            } else {
+                return .trailing
+            }
+        }
+
+        enum Side {
+            case leading
+            case trailing
+        }
+
         public init(
             dependency: DependencyObject,
             leadingStartPoint: CGPoint,

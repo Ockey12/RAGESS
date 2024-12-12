@@ -76,6 +76,7 @@ struct IndexView: View {
 
             Text(text)
                 .font(.system(size: ComponentSizeValues.fontSize))
+                .foregroundColor(Color("IndexFont", bundle: .module))
                 .frame(
                     width: ComponentSizeValues.headerIndexWidth,
                     height: ComponentSizeValues.itemHeight

@@ -18,7 +18,8 @@ struct IndexView: View {
 //            return Color(red: 0.15, green: 1, blue: 0)
             return Color("StructIndex", bundle: .module)
         case .class:
-            return Color(red: 1, green: 0.7, blue: 0)
+//            return Color(red: 1, green: 0.7, blue: 0)
+            return Color("ClassIndex", bundle: .module)
         case .enum:
 //            return Color(red: 0, green: 0.7, blue: 0.85)
             return Color("EnumIndex", bundle: .module)

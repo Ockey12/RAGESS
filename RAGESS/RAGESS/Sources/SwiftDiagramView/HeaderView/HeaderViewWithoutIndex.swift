@@ -21,7 +21,7 @@ struct HeaderViewWithoutIndex: View {
     var body: some View {
         ZStack(alignment: .topLeading) {
             HeaderFrameWithoutIndex(frameWidth: store.bodyWidth)
-                .foregroundStyle(.white)
+                .foregroundStyle(Color("Component", bundle: .module))
 
             HeaderFrameWithoutIndex(frameWidth: store.bodyWidth)
                 .stroke(lineWidth: borderWidth)

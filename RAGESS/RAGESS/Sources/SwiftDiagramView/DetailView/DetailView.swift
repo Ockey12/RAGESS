@@ -18,7 +18,7 @@ struct DetailView: View {
                 frameWidth: store.frameWidth,
                 numberOfItems: store.texts.count
             )
-            .foregroundStyle(.white)
+            .foregroundStyle(Color("Component", bundle: .module))
 
             DetailFrameShape(
                 frameWidth: store.frameWidth,

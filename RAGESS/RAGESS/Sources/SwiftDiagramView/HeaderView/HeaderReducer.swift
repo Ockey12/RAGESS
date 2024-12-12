@@ -74,6 +74,9 @@ public struct HeaderReducer {
     }
 
     public var body: some ReducerOf<Self> {
+        Scope(state: \.text, action: \.text) {
+            TextCellReducer()
+        }
         Reduce { state, action in
             switch action {
             case .text(.clicked):

@@ -10,8 +10,12 @@ import ComposableArchitecture
 import SwiftUI
 
 struct TextCellView: View {
-    let store: StoreOf<TextCellReducer>
+    @Bindable private var store: StoreOf<TextCellReducer>
     @State private var onHover = false
+
+    init(store: StoreOf<TextCellReducer>) {
+        self.store = store
+    }
 
     var body: some View {
         HStack(spacing: 0) {
@@ -24,14 +28,11 @@ struct TextCellView: View {
                 .font(.system(size: ComponentSizeValues.fontSize))
                 .foregroundStyle(Color("TextCellFont", bundle: .module))
                 .padding(.leading, ComponentSizeValues.textLeadingPadding)
-                .frame(width: store.bodyWidth, alignment: .leading)
+                .frame(width: store.bodyWidth, height: ComponentSizeValues.itemHeight, alignment: .leading)
                 .background(onHover ? Color("SelectedCell", bundle: .module) : .clear)
 #if DEBUG
                 .border(.red)
 #endif
-                .onTapGesture {
-                    store.send(.clicked)
-                }
 
             Rectangle()
                 .frame(width: ComponentSizeValues.arrowTerminalWidth, height: ComponentSizeValues.arrowTerminalHeight)
@@ -41,6 +42,13 @@ struct TextCellView: View {
         .onHover { onHover in
             self.onHover = onHover
         }
+        .onTapGesture {
+            store.send(.clicked)
+        }
+        .popover(
+            item: $store.scope(state: \.destination?.popover, action: \.destination.popover)) { popoverStore in
+                Text(popoverStore.fullPath)
+            }
     }
 }
 

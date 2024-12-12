@@ -25,7 +25,7 @@ struct HeaderViewWithoutIndex: View {
 
             HeaderFrameWithoutIndex(frameWidth: store.bodyWidth)
                 .stroke(lineWidth: borderWidth)
-                .fill(.black)
+                .fill(Color("ComponentBorder", bundle: .module))
 
             TextCellView(store: store.scope(state: \.text, action: \.text))
         } // ZStack

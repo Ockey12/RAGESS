@@ -63,7 +63,7 @@ struct IndexView: View {
 
             IndexFrameShape()
                 .stroke(lineWidth: ComponentSizeValues.borderWidth)
-                .fill(.black)
+                .fill(Color("ComponentBorder", bundle: .module))
                 .frame(
                     width: ComponentSizeValues.headerIndexWidth,
                     height: ComponentSizeValues.itemHeight

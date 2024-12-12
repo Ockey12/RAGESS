@@ -25,7 +25,7 @@ struct DetailView: View {
                 numberOfItems: store.texts.count
             )
             .stroke(lineWidth: ComponentSizeValues.borderWidth)
-            .fill(.black)
+            .fill(Color("ComponentBorder", bundle: .module))
 
             Text(store.kind.text)
                 .font(.system(size: ComponentSizeValues.fontSize))

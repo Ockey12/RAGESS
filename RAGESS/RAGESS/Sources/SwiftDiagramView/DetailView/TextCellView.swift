@@ -15,7 +15,7 @@ struct TextCellView: View {
     var body: some View {
         Text(store.object.declaration)
             .font(.system(size: ComponentSizeValues.fontSize))
-            .foregroundStyle(.black)
+            .foregroundStyle(Color("TextCellFont", bundle: .module))
             .padding(.leading, ComponentSizeValues.textLeadingPadding)
             .offset(x: ComponentSizeValues.arrowTerminalWidth)
             .frame(

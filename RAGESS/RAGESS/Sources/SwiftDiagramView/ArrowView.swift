@@ -42,7 +42,6 @@ struct ArrowView: View {
                         x: positiveCorner.x,
                         y: store.startPoint.y + 7
                     )
-//                    let tipAngle = atan2(negativeCorner.y - positiveCorner.y, negativeCorner.x - positiveCorner.x)
                     let tipAngle = atan2(positiveCorner.y - negativeCorner.y, positiveCorner.x - negativeCorner.x)
                     let tipNegativePoint = CGPoint(
                         x: tipPoint.x - arrowSize * cos(tipAngle - CGFloat.pi / 6),

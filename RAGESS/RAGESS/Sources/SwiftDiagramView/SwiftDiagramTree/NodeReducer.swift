@@ -259,14 +259,40 @@ public struct NodeReducer {
     public enum Action {
         case header(HeaderReducer.Action)
         case details(IdentifiedActionOf<DetailReducer>)
+        case delegate(Delegate)
+
+        public enum Delegate {
+            case showImpactScopeButtonClicked(calleeUSR: [String])
+        }
     }
 
     public var body: some ReducerOf<Self> {
         Scope(state: \.header, action: \.header) {
             HeaderReducer()
         }
-        Reduce { _, _ in
-            .none
+        Reduce { _, action in
+            switch action {
+            case let .header(.delegate(delegateAction)):
+                switch delegateAction {
+                case let .showImpactScopeButtonClicked(calleeUSR: calleeUSR):
+                    return .send(.delegate(.showImpactScopeButtonClicked(calleeUSR: calleeUSR)))
+                }
+
+            case .header:
+                return .none
+
+            case let .details(.element(id: _, action: .delegate(delegateAction))):
+                switch delegateAction {
+                case let .showImpactScopeButtonClicked(calleeUSR: calleeUSR):
+                    return .send(.delegate(.showImpactScopeButtonClicked(calleeUSR: calleeUSR)))
+                }
+
+            case .details:
+                return .none
+
+            case .delegate:
+                return .none
+            }
         }
         .forEach(\.details, action: \.details) {
             DetailReducer()

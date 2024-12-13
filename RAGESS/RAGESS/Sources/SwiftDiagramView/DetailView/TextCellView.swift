@@ -10,25 +10,46 @@ import ComposableArchitecture
 import SwiftUI
 
 struct TextCellView: View {
-    let store: StoreOf<TextCellReducer>
+    @Bindable private var store: StoreOf<TextCellReducer>
+    @State private var onHover = false
+
+    init(store: StoreOf<TextCellReducer>) {
+        self.store = store
+    }
 
     var body: some View {
-        Text(store.object.declaration)
-            .font(.system(size: ComponentSizeValues.fontSize))
-            .foregroundStyle(Color("TextCellFont", bundle: .module))
-            .padding(.leading, ComponentSizeValues.textLeadingPadding)
-            .offset(x: ComponentSizeValues.arrowTerminalWidth)
-            .frame(
-                width: store.bodyWidth + ComponentSizeValues.arrowTerminalWidth * 2,
-                height: ComponentSizeValues.itemHeight,
-                alignment: .leading
-            )
-        #if DEBUG
-            .border(.red)
-        #endif
-            .onTapGesture {
-                store.send(.clicked)
-            }
+        HStack(spacing: 0) {
+            Rectangle()
+                .frame(width: ComponentSizeValues.arrowTerminalWidth, height: ComponentSizeValues.arrowTerminalHeight)
+                .padding(.vertical, ComponentSizeValues.oneVerticalLineWithoutArrow)
+                .foregroundStyle(onHover ? Color("SelectedCell", bundle: .module) : .clear)
+
+            Text(store.object.declaration)
+                .font(.system(size: ComponentSizeValues.fontSize))
+                .foregroundStyle(Color("TextCellFont", bundle: .module))
+                .padding(.leading, ComponentSizeValues.textLeadingPadding)
+                .frame(width: store.bodyWidth, height: ComponentSizeValues.itemHeight, alignment: .leading)
+                .background(onHover ? Color("SelectedCell", bundle: .module) : .clear)
+            #if DEBUG
+                .border(.red)
+            #endif
+
+            Rectangle()
+                .frame(width: ComponentSizeValues.arrowTerminalWidth, height: ComponentSizeValues.arrowTerminalHeight)
+                .padding(.vertical, ComponentSizeValues.oneVerticalLineWithoutArrow)
+                .foregroundStyle(onHover ? Color("SelectedCell", bundle: .module) : .clear)
+        }
+        .onHover { onHover in
+            self.onHover = onHover
+        }
+        .onTapGesture {
+            store.send(.clicked)
+        }
+        .popover(
+            item: $store.scope(state: \.destination?.popover, action: \.destination.popover)
+        ) { popoverStore in
+            TextCellPopoverContentView(store: popoverStore)
+        }
     }
 }
 

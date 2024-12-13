@@ -390,8 +390,13 @@ final class DeclarationVisitor: SyntaxVisitor {
             ... LocationInXcode(line: locationRange.end.line, column: locationRange.end.column)
         let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
+        let singleSpacedSignature = node.signature.trimmed.description.replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression)
+        let signatureWithoutSpacesAroundParams = singleSpacedSignature
+            .replacingOccurrences(of: "\\(\\s*", with: "(", options: .regularExpression)
+            .replacingOccurrences(of: "\\s*\\)", with: ")", options: .regularExpression)
+
         let currentFunction = DeclaredObject(
-            name: node.name.text,
+            name: node.name.text + signatureWithoutSpacesAroundParams,
             nameOffset: node.name.trimmedByteRange.offset,
             fullPath: fullPath,
             sourceCode: trimSourceCode(node.description),

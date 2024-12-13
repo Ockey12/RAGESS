@@ -46,7 +46,7 @@ public struct DeclaredObject: Identifiable, Equatable {
         }
     }
 
-    public let name: String
+    public var name: String
     public let nameOffset: Int
     public let fullPath: String
     public var annotatedDecl: String?

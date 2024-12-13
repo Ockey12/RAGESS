@@ -54,8 +54,7 @@ struct NodeModel {
         allAnnotatedDecl.append(contentsOf: object.variables.map { $0.declaration })
         allAnnotatedDecl.append(contentsOf: object.functions.map { $0.declaration })
         allAnnotatedDecl.append(contentsOf: object.cases.map { $0.declaration })
-        print("")
-        dump(allAnnotatedDecl)
+
         let bodyWidth = max(
             calculateMaxTextWidth(allAnnotatedDecl),
             ComponentSizeValues.bodyMinWidth

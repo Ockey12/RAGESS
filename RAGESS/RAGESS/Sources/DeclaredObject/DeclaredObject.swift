@@ -138,8 +138,13 @@ public struct DeclaredObject: Identifiable, Equatable {
         }
     }
 
+    public let declModifiers: [String]
+
     public var declaration: String {
-        var declaration = ""
+        var declaration = declModifiers.joined(separator: " ")
+        if !declModifiers.isEmpty {
+            declaration += " "
+        }
         switch kind {
         case .struct, .class, .enum, .protocol, .actor, .extension:
             declaration += kind.rawValue + " "
@@ -179,7 +184,8 @@ public struct DeclaredObject: Identifiable, Equatable {
         nestingProtocols: [Self] = [],
         nestingActors: [Self] = [],
         parentUSRs: [String] = [],
-        enclosingTypeNames: [String] = []
+        enclosingTypeNames: [String] = [],
+        declModifiers: [String] = []
     ) {
         self.usrs = usrs
         @Dependency(\.uuid) var uuid
@@ -207,6 +213,7 @@ public struct DeclaredObject: Identifiable, Equatable {
 
         self.parentUSRs = parentUSRs
         self.enclosingTypeNames = enclosingTypeNames
+        self.declModifiers = declModifiers
     }
 }
 

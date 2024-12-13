@@ -36,7 +36,8 @@ final class DeclarationVisitor: SyntaxVisitor {
             sourceCode: trimSourceCode(node.description),
             rangeInXcode: rangeInXcode,
             offsetRange: offsetRange,
-            kind: .protocol
+            kind: .protocol,
+            declModifiers: node.modifiers.map { $0.trimmed.description }
         )
 
         appendToBuffer(currentProtocol)
@@ -82,7 +83,8 @@ final class DeclarationVisitor: SyntaxVisitor {
             sourceCode: trimSourceCode(node.description),
             rangeInXcode: rangeInXcode,
             offsetRange: offsetRange,
-            kind: .struct
+            kind: .struct,
+            declModifiers: node.modifiers.map { $0.trimmed.description }
         )
 
         appendToBuffer(currentStruct)
@@ -128,7 +130,8 @@ final class DeclarationVisitor: SyntaxVisitor {
             sourceCode: trimSourceCode(node.description),
             rangeInXcode: rangeInXcode,
             offsetRange: offsetRange,
-            kind: .class
+            kind: .class,
+            declModifiers: node.modifiers.map { $0.trimmed.description }
         )
 
         appendToBuffer(currentClass)
@@ -172,7 +175,8 @@ final class DeclarationVisitor: SyntaxVisitor {
             sourceCode: trimSourceCode(node.description),
             rangeInXcode: rangeInXcode,
             offsetRange: offsetRange,
-            kind: .enum
+            kind: .enum,
+            declModifiers: node.modifiers.map { $0.trimmed.description }
         )
 
         appendToBuffer(currentEnum)
@@ -217,7 +221,8 @@ final class DeclarationVisitor: SyntaxVisitor {
             sourceCode: trimSourceCode(node.description),
             rangeInXcode: rangeInXcode,
             offsetRange: offsetRange,
-            kind: .actor
+            kind: .actor,
+            declModifiers: node.modifiers.map { $0.trimmed.description }
         )
 
         appendToBuffer(currentActor)
@@ -299,7 +304,8 @@ final class DeclarationVisitor: SyntaxVisitor {
             sourceCode: trimSourceCode(node.description),
             rangeInXcode: rangeInXcode,
             offsetRange: offsetRange,
-            kind: .initializer
+            kind: .initializer,
+            declModifiers: node.modifiers.map { $0.trimmed.description }
         )
 
         appendToBuffer(currentInitializer)
@@ -352,7 +358,8 @@ final class DeclarationVisitor: SyntaxVisitor {
             sourceCode: trimSourceCode(node.description),
             rangeInXcode: rangeInXcode,
             offsetRange: offsetRange,
-            kind: .variable
+            kind: .variable,
+            declModifiers: node.modifiers.map { $0.trimmed.description }
         )
 
         appendToBuffer(currentVariable)
@@ -402,7 +409,8 @@ final class DeclarationVisitor: SyntaxVisitor {
             sourceCode: trimSourceCode(node.description),
             rangeInXcode: rangeInXcode,
             offsetRange: offsetRange,
-            kind: .function
+            kind: .function,
+            declModifiers: node.modifiers.map { $0.trimmed.description }
         )
 
         appendToBuffer(currentFunction)

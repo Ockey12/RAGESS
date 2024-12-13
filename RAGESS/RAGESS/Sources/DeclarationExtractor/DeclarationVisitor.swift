@@ -436,8 +436,7 @@ final class DeclarationVisitor: SyntaxVisitor {
         let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
         let currentCase = DeclaredObject(
-            // FIXME: Extract the actual case name.
-            name: "case",
+            name: node.trimmed.description,
             nameOffset: node.elements.trimmedByteRange.offset,
             fullPath: fullPath,
             sourceCode: trimSourceCode(node.description),

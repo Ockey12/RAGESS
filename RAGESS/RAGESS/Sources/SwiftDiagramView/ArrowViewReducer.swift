@@ -32,7 +32,7 @@ public struct ArrowViewReducer {
         var isShow: Bool = false
 
         var opacity: Double {
-            isShow ? 1 : 0
+            isShow ? 1 : 0.15
         }
 
         var startPoint: CGPoint {

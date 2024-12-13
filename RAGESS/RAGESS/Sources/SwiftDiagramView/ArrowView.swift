@@ -58,25 +58,27 @@ struct ArrowView: View {
                 path.move(to: firstTipPoint)
                 path.addLine(to: firstTipPositivePoint)
 
-                // second
-                // vertical segment
-                let secondTipPoint = CGPoint(
-                    x: firstCorner.x + (secondCorner.x - firstCorner.x) / 2,
-                    y: firstCorner.y + (secondCorner.y - firstCorner.y) / 2
-                )
-                let secondTipAngle = atan2(secondCorner.y - firstCorner.y, secondCorner.x - firstCorner.x)
-                let secondTipNegativePoint = CGPoint(
-                    x: secondTipPoint.x - arrowSize * cos(secondTipAngle - CGFloat.pi / 6),
-                    y: secondTipPoint.y - arrowSize * sin(secondTipAngle - CGFloat.pi / 6)
-                )
-                let secondTipPositivePoint = CGPoint(
-                    x: secondTipPoint.x - arrowSize * cos(secondTipAngle + CGFloat.pi / 6),
-                    y: secondTipPoint.y - arrowSize * sin(secondTipAngle + CGFloat.pi / 6)
-                )
-                path.move(to: secondTipPoint)
-                path.addLine(to: secondTipNegativePoint)
-                path.move(to: secondTipPoint)
-                path.addLine(to: secondTipPositivePoint)
+                if fabs(Double(firstCorner.y) - Double(secondCorner.y)) > Double(ComponentSizeValues.itemHeight) * 3 {
+                    // second
+                    // vertical segment
+                    let secondTipPoint = CGPoint(
+                        x: firstCorner.x + (secondCorner.x - firstCorner.x) / 2,
+                        y: firstCorner.y + (secondCorner.y - firstCorner.y) / 2
+                    )
+                    let secondTipAngle = atan2(secondCorner.y - firstCorner.y, secondCorner.x - firstCorner.x)
+                    let secondTipNegativePoint = CGPoint(
+                        x: secondTipPoint.x - arrowSize * cos(secondTipAngle - CGFloat.pi / 6),
+                        y: secondTipPoint.y - arrowSize * sin(secondTipAngle - CGFloat.pi / 6)
+                    )
+                    let secondTipPositivePoint = CGPoint(
+                        x: secondTipPoint.x - arrowSize * cos(secondTipAngle + CGFloat.pi / 6),
+                        y: secondTipPoint.y - arrowSize * sin(secondTipAngle + CGFloat.pi / 6)
+                    )
+                    path.move(to: secondTipPoint)
+                    path.addLine(to: secondTipNegativePoint)
+                    path.move(to: secondTipPoint)
+                    path.addLine(to: secondTipPositivePoint)
+                }
 
                 // third
                 let thirdTipPoint = CGPoint(

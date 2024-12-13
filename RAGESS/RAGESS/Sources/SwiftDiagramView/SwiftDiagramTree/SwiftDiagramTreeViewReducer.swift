@@ -343,15 +343,6 @@ private enum ArrowsStateGenerator {
         for node in nodes {
             let calleeDependencies = dependencyObjects.filteringWhereCallee(node.object)
             for dependency in calleeDependencies {
-                guard let calleeKeyPath = usrTable[dependency.calleeUSR],
-                      let callerUSR = dependency.callerUSRs.first,
-                      let callerKeyPath = usrTable[callerUSR],
-                      rootDirectory.findRootTypeObject(targetKeyPath: calleeKeyPath, usrTable: usrTable)
-                      != rootDirectory.findRootTypeObject(targetKeyPath: callerKeyPath, usrTable: usrTable)
-                else {
-                    continue
-                }
-
                 // set start point coordinate
                 var leadingStartPoint: CGPoint = .zero
                 var trailingStartPoint: CGPoint = .zero
@@ -395,15 +386,20 @@ private enum ArrowsStateGenerator {
                     continue
                 }
 
-                arrowStates.append(
-                    .init(
-                        dependency: dependency,
-                        leadingStartPoint: leadingStartPoint,
-                        trailingStartPoint: trailingStartPoint,
-                        leadingEndPoint: leadingEndPoint,
-                        trailingEndPoint: trailingEndPoint
-                    )
+                let arrowState = ArrowViewReducer.State(
+                    dependency: dependency,
+                    leadingStartPoint: leadingStartPoint,
+                    trailingStartPoint: trailingStartPoint,
+                    leadingEndPoint: leadingEndPoint,
+                    trailingEndPoint: trailingEndPoint
                 )
+
+                // Arrows with the same start and end points should be combined into one.
+                guard !arrowStates.contains(where: { $0.startPoint == arrowState.startPoint && $0.endPoint == arrowState.endPoint }) else {
+                    continue
+                }
+
+                arrowStates.append(arrowState)
             } // for dependency
         } // for node
 

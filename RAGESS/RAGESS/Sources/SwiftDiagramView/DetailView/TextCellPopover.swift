@@ -61,9 +61,9 @@ public struct TextCellPopoverContentView: View {
                     label: {
                         Text("Show Impact Scope")
                             .font(.system(size: ComponentSizeValues.fontSize))
+                            .frame(width: 200, height: 30)
                     }
                 )
-                .frame(maxWidth: 600, alignment: .center)
                 Spacer()
             }
         }

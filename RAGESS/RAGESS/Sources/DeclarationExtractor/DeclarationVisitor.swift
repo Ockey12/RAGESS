@@ -352,6 +352,11 @@ final class DeclarationVisitor: SyntaxVisitor {
             return .visitChildren
         }
 
+        var name = array[0].pattern.trimmed.description
+        if let typeAnnotation = array[0].typeAnnotation {
+            name += typeAnnotation.description
+        }
+
         let locationRange = node.sourceRange(converter: locationConverter)
         let rangeInXcode = LocationInXcode(line: locationRange.start.line, column: locationRange.start.column)
             ... LocationInXcode(line: locationRange.end.line, column: locationRange.end.column)
@@ -364,7 +369,7 @@ final class DeclarationVisitor: SyntaxVisitor {
             // FIXME: This element does not necessarily represent the name of the variable.
             // For example, in the case of Tuple Decomposition, the tuple would be the name of the variable.
             // When `let (a, b, c) = (0, 1, 2)`, the variable name becomes “(a, b, c)”.
-            name: array[0].pattern.trimmed.description,
+            name: name,
             nameOffset: array[0].pattern.trimmed.trimmedByteRange.offset,
             fullPath: fullPath,
             sourceCode: trimSourceCode(node.description),

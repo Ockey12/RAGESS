@@ -1,9 +1,9 @@
 //
 //  InitialValue.swift
-//  
-//  
+//
+//
 //  Created by Ockey12 on 2024/12/14
-//  
+//
 //
 
 import Foundation
@@ -18,9 +18,7 @@ struct InitialValuesSample {
         second: 4
     )
 
-    private let d = {
-        0
-    }()
+    private let d = 0
 
     private let e: (Int) -> String = { num in
         String(num)
@@ -40,9 +38,7 @@ struct InitialValuesSample {
     ]
 
     private let h = [
-        {
-            "first"
-        }(),
+        "first",
         "second"
     ]
 }
@@ -54,4 +50,3 @@ func returnString() throws -> String {
 func returnString(first: Double, second: Float) throws -> String {
     String(first)
 }
-

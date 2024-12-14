@@ -297,8 +297,17 @@ final class DeclarationVisitor: SyntaxVisitor {
             ... LocationInXcode(line: locationRange.end.line, column: locationRange.end.column)
         let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
+        var name = "init"
+        if let _ = node.optionalMark {
+            name += "?"
+        }
+        let singleSpacedSignature = node.signature.trimmed.description.replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression)
+        name += singleSpacedSignature
+            .replacingOccurrences(of: "\\(\\s*", with: "(", options: .regularExpression)
+            .replacingOccurrences(of: "\\s*\\)", with: ")", options: .regularExpression)
+
         let currentInitializer = DeclaredObject(
-            name: "init",
+            name: name,
             nameOffset: node.initKeyword.trimmedByteRange.offset,
             fullPath: fullPath,
             sourceCode: trimSourceCode(node.description),

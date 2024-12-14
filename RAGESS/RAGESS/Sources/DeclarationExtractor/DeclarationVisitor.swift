@@ -357,6 +357,23 @@ final class DeclarationVisitor: SyntaxVisitor {
             name += typeAnnotation.description
         }
 
+
+        if let initializer = array[0].initializer {
+            print("\ninitializer")
+            dump(initializer)
+            let children = initializer.value.children(viewMode: .sourceAccurate)
+            let isClosure = !children.compactMap { $0.as(ClosureExprSyntax.self) }.isEmpty
+            let hasParam = !children.compactMap { $0.description == "(" }.isEmpty
+            if isClosure {
+                name += " = {...}"
+                if hasParam {
+                    name += "()"
+                }
+            } else {
+                name += initializer.description
+            }
+        }
+
         let locationRange = node.sourceRange(converter: locationConverter)
         let rangeInXcode = LocationInXcode(line: locationRange.start.line, column: locationRange.start.column)
             ... LocationInXcode(line: locationRange.end.line, column: locationRange.end.column)

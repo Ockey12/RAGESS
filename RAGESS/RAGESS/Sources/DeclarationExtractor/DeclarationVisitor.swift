@@ -36,7 +36,8 @@ final class DeclarationVisitor: SyntaxVisitor {
             sourceCode: trimSourceCode(node.description),
             rangeInXcode: rangeInXcode,
             offsetRange: offsetRange,
-            kind: .protocol
+            kind: .protocol,
+            declModifiers: node.modifiers.map { $0.trimmed.description }
         )
 
         appendToBuffer(currentProtocol)
@@ -82,7 +83,8 @@ final class DeclarationVisitor: SyntaxVisitor {
             sourceCode: trimSourceCode(node.description),
             rangeInXcode: rangeInXcode,
             offsetRange: offsetRange,
-            kind: .struct
+            kind: .struct,
+            declModifiers: node.modifiers.map { $0.trimmed.description }
         )
 
         appendToBuffer(currentStruct)
@@ -128,7 +130,8 @@ final class DeclarationVisitor: SyntaxVisitor {
             sourceCode: trimSourceCode(node.description),
             rangeInXcode: rangeInXcode,
             offsetRange: offsetRange,
-            kind: .class
+            kind: .class,
+            declModifiers: node.modifiers.map { $0.trimmed.description }
         )
 
         appendToBuffer(currentClass)
@@ -172,7 +175,8 @@ final class DeclarationVisitor: SyntaxVisitor {
             sourceCode: trimSourceCode(node.description),
             rangeInXcode: rangeInXcode,
             offsetRange: offsetRange,
-            kind: .enum
+            kind: .enum,
+            declModifiers: node.modifiers.map { $0.trimmed.description }
         )
 
         appendToBuffer(currentEnum)
@@ -217,7 +221,8 @@ final class DeclarationVisitor: SyntaxVisitor {
             sourceCode: trimSourceCode(node.description),
             rangeInXcode: rangeInXcode,
             offsetRange: offsetRange,
-            kind: .actor
+            kind: .actor,
+            declModifiers: node.modifiers.map { $0.trimmed.description }
         )
 
         appendToBuffer(currentActor)
@@ -292,14 +297,24 @@ final class DeclarationVisitor: SyntaxVisitor {
             ... LocationInXcode(line: locationRange.end.line, column: locationRange.end.column)
         let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
+        var name = "init"
+        if let _ = node.optionalMark {
+            name += "?"
+        }
+        let singleSpacedSignature = node.signature.trimmed.description.replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression)
+        name += singleSpacedSignature
+            .replacingOccurrences(of: "\\(\\s*", with: "(", options: .regularExpression)
+            .replacingOccurrences(of: "\\s*\\)", with: ")", options: .regularExpression)
+
         let currentInitializer = DeclaredObject(
-            name: "init",
+            name: name,
             nameOffset: node.initKeyword.trimmedByteRange.offset,
             fullPath: fullPath,
             sourceCode: trimSourceCode(node.description),
             rangeInXcode: rangeInXcode,
             offsetRange: offsetRange,
-            kind: .initializer
+            kind: .initializer,
+            declModifiers: node.modifiers.map { $0.trimmed.description }
         )
 
         appendToBuffer(currentInitializer)
@@ -337,22 +352,61 @@ final class DeclarationVisitor: SyntaxVisitor {
             return .visitChildren
         }
 
+        var name = array[0].pattern.trimmed.description
+        if let typeAnnotation = array[0].typeAnnotation {
+            name += typeAnnotation.description
+        }
+
+        if let initializer = array[0].initializer {
+            let children = initializer.value.children(viewMode: .sourceAccurate)
+            if let array = initializer.value.as(ArrayExprSyntax.self) {
+                // array
+                let elements = Array(array.elements)
+                if !elements.isEmpty {
+                    if elements[0].description.components(separatedBy: "\n").count > 2 {
+                        name += " = [ ... ]"
+                    } else {
+                        name += " = [\(elements.first!.trimmedDescription) ... ]"
+                    }
+                }
+            } else if initializer.description.contains("\n") {
+                // multiple lines
+                let lines = initializer.description.components(separatedBy: "\n").map { $0.trimmingCharacters(in: .whitespaces) }
+                if let firstLine = lines.first,
+                   let lastLine = lines.last {
+                    if !name.hasSuffix(" ") {
+                        name += " "
+                    }
+                    name += firstLine + " ... " + lastLine
+                }
+            } else {
+                if !name.hasSuffix(" ") {
+                    name += " "
+                }
+                name += initializer.description
+            }
+        }
+
         let locationRange = node.sourceRange(converter: locationConverter)
         let rangeInXcode = LocationInXcode(line: locationRange.start.line, column: locationRange.start.column)
             ... LocationInXcode(line: locationRange.end.line, column: locationRange.end.column)
         let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
+        var modifiers = node.modifiers.map { $0.trimmed.description }
+        modifiers.append(node.bindingSpecifier.text)
+
         let currentVariable = DeclaredObject(
             // FIXME: This element does not necessarily represent the name of the variable.
             // For example, in the case of Tuple Decomposition, the tuple would be the name of the variable.
             // When `let (a, b, c) = (0, 1, 2)`, the variable name becomes “(a, b, c)”.
-            name: array[0].pattern.trimmed.description,
+            name: name,
             nameOffset: array[0].pattern.trimmed.trimmedByteRange.offset,
             fullPath: fullPath,
             sourceCode: trimSourceCode(node.description),
             rangeInXcode: rangeInXcode,
             offsetRange: offsetRange,
-            kind: .variable
+            kind: .variable,
+            declModifiers: modifiers
         )
 
         appendToBuffer(currentVariable)
@@ -390,14 +444,20 @@ final class DeclarationVisitor: SyntaxVisitor {
             ... LocationInXcode(line: locationRange.end.line, column: locationRange.end.column)
         let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
+        let singleSpacedSignature = node.signature.trimmed.description.replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression)
+        let signatureWithoutSpacesAroundParams = singleSpacedSignature
+            .replacingOccurrences(of: "\\(\\s*", with: "(", options: .regularExpression)
+            .replacingOccurrences(of: "\\s*\\)", with: ")", options: .regularExpression)
+
         let currentFunction = DeclaredObject(
-            name: node.name.text,
+            name: node.name.text + signatureWithoutSpacesAroundParams,
             nameOffset: node.name.trimmedByteRange.offset,
             fullPath: fullPath,
             sourceCode: trimSourceCode(node.description),
             rangeInXcode: rangeInXcode,
             offsetRange: offsetRange,
-            kind: .function
+            kind: .function,
+            declModifiers: node.modifiers.map { $0.trimmed.description }
         )
 
         appendToBuffer(currentFunction)
@@ -436,8 +496,7 @@ final class DeclarationVisitor: SyntaxVisitor {
         let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
         let currentCase = DeclaredObject(
-            // FIXME: Extract the actual case name.
-            name: "case",
+            name: node.trimmed.description,
             nameOffset: node.elements.trimmedByteRange.offset,
             fullPath: fullPath,
             sourceCode: trimSourceCode(node.description),

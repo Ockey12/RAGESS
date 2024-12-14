@@ -357,21 +357,49 @@ final class DeclarationVisitor: SyntaxVisitor {
             name += typeAnnotation.description
         }
 
+        if fullPath == "/Users/onaga/RAGESS/RAGESS/RAGESS/Sources/Sample/TupleDecomposition.swift" {
+            print("\n---")
+            print(name)
+//            dump(node)
+            if let initializer = array[0].initializer {
+//                print("\ninitializer")
+                dump(initializer)
 
-        if let initializer = array[0].initializer {
-            print("\ninitializer")
-            dump(initializer)
-            let children = initializer.value.children(viewMode: .sourceAccurate)
-            let isClosure = !children.compactMap { $0.as(ClosureExprSyntax.self) }.isEmpty
-            let hasParam = !children.compactMap { $0.description == "(" }.isEmpty
-            if isClosure {
-                name += " = {...}"
-                if hasParam {
-                    name += "()"
+                let isArray = initializer.value.as(ArrayExprSyntax.self) != nil
+                let children = initializer.value.children(viewMode: .sourceAccurate)
+                let isClosure = !children.compactMap { $0.as(ClosureExprSyntax.self) }.isEmpty
+                let hasParentheses = !children.compactMap { $0.description == "(" }.isEmpty
+                var isMultipleLine = false
+                var firstLine = ""
+
+                if initializer.description.contains("\n") {
+                    isMultipleLine = true
+                    firstLine = initializer.description.components(separatedBy: "\n").first!
+                    print("first line: \(firstLine)")
                 }
-            } else {
-                name += initializer.description
+                if let array = initializer.value.as(ArrayExprSyntax.self) {
+                    // array
+                    let elements = Array(array.elements)
+                    if !elements.isEmpty {
+                        let firstElement = elements[0].trimmedDescription.components(separatedBy: "\n")
+                        print("firstElement: \(firstElement)")
+                        if elements[0].description.components(separatedBy: "\n").count > 2 {
+                            name += " = [...]"
+                        } else {
+                            name += " = [\(elements.first!.trimmedDescription) ...]"
+                        }
+                    }
+                } else if isClosure {
+                    // call closure
+                    name += " = {...}"
+                    if hasParentheses {
+                        name += "()"
+                    }
+                } else {
+                    name += initializer.description
+                }
             }
+            print("name: \(name)")
         }
 
         let locationRange = node.sourceRange(converter: locationConverter)

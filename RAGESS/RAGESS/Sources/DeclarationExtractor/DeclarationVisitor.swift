@@ -348,6 +348,9 @@ final class DeclarationVisitor: SyntaxVisitor {
             ... LocationInXcode(line: locationRange.end.line, column: locationRange.end.column)
         let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
+        var modifiers = node.modifiers.map { $0.trimmed.description }
+        modifiers.append(node.bindingSpecifier.text)
+
         let currentVariable = DeclaredObject(
             // FIXME: This element does not necessarily represent the name of the variable.
             // For example, in the case of Tuple Decomposition, the tuple would be the name of the variable.
@@ -359,7 +362,7 @@ final class DeclarationVisitor: SyntaxVisitor {
             rangeInXcode: rangeInXcode,
             offsetRange: offsetRange,
             kind: .variable,
-            declModifiers: node.modifiers.map { $0.trimmed.description }
+            declModifiers: modifiers
         )
 
         appendToBuffer(currentVariable)

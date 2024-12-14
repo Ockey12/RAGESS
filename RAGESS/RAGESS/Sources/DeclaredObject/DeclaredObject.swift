@@ -148,12 +148,9 @@ public struct DeclaredObject: Identifiable, Equatable {
         switch kind {
         case .struct, .class, .enum, .protocol, .actor, .extension:
             declaration += kind.rawValue + " "
-        case .variable:
-            // TODO: "let"
-            declaration += "var "
         case .function:
             declaration += "func "
-        case .initializer, .case, .attribute:
+        case .initializer, .variable, .case, .attribute:
             break
         }
         for enclosingTypeName in enclosingTypeNames {

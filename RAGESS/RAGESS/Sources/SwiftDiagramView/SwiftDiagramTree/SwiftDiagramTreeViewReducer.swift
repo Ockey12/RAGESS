@@ -343,6 +343,18 @@ private enum ArrowsStateGenerator {
         for node in nodes {
             let calleeDependencies = dependencyObjects.filteringWhereCallee(node.object)
             for dependency in calleeDependencies {
+                guard let calleeKeyPath = usrTable[dependency.calleeUSR] else {
+                    continue
+                }
+                let callee = rootDirectory[keyPath: calleeKeyPath]
+                // Do not show dependencies where a function references its own arguments.
+                if dependency.callerUSRs.contains(dependency.calleeUSR),
+                   dependency.callerUSRs.first != dependency.calleeUSR,
+                   (callee.kind == .function || callee.kind == .initializer)
+                {
+                    continue
+                }
+
                 // set start point coordinate
                 var leadingStartPoint: CGPoint = .zero
                 var trailingStartPoint: CGPoint = .zero

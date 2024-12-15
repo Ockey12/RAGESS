@@ -350,8 +350,7 @@ private enum ArrowsStateGenerator {
                 // Do not show dependencies where a function references its own arguments.
                 if dependency.callerUSRs.contains(dependency.calleeUSR),
                    dependency.callerUSRs.first != dependency.calleeUSR,
-                   (callee.kind == .function || callee.kind == .initializer)
-                {
+                   callee.kind == .function || callee.kind == .initializer {
                     continue
                 }
 

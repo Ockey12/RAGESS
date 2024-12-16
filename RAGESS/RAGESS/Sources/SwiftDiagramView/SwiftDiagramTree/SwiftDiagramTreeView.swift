@@ -41,7 +41,7 @@ public struct SwiftDiagramTreeView: View {
                             )
                             .id(nodeStore.id)
                     }
-                    .onChange(of: store.nodes) { oldValue, newValue in
+                    .onChange(of: store.nodes) { _, _ in
                         withAnimation {
                             proxy.scrollTo(ScrollAnchor.selected, anchor: .leading)
                         }

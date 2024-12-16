@@ -16,25 +16,50 @@ public struct SwiftDiagramTreeView: View {
         self.store = store
     }
 
-    public var body: some View {
-        ZStack(alignment: .topLeading) {
-            ForEach(store.scope(state: \.nodes, action: \.nodes)) { nodeStore in
-                NodeView(store: nodeStore)
-                    .offset(
-                        x: nodeStore.topLeadingPoint.x,
-                        y: nodeStore.topLeadingPoint.y
-                    )
-            }
+    private enum ScrollAnchor {
+        case selected
+    }
 
-            ForEach(store.scope(state: \.arrows, action: \.arrows)) { arrowStore in
-                ArrowView(store: arrowStore)
-                    .opacity(arrowStore.opacity)
+    public var body: some View {
+        ScrollViewReader { proxy in
+            ScrollView([.horizontal, .vertical]) {
+                ZStack(alignment: .topLeading) {
+                    if let first = store.nodes.first {
+                        Color.clear
+                            .frame(width: 1, height: 1)
+                            .id(ScrollAnchor.selected)
+                            .position(
+                                x: first.topLeadingPoint.x - 200,
+                                y: first.topLeadingPoint.y
+                            )
+                    }
+                    ForEach(store.scope(state: \.nodes, action: \.nodes)) { nodeStore in
+                        NodeView(store: nodeStore)
+                            .offset(
+                                x: nodeStore.topLeadingPoint.x,
+                                y: nodeStore.topLeadingPoint.y
+                            )
+                            .id(nodeStore.id)
+                    }
+                    .onChange(of: store.nodes) { oldValue, newValue in
+                        withAnimation {
+                            proxy.scrollTo(ScrollAnchor.selected, anchor: .leading)
+                        }
+                    }
+
+                    ForEach(store.scope(state: \.arrows, action: \.arrows)) { arrowStore in
+                        ArrowView(store: arrowStore)
+                            .opacity(arrowStore.opacity)
+                    }
+                }
+                .frame(
+                    width: store.frameWidth,
+                    height: store.frameHeight,
+                    alignment: .topLeading
+                )
+                .padding(300)
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .frame(
-            width: store.frameWidth,
-            height: store.frameHeight,
-            alignment: .topLeading
-        )
     }
 }

@@ -36,8 +36,8 @@ public struct SwiftDiagramTreeView: View {
                     ForEach(store.scope(state: \.nodes, action: \.nodes)) { nodeStore in
                         NodeView(store: nodeStore)
                             .offset(
-                                x: nodeStore.topLeadingPoint.x,
-                                y: nodeStore.topLeadingPoint.y
+                                x: nodeStore.topLeadingPoint.x + ComponentSizeValues.PaddingAroundSwiftDiagramTreeView,
+                                y: nodeStore.topLeadingPoint.y + ComponentSizeValues.PaddingAroundSwiftDiagramTreeView
                             )
                             .id(nodeStore.id)
                     }
@@ -53,11 +53,10 @@ public struct SwiftDiagramTreeView: View {
                     }
                 }
                 .frame(
-                    width: store.frameWidth,
-                    height: store.frameHeight,
+                    width: store.frameWidth + ComponentSizeValues.PaddingAroundSwiftDiagramTreeView * 2,
+                    height: store.frameHeight + ComponentSizeValues.PaddingAroundSwiftDiagramTreeView * 2,
                     alignment: .topLeading
                 )
-                .padding(300)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }

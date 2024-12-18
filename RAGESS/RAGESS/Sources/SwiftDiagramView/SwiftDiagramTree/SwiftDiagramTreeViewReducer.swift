@@ -22,6 +22,7 @@ public struct SwiftDiagramTreeViewReducer {
         var arrows: IdentifiedArrayOf<ArrowViewReducer.State>
         public let frameWidth: CGFloat
         public let frameHeight: CGFloat
+        public var swiftDiagramScale: CGFloat = 1
 
         public init(
             rootObjectKeyPath: KeyPath<Directory, DeclaredObject>?,

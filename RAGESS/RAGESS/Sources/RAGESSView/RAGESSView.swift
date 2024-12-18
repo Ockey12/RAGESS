@@ -74,7 +74,7 @@ public struct RAGESSView: View {
                             )
                             .padding(.leading)
 
-                            Text("\(Int(store.swiftDiagramScale * 100))%")
+                            Text("\(Int(store.swiftDiagramTree.swiftDiagramScale * 100))%")
                                 .frame(width: 50)
 
                             Button(
@@ -91,15 +91,6 @@ public struct RAGESSView: View {
 
                         Divider()
 
-//                        ScrollView([.horizontal, .vertical]) {
-//                            SwiftDiagramTreeView(store: store.scope(state: \.swiftDiagramTree, action: \.swiftDiagramTree))
-//                                .scaleEffect(store.swiftDiagramScale)
-//                                .frame(
-//                                    width: max(store.swiftDiagramTree.frameWidth * store.swiftDiagramScale, 10),
-//                                    height: max(store.swiftDiagramTree.frameHeight * store.swiftDiagramScale, 10)
-//                                )
-//                                .padding(300)
-//                        }
                         SwiftDiagramTreeView(store: store.scope(state: \.swiftDiagramTree, action: \.swiftDiagramTree))
 
                         Spacer()

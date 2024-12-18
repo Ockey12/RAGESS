@@ -29,7 +29,7 @@ public struct SwiftDiagramTreeView: View {
                             .frame(width: 1, height: 1)
                             .id(ScrollAnchor.selected)
                             .position(
-                                x: first.topLeadingPoint.x - 200,
+                                x: first.topLeadingPoint.x,
                                 y: first.topLeadingPoint.y
                             )
                     }
@@ -52,11 +52,12 @@ public struct SwiftDiagramTreeView: View {
                             .opacity(arrowStore.opacity)
                     }
                 }
+                .scaleEffect(store.swiftDiagramScale)
                 .frame(
-                    width: store.frameWidth + ComponentSizeValues.PaddingAroundSwiftDiagramTreeView * 2,
-                    height: store.frameHeight + ComponentSizeValues.PaddingAroundSwiftDiagramTreeView * 2,
-                    alignment: .topLeading
+                    width: (store.frameWidth + ComponentSizeValues.PaddingAroundSwiftDiagramTreeView * 2) * store.swiftDiagramScale,
+                    height: (store.frameHeight + ComponentSizeValues.PaddingAroundSwiftDiagramTreeView * 2) * store.swiftDiagramScale
                 )
+
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }

@@ -64,28 +64,28 @@ public struct RAGESSView: View {
 
                             Spacer()
 
-                            Button(
-                                action: {
-                                    store.send(.minusMagnifyingglassTapped)
-                                },
-                                label: {
-                                    Image(systemName: "minus.magnifyingglass")
-                                }
-                            )
-                            .padding(.leading)
-
-                            Text("\(Int(store.swiftDiagramTree.swiftDiagramScale * 100))%")
-                                .frame(width: 50)
-
-                            Button(
-                                action: {
-                                    store.send(.plusMagnifyingglassTapped)
-                                },
-                                label: {
-                                    Image(systemName: "plus.magnifyingglass")
-                                }
-                            )
-                            .padding(.trailing)
+//                            Button(
+//                                action: {
+//                                    store.send(.minusMagnifyingglassTapped)
+//                                },
+//                                label: {
+//                                    Image(systemName: "minus.magnifyingglass")
+//                                }
+//                            )
+//                            .padding(.leading)
+//
+//                            Text("\(Int(store.swiftDiagramTree.swiftDiagramScale * 100))%")
+//                                .frame(width: 50)
+//
+//                            Button(
+//                                action: {
+//                                    store.send(.plusMagnifyingglassTapped)
+//                                },
+//                                label: {
+//                                    Image(systemName: "plus.magnifyingglass")
+//                                }
+//                            )
+//                            .padding(.trailing)
                         } // HStack
                         .frame(height: 40)
 

@@ -33,4 +33,6 @@ enum ComponentSizeValues {
 
     static let verticalPaddingBetweenCombinedDiagrams: CGFloat = 500 / 4
     static let horizontalPaddingBetweenCombinedDiagrams: CGFloat = 1000 / 4
+
+    static let PaddingAroundSwiftDiagramTreeView: CGFloat = 150
 }

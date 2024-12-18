@@ -57,7 +57,6 @@ public struct SwiftDiagramTreeView: View {
                     width: (store.frameWidth + ComponentSizeValues.PaddingAroundSwiftDiagramTreeView * 2) * store.swiftDiagramScale,
                     height: (store.frameHeight + ComponentSizeValues.PaddingAroundSwiftDiagramTreeView * 2) * store.swiftDiagramScale
                 )
-
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }

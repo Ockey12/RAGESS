@@ -1,9 +1,9 @@
 //
 //  BuildAnalyzer.swift
 //
-//  
+//
 //  Created by Ockey12 on 2024/12/18
-//  
+//
 //
 
 import Foundation
@@ -51,7 +51,9 @@ class DerivedDataChangeMonitor {
 
     private func setupMonitoring(for path: String) {
         let handle = open(path, O_EVTONLY)
-        guard handle != -1 else { return }
+        guard handle != -1 else {
+            return
+        }
         fileDescriptors[path] = handle
 
         let source = DispatchSource.makeFileSystemObjectSource(

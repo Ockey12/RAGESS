@@ -9,12 +9,12 @@
 import Foundation
 
 public class BuildAnalyzer {
-    private var monitor: DerivedDataChangeMonitor?
+    private var monitor: BuildDirectoriesMonitor?
 
     public init() {}
 
     public func startAnalyzing(derivedDataPath: String) {
-        monitor = DerivedDataChangeMonitor()
+        monitor = BuildDirectoriesMonitor()
         monitor?.startMonitoring(derivedDataPath: derivedDataPath)
     }
 
@@ -24,41 +24,64 @@ public class BuildAnalyzer {
     }
 }
 
-class DerivedDataChangeMonitor {
-    private var monitors: [String: DispatchSourceFileSystemObject] = [:]
-    private var fileDescriptors: [String: Int32] = [:]
+class BuildDirectoriesMonitor {
+    private var derivedDataMonitor: DispatchSourceFileSystemObject?
+    private var buildLogsMonitor: DispatchSourceFileSystemObject?
+    private var buildProductsMonitor: DispatchSourceFileSystemObject?
+    private var derivedDataFileDescriptor: Int32 = -1
+    private var buildLogsFileDescriptor: Int32 = -1
+    private var buildProductsFileDescriptor: Int32 = -1
+
+    enum DirectoryType: String {
+        case derivedData = "DerivedData"
+        case buildLogs = "Logs/Build"
+        case buildProducts = "Build/Products"
+    }
 
     func startMonitoring(derivedDataPath: String) {
         stopMonitoring()
 
-        setupMonitoring(for: derivedDataPath)
+        setupMonitor(
+            path: derivedDataPath,
+            type: .derivedData,
+            fileDescriptor: &derivedDataFileDescriptor,
+            monitor: &derivedDataMonitor
+        )
 
-        // Monitor subdirectories recursively.
-        if let enumerator = FileManager.default.enumerator(
-            at: URL(fileURLWithPath: derivedDataPath),
-            includingPropertiesForKeys: [.isDirectoryKey],
-            options: [.skipsHiddenFiles]
-        ) {
-            while let url = enumerator.nextObject() as? URL {
-                var isDirectory: ObjCBool = false
-                if FileManager.default.fileExists(atPath: url.path, isDirectory: &isDirectory),
-                   isDirectory.boolValue {
-                    setupMonitoring(for: url.path)
-                }
-            }
-        }
+        let buildLogsPath = (derivedDataPath as NSString).appendingPathComponent("Logs/Build")
+        setupMonitor(
+            path: buildLogsPath,
+            type: .buildLogs,
+            fileDescriptor: &buildLogsFileDescriptor,
+            monitor: &buildLogsMonitor
+        )
+
+        let buildProductsPath = (derivedDataPath as NSString).appendingPathComponent("Build/Products")
+        setupMonitor(
+            path: buildProductsPath,
+            type: .buildProducts,
+            fileDescriptor: &buildProductsFileDescriptor,
+            monitor: &buildProductsMonitor
+        )
     }
 
-    private func setupMonitoring(for path: String) {
+    private func setupMonitor(
+        path: String,
+        type: DirectoryType,
+        fileDescriptor: inout Int32,
+        monitor: inout DispatchSourceFileSystemObject?
+    ) {
         let handle = open(path, O_EVTONLY)
-        guard handle != -1 else {
+        if handle == -1 {
+            let error = String(cString: strerror(errno))
+            print("Failed to open file descriptor for \(type.rawValue) path: \(path)")
+            print("Error: \(error)")
             return
         }
-        fileDescriptors[path] = handle
+        fileDescriptor = handle
 
         let source = DispatchSource.makeFileSystemObjectSource(
             fileDescriptor: handle,
-            // `.link` also detects new file creation.
             eventMask: [.write, .link],
             queue: DispatchQueue.global()
         )
@@ -67,15 +90,14 @@ class DerivedDataChangeMonitor {
             let date = Date()
             let formatter = DateFormatter()
             formatter.dateFormat = "HH:mm:ss.SSS"
+            let timestamp = formatter.string(from: date)
 
-            // Check the type of event.
             let eventData = source.data
             if eventData.contains(.write) {
-                print("🔄 \(formatter.string(from: date)) File modified: \(path)")
+                print("🔄 \(timestamp) [\(type.rawValue)] Directory modified: \(path)")
             }
             if eventData.contains(.link) {
-                // Check for changes in directories, as new files may have been created.
-                self?.checkNewFiles(in: path, timestamp: formatter.string(from: date))
+                print("🔗 \(timestamp) [\(type.rawValue)] Link event: \(path)")
             }
         }
 
@@ -84,36 +106,26 @@ class DerivedDataChangeMonitor {
         }
 
         source.resume()
-        monitors[path] = source
-    }
-
-    private func checkNewFiles(in directoryPath: String, timestamp: String) {
-        // Obtain the current list of files to compare with the results of the previous scan.
-        if let contents = try? FileManager.default.contentsOfDirectory(
-            at: URL(fileURLWithPath: directoryPath),
-            includingPropertiesForKeys: nil
-        ) {
-            for url in contents {
-                if !monitors.keys.contains(url.path) {
-                    let isDirectory = (try? url.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory ?? false
-                    if isDirectory {
-                        // When new directories are discovered, they are also added to the monitoring target.
-                        setupMonitoring(for: url.path)
-                        print("📁 \(timestamp) New directory detected: \(url.path)")
-                    } else {
-                        print("📄 \(timestamp) New file detected: \(url.path)")
-                    }
-                }
-            }
-        }
+        monitor = source
     }
 
     func stopMonitoring() {
-        for (_, monitor) in monitors {
+        // DerivedDataの監視を停止
+        if let monitor = derivedDataMonitor {
             monitor.cancel()
+            derivedDataMonitor = nil
         }
-        monitors.removeAll()
-        fileDescriptors.removeAll()
+
+        // Build Logsの監視を停止
+        if let monitor = buildLogsMonitor {
+            monitor.cancel()
+            buildLogsMonitor = nil
+        }
+
+        if let monitor = buildProductsMonitor {
+            monitor.cancel()
+            buildProductsMonitor = nil
+        }
     }
 
     deinit {

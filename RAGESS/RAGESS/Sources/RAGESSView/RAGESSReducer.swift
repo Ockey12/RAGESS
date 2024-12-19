@@ -79,7 +79,7 @@ public struct RAGESSReducer {
         let monitor = BuildMonitor()
 
         public init() {
-            self.dateFormatter = DateFormatter()
+            dateFormatter = DateFormatter()
             dateFormatter.timeStyle = .medium
             dateFormatter.dateStyle = .short
             dateFormatter.locale = .current

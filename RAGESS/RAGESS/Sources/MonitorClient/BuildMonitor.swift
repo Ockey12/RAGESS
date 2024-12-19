@@ -20,10 +20,10 @@ public final class BuildMonitor {
 
     public init() {
         let homeDirectory = FileManager.default.homeDirectoryForCurrentUser.path()
-        self.buildStartMonitor = FileMonitor(
+        buildStartMonitor = FileMonitor(
             filePath: "\(homeDirectory)/RAGESSCache/BuildStartTimeStamps.log"
         )
-        self.buildSuccessMonitor = FileMonitor(
+        buildSuccessMonitor = FileMonitor(
             filePath: "\(homeDirectory)/RAGESSCache/BuildSuccessTimeStamps.log"
         )
     }

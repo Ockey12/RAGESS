@@ -32,11 +32,11 @@ public struct RAGESSView: View {
                         TextField("DerivedData path", text: $store.derivedDataPath)
                             .padding(.horizontal)
 
-#if DEBUG
-                        Divider()
-                        DebugView(store: store.scope(state: \.debugView, action: \.debugView))
-                        Divider()
-#endif
+                        #if DEBUG
+                            Divider()
+                            DebugView(store: store.scope(state: \.debugView, action: \.debugView))
+                            Divider()
+                        #endif
 
                         Text("Build Start: \(store.lastBuildStartTimeString)")
                             .padding(.horizontal)

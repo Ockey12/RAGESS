@@ -21,8 +21,6 @@ import MonitorClient
 import SourceFileClient
 import SwiftDiagramView
 import SwiftIndexStoreObject
-
-// import TypeDeclaration
 import XcodeObject
 
 @Reducer
@@ -53,6 +51,7 @@ public struct RAGESSReducer {
 
         var derivedDataPath: String = "/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz"
         var extractedData: ExtractedData = .init()
+        var rootDirectoryWithoutUSRs: Directory?
         let ignoredDirectories = [
             "build",
             ".build",
@@ -69,7 +68,6 @@ public struct RAGESSReducer {
             usrTable: [:],
             dependencyObjects: []
         )
-//        var swiftDiagramScale: CGFloat = 1
         var processStartTime = CFAbsoluteTimeGetCurrent()
         var debugView = DebugReducer.State()
 
@@ -90,17 +88,12 @@ public struct RAGESSReducer {
         case projectDirectorySelectorResponse(Result<[URL], Error>)
         case extractSourceFiles
         case sourceFileResponse(Result<Directory, Error>)
-//        case buildSettingsResponse(Result<[String: String], Error>)
-//        case dumpPackageResponse(Result<PackageObject, Error>)
-//        case dumpPackageCompleted(rootDirectory: Directory)
         case declarationExtractorResponse(Result<DeclarationExtractor.Response, Error>)
         case dependenciesExtractorCompleted([DependencyObject])
 
         case detectedBuildStart(Date)
         case detectedBuildSuccess(Date)
 
-        case startMonitoring
-        case detectedDirectoryChange
         case fileTree(FileTreeViewReducer.Action)
         case swiftDiagramTree(SwiftDiagramTreeViewReducer.Action)
         case minusMagnifyingglassTapped
@@ -111,14 +104,7 @@ public struct RAGESSReducer {
 
     @Dependency(MonitorClient.self) var monitorClient
     @Dependency(SourceFileClient.self) var sourceFileClient
-    @Dependency(BuildSettingsClient.self) var buildSettingsClient
-    @Dependency(DumpPackageClient.self) var dumpPackageClient
     @Dependency(\.swiftIndexStoreClient) private var indexStoreClient
-    @Dependency(\.mainQueue) var mainQueue
-
-    enum CancelID {
-        case detectedBuildSucceeded
-    }
 
     public var body: some ReducerOf<Self> {
         BindingReducer()
@@ -145,9 +131,7 @@ public struct RAGESSReducer {
 
                     state.extractedData.projectRootDirectoryPath = url.path()
 
-//                    return .send(.extractSourceFiles)
                     return .merge(
-                        .send(.extractSourceFiles),
                         .run { send in
                             for await event in BuildMonitor().monitorBuildEvents() {
                                 switch event {
@@ -168,7 +152,6 @@ public struct RAGESSReducer {
 
             case .extractSourceFiles:
                 state.processStartTime = CFAbsoluteTimeGetCurrent()
-//                state.loadingTaskKindBuffer.append(.sourceFiles)
 
                 return .run { [
                     projectRootDirectoryPath = state.extractedData.projectRootDirectoryPath,
@@ -185,107 +168,14 @@ public struct RAGESSReducer {
             case let .sourceFileResponse(result):
                 switch result {
                 case let .success(rootDirectory):
-//                    state.loadingTaskKindBuffer.removeFirst()
-
-                    guard !rootDirectory.allXcodeprojPathsUnderDirectory.isEmpty else {
-                        assertionFailure()
-                        return .none
-                    }
-
-//                    state.loadingTaskKindBuffer.append(.buildSettings)
-//                    state.loadingTaskKindBuffer.append(
-//                        contentsOf: Array(
-//                            repeating: .dumpPackage,
-//                            count: rootDirectory.allPackageSwiftPath.count
-//                        )
-//                    )
-                    guard let derivedDataURL = URL(string: state.derivedDataPath) else {
-                        assertionFailure()
-                        return .none
-                    }
-                    let indexStoreURL = derivedDataURL
-                        .appendingPathComponent("Index.noindex")
-                        .appendingPathComponent("DataStore")
-
-//                    state.monitor.startMonitoring()
-
-                    return .run { send in
-                        await send(.declarationExtractorResponse(Result {
-                            try DeclarationExtractor.extractDeclarations(rootDirectory: rootDirectory, indexStoreURL: indexStoreURL)
-                        }))
-//                        await send(.buildSettingsResponse(Result {
-//                            try await buildSettingsClient.getSettings(
-//                                // TODO: support for multiple xcodeproj
-//                                xcodeprojPath: rootDirectory.allXcodeprojPathsUnderDirectory[0]
-//                            )
-//                        }))
-//
-//                        for packageSwiftPath in rootDirectory.allPackageSwiftPath {
-//                            let packageDirectoryPath = NSString(string: packageSwiftPath)
-//                                .deletingLastPathComponent
-//                            await send(.dumpPackageResponse(Result {
-//                                try await dumpPackageClient.dumpPackage(currentDirectory: packageDirectoryPath)
-//                            }))
-//                        }
-//
-//                        await send(.dumpPackageCompleted(rootDirectory: rootDirectory))
-                    }
+                    state.rootDirectoryWithoutUSRs = rootDirectory
+                    return .none
 
                 case let .failure(error):
                     print(error)
                     assertionFailure()
                     return .none
                 }
-
-//            case let .buildSettingsResponse(result):
-//                switch result {
-//                case let .success(buildSettings):
-//                    state.extractedData.buildSettings = buildSettings
-//                    state.loadingTaskKindBuffer.removeFirst()
-//                    return .none
-//
-//                case let .failure(error):
-//                    print(error)
-//                    assertionFailure()
-//                    return .none
-//                }
-//
-//            case let .dumpPackageResponse(result):
-//                switch result {
-//                case let .success(packageObject):
-//                    state.extractedData.packages.append(packageObject)
-//                    state.loadingTaskKindBuffer.removeFirst()
-//                    return .none
-//
-//                case let .failure(error):
-//                    print(error)
-//                    assertionFailure()
-//                    return .none
-//                }
-
-//            case let .dumpPackageCompleted(rootDirectory: rootDirectory):
-//                state.loadingTaskKindBuffer.removeAll(where: { $0 == .dumpPackage })
-//
-//                // example: BUILD_DIR: ~/Library/Developer/Xcode/DerivedData/<project hash>/Build/Products
-//                guard let buildProductsPath = state.extractedData.buildSettings["BUILD_DIR"] else {
-//                    assertionFailure()
-//                    return .none
-//                }
-//                guard let derivedDataURL = URL(string: buildProductsPath)?.deletingLastPathComponent().deletingLastPathComponent() else {
-//                    assertionFailure()
-//                    return .none
-//                }
-//                let indexStoreURL = derivedDataURL
-//                    .appendingPathComponent("Index.noindex")
-//                    .appendingPathComponent("DataStore")
-//
-//                state.loadingTaskKindBuffer.append(.extractDeclarations)
-//
-//                return .run { send in
-//                    await send(.declarationExtractorResponse(Result {
-//                        try DeclarationExtractor.extractDeclarations(rootDirectory: rootDirectory, indexStoreURL: indexStoreURL)
-//                    }))
-//                }
 
             case let .declarationExtractorResponse(result):
                 switch result {
@@ -294,7 +184,6 @@ public struct RAGESSReducer {
                     state.extractedData.usrTable = response.usrTable
                     state.extractedData.sourceFileTable = response.sourceFileTable
                     state.extractedData.indexStoreObjects = response.indexStoreObjects
-
                     state.fileTree.rootDirectory = response.rootDirectory
 
                     return .send(.dependenciesExtractorCompleted(
@@ -321,41 +210,32 @@ public struct RAGESSReducer {
                 let dateString = state.dateFormatter.string(from: date)
                 print("Build Start: \(dateString)")
                 state.lastBuildStartTimeString = dateString
-                return .none
+                return .send(.extractSourceFiles)
 
             case let .detectedBuildSuccess(date):
                 let dateString = state.dateFormatter.string(from: date)
                 print("Build Success: \(dateString)")
                 state.lastBuildSuccessTimeString = dateString
-                return .none
 
-            case .startMonitoring:
-                guard let buildDirectoryPath = state.extractedData.buildSettings["BUILD_DIR"] else {
+                guard let rootDirectory = state.rootDirectoryWithoutUSRs,
+                      !rootDirectory.allXcodeprojPathsUnderDirectory.isEmpty,
+                      let derivedDataURL = URL(string: state.derivedDataPath)
+                else {
                     assertionFailure()
                     return .none
                 }
-                let appPaths = findAppPaths(in: buildDirectoryPath)
 
-                guard !appPaths.isEmpty else {
-                    assertionFailure()
-                    return .none
-                }
+                let indexStoreURL = derivedDataURL
+                    .appendingPathComponent("Index.noindex")
+                    .appendingPathComponent("DataStore")
 
                 return .run { send in
-                    // FIXME: Monitoring multiple `.app` directories.
-                    // FIXME: Reset monitoring if project root directory changes.
-                    for await _ in monitorClient.start(directoryPath: appPaths[0]) {
-                        await send(.detectedDirectoryChange)
-                    }
+                    await send(.declarationExtractorResponse(Result {
+                        try DeclarationExtractor.extractDeclarations(rootDirectory: rootDirectory, indexStoreURL: indexStoreURL)
+                    }))
                 }
 
-            case .detectedDirectoryChange:
-                return .send(.extractSourceFiles)
-                    .debounce(
-                        id: CancelID.detectedBuildSucceeded,
-                        for: 1.0,
-                        scheduler: self.mainQueue
-                    )
+            // MARK: Children Actions
 
             case let .fileTree(.delegate(delegateAction)):
                 switch delegateAction {
@@ -402,26 +282,5 @@ public struct RAGESSReducer {
                 return .none
             }
         }
-    }
-}
-
-extension RAGESSReducer {
-    func findAppPaths(in directoryPath: String) -> [String] {
-        let fileManager = FileManager.default
-        let directoryURL = URL(filePath: directoryPath)
-
-        guard let enumerator = fileManager.enumerator(at: directoryURL, includingPropertiesForKeys: nil) else {
-            return []
-        }
-
-        var appPaths: [String] = []
-
-        while let url = enumerator.nextObject() as? URL {
-            if url.pathExtension == "app" {
-                appPaths.append(url.path())
-            }
-        }
-
-        return appPaths
     }
 }

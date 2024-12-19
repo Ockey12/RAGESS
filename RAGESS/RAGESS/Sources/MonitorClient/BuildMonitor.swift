@@ -32,14 +32,12 @@ public final class BuildMonitor {
         AsyncStream { continuation in
             self.continuation = continuation
 
-            // Build Start Monitorのセットアップ
             Task {
                 for await _ in buildStartMonitor.monitorChanges() {
                     continuation.yield(.buildStart(date: Date()))
                 }
             }
 
-            // Build Success Monitorのセットアップ
             Task {
                 for await _ in buildSuccessMonitor.monitorChanges() {
                     continuation.yield(.buildSuccess(date: Date()))

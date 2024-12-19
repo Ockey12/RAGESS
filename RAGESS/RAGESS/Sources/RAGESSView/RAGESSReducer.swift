@@ -73,7 +73,10 @@ public struct RAGESSReducer {
         var processStartTime = CFAbsoluteTimeGetCurrent()
         var debugView = DebugReducer.State()
 
-        let monitor = BuildAnalyzer()
+        let monitor = BuildMonitor(
+            onBuildStartHandler: { print("Build Start: \(Date())") },
+            onBuildSuccessHander: { print("Build Success: \(Date())") }
+        )
 
         public init() {}
     }
@@ -183,7 +186,7 @@ public struct RAGESSReducer {
                         .appendingPathComponent("Index.noindex")
                         .appendingPathComponent("DataStore")
 
-                    state.monitor.startAnalyzing(derivedDataPath: state.derivedDataPath)
+                    state.monitor.startMonitoring()
 
                     return .run { send in
                         await send(.declarationExtractorResponse(Result {

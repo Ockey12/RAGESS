@@ -8,34 +8,48 @@
 
 import Foundation
 
+public enum BuildEvent {
+    case buildStart(date: Date)
+    case buildSuccess(date: Date)
+}
+
 public final class BuildMonitor {
     private var buildStartMonitor: FileMonitor
     private var buildSuccessMonitor: FileMonitor
+    private var continuation: AsyncStream<BuildEvent>.Continuation?
 
-    public init(onBuildStartHandler: @escaping () -> Void, onBuildSuccessHander: @escaping () -> Void) {
+    public init() {
         let homeDirectory = FileManager.default.homeDirectoryForCurrentUser.path()
         self.buildStartMonitor = FileMonitor(
-            filePath: "\(homeDirectory)/RAGESSCache/BuildStartTimeStamps.log",
-            onChangeHandler: onBuildStartHandler
+            filePath: "\(homeDirectory)/RAGESSCache/BuildStartTimeStamps.log"
         )
         self.buildSuccessMonitor = FileMonitor(
-            filePath: "\(homeDirectory)/RAGESSCache/BuildSuccessTimeStamps.log",
-            onChangeHandler: onBuildSuccessHander
+            filePath: "\(homeDirectory)/RAGESSCache/BuildSuccessTimeStamps.log"
         )
     }
 
-    public func startMonitoring() {
-        buildStartMonitor.startMonitoring()
-        buildSuccessMonitor.startMonitoring()
-    }
+    public func monitorBuildEvents() -> AsyncStream<BuildEvent> {
+        AsyncStream { continuation in
+            self.continuation = continuation
 
-    public func stopMonitoring() {
-        buildStartMonitor.stopMonitoring()
-        buildSuccessMonitor.stopMonitoring()
+            // Build Start Monitorのセットアップ
+            Task {
+                for await _ in buildStartMonitor.monitorChanges() {
+                    continuation.yield(.buildStart(date: Date()))
+                }
+            }
+
+            // Build Success Monitorのセットアップ
+            Task {
+                for await _ in buildSuccessMonitor.monitorChanges() {
+                    continuation.yield(.buildSuccess(date: Date()))
+                }
+            }
+        }
     }
 
     deinit {
-        stopMonitoring()
+        continuation?.finish()
     }
 }
 
@@ -43,12 +57,12 @@ private class FileMonitor {
     private var fileHandle: FileHandle?
     private var source: DispatchSourceFileSystemObject?
     private let filePath: String
-    private let onChangeHandler: () -> Void
+    private var continuation: AsyncStream<Void>.Continuation?
     private let queue = DispatchQueue(label: "com.FileMonitor.queue")
 
-    init(filePath: String, onChangeHandler: @escaping () -> Void) {
+    init(filePath: String) {
         self.filePath = filePath
-        self.onChangeHandler = onChangeHandler
+        setup()
     }
 
     private func setup() {
@@ -56,26 +70,31 @@ private class FileMonitor {
         let directoryPath = NSString(string: filePath).deletingLastPathComponent
 
         do {
-            // If the directory does not exist, create it.
             if !fileManager.fileExists(atPath: directoryPath) {
                 try fileManager.createDirectory(atPath: directoryPath, withIntermediateDirectories: true)
             }
 
-            // If the file does not exist, create it.
             if !fileManager.fileExists(atPath: filePath) {
                 fileManager.createFile(atPath: filePath, contents: nil)
             }
         } catch {
-            assertionFailure()
+            assertionFailure("Failed to setup directory/file: \(error)")
         }
     }
 
-    func startMonitoring() {
+    func monitorChanges() -> AsyncStream<Void> {
+        AsyncStream { continuation in
+            self.continuation = continuation
+            startMonitoring()
+        }
+    }
+
+    private func startMonitoring() {
         do {
             fileHandle = try FileHandle(forReadingFrom: URL(filePath: filePath))
 
             guard let fileHandle else {
-                assertionFailure()
+                assertionFailure("Failed to create file handle")
                 return
             }
 
@@ -89,14 +108,13 @@ private class FileMonitor {
 
             source?.setEventHandler { [weak self] in
                 guard let self,
-                      let source
-                else {
+                      let source else {
                     return
                 }
 
                 let eventData = source.data
                 if eventData.contains(.write) {
-                    self.onChangeHandler()
+                    self.continuation?.yield(())
                 }
                 if eventData.contains(.delete) || eventData.contains(.rename) {
                     self.stopMonitoring()
@@ -112,11 +130,11 @@ private class FileMonitor {
 
             source?.resume()
         } catch {
-            assertionFailure()
+            assertionFailure("Failed to start monitoring: \(error)")
         }
     }
 
-    func stopMonitoring() {
+    private func stopMonitoring() {
         source?.cancel()
         source = nil
         fileHandle?.closeFile()
@@ -125,5 +143,6 @@ private class FileMonitor {
 
     deinit {
         stopMonitoring()
+        continuation?.finish()
     }
 }

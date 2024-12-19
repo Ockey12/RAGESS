@@ -73,12 +73,17 @@ public struct RAGESSReducer {
         var processStartTime = CFAbsoluteTimeGetCurrent()
         var debugView = DebugReducer.State()
 
-        let monitor = BuildMonitor(
-            onBuildStartHandler: { print("Build Start: \(Date())") },
-            onBuildSuccessHander: { print("Build Success: \(Date())") }
-        )
+        var lastBuildStartTimeString = ""
+        var lastBuildSuccessTimeString = ""
+        let dateFormatter: DateFormatter
+        let monitor = BuildMonitor()
 
-        public init() {}
+        public init() {
+            self.dateFormatter = DateFormatter()
+            dateFormatter.timeStyle = .medium
+            dateFormatter.dateStyle = .short
+            dateFormatter.locale = .current
+        }
     }
 
     public enum Action: BindableAction {
@@ -90,6 +95,9 @@ public struct RAGESSReducer {
 //        case dumpPackageCompleted(rootDirectory: Directory)
         case declarationExtractorResponse(Result<DeclarationExtractor.Response, Error>)
         case dependenciesExtractorCompleted([DependencyObject])
+
+        case detectedBuildStart(Date)
+        case detectedBuildSuccess(Date)
 
         case startMonitoring
         case detectedDirectoryChange
@@ -137,7 +145,20 @@ public struct RAGESSReducer {
 
                     state.extractedData.projectRootDirectoryPath = url.path()
 
-                    return .send(.extractSourceFiles)
+//                    return .send(.extractSourceFiles)
+                    return .merge(
+                        .send(.extractSourceFiles),
+                        .run { send in
+                            for await event in BuildMonitor().monitorBuildEvents() {
+                                switch event {
+                                case let .buildStart(date):
+                                    await send(.detectedBuildStart(date))
+                                case let .buildSuccess(date):
+                                    await send(.detectedBuildSuccess(date))
+                                }
+                            }
+                        }
+                    )
 
                 case let .failure(error):
                     print(error)
@@ -186,7 +207,7 @@ public struct RAGESSReducer {
                         .appendingPathComponent("Index.noindex")
                         .appendingPathComponent("DataStore")
 
-                    state.monitor.startMonitoring()
+//                    state.monitor.startMonitoring()
 
                     return .run { send in
                         await send(.declarationExtractorResponse(Result {
@@ -294,6 +315,18 @@ public struct RAGESSReducer {
             case let .dependenciesExtractorCompleted(dependencyObjects):
                 state.extractedData.dependencyObjects = dependencyObjects
                 print("EXTRACT COMPLETED: \(CFAbsoluteTimeGetCurrent() - state.processStartTime) S")
+                return .none
+
+            case let .detectedBuildStart(date):
+                let dateString = state.dateFormatter.string(from: date)
+                print("Build Start: \(dateString)")
+                state.lastBuildStartTimeString = dateString
+                return .none
+
+            case let .detectedBuildSuccess(date):
+                let dateString = state.dateFormatter.string(from: date)
+                print("Build Success: \(dateString)")
+                state.lastBuildSuccessTimeString = dateString
                 return .none
 
             case .startMonitoring:

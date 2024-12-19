@@ -26,23 +26,31 @@ public struct RAGESSView: View {
         ZStack {
             NavigationSplitView(
                 sidebar: {
-                    Divider()
+                    VStack(alignment: .leading) {
+                        Divider()
 
-                    TextField("DerivedData path", text: $store.derivedDataPath)
-                        .padding(.horizontal)
+                        TextField("DerivedData path", text: $store.derivedDataPath)
+                            .padding(.horizontal)
 
-                    #if DEBUG
+#if DEBUG
                         Divider()
                         DebugView(store: store.scope(state: \.debugView, action: \.debugView))
                         Divider()
-                    #endif
+#endif
 
-                    if let _ = store.fileTree.rootDirectory {
-                        FileTreeView(store: store.scope(state: \.fileTree, action: \.fileTree))
-                            .padding(.leading, 20)
+                        Text("Build Start: \(store.lastBuildStartTimeString)")
+                            .padding(.horizontal)
+                        Text("Build Success: \(store.lastBuildSuccessTimeString)")
+                            .padding(.horizontal)
+                        Divider()
+
+                        if let _ = store.fileTree.rootDirectory {
+                            FileTreeView(store: store.scope(state: \.fileTree, action: \.fileTree))
+                                .padding(.leading, 20)
+                        }
+
+                        Spacer()
                     }
-
-                    Spacer()
                 },
                 detail: {
                     VStack(spacing: 0) {

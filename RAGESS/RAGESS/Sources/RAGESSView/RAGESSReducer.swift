@@ -76,7 +76,7 @@ public struct RAGESSReducer {
         let dateFormatter: DateFormatter
         let monitor = BuildMonitor()
 
-        var lastSelectedObjectUSR: String? = nil
+        var lastSelectedObjectUSR: String?
 
         public init() {
             dateFormatter = DateFormatter()

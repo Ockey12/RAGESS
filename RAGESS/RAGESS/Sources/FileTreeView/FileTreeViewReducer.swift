@@ -69,7 +69,7 @@ public struct FileTreeViewReducer {
             cells.insert(
                 contentsOf: IdentifiedArrayOf(
                     uniqueElements: directory.files
-                        .map{ CellReducer.State(content: .sourceFile($0), leadingPadding: state.leadingPadding + 37) }
+                        .map { CellReducer.State(content: .sourceFile($0), leadingPadding: state.leadingPadding + 37) }
                         .sorted(by: { $0.name < $1.name })
                 ),
                 at: index

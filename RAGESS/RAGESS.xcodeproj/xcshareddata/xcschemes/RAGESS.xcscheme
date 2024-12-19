@@ -5,6 +5,16 @@
    <BuildAction
       parallelizeBuildables = "YES"
       buildImplicitDependencies = "YES">
+      <PreActions>
+         <ExecutionAction
+            ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
+            <ActionContent
+               title = "Run Script"
+               scriptText = "#!/bin/bash&#10;&#10;# Stops the script execution when an error occurs.&#10;set -e&#10;&#10;# path to the recording file&#10;TIMESTAMP_FILE=&quot;${HOME}/RAGESSCache/BuildStartTimeStamps.log&quot;&#10;&#10;# If the directory for the recording file does not exist, create it.&#10;mkdir -p &quot;$(dirname &quot;$TIMESTAMP_FILE&quot;)&quot;&#10;&#10;# Record the current date and time.&#10;date &quot;+%Y-%m-%d %H:%M:%S&quot; &gt;&gt; &quot;$TIMESTAMP_FILE&quot;&#10;"
+               shellToInvoke = "/bin/bash">
+            </ActionContent>
+         </ExecutionAction>
+      </PreActions>
       <BuildActionEntries>
          <BuildActionEntry
             buildForTesting = "YES"

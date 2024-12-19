@@ -127,6 +127,7 @@
 				AC2024252BC151070007E156 /* Sources */,
 				AC2024262BC151070007E156 /* Frameworks */,
 				AC2024272BC151070007E156 /* Resources */,
+				AC146B082D13F366000A42DC /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -246,6 +247,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		AC146B082D13F366000A42DC /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "#!/bin/bash\n\n# Stops the script execution when an error occurs.\nset -e\n\n# path to the recording file\nTIMESTAMP_FILE=\"${HOME}/RAGESSCache/BuildSuccessTimeStamps.log\"\n\n# If the directory for the recording file does not exist, create it.\nmkdir -p \"$(dirname \"$TIMESTAMP_FILE\")\"\n\n# Record the current date and time.\ndate \"+%Y-%m-%d %H:%M:%S\" >> \"$TIMESTAMP_FILE\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		AC2024252BC151070007E156 /* Sources */ = {

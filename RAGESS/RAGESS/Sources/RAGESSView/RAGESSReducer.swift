@@ -217,8 +217,14 @@ public struct RAGESSReducer {
                 print("Build Success: \(dateString)")
                 state.lastBuildSuccessTimeString = dateString
 
-                guard let rootDirectory = state.rootDirectoryWithoutUSRs,
-                      !rootDirectory.allXcodeprojPathsUnderDirectory.isEmpty,
+                guard let rootDirectory = state.rootDirectoryWithoutUSRs else {
+                    print("state.rootDirectoryWithoutUSRs == nil")
+                    return .run { send in
+                        try await Task.sleep(for: .seconds(1))
+                        await send(.detectedBuildSuccess(date))
+                    }
+                }
+                guard !rootDirectory.allXcodeprojPathsUnderDirectory.isEmpty,
                       let derivedDataURL = URL(string: state.derivedDataPath)
                 else {
                     assertionFailure()

@@ -20,22 +20,23 @@ public struct FileTreeViewReducer {
         public var rootDirectory: Directory? {
             didSet {
                 if let directory = rootDirectory {
-                    cells = .init(
-                        uniqueElements: [
-                            CellReducer.State(
-                                content: .directory(
-                                    directory
-                                ),
-                                leadingPadding: 0,
-                                isExpanding: false
-                            )
-                        ]
+                    let state = CellReducer.State(
+                        content: .directory(
+                            directory
+                        ),
+                        leadingPadding: 0,
+                        isExpanding: expandedDirectoryPaths.contains(directory.fullPath)
                     )
+                    cells = .init(
+                        uniqueElements: [state]
+                    )
+                    expandDirectory(state)
                 }
             }
         }
 
         var cells: IdentifiedArrayOf<CellReducer.State>
+        var expandedDirectoryPaths: Set<String> = []
 
         public init(rootDirectory: Directory? = nil) {
             self.rootDirectory = rootDirectory
@@ -54,6 +55,39 @@ public struct FileTreeViewReducer {
             } else {
                 cells = []
             }
+        }
+
+        mutating func expandDirectory(_ state: CellReducer.State) {
+            guard case let .directory(directory) = state.content,
+                  expandedDirectoryPaths.contains(directory.fullPath),
+                  var index = cells.index(id: state.id)
+            else {
+                return
+            }
+
+            index += 1
+            cells.insert(
+                contentsOf: IdentifiedArrayOf(
+                    uniqueElements: directory.files
+                        .map { CellReducer.State(content: .sourceFile($0), leadingPadding: state.leadingPadding + 37) }
+                        .sorted(by: { $0.name < $1.name })
+                ),
+                at: index
+            )
+
+            index += directory.files.count
+            var subDirectoryStates = [CellReducer.State]()
+            for subDirectory in directory.subDirectories {
+                let subDirectoryState = CellReducer.State(
+                    content: .directory(subDirectory),
+                    leadingPadding: state.leadingPadding + (subDirectory.files.isEmpty && subDirectory.subDirectories.isEmpty ? 37 : 22),
+                    isExpanding: expandedDirectoryPaths.contains(subDirectory.fullPath)
+                )
+                subDirectoryStates.append(subDirectoryState)
+            }
+            subDirectoryStates.sort(by: { $0.name < $1.name })
+            cells.insert(contentsOf: subDirectoryStates, at: index)
+            subDirectoryStates.forEach { expandDirectory($0) }
         }
     }
 
@@ -78,6 +112,7 @@ public struct FileTreeViewReducer {
                     guard case let .directory(directory) = content else {
                         return .none
                     }
+                    state.expandedDirectoryPaths.insert(directory.fullPath)
 
                     index += 1
 
@@ -117,6 +152,7 @@ public struct FileTreeViewReducer {
                     }
 
                     removeChildrenCell(directory: directory, state: &state)
+                    state.expandedDirectoryPaths.remove(directory.fullPath)
 
                     return .none
 

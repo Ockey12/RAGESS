@@ -76,6 +76,8 @@ public struct RAGESSReducer {
         let dateFormatter: DateFormatter
         let monitor = BuildMonitor()
 
+        var lastSelectedObjectUSR: String?
+
         public init() {
             dateFormatter = DateFormatter()
             dateFormatter.timeStyle = .medium
@@ -204,6 +206,21 @@ public struct RAGESSReducer {
             case let .dependenciesExtractorCompleted(dependencyObjects):
                 state.extractedData.dependencyObjects = dependencyObjects
                 print("EXTRACT COMPLETED: \(CFAbsoluteTimeGetCurrent() - state.processStartTime) S")
+
+                if let usr = state.lastSelectedObjectUSR,
+                   let objectKeyPath = state.extractedData.usrTable[usr],
+                   let rootDirectory = state.extractedData.rootDirectory {
+                    let startTime = CFAbsoluteTimeGetCurrent()
+                    state.swiftDiagramTree = .init(
+                        rootObjectKeyPath: objectKeyPath,
+                        rootDirectory: rootDirectory,
+                        usrTable: state.extractedData.usrTable,
+                        dependencyObjects: state.extractedData.dependencyObjects
+                    )
+                    print("Node States Generated: \(CFAbsoluteTimeGetCurrent() - startTime) S")
+                } else {
+                    state.swiftDiagramTree.reset()
+                }
                 return .none
 
             case let .detectedBuildStart(date):
@@ -217,8 +234,15 @@ public struct RAGESSReducer {
                 print("Build Success: \(dateString)")
                 state.lastBuildSuccessTimeString = dateString
 
-                guard let rootDirectory = state.rootDirectoryWithoutUSRs,
-                      !rootDirectory.allXcodeprojPathsUnderDirectory.isEmpty,
+                guard let rootDirectory = state.rootDirectoryWithoutUSRs else {
+                    print("state.rootDirectoryWithoutUSRs == nil")
+                    return .run { send in
+                        try await Task.sleep(for: .seconds(1))
+                        await send(.detectedBuildSuccess(date))
+                    }
+                }
+                state.rootDirectoryWithoutUSRs = nil
+                guard !rootDirectory.allXcodeprojPathsUnderDirectory.isEmpty,
                       let derivedDataURL = URL(string: state.derivedDataPath)
                 else {
                     assertionFailure()
@@ -247,6 +271,7 @@ public struct RAGESSReducer {
                         return .none
                     }
                     let selectedObject = rootDirectory[keyPath: objectKeyPath]
+                    state.lastSelectedObjectUSR = firstUSR
                     print("Selected: \(selectedObject.name)")
 
                     let startTime = CFAbsoluteTimeGetCurrent()

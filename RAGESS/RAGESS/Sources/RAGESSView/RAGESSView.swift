@@ -92,6 +92,11 @@ public struct RAGESSView: View {
 
                     Spacer()
                 } // VStack
+                .overlay {
+                    if store.showProgressView {
+                        Color(red: 0, green: 0, blue: 0, opacity: 0.4)
+                    }
+                }
                 .toolbar {
                     ToolbarItemGroup(placement: .navigation) {
                         if store.showStopButton {
@@ -124,35 +129,16 @@ public struct RAGESSView: View {
             } detail: {
                 SwiftDiagramTreeView(store: store.scope(state: \.swiftDiagramTree, action: \.swiftDiagramTree))
                     .navigationTitle(store.extractedData.projectRootDirectoryPath)
+                    .overlay {
+                        if store.showProgressView {
+                            Color(red: 0, green: 0, blue: 0, opacity: 0.4)
+                        }
+                    }
             }
 
-            if let currentLoadingTask = store.loadingTaskKindBuffer.first {
-                switch currentLoadingTask {
-                case .sourceFiles:
-                    ProgressView {
-                        Text("In the process of extracting the source files.")
-                    }
-
-                case .buildSettings:
-                    ProgressView {
-                        Text("In the process of getting build settings.")
-                    }
-
-                case .dumpPackage:
-                    ProgressView {
-                        Text("In the process of analyzing the package.")
-                    }
-
-                case .extractDeclarations:
-                    ProgressView {
-                        Text("In the process of extracting declarations.")
-                    }
-
-                case .extractDependencies:
-                    ProgressView {
-                        Text("In the process of extracting dependencies.")
-                    }
-                }
+            if store.showProgressView {
+                ProgressView()
+                    .scaleEffect(2)
             }
         } // ZStack
         .task {

@@ -62,7 +62,7 @@ public struct RAGESSReducer {
             ".swiftpm"
         ]
         var fileTree: FileTreeViewReducer.State = .init()
-        var loadingTaskKindBuffer: [LoadingTaskKind] = []
+        var showProgressView = false
         var swiftDiagramTree: SwiftDiagramTreeViewReducer.State = .init(
             rootObjectKeyPath: nil,
             rootDirectory: nil,
@@ -242,14 +242,16 @@ public struct RAGESSReducer {
                     ))
 
                 case let .failure(error):
+                    state.showProgressView = false
                     print(error)
                     assertionFailure()
                     return .none
                 }
 
             case let .dependenciesExtractorCompleted(dependencyObjects):
-                state.extractedData.dependencyObjects = dependencyObjects
                 print("EXTRACT COMPLETED: \(CFAbsoluteTimeGetCurrent() - state.processStartTime) S")
+                state.extractedData.dependencyObjects = dependencyObjects
+                state.showProgressView = false
 
                 if let usr = state.lastSelectedObjectUSR,
                    let objectKeyPath = state.extractedData.usrTable[usr],
@@ -305,6 +307,7 @@ public struct RAGESSReducer {
                     .appendingPathComponent("Index.noindex")
                     .appendingPathComponent("DataStore")
 
+                state.showProgressView = true
                 return .run { send in
                     await send(.declarationExtractorResponse(Result {
                         try DeclarationExtractor.extractDeclarations(rootDirectory: rootDirectory, indexStoreURL: indexStoreURL)

@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct PackageObject {
+public struct PackageObject: Equatable {
     public let name: String
     public let modules: [Module]
 

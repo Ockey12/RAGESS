@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct Module {
+public struct Module: Equatable {
     public let name: String
     let internalDependencies: [String]
     let externalDependencies: [String]

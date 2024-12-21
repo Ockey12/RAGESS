@@ -17,6 +17,7 @@ public struct RAGESSView: View {
 
     // FIXME: If Reducer manages this state, the `.fileImporter` will be opened only once.
     @State private var isShowRootDirectorySelector = false
+    @State private var isShowDerivedDataSelector = false
 
     public init(store: StoreOf<RAGESSReducer>) {
         self.store = store
@@ -24,87 +25,106 @@ public struct RAGESSView: View {
 
     public var body: some View {
         ZStack {
-            NavigationSplitView(
-                sidebar: {
-                    VStack(alignment: .leading) {
-                        Divider()
+            NavigationSplitView {
+                VStack(alignment: .leading) {
+                    Divider()
 
-                        TextField("DerivedData path", text: $store.derivedDataPath)
-                            .padding(.horizontal)
+                    HStack(spacing: 10) {
+                        TextField("YourApp", text: $store.extractedData.projectRootDirectoryPath)
 
-                        #if DEBUG
-                            Divider()
-                            DebugView(store: store.scope(state: \.debugView, action: \.debugView))
-                            Divider()
-                        #endif
-
-                        Text("Build Start: \(store.lastBuildStartTimeString)")
-                            .padding(.horizontal)
-                        Text("Build Success: \(store.lastBuildSuccessTimeString)")
-                            .padding(.horizontal)
-                        Divider()
-
-                        if let _ = store.fileTree.rootDirectory {
-                            FileTreeView(store: store.scope(state: \.fileTree, action: \.fileTree))
-                                .padding(.leading, 20)
+                        Button(
+                            action: {
+                                isShowRootDirectorySelector = true
+                            },
+                            label: {
+                                Image(systemName: "folder")
+                            }
+                        )
+                        .fileImporter(
+                            isPresented: $isShowRootDirectorySelector,
+                            allowedContentTypes: [.directory],
+                            allowsMultipleSelection: false
+                        ) { result in
+                            store.send(.projectDirectorySelectorResponse(result))
                         }
-
-                        Spacer()
                     }
-                },
-                detail: {
-                    VStack(spacing: 0) {
-                        HStack(spacing: 0) {
+                    .padding(.horizontal, 10)
+
+                    HStack(spacing: 10) {
+                        TextField("DerivedData/YourApp-hash", text: $store.extractedData.derivedDataPath)
+
+                        Button(
+                            action: {
+                                isShowDerivedDataSelector = true
+                            },
+                            label: {
+                                Image(systemName: "folder")
+                            }
+                        )
+                        .fileImporter(
+                            isPresented: $isShowDerivedDataSelector,
+                            allowedContentTypes: [.directory],
+                            allowsMultipleSelection: false
+                        ) { result in
+                            store.send(.derivedDataSelectorResponse(result))
+                        }
+                    }
+                    .padding(.horizontal, 10)
+
+                    #if DEBUG
+                        Divider()
+                        DebugView(store: store.scope(state: \.debugView, action: \.debugView))
+                        Divider()
+                    #endif
+
+                    Text("Build Start: \(store.lastBuildStartTimeString)")
+                        .padding(.horizontal)
+
+                    Text("Build Success: \(store.lastBuildSuccessTimeString)")
+                        .padding(.horizontal)
+
+                    Divider()
+
+                    if let _ = store.fileTree.rootDirectory {
+                        FileTreeView(store: store.scope(state: \.fileTree, action: \.fileTree))
+                            .padding(.leading, 20)
+                    }
+
+                    Spacer()
+                } // VStack
+                .toolbar {
+                    ToolbarItemGroup(placement: .navigation) {
+                        if store.showStopButton {
                             Button(
                                 action: {
-                                    isShowRootDirectorySelector = true
+                                    store.send(.stopButtonTapped)
                                 },
                                 label: {
-                                    Image(systemName: "folder")
+                                    Image(systemName: "stop.fill")
+                                        .resizable()
+                                        .frame(width: 15, height: 15)
                                 }
                             )
-                            .padding()
+                            .disabled(false)
+                        }
 
-                            Divider()
-
-                            Text(store.extractedData.projectRootDirectoryPath)
-                                .padding()
-
-                            Spacer()
-
-//                            Button(
-//                                action: {
-//                                    store.send(.minusMagnifyingglassTapped)
-//                                },
-//                                label: {
-//                                    Image(systemName: "minus.magnifyingglass")
-//                                }
-//                            )
-//                            .padding(.leading)
-//
-//                            Text("\(Int(store.swiftDiagramTree.swiftDiagramScale * 100))%")
-//                                .frame(width: 50)
-//
-//                            Button(
-//                                action: {
-//                                    store.send(.plusMagnifyingglassTapped)
-//                                },
-//                                label: {
-//                                    Image(systemName: "plus.magnifyingglass")
-//                                }
-//                            )
-//                            .padding(.trailing)
-                        } // HStack
-                        .frame(height: 40)
-
-                        Divider()
-
-                        SwiftDiagramTreeView(store: store.scope(state: \.swiftDiagramTree, action: \.swiftDiagramTree))
-
-                        Spacer()
-                    } // VStack
+                        Button(
+                            action: {
+                                store.send(.startButtonTapped)
+                            },
+                            label: {
+                                Image(systemName: "play.fill")
+                                    .resizable()
+                                    .frame(width: 15, height: 15)
+                            }
+                        )
+                        .disabled(false)
+                    }
                 }
-            )
+            } detail: {
+                SwiftDiagramTreeView(store: store.scope(state: \.swiftDiagramTree, action: \.swiftDiagramTree))
+                    .navigationTitle(store.extractedData.projectRootDirectoryPath)
+            }
 
             if let currentLoadingTask = store.loadingTaskKindBuffer.first {
                 switch currentLoadingTask {
@@ -135,12 +155,8 @@ public struct RAGESSView: View {
                 }
             }
         } // ZStack
-        .fileImporter(
-            isPresented: $isShowRootDirectorySelector,
-            allowedContentTypes: [.directory],
-            allowsMultipleSelection: false
-        ) { result in
-            store.send(.projectDirectorySelectorResponse(result))
+        .task {
+            store.send(.task)
         }
     }
 }

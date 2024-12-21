@@ -29,8 +29,9 @@ public struct RAGESSReducer {
 
     @ObservableState
     public struct State {
-        struct ExtractedData {
+        struct ExtractedData: Equatable {
             var projectRootDirectoryPath: String = ""
+            var derivedDataPath: String = ""
             var rootDirectory: Directory?
             var buildSettings: [String: String] = [:]
             var packages: [PackageObject] = []
@@ -49,7 +50,7 @@ public struct RAGESSReducer {
             }
         }
 
-        var derivedDataPath: String = "/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz"
+        var showStopButton = false
         var extractedData: ExtractedData = .init()
         var rootDirectoryWithoutUSRs: Directory?
         let ignoredDirectories = [
@@ -75,6 +76,7 @@ public struct RAGESSReducer {
         var lastBuildSuccessTimeString = ""
         let dateFormatter: DateFormatter
         let monitor = BuildMonitor()
+        var isMonitoring = false
 
         var lastSelectedObjectUSR: String?
 
@@ -87,7 +89,12 @@ public struct RAGESSReducer {
     }
 
     public enum Action: BindableAction {
+        case task
+
         case projectDirectorySelectorResponse(Result<[URL], Error>)
+        case derivedDataSelectorResponse(Result<[URL], Error>)
+        case startButtonTapped
+        case stopButtonTapped
         case extractSourceFiles
         case sourceFileResponse(Result<Directory, Error>)
         case declarationExtractorResponse(Result<DeclarationExtractor.Response, Error>)
@@ -123,6 +130,18 @@ public struct RAGESSReducer {
         #endif
         Reduce { state, action in
             switch action {
+            case .task:
+                return .run { send in
+                    for await event in BuildMonitor().monitorBuildEvents() {
+                        switch event {
+                        case let .buildStart(date):
+                            await send(.detectedBuildStart(date))
+                        case let .buildSuccess(date):
+                            await send(.detectedBuildSuccess(date))
+                        }
+                    }
+                }
+
             case let .projectDirectorySelectorResponse(result):
                 switch result {
                 case let .success(urls):
@@ -133,24 +152,49 @@ public struct RAGESSReducer {
 
                     state.extractedData.projectRootDirectoryPath = url.path()
 
-                    return .merge(
-                        .run { send in
-                            for await event in BuildMonitor().monitorBuildEvents() {
-                                switch event {
-                                case let .buildStart(date):
-                                    await send(.detectedBuildStart(date))
-                                case let .buildSuccess(date):
-                                    await send(.detectedBuildSuccess(date))
-                                }
-                            }
-                        }
-                    )
+                    return .none
 
                 case let .failure(error):
                     print(error)
                     assertionFailure()
                     return .none
                 }
+
+            case let .derivedDataSelectorResponse(result):
+                switch result {
+                case let .success(urls):
+                    guard let url = urls.first else {
+                        assertionFailure()
+                        return .none
+                    }
+
+                    state.extractedData.derivedDataPath = url.path()
+
+                    return .none
+
+                case let .failure(error):
+                    print(error)
+                    assertionFailure()
+                    return .none
+                }
+
+            case .startButtonTapped:
+                guard state.extractedData.projectRootDirectoryPath != "",
+                      state.extractedData.derivedDataPath != "" else {
+                    return .none
+                }
+
+                state.showStopButton = true
+                state.isMonitoring = true
+
+                return .none
+
+            case .stopButtonTapped:
+                state.showStopButton = false
+                state.isMonitoring = false
+                state.rootDirectoryWithoutUSRs = nil
+
+                return .none
 
             case .extractSourceFiles:
                 state.processStartTime = CFAbsoluteTimeGetCurrent()
@@ -224,12 +268,20 @@ public struct RAGESSReducer {
                 return .none
 
             case let .detectedBuildStart(date):
+                guard state.isMonitoring else {
+                    return .none
+                }
+
                 let dateString = state.dateFormatter.string(from: date)
                 print("Build Start: \(dateString)")
                 state.lastBuildStartTimeString = dateString
                 return .send(.extractSourceFiles)
 
             case let .detectedBuildSuccess(date):
+                guard state.isMonitoring else {
+                    return .none
+                }
+
                 let dateString = state.dateFormatter.string(from: date)
                 print("Build Success: \(dateString)")
                 state.lastBuildSuccessTimeString = dateString
@@ -243,7 +295,7 @@ public struct RAGESSReducer {
                 }
                 state.rootDirectoryWithoutUSRs = nil
                 guard !rootDirectory.allXcodeprojPathsUnderDirectory.isEmpty,
-                      let derivedDataURL = URL(string: state.derivedDataPath)
+                      let derivedDataURL = URL(string: state.extractedData.derivedDataPath)
                 else {
                     assertionFailure()
                     return .none

@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct Directory: Identifiable {
+public struct Directory: Identifiable, Equatable {
     public var id: String {
         fullPath
     }

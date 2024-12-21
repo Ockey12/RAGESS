@@ -94,41 +94,7 @@ public struct RAGESSView: View {
                     }
                 },
                 detail: {
-                    VStack(spacing: 0) {
-//                        HStack(spacing: 0) {
-//                            Spacer()
-//
-//                            Button(
-//                                action: {
-//                                    store.send(.minusMagnifyingglassTapped)
-//                                },
-//                                label: {
-//                                    Image(systemName: "minus.magnifyingglass")
-//                                }
-//                            )
-//                            .padding(.leading)
-//
-//                            Text("\(Int(store.swiftDiagramTree.swiftDiagramScale * 100))%")
-//                                .frame(width: 50)
-//
-//                            Button(
-//                                action: {
-//                                    store.send(.plusMagnifyingglassTapped)
-//                                },
-//                                label: {
-//                                    Image(systemName: "plus.magnifyingglass")
-//                                }
-//                            )
-//                            .padding(.trailing)
-//                        } // HStack
-//                        .frame(height: 40)
-
-//                        Divider()
-
-                        SwiftDiagramTreeView(store: store.scope(state: \.swiftDiagramTree, action: \.swiftDiagramTree))
-
-                        Spacer()
-                    } // VStack
+                    SwiftDiagramTreeView(store: store.scope(state: \.swiftDiagramTree, action: \.swiftDiagramTree))
                 }
             )
 

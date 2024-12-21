@@ -29,8 +29,9 @@ public struct RAGESSReducer {
 
     @ObservableState
     public struct State {
-        struct ExtractedData {
+        struct ExtractedData: Equatable {
             var projectRootDirectoryPath: String = ""
+            var derivedDataPath: String = ""
             var rootDirectory: Directory?
             var buildSettings: [String: String] = [:]
             var packages: [PackageObject] = []
@@ -49,7 +50,6 @@ public struct RAGESSReducer {
             }
         }
 
-        var derivedDataPath: String = "/Users/onaga/Library/Developer/Xcode/DerivedData/RAGESS-ayjrlzfdtsotsbgxonebesbohntz"
         var extractedData: ExtractedData = .init()
         var rootDirectoryWithoutUSRs: Directory?
         let ignoredDirectories = [
@@ -88,6 +88,7 @@ public struct RAGESSReducer {
 
     public enum Action: BindableAction {
         case projectDirectorySelectorResponse(Result<[URL], Error>)
+        case derivedDataSelectorResponse(Result<[URL], Error>)
         case extractSourceFiles
         case sourceFileResponse(Result<Directory, Error>)
         case declarationExtractorResponse(Result<DeclarationExtractor.Response, Error>)
@@ -145,6 +146,24 @@ public struct RAGESSReducer {
                             }
                         }
                     )
+
+                case let .failure(error):
+                    print(error)
+                    assertionFailure()
+                    return .none
+                }
+
+            case let .derivedDataSelectorResponse(result):
+                switch result {
+                case let .success(urls):
+                    guard let url = urls.first else {
+                        assertionFailure()
+                        return .none
+                    }
+                    
+                    state.extractedData.derivedDataPath = url.path()
+
+                    return .none
 
                 case let .failure(error):
                     print(error)
@@ -243,7 +262,7 @@ public struct RAGESSReducer {
                 }
                 state.rootDirectoryWithoutUSRs = nil
                 guard !rootDirectory.allXcodeprojPathsUnderDirectory.isEmpty,
-                      let derivedDataURL = URL(string: state.derivedDataPath)
+                      let derivedDataURL = URL(string: state.extractedData.derivedDataPath)
                 else {
                     assertionFailure()
                     return .none

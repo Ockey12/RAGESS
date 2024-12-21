@@ -8,7 +8,7 @@
 
 import DeclaredObject
 
-public struct IndexStoreObject {
+public struct IndexStoreObject: Equatable {
     public let usr: String
     public let roles: [Role]
     public let fullPath: String

@@ -8,7 +8,7 @@
 import DeclaredObject
 import Foundation
 
-public struct SourceFile: Identifiable {
+public struct SourceFile: Identifiable, Equatable {
     public var id: String {
         fullPath
     }

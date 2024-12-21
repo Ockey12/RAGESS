@@ -8,7 +8,7 @@
 
 import SwiftIndexStoreObject
 
-public struct DependencyObject {
+public struct DependencyObject: Equatable {
     public let calleeUSR: String
     public let callerUSRs: [String]
     public let roles: [IndexStoreObject.Role]

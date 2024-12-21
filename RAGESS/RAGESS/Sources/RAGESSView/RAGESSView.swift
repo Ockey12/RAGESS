@@ -25,78 +25,107 @@ public struct RAGESSView: View {
 
     public var body: some View {
         ZStack {
-            NavigationSplitView(
-                sidebar: {
-                    VStack(alignment: .leading) {
-                        Divider()
+            NavigationSplitView {
+                VStack(alignment: .leading) {
+                    Divider()
 
-                        HStack(spacing: 10) {
-                            TextField("YourApp", text: $store.extractedData.projectRootDirectoryPath)
+                    HStack(spacing: 10) {
+                        TextField("YourApp", text: $store.extractedData.projectRootDirectoryPath)
 
-                            Button(
-                                action: {
-                                    isShowRootDirectorySelector = true
-                                },
-                                label: {
-                                    Image(systemName: "folder")
-                                }
-                            )
-                            .fileImporter(
-                                isPresented: $isShowRootDirectorySelector,
-                                allowedContentTypes: [.directory],
-                                allowsMultipleSelection: false
-                            ) { result in
-                                store.send(.projectDirectorySelectorResponse(result))
+                        Button(
+                            action: {
+                                isShowRootDirectorySelector = true
+                            },
+                            label: {
+                                Image(systemName: "folder")
                             }
+                        )
+                        .fileImporter(
+                            isPresented: $isShowRootDirectorySelector,
+                            allowedContentTypes: [.directory],
+                            allowsMultipleSelection: false
+                        ) { result in
+                            store.send(.projectDirectorySelectorResponse(result))
                         }
-                        .padding(.horizontal, 10)
-
-                        HStack(spacing: 10) {
-                            TextField("DerivedData/YourApp-hash", text: $store.extractedData.derivedDataPath)
-
-                            Button(
-                                action: {
-                                    isShowDerivedDataSelector = true
-                                },
-                                label: {
-                                    Image(systemName: "folder")
-                                }
-                            )
-                            .fileImporter(
-                                isPresented: $isShowDerivedDataSelector,
-                                allowedContentTypes: [.directory],
-                                allowsMultipleSelection: false
-                            )
-                            { result in
-                                store.send(.derivedDataSelectorResponse(result))
-                            }
-                        }
-                        .padding(.horizontal, 10)
-
-                        #if DEBUG
-                            Divider()
-                            DebugView(store: store.scope(state: \.debugView, action: \.debugView))
-                            Divider()
-                        #endif
-
-                        Text("Build Start: \(store.lastBuildStartTimeString)")
-                            .padding(.horizontal)
-                        Text("Build Success: \(store.lastBuildSuccessTimeString)")
-                            .padding(.horizontal)
-                        Divider()
-
-                        if let _ = store.fileTree.rootDirectory {
-                            FileTreeView(store: store.scope(state: \.fileTree, action: \.fileTree))
-                                .padding(.leading, 20)
-                        }
-
-                        Spacer()
                     }
-                },
-                detail: {
-                    SwiftDiagramTreeView(store: store.scope(state: \.swiftDiagramTree, action: \.swiftDiagramTree))
+                    .padding(.horizontal, 10)
+
+                    HStack(spacing: 10) {
+                        TextField("DerivedData/YourApp-hash", text: $store.extractedData.derivedDataPath)
+
+                        Button(
+                            action: {
+                                isShowDerivedDataSelector = true
+                            },
+                            label: {
+                                Image(systemName: "folder")
+                            }
+                        )
+                        .fileImporter(
+                            isPresented: $isShowDerivedDataSelector,
+                            allowedContentTypes: [.directory],
+                            allowsMultipleSelection: false
+                        )
+                        { result in
+                            store.send(.derivedDataSelectorResponse(result))
+                        }
+                    }
+                    .padding(.horizontal, 10)
+
+                    #if DEBUG
+                        Divider()
+                        DebugView(store: store.scope(state: \.debugView, action: \.debugView))
+                        Divider()
+                    #endif
+
+                    Text("Build Start: \(store.lastBuildStartTimeString)")
+                        .padding(.horizontal)
+
+                    Text("Build Success: \(store.lastBuildSuccessTimeString)")
+                        .padding(.horizontal)
+
+                    Divider()
+
+                    if let _ = store.fileTree.rootDirectory {
+                        FileTreeView(store: store.scope(state: \.fileTree, action: \.fileTree))
+                            .padding(.leading, 20)
+                    }
+
+                    Spacer()
+                } // VStack
+                .toolbar {
+                    ToolbarItemGroup(placement: .navigation) {
+                        if store.showStopButton {
+                            Button(
+                                action: {
+                                    store.send(.stopButtonTapped)
+                                },
+                                label: {
+                                    Image(systemName: "stop.fill")
+                                        .resizable()
+                                        .frame(width: 15, height: 15)
+                                }
+                            )
+                            .disabled(false)
+                        }
+
+                        Button(
+                            action: {
+                                store.send(.startButtonTapped)
+                            },
+                            label: {
+                                Image(systemName: "play.fill")
+                                    .resizable()
+                                    .frame(width: 15, height: 15)
+                            }
+                        )
+                        .disabled(false)
+                    }
                 }
-            )
+            } detail: {
+                SwiftDiagramTreeView(store: store.scope(state: \.swiftDiagramTree, action: \.swiftDiagramTree))
+                    .navigationTitle(store.extractedData.projectRootDirectoryPath)
+            }
 
             if let currentLoadingTask = store.loadingTaskKindBuffer.first {
                 switch currentLoadingTask {

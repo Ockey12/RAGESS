@@ -50,6 +50,7 @@ public struct RAGESSReducer {
             }
         }
 
+        var showStopButton = false
         var extractedData: ExtractedData = .init()
         var rootDirectoryWithoutUSRs: Directory?
         let ignoredDirectories = [
@@ -89,6 +90,8 @@ public struct RAGESSReducer {
     public enum Action: BindableAction {
         case projectDirectorySelectorResponse(Result<[URL], Error>)
         case derivedDataSelectorResponse(Result<[URL], Error>)
+        case startButtonTapped
+        case stopButtonTapped
         case extractSourceFiles
         case sourceFileResponse(Result<Directory, Error>)
         case declarationExtractorResponse(Result<DeclarationExtractor.Response, Error>)
@@ -134,18 +137,7 @@ public struct RAGESSReducer {
 
                     state.extractedData.projectRootDirectoryPath = url.path()
 
-                    return .merge(
-                        .run { send in
-                            for await event in BuildMonitor().monitorBuildEvents() {
-                                switch event {
-                                case let .buildStart(date):
-                                    await send(.detectedBuildStart(date))
-                                case let .buildSuccess(date):
-                                    await send(.detectedBuildSuccess(date))
-                                }
-                            }
-                        }
-                    )
+                    return .none
 
                 case let .failure(error):
                     print(error)
@@ -170,6 +162,30 @@ public struct RAGESSReducer {
                     assertionFailure()
                     return .none
                 }
+
+            case .startButtonTapped:
+                state.showStopButton = true
+                guard state.extractedData.projectRootDirectoryPath != "",
+                      state.extractedData.derivedDataPath != "" else {
+                    return .none
+                }
+
+                return .run { send in
+                    for await event in BuildMonitor().monitorBuildEvents() {
+                        switch event {
+                        case let .buildStart(date):
+                            await send(.detectedBuildStart(date))
+                        case let .buildSuccess(date):
+                            await send(.detectedBuildSuccess(date))
+                        }
+                    }
+                }
+
+            case .stopButtonTapped:
+                state.showStopButton = false
+                state.monitor.buildStartMonitor.stopMonitoring()
+
+                return .none
 
             case .extractSourceFiles:
                 state.processStartTime = CFAbsoluteTimeGetCurrent()

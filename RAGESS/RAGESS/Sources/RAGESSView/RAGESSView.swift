@@ -129,35 +129,6 @@ public struct RAGESSView: View {
             if store.showProgressView {
                 ProgressView()
             }
-
-//            if let currentLoadingTask = store.loadingTaskKindBuffer.first {
-//                switch currentLoadingTask {
-//                case .sourceFiles:
-//                    ProgressView {
-//                        Text("In the process of extracting the source files.")
-//                    }
-//
-//                case .buildSettings:
-//                    ProgressView {
-//                        Text("In the process of getting build settings.")
-//                    }
-//
-//                case .dumpPackage:
-//                    ProgressView {
-//                        Text("In the process of analyzing the package.")
-//                    }
-//
-//                case .extractDeclarations:
-//                    ProgressView {
-//                        Text("In the process of extracting declarations.")
-//                    }
-//
-//                case .extractDependencies:
-//                    ProgressView {
-//                        Text("In the process of extracting dependencies.")
-//                    }
-//                }
-//            }
         } // ZStack
         .task {
             store.send(.task)

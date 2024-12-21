@@ -76,6 +76,7 @@ public struct RAGESSReducer {
         var lastBuildSuccessTimeString = ""
         let dateFormatter: DateFormatter
         let monitor = BuildMonitor()
+        var isMonitoring = false
 
         var lastSelectedObjectUSR: String?
 
@@ -88,6 +89,8 @@ public struct RAGESSReducer {
     }
 
     public enum Action: BindableAction {
+        case task
+
         case projectDirectorySelectorResponse(Result<[URL], Error>)
         case derivedDataSelectorResponse(Result<[URL], Error>)
         case startButtonTapped
@@ -127,6 +130,18 @@ public struct RAGESSReducer {
         #endif
         Reduce { state, action in
             switch action {
+            case .task:
+                return .run { send in
+                    for await event in BuildMonitor().monitorBuildEvents() {
+                        switch event {
+                        case let .buildStart(date):
+                            await send(.detectedBuildStart(date))
+                        case let .buildSuccess(date):
+                            await send(.detectedBuildSuccess(date))
+                        }
+                    }
+                }
+
             case let .projectDirectorySelectorResponse(result):
                 switch result {
                 case let .success(urls):
@@ -164,26 +179,20 @@ public struct RAGESSReducer {
                 }
 
             case .startButtonTapped:
-                state.showStopButton = true
                 guard state.extractedData.projectRootDirectoryPath != "",
                       state.extractedData.derivedDataPath != "" else {
                     return .none
                 }
 
-                return .run { send in
-                    for await event in BuildMonitor().monitorBuildEvents() {
-                        switch event {
-                        case let .buildStart(date):
-                            await send(.detectedBuildStart(date))
-                        case let .buildSuccess(date):
-                            await send(.detectedBuildSuccess(date))
-                        }
-                    }
-                }
+                state.showStopButton = true
+                state.isMonitoring = true
+
+                return .none
 
             case .stopButtonTapped:
                 state.showStopButton = false
-                state.monitor.buildStartMonitor.stopMonitoring()
+                state.isMonitoring = false
+                state.rootDirectoryWithoutUSRs = nil
 
                 return .none
 
@@ -259,12 +268,20 @@ public struct RAGESSReducer {
                 return .none
 
             case let .detectedBuildStart(date):
+                guard state.isMonitoring else {
+                    return .none
+                }
+
                 let dateString = state.dateFormatter.string(from: date)
                 print("Build Start: \(dateString)")
                 state.lastBuildStartTimeString = dateString
                 return .send(.extractSourceFiles)
 
             case let .detectedBuildSuccess(date):
+                guard state.isMonitoring else {
+                    return .none
+                }
+
                 let dateString = state.dateFormatter.string(from: date)
                 print("Build Success: \(dateString)")
                 state.lastBuildSuccessTimeString = dateString

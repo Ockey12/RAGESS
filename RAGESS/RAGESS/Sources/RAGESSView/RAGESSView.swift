@@ -156,5 +156,8 @@ public struct RAGESSView: View {
                 }
             }
         } // ZStack
+        .task {
+            store.send(.task)
+        }
     }
 }

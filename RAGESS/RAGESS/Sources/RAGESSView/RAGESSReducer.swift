@@ -167,7 +167,7 @@ public struct RAGESSReducer {
                         assertionFailure()
                         return .none
                     }
-                    
+
                     state.extractedData.derivedDataPath = url.path()
 
                     return .none

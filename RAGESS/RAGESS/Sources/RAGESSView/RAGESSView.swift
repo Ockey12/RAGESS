@@ -65,8 +65,7 @@ public struct RAGESSView: View {
                             isPresented: $isShowDerivedDataSelector,
                             allowedContentTypes: [.directory],
                             allowsMultipleSelection: false
-                        )
-                        { result in
+                        ) { result in
                             store.send(.derivedDataSelectorResponse(result))
                         }
                     }

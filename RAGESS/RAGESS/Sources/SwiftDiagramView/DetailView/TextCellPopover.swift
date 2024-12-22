@@ -13,7 +13,7 @@ import SwiftUI
 @Reducer
 public struct TextCellPopoverReducer {
     @ObservableState
-    public struct State {
+    public struct State: Hashable {
         let object: DeclaredObject
     }
 

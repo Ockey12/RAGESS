@@ -7,18 +7,19 @@
 //
 
 import ComposableArchitecture
+import CoreGraphics
 import DeclaredObject
 import Foundation
 
 @Reducer
 public struct TextCellReducer {
-    @Reducer
+    @Reducer(state: .hashable)
     public enum Destination {
         case popover(TextCellPopoverReducer)
     }
 
     @ObservableState
-    public struct State: Identifiable, Equatable {
+    public struct State: Identifiable, Equatable, Hashable {
         public static func == (lhs: TextCellReducer.State, rhs: TextCellReducer.State) -> Bool {
             lhs.id == rhs.id
                 && lhs.object.id == rhs.object.id
@@ -87,5 +88,12 @@ public struct TextCellReducer {
             }
         }
         .ifLet(\.$destination, action: \.destination)
+    }
+}
+
+extension CGPoint: Hashable {
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(x)
+        hasher.combine(y)
     }
 }

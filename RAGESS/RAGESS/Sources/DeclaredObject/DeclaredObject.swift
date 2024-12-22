@@ -9,7 +9,7 @@
 import Dependencies
 import Foundation
 
-public struct DeclaredObject: Identifiable, Equatable {
+public struct DeclaredObject: Identifiable, Equatable, Hashable {
     public let id: UUID
     public var usrs: [String] {
         didSet {

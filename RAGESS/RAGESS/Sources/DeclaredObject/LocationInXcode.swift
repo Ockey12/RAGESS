@@ -6,7 +6,7 @@
 //
 //
 
-public struct LocationInXcode: Equatable, Hashable {
+public struct LocationInXcode: Equatable {
     public let line: Int
     public let column: Int
 

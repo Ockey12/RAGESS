@@ -5,493 +5,243 @@
 //  Created by ockey12 on 2024/05/05.
 //
 
+import DeclaredObject
 import Dependencies
+import Foundation
 import SourceKitClient
+import SwiftIndexStoreClient
+import SwiftIndexStoreObject
 import SwiftParser
 import SwiftSyntax
 import TypeDeclaration
 import XcodeObject
 
-public struct DeclarationExtractor {
-    public init() {}
+public enum DeclarationExtractor {
+    public struct Response {
+        public let rootDirectory: Directory
+        public let usrTable: USRTable
+        public let sourceFileTable: [String: WritableKeyPath<Directory, SourceFile>]
+        public let indexStoreObjects: [IndexStoreObject]
+    }
 
-    public func extractDeclarations(
-        from sourceFile: SourceFile,
-        buildSettings: [String: String],
-        sourceFilePaths: [String],
-        packages: [PackageObject]
-    ) async -> [any DeclarationObject] {
-        let parsedFile = Parser.parse(source: sourceFile.content)
+    public static func extractDeclarations(
+        rootDirectory: Directory,
+        indexStoreURL: URL
+    ) throws -> Response {
+        @Dependency(SwiftIndexStoreClient.self) var swiftIndexStoreClient
+        let indexStoreObjects = try swiftIndexStoreClient.extractOccurrences(
+            indexStoreURL: indexStoreURL,
+            projectRootPath: rootDirectory.fullPath
+        )
 
-        #if DEBUG
-            print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
-            print("PATH: \(sourceFile.path)")
-            print(parsedFile.debugDescription)
-        #endif
+        // Assign USR to the DeclaredObject of each SourceFile in the SourceFileTable.
+        let definitions = indexStoreObjects.filter { $0.roles.contains(.definition) }
+        var sourceFilesTable = extractDeclarations(directory: rootDirectory)
+        var usrTable = USRTable()
+        for object in definitions {
+            usrTable.merge(assignUSR(indexStoreObject: object, sourceFileTable: &sourceFilesTable)) { current, _ in
+                current
+            }
+        }
 
+        var resultRootDirectory = rootDirectory
+        for (_, sourceFile) in sourceFilesTable {
+            resultRootDirectory[keyPath: sourceFile.keyPathFromRootDirectory] = sourceFile
+        }
+
+        let sourceFileKeyPathTable = sourceFilesTable.mapValues { $0.keyPathFromRootDirectory }
+
+        return Response(
+            rootDirectory: resultRootDirectory,
+            usrTable: usrTable,
+            sourceFileTable: sourceFileKeyPathTable,
+            indexStoreObjects: indexStoreObjects
+        )
+    }
+
+    private static func extractDeclarations(directory: Directory) -> SourceFileTable {
+        var sourceFilesTable = SourceFileTable()
+
+        for sourceFile in directory.files {
+            let fileWithAddedObjects = extractDeclarations(sourceFile: sourceFile)
+            sourceFilesTable[fileWithAddedObjects.fullPath] = fileWithAddedObjects
+        }
+
+        for subDirectory in directory.subDirectories {
+            sourceFilesTable.merge(extractDeclarations(directory: subDirectory)) { current, _ in
+                current
+            }
+        }
+
+        return sourceFilesTable
+    }
+
+    private static func extractDeclarations(sourceFile: SourceFile) -> SourceFile {
+        let parsedFile = Parser.parse(source: sourceFile.sourceCode)
         let visitor = DeclarationVisitor(
-            in: sourceFile.path,
+            in: sourceFile.fullPath,
             locatonConverter: SourceLocationConverter(
-                fileName: sourceFile.path,
+                fileName: sourceFile.fullPath,
                 tree: parsedFile
             )
         )
+
         visitor.walk(Syntax(parsedFile))
 
-        #if DEBUG
-            print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=\n")
-        #endif
-
-        var result: [any DeclarationObject] = visitor.extractedDeclarations
-
-        for (index, object) in result.enumerated() {
-            if let enumObject = object as? EnumObject {
-                let annotatedEnumObject = await getAnnotatedDeclaration(
-                    enumObject,
-                    buildSettings: buildSettings,
-                    sourceFilePaths: sourceFilePaths,
-                    packages: packages
-                )
-                result[index] = annotatedEnumObject
-
-            } else if let typeObject = object as? any TypeDeclaration {
-                let annotatedTypeObject = await getAnnotatedDeclaration(
-                    typeObject,
-                    buildSettings: buildSettings,
-                    sourceFilePaths: sourceFilePaths,
-                    packages: packages
-                )
-                result[index] = annotatedTypeObject
-
-            } else if let typeNestableObject = object as? any TypeNestable {
-                let annotatedTypeNestableObject = await getAnnotatedDeclaration(
-                    typeNestableObject,
-                    buildSettings: buildSettings,
-                    sourceFilePaths: sourceFilePaths,
-                    packages: packages
-                )
-                result[index] = annotatedTypeNestableObject
-
-            } else if let protocolObject = object as? ProtocolObject {
-                let annotatedProtocolObject = await getAnnotatedDeclaration(
-                    protocolObject,
-                    buildSettings: buildSettings,
-                    sourceFilePaths: sourceFilePaths,
-                    packages: packages
-                )
-                result[index] = annotatedProtocolObject
-
-            } else {
-                print("WARNING: \(#file) - \(#function): \(object.name) cannot be applied to any generic `getAnnotatedDeclaration` function.")
-            }
-        }
+        var result = sourceFile
+        result.declaredObjects = visitor.extractedDeclarations
 
         return result
     }
 
-    // Used for `StructObject`, `ClassObject`.
-    private func getAnnotatedDeclaration<T: TypeDeclaration>(
-        _ typeObject: T,
-        buildSettings: [String: String],
-        sourceFilePaths: [String],
-        packages: [PackageObject]
-    ) async -> T {
-        @Dependency(SourceKitClient.self) var sourceKitClient
-        let argumentsGenerator = CompilerArgumentsGenerator(
-            targetFilePath: typeObject.fullPath,
-            buildSettings: buildSettings,
-            sourceFilePaths: sourceFilePaths,
-            packages: packages
-        )
-
-        do {
-            let arguments = try argumentsGenerator.generateArguments()
-            let response = try await sourceKitClient.sendCursorInfoRequest(
-                file: typeObject.fullPath,
-                offset: typeObject.nameOffset,
-                sourceFilePaths: sourceFilePaths,
-                arguments: arguments
-            )
-
-            guard let annotatedDecl = response[CursorInfoResponseKeys.fullyAnnotatedDecl.key] as? String else {
-                print("ERROR: \(#file) - \(#function): Cannot find `key.fully_annotated_decl` about \(typeObject.name).")
-                return typeObject
-            }
-
-            var resultObject = typeObject
-            resultObject.annotatedDecl = annotatedDecl.removedTags
-
-            for (index, initializer) in typeObject.initializers.enumerated() {
-                let annotatedInit = await getAnnotatedDeclaration(
-                    initializer,
-                    buildSettings: buildSettings,
-                    sourceFilePaths: sourceFilePaths,
-                    packages: packages
-                )
-                resultObject.initializers[index] = annotatedInit
-            }
-
-            for (index, variable) in typeObject.variables.enumerated() {
-                let annotatedVariable = await getAnnotatedDeclaration(
-                    variable,
-                    buildSettings: buildSettings,
-                    sourceFilePaths: sourceFilePaths,
-                    packages: packages
-                )
-                resultObject.variables[index] = annotatedVariable
-            }
-
-            for (index, function) in typeObject.functions.enumerated() {
-                let annotatedFunction = await getAnnotatedDeclaration(
-                    function,
-                    buildSettings: buildSettings,
-                    sourceFilePaths: sourceFilePaths,
-                    packages: packages
-                )
-                resultObject.functions[index] = annotatedFunction
-            }
-
-            for (index, nestingProtocol) in resultObject.nestingProtocols.enumerated() {
-                let annotatedProtocol = await getAnnotatedDeclaration(
-                    nestingProtocol,
-                    buildSettings: buildSettings,
-                    sourceFilePaths: sourceFilePaths,
-                    packages: packages
-                )
-                resultObject.nestingProtocols[index] = annotatedProtocol
-            }
-
-            for (index, nestingStruct) in resultObject.nestingStructs.enumerated() {
-                let annotatedStruct = await getAnnotatedDeclaration(
-                    nestingStruct,
-                    buildSettings: buildSettings,
-                    sourceFilePaths: sourceFilePaths,
-                    packages: packages
-                )
-                resultObject.nestingStructs[index] = annotatedStruct
-            }
-
-            for (index, nestingClass) in resultObject.nestingClasses.enumerated() {
-                let annotatedClass = await getAnnotatedDeclaration(
-                    nestingClass,
-                    buildSettings: buildSettings,
-                    sourceFilePaths: sourceFilePaths,
-                    packages: packages
-                )
-                resultObject.nestingClasses[index] = annotatedClass
-            }
-
-            for (index, nestingEnum) in resultObject.nestingEnums.enumerated() {
-                let annotatedEnum = await getAnnotatedDeclaration(
-                    nestingEnum,
-                    buildSettings: buildSettings,
-                    sourceFilePaths: sourceFilePaths,
-                    packages: packages
-                )
-                resultObject.nestingEnums[index] = annotatedEnum
-            }
-
-            return resultObject
-        } catch {
-            print("ERROR: \(#file) - \(#function): Cannot get annotated declaration about \(typeObject.name).")
-            print(error)
-            return typeObject
+    private static func assignUSR(indexStoreObject: IndexStoreObject, sourceFileTable: inout [FullPath: SourceFile]) -> USRTable {
+        guard indexStoreObject.roles.contains(.definition),
+              let sourceFile = sourceFileTable[indexStoreObject.fullPath]
+        else {
+            return [:]
         }
+
+        var resultFile = sourceFile
+        var usrTable = USRTable()
+        for (index, object) in sourceFile.declaredObjects.enumerated() {
+            if object.rangeInXcode.contains(indexStoreObject.locationInXcode) {
+                let fromRootDirectory = assignUSR(
+                    usr: indexStoreObject.usr,
+                    definitionLocation: indexStoreObject.locationInXcode,
+                    declaredObject: &resultFile.declaredObjects[index],
+                    fromRootDirectory: resultFile.keyPathFromRootDirectory.appending(path: \.declaredObjects[index])
+                )
+                usrTable[indexStoreObject.usr] = fromRootDirectory
+                break
+            }
+        }
+
+        sourceFileTable[indexStoreObject.fullPath] = resultFile
+
+        return usrTable
     }
 
-    // Used for `EnumObject`.
-    private func getAnnotatedDeclaration(
-        _ enumObject: EnumObject,
-        buildSettings: [String: String],
-        sourceFilePaths: [String],
-        packages: [PackageObject]
-    ) async -> EnumObject {
-        @Dependency(SourceKitClient.self) var sourceKitClient
-        let argumentsGenerator = CompilerArgumentsGenerator(
-            targetFilePath: enumObject.fullPath,
-            buildSettings: buildSettings,
-            sourceFilePaths: sourceFilePaths,
-            packages: packages
-        )
+    private static func assignUSR(
+        usr: String,
+        definitionLocation: LocationInXcode,
+        declaredObject: inout DeclaredObject,
+        fromRootDirectory: WritableKeyPath<Directory, DeclaredObject>
+    ) -> WritableKeyPath<Directory, DeclaredObject> {
+        // Search from the kind that is most likely to meet the conditions.
 
-        do {
-            let arguments = try argumentsGenerator.generateArguments()
-            let response = try await sourceKitClient.sendCursorInfoRequest(
-                file: enumObject.fullPath,
-                offset: enumObject.nameOffset,
-                sourceFilePaths: sourceFilePaths,
-                arguments: arguments
-            )
-
-            guard let annotatedDecl = response[CursorInfoResponseKeys.fullyAnnotatedDecl.key] as? String else {
-                print("ERROR: \(#file) - \(#function): Cannot find `key.fully_annotated_decl` about \(enumObject.name).")
-                return enumObject
-            }
-
-            var resultObject = enumObject
-            resultObject.annotatedDecl = annotatedDecl.removedTags
-
-            for (index, initializer) in enumObject.initializers.enumerated() {
-                let annotatedInit = await getAnnotatedDeclaration(
-                    initializer,
-                    buildSettings: buildSettings,
-                    sourceFilePaths: sourceFilePaths,
-                    packages: packages
+        for (index, variableObject) in declaredObject.variables.enumerated() {
+            if variableObject.rangeInXcode.contains(definitionLocation) {
+                return assignUSR(
+                    usr: usr,
+                    definitionLocation: definitionLocation,
+                    declaredObject: &declaredObject.variables[index],
+                    fromRootDirectory: fromRootDirectory.appending(path: \.variables[index])
                 )
-                resultObject.initializers[index] = annotatedInit
             }
-
-            for (index, variable) in enumObject.variables.enumerated() {
-                let annotatedVariable = await getAnnotatedDeclaration(
-                    variable,
-                    buildSettings: buildSettings,
-                    sourceFilePaths: sourceFilePaths,
-                    packages: packages
-                )
-                resultObject.variables[index] = annotatedVariable
-            }
-
-            for (index, function) in enumObject.functions.enumerated() {
-                let annotatedFunction = await getAnnotatedDeclaration(
-                    function,
-                    buildSettings: buildSettings,
-                    sourceFilePaths: sourceFilePaths,
-                    packages: packages
-                )
-                resultObject.functions[index] = annotatedFunction
-            }
-
-            for (index, nestingProtocol) in resultObject.nestingProtocols.enumerated() {
-                let annotatedProtocol = await getAnnotatedDeclaration(
-                    nestingProtocol,
-                    buildSettings: buildSettings,
-                    sourceFilePaths: sourceFilePaths,
-                    packages: packages
-                )
-                resultObject.nestingProtocols[index] = annotatedProtocol
-            }
-
-            for (index, nestingStruct) in resultObject.nestingStructs.enumerated() {
-                let annotatedStruct = await getAnnotatedDeclaration(
-                    nestingStruct,
-                    buildSettings: buildSettings,
-                    sourceFilePaths: sourceFilePaths,
-                    packages: packages
-                )
-                resultObject.nestingStructs[index] = annotatedStruct
-            }
-
-            for (index, nestingClass) in resultObject.nestingClasses.enumerated() {
-                let annotatedClass = await getAnnotatedDeclaration(
-                    nestingClass,
-                    buildSettings: buildSettings,
-                    sourceFilePaths: sourceFilePaths,
-                    packages: packages
-                )
-                resultObject.nestingClasses[index] = annotatedClass
-            }
-
-            for (index, nestingEnum) in resultObject.nestingEnums.enumerated() {
-                let annotatedEnum = await getAnnotatedDeclaration(
-                    nestingEnum,
-                    buildSettings: buildSettings,
-                    sourceFilePaths: sourceFilePaths,
-                    packages: packages
-                )
-                resultObject.nestingEnums[index] = annotatedEnum
-            }
-
-            for (index, caseObject) in resultObject.cases.enumerated() {
-                let response = try await sourceKitClient.sendCursorInfoRequest(
-                    file: caseObject.fullPath,
-                    offset: caseObject.nameOffset,
-                    sourceFilePaths: sourceFilePaths,
-                    arguments: arguments
-                )
-
-                guard let annotatedDecl = response[CursorInfoResponseKeys.fullyAnnotatedDecl.key] as? String else {
-                    print("ERROR: \(#file) - \(#function): Cannot find `key.fully_annotated_decl` about \(resultObject.name).cases[\(index)].")
-                    continue
-                }
-
-                resultObject.cases[index].annotatedDecl = annotatedDecl.removedTags
-            }
-
-            return resultObject
-        } catch {
-            print("ERROR: \(#file) - \(#function): Cannot get annotated declaration about \(enumObject.name).")
-            print(error)
-            return enumObject
         }
-    }
 
-    // Used for `InitializerObject`, `VariableObject`, `FunctionObject`.
-    private func getAnnotatedDeclaration<T: TypeNestable>(
-        _ typeNestableObject: T,
-        buildSettings: [String: String],
-        sourceFilePaths: [String],
-        packages: [PackageObject]
-    ) async -> T {
-        @Dependency(SourceKitClient.self) var sourceKitClient
-        let argumentsGenerator = CompilerArgumentsGenerator(
-            targetFilePath: typeNestableObject.fullPath,
-            buildSettings: buildSettings,
-            sourceFilePaths: sourceFilePaths,
-            packages: packages
-        )
-
-        do {
-            let arguments = try argumentsGenerator.generateArguments()
-            let response = try await sourceKitClient.sendCursorInfoRequest(
-                file: typeNestableObject.fullPath,
-                offset: typeNestableObject.nameOffset,
-                sourceFilePaths: sourceFilePaths,
-                arguments: arguments
-            )
-
-            guard let annotatedDecl = response[CursorInfoResponseKeys.fullyAnnotatedDecl.key] as? String else {
-                print("ERROR: \(#file) - \(#function): Cannot find `key.fully_annotated_decl` about \(typeNestableObject.name).")
-                return typeNestableObject
-            }
-
-            var resultObject = typeNestableObject
-            resultObject.annotatedDecl = annotatedDecl.removedTags
-
-            for (index, variable) in typeNestableObject.variables.enumerated() {
-                let annotatedVariable = await getAnnotatedDeclaration(
-                    variable,
-                    buildSettings: buildSettings,
-                    sourceFilePaths: sourceFilePaths,
-                    packages: packages
+        for (index, functionObject) in declaredObject.functions.enumerated() {
+            if functionObject.rangeInXcode.contains(definitionLocation) {
+                return assignUSR(
+                    usr: usr,
+                    definitionLocation: definitionLocation,
+                    declaredObject: &declaredObject.functions[index],
+                    fromRootDirectory: fromRootDirectory.appending(path: \.functions[index])
                 )
-                resultObject.variables[index] = annotatedVariable
             }
-
-            for (index, function) in typeNestableObject.functions.enumerated() {
-                let annotatedFunction = await getAnnotatedDeclaration(
-                    function,
-                    buildSettings: buildSettings,
-                    sourceFilePaths: sourceFilePaths,
-                    packages: packages
-                )
-                resultObject.functions[index] = annotatedFunction
-            }
-
-            for (index, nestingProtocol) in resultObject.nestingProtocols.enumerated() {
-                let annotatedProtocol = await getAnnotatedDeclaration(
-                    nestingProtocol,
-                    buildSettings: buildSettings,
-                    sourceFilePaths: sourceFilePaths,
-                    packages: packages
-                )
-                resultObject.nestingProtocols[index] = annotatedProtocol
-            }
-
-            for (index, nestingStruct) in resultObject.nestingStructs.enumerated() {
-                let annotatedStruct = await getAnnotatedDeclaration(
-                    nestingStruct,
-                    buildSettings: buildSettings,
-                    sourceFilePaths: sourceFilePaths,
-                    packages: packages
-                )
-                resultObject.nestingStructs[index] = annotatedStruct
-            }
-
-            for (index, nestingClass) in resultObject.nestingClasses.enumerated() {
-                let annotatedClass = await getAnnotatedDeclaration(
-                    nestingClass,
-                    buildSettings: buildSettings,
-                    sourceFilePaths: sourceFilePaths,
-                    packages: packages
-                )
-                resultObject.nestingClasses[index] = annotatedClass
-            }
-
-            for (index, nestingEnum) in resultObject.nestingEnums.enumerated() {
-                let annotatedEnum = await getAnnotatedDeclaration(
-                    nestingEnum,
-                    buildSettings: buildSettings,
-                    sourceFilePaths: sourceFilePaths,
-                    packages: packages
-                )
-                resultObject.nestingEnums[index] = annotatedEnum
-            }
-
-            return resultObject
-        } catch {
-            print("ERROR: \(#file) - \(#function): Cannot get annotated declaration about \(typeNestableObject.name).")
-            print(error)
-            return typeNestableObject
         }
-    }
 
-    private func getAnnotatedDeclaration(
-        _ protocolObject: ProtocolObject,
-        buildSettings: [String: String],
-        sourceFilePaths: [String],
-        packages: [PackageObject]
-    ) async -> ProtocolObject {
-        @Dependency(SourceKitClient.self) var sourceKitClient
-        let argumentsGenerator = CompilerArgumentsGenerator(
-            targetFilePath: protocolObject.fullPath,
-            buildSettings: buildSettings,
-            sourceFilePaths: sourceFilePaths,
-            packages: packages
-        )
-
-        do {
-            let arguments = try argumentsGenerator.generateArguments()
-            let response = try await sourceKitClient.sendCursorInfoRequest(
-                file: protocolObject.fullPath,
-                offset: protocolObject.nameOffset,
-                sourceFilePaths: sourceFilePaths,
-                arguments: arguments
-            )
-
-            guard let annotatedDecl = response[CursorInfoResponseKeys.fullyAnnotatedDecl.key] as? String else {
-                print("ERROR: \(#file) - \(#function): Cannot find `key.fully_annotated_decl` about \(protocolObject.name).")
-                return protocolObject
-            }
-
-            var resultObject = protocolObject
-            resultObject.annotatedDecl = annotatedDecl.removedTags
-
-            for (index, initializer) in protocolObject.initializers.enumerated() {
-                let annotatedInit = await getAnnotatedDeclaration(
-                    initializer,
-                    buildSettings: buildSettings,
-                    sourceFilePaths: sourceFilePaths,
-                    packages: packages
+        for (index, initializerObject) in declaredObject.initializers.enumerated() {
+            if initializerObject.rangeInXcode.contains(definitionLocation) {
+                return assignUSR(
+                    usr: usr,
+                    definitionLocation: definitionLocation,
+                    declaredObject: &declaredObject.initializers[index],
+                    fromRootDirectory: fromRootDirectory.appending(path: \.initializers[index])
                 )
-                resultObject.initializers[index] = annotatedInit
             }
-
-            for (index, variable) in protocolObject.variables.enumerated() {
-                let annotatedVariable = await getAnnotatedDeclaration(
-                    variable,
-                    buildSettings: buildSettings,
-                    sourceFilePaths: sourceFilePaths,
-                    packages: packages
-                )
-                resultObject.variables[index] = annotatedVariable
-            }
-
-            for (index, function) in protocolObject.functions.enumerated() {
-                let annotatedFunction = await getAnnotatedDeclaration(
-                    function,
-                    buildSettings: buildSettings,
-                    sourceFilePaths: sourceFilePaths,
-                    packages: packages
-                )
-                resultObject.functions[index] = annotatedFunction
-            }
-
-            return resultObject
-        } catch {
-            print("ERROR: \(#file) - \(#function): Cannot get annotated declaration about \(protocolObject.name).")
-            print(error)
-            return protocolObject
         }
+
+        for (index, caseObject) in declaredObject.cases.enumerated() {
+            if caseObject.rangeInXcode.contains(definitionLocation) {
+                return assignUSR(
+                    usr: usr,
+                    definitionLocation: definitionLocation,
+                    declaredObject: &declaredObject.cases[index],
+                    fromRootDirectory: fromRootDirectory.appending(path: \.cases[index])
+                )
+            }
+        }
+
+        for (index, attributeObject) in declaredObject.attributes.enumerated() {
+            if attributeObject.rangeInXcode.contains(definitionLocation) {
+                return assignUSR(
+                    usr: usr,
+                    definitionLocation: definitionLocation,
+                    declaredObject: &declaredObject.attributes[index],
+                    fromRootDirectory: fromRootDirectory.appending(path: \.attributes[index])
+                )
+            }
+        }
+
+        for (index, enumObject) in declaredObject.nestingEnums.enumerated() {
+            if enumObject.rangeInXcode.contains(definitionLocation) {
+                return assignUSR(
+                    usr: usr,
+                    definitionLocation: definitionLocation,
+                    declaredObject: &declaredObject.nestingEnums[index],
+                    fromRootDirectory: fromRootDirectory.appending(path: \.nestingEnums[index])
+                )
+            }
+        }
+
+        for (index, structObject) in declaredObject.nestingStructs.enumerated() {
+            if structObject.rangeInXcode.contains(definitionLocation) {
+                return assignUSR(
+                    usr: usr,
+                    definitionLocation: definitionLocation,
+                    declaredObject: &declaredObject.nestingStructs[index],
+                    fromRootDirectory: fromRootDirectory.appending(path: \.nestingStructs[index])
+                )
+            }
+        }
+
+        for (index, classObject) in declaredObject.nestingClasses.enumerated() {
+            if classObject.rangeInXcode.contains(definitionLocation) {
+                return assignUSR(
+                    usr: usr,
+                    definitionLocation: definitionLocation,
+                    declaredObject: &declaredObject.nestingClasses[index],
+                    fromRootDirectory: fromRootDirectory.appending(path: \.nestingClasses[index])
+                )
+            }
+        }
+
+        for (index, actorObject) in declaredObject.nestingActors.enumerated() {
+            if actorObject.rangeInXcode.contains(definitionLocation) {
+                return assignUSR(
+                    usr: usr,
+                    definitionLocation: definitionLocation,
+                    declaredObject: &declaredObject.nestingActors[index],
+                    fromRootDirectory: fromRootDirectory.appending(path: \.nestingActors[index])
+                )
+            }
+        }
+
+        for (index, protocolObject) in declaredObject.nestingProtocols.enumerated() {
+            if protocolObject.rangeInXcode.contains(definitionLocation) {
+                return assignUSR(
+                    usr: usr,
+                    definitionLocation: definitionLocation,
+                    declaredObject: &declaredObject.nestingProtocols[index],
+                    fromRootDirectory: fromRootDirectory.appending(path: \.nestingProtocols[index])
+                )
+            }
+        }
+
+        declaredObject.usrs.append(usr)
+
+        return fromRootDirectory
     }
 }
 

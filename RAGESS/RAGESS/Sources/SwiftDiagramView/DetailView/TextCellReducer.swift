@@ -7,11 +7,16 @@
 //
 
 import ComposableArchitecture
+import DeclaredObject
 import Foundation
-import TypeDeclaration
 
 @Reducer
 public struct TextCellReducer {
+    @Reducer
+    public enum Destination {
+        case popover(TextCellPopoverReducer)
+    }
+
     @ObservableState
     public struct State: Identifiable, Equatable {
         public static func == (lhs: TextCellReducer.State, rhs: TextCellReducer.State) -> Bool {
@@ -23,7 +28,7 @@ public struct TextCellReducer {
             object.id
         }
 
-        let object: any DeclarationObject
+        let object: DeclaredObject
         var topLeadingPoint: CGPoint
         var leadingArrowTerminalPoint: CGPoint {
             CGPoint(
@@ -45,18 +50,42 @@ public struct TextCellReducer {
         }
 
         let bodyWidth: CGFloat
+        @Presents var destination: Destination.State?
     }
 
     public enum Action {
         case clicked
+        case destination(PresentationAction<Destination.Action>)
+        case delegate(Delegate)
+
+        public enum Delegate {
+            case showImpactScopeButtonClicked(calleeUSR: [String])
+        }
     }
 
     public var body: some ReducerOf<Self> {
-        Reduce { _, action in
+        Reduce { state, action in
             switch action {
             case .clicked:
+                state.destination = .popover(
+                    TextCellPopoverReducer.State(object: state.object)
+                )
+                return .none
+
+            case let .destination(.presented(.popover(.delegate(delegateAction)))):
+                switch delegateAction {
+                case let .showImpactScopeButtonClicked(calleeUSR):
+                    state.destination = nil
+                    return .send(.delegate(.showImpactScopeButtonClicked(calleeUSR: calleeUSR)))
+                }
+
+            case .destination:
+                return .none
+
+            case .delegate:
                 return .none
             }
         }
+        .ifLet(\.$destination, action: \.destination)
     }
 }

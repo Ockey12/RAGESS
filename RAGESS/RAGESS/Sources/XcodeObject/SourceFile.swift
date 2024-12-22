@@ -5,22 +5,32 @@
 //  Created by ockey12 on 2024/04/13.
 //
 
+import DeclaredObject
 import Foundation
 
-public struct SourceFile: Identifiable {
+public struct SourceFile: Identifiable, Equatable {
     public var id: String {
-        path
+        fullPath
     }
 
-    public var path: String
+    public let fullPath: String
+    public let keyPathFromRootDirectory: WritableKeyPath<Directory, Self>
     public var name: String {
-        NSString(string: path).lastPathComponent
+        NSString(string: fullPath).lastPathComponent
     }
 
-    public var content: String
+    public var sourceCode: String
+    public var declaredObjects: [DeclaredObject]
 
-    public init(path: String, content: String) {
-        self.path = path
-        self.content = content
+    public init(
+        fullPath: String,
+        keyPathFromRootDirectory: WritableKeyPath<Directory, Self>,
+        sourceCode: String,
+        declaredObjects: [DeclaredObject] = []
+    ) {
+        self.fullPath = fullPath
+        self.keyPathFromRootDirectory = keyPathFromRootDirectory
+        self.sourceCode = sourceCode
+        self.declaredObjects = declaredObjects
     }
 }

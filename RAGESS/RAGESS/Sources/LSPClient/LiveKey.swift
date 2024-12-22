@@ -72,12 +72,12 @@ extension LSPClient: DependencyKey {
             #endif
         },
         sendInlayHintRequest: { sourceFile, range in
-            let sourceFileURL = URL(fileURLWithPath: sourceFile.path)
+            let sourceFileURL = URL(fileURLWithPath: sourceFile.fullPath)
             let request = InlayHintRequest(
                 textDocument: TextDocumentIdentifier(
                     DocumentURI(sourceFileURL)
                 ),
-                range: Position(line: 0, utf16index: 0) ..< sourceFile.content.lastPosition
+                range: Position(line: 0, utf16index: 0) ..< sourceFile.sourceCode.lastPosition
             )
 
             #if DEBUG

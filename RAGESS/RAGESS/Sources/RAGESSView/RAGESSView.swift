@@ -7,6 +7,7 @@
 //
 
 import ComposableArchitecture
+import DebugView
 import FileTreeView
 import SwiftDiagramView
 import SwiftUI
@@ -16,6 +17,7 @@ public struct RAGESSView: View {
 
     // FIXME: If Reducer manages this state, the `.fileImporter` will be opened only once.
     @State private var isShowRootDirectorySelector = false
+    @State private var isShowDerivedDataSelector = false
 
     public init(store: StoreOf<RAGESSReducer>) {
         self.store = store
@@ -23,8 +25,64 @@ public struct RAGESSView: View {
 
     public var body: some View {
         ZStack {
-            NavigationSplitView(
-                sidebar: {
+            NavigationSplitView {
+                VStack(alignment: .leading) {
+                    Divider()
+
+                    HStack(spacing: 10) {
+                        TextField("YourApp", text: $store.extractedData.projectRootDirectoryPath)
+
+                        Button(
+                            action: {
+                                isShowRootDirectorySelector = true
+                            },
+                            label: {
+                                Image(systemName: "folder")
+                            }
+                        )
+                        .fileImporter(
+                            isPresented: $isShowRootDirectorySelector,
+                            allowedContentTypes: [.directory],
+                            allowsMultipleSelection: false
+                        ) { result in
+                            store.send(.projectDirectorySelectorResponse(result))
+                        }
+                    }
+                    .padding(.horizontal, 10)
+
+                    HStack(spacing: 10) {
+                        TextField("DerivedData/YourApp-hash", text: $store.extractedData.derivedDataPath)
+
+                        Button(
+                            action: {
+                                isShowDerivedDataSelector = true
+                            },
+                            label: {
+                                Image(systemName: "folder")
+                            }
+                        )
+                        .fileImporter(
+                            isPresented: $isShowDerivedDataSelector,
+                            allowedContentTypes: [.directory],
+                            allowsMultipleSelection: false
+                        ) { result in
+                            store.send(.derivedDataSelectorResponse(result))
+                        }
+                    }
+                    .padding(.horizontal, 10)
+
+                    #if DEBUG
+                        Divider()
+                        DebugView(store: store.scope(state: \.debugView, action: \.debugView))
+                        Divider()
+                    #endif
+
+                    Text("Build Start: \(store.lastBuildStartTimeString)")
+                        .padding(.horizontal)
+
+                    Text("Build Success: \(store.lastBuildSuccessTimeString)")
+                        .padding(.horizontal)
+
                     Divider()
 
                     if let _ = store.fileTree.rootDirectory {
@@ -33,104 +91,44 @@ public struct RAGESSView: View {
                     }
 
                     Spacer()
-                },
-                detail: {
-                    VStack(spacing: 0) {
-                        HStack(spacing: 0) {
-                            Button(
-                                action: {
-                                    isShowRootDirectorySelector = true
-                                },
-                                label: {
-                                    Image(systemName: "folder")
-                                }
-                            )
-                            .padding()
-
-                            Divider()
-
-                            Text(store.projectRootDirectoryPath)
-                                .padding()
-
-                            Spacer()
-
-                            Button(
-                                action: {
-                                    store.send(.minusMagnifyingglassTapped)
-                                },
-                                label: {
-                                    Image(systemName: "minus.magnifyingglass")
-                                }
-                            )
-                            .padding(.leading)
-
-                            Text("\(Int(store.swiftDiagramScale * 100))%")
-                                .frame(width: 50)
-
-                            Button(
-                                action: {
-                                    store.send(.plusMagnifyingglassTapped)
-                                },
-                                label: {
-                                    Image(systemName: "plus.magnifyingglass")
-                                }
-                            )
-                            .padding(.trailing)
-                        } // HStack
-                        .frame(height: 40)
-
-                        Divider()
-
-                        ScrollView([.horizontal, .vertical]) {
-                            SwiftDiagramTreeView(store: store.scope(state: \.swiftDiagramTree, action: \.swiftDiagramTree))
-                                .scaleEffect(store.swiftDiagramScale)
-                                .frame(
-                                    width: max(store.swiftDiagramTree.frameWidth * store.swiftDiagramScale, 10),
-                                    height: max(store.swiftDiagramTree.frameHeight * store.swiftDiagramScale, 10)
-                                )
-                                .padding(300)
+                } // VStack
+                .overlay {
+                    if store.showProgressView {
+                        Color(red: 0, green: 0, blue: 0, opacity: 0.4)
+                    }
+                }
+                .toolbar {
+                    ToolbarItemGroup(placement: .navigation) {
+                        Button(
+                            action: {
+                                store.send(.monitorButtonTapped)
+                            },
+                            label: {
+                                Image(systemName: store.isMonitoring ? "stop.fill" : "play.fill")
+                                    .resizable()
+                                    .frame(width: 15, height: 15)
+                            }
+                        )
+                        .disabled(false)
+                    }
+                }
+            } detail: {
+                SwiftDiagramTreeView(store: store.scope(state: \.swiftDiagramTree, action: \.swiftDiagramTree))
+                    .navigationTitle(store.extractedData.projectRootDirectoryPath)
+                    .overlay {
+                        if store.showProgressView {
+                            Color(red: 0, green: 0, blue: 0, opacity: 0.4)
                         }
-
-                        Spacer()
-                    } // VStack
-                }
-            )
-
-            if let currentLoadingTask = store.loadingTaskKindBuffer.first {
-                switch currentLoadingTask {
-                case .sourceFiles:
-                    ProgressView {
-                        Text("In the process of extracting the source files.")
                     }
+            }
 
-                case .buildSettings:
-                    ProgressView {
-                        Text("In the process of getting build settings.")
-                    }
-
-                case .dumpPackage:
-                    ProgressView {
-                        Text("In the process of analyzing the package.")
-                    }
-
-                case .extractDeclarations:
-                    ProgressView {
-                        Text("In the process of extracting declarations.")
-                    }
-
-                case .extractDependencies:
-                    ProgressView {
-                        Text("In the process of extracting dependencies.")
-                    }
-                }
+            if store.showProgressView {
+                ProgressView()
+                    .scaleEffect(2)
             }
         } // ZStack
-        .fileImporter(
-            isPresented: $isShowRootDirectorySelector,
-            allowedContentTypes: [.directory],
-            allowsMultipleSelection: false
-        ) { result in
-            store.send(.projectDirectorySelectorResponse(result))
+        .task {
+            store.send(.task)
         }
     }
 }

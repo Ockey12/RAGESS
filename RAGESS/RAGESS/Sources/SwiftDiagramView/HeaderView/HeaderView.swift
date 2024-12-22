@@ -7,8 +7,8 @@
 //
 
 import ComposableArchitecture
+import DeclaredObject
 import SwiftUI
-import TypeDeclaration
 
 struct HeaderView: View {
     let store: StoreOf<HeaderReducer>
@@ -25,109 +25,132 @@ struct HeaderView: View {
         }
         .frame(
             width: store.bodyWidth + ComponentSizeValues.arrowTerminalWidth * 2,
-            height: 300
+            height: ComponentSizeValues.itemHeight * 2
+                + ComponentSizeValues.bottomPaddingForLastText
+                + ComponentSizeValues.connectionHeight
         )
     }
 }
 
 #Preview {
-    let protocolObject = ProtocolObject(
-        name: "SampleProtocol",
-        nameOffset: 0,
-        fullPath: "",
-        sourceCode: "",
-        positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
-        offsetRange: 0 ... 1
-    )
-
-    let structObject = StructObject(
-        name: "SampleStruct",
-        nameOffset: 0,
-        fullPath: "",
-        sourceCode: "",
-        positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
-        offsetRange: 0 ... 1
-    )
-
-    let classObject = ClassObject(
-        name: "SampleClass",
-        nameOffset: 0,
-        fullPath: "",
-        sourceCode: "",
-        positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
-        offsetRange: 0 ... 1
-    )
-
-    let enumObject = EnumObject(
-        name: "SampleEnum",
-        nameOffset: 0,
-        fullPath: "",
-        sourceCode: "",
-        positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
-        offsetRange: 0 ... 1
-    )
-
-    return VStack(spacing: 50) {
-        HeaderView(
-            store: .init(
-                initialState: HeaderReducer.State(
-                    object: protocolObject,
-                    topLeadingPoint: CGPoint(x: 0, y: 0),
-                    bodyWidth: max(
-                        protocolObject.name.systemSize50Width,
-                        ComponentSizeValues.bodyMinWidth
-                    )
+    HeaderView(
+        store: .init(
+            initialState: HeaderReducer.State(
+                object: .init(
+                    name: "Sample",
+                    nameOffset: 0,
+                    fullPath: "",
+                    sourceCode: "",
+                    rangeInXcode: LocationInXcode(line: 0, column: 0) ... LocationInXcode(line: 1, column: 1),
+                    offsetRange: 0 ... 1,
+                    kind: .struct
                 ),
-                reducer: { HeaderReducer() }
-            )
+                topLeadingPoint: .init(x: 0, y: 0),
+                bodyWidth: 800
+            ),
+            reducer: { HeaderReducer() }
         )
-        .border(.pink)
-
-        HeaderView(
-            store: .init(
-                initialState: HeaderReducer.State(
-                    object: structObject,
-                    topLeadingPoint: CGPoint(x: 0, y: 0),
-                    bodyWidth: max(
-                        structObject.name.systemSize50Width,
-                        ComponentSizeValues.bodyMinWidth
-                    )
-                ),
-                reducer: { HeaderReducer() }
-            )
-        )
-        .border(.pink)
-
-        HeaderView(
-            store: .init(
-                initialState: HeaderReducer.State(
-                    object: classObject,
-                    topLeadingPoint: CGPoint(x: 0, y: 0),
-                    bodyWidth: max(
-                        classObject.name.systemSize50Width,
-                        ComponentSizeValues.bodyMinWidth
-                    )
-                ),
-                reducer: { HeaderReducer() }
-            )
-        )
-        .border(.pink)
-
-        HeaderView(
-            store: .init(
-                initialState: HeaderReducer.State(
-                    object: enumObject,
-                    topLeadingPoint: CGPoint(x: 0, y: 0),
-                    bodyWidth: max(
-                        enumObject.name.systemSize50Width,
-                        ComponentSizeValues.bodyMinWidth
-                    )
-                ),
-                reducer: { HeaderReducer() }
-            )
-        )
-        .border(.pink)
-    }
-    .frame(width: 1000, height: 1600)
-    .padding()
+    )
 }
+
+// #Preview {
+//    let protocolObject = ProtocolObject(
+//        name: "SampleProtocol",
+//        nameOffset: 0,
+//        fullPath: "",
+//        sourceCode: "",
+//        positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
+//        offsetRange: 0 ... 1
+//    )
+//
+//    let structObject = StructObject(
+//        name: "SampleStruct",
+//        nameOffset: 0,
+//        fullPath: "",
+//        sourceCode: "",
+//        positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
+//        offsetRange: 0 ... 1
+//    )
+//
+//    let classObject = ClassObject(
+//        name: "SampleClass",
+//        nameOffset: 0,
+//        fullPath: "",
+//        sourceCode: "",
+//        positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
+//        offsetRange: 0 ... 1
+//    )
+//
+//    let enumObject = EnumObject(
+//        name: "SampleEnum",
+//        nameOffset: 0,
+//        fullPath: "",
+//        sourceCode: "",
+//        positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
+//        offsetRange: 0 ... 1
+//    )
+//
+//    return VStack(spacing: 50) {
+//        HeaderView(
+//            store: .init(
+//                initialState: HeaderReducer.State(
+//                    object: protocolObject,
+//                    topLeadingPoint: CGPoint(x: 0, y: 0),
+//                    bodyWidth: max(
+//                        protocolObject.name.systemSize50Width,
+//                        ComponentSizeValues.bodyMinWidth
+//                    )
+//                ),
+//                reducer: { HeaderReducer() }
+//            )
+//        )
+//        .border(.pink)
+//
+//        HeaderView(
+//            store: .init(
+//                initialState: HeaderReducer.State(
+//                    object: structObject,
+//                    topLeadingPoint: CGPoint(x: 0, y: 0),
+//                    bodyWidth: max(
+//                        structObject.name.systemSize50Width,
+//                        ComponentSizeValues.bodyMinWidth
+//                    )
+//                ),
+//                reducer: { HeaderReducer() }
+//            )
+//        )
+//        .border(.pink)
+//
+//        HeaderView(
+//            store: .init(
+//                initialState: HeaderReducer.State(
+//                    object: classObject,
+//                    topLeadingPoint: CGPoint(x: 0, y: 0),
+//                    bodyWidth: max(
+//                        classObject.name.systemSize50Width,
+//                        ComponentSizeValues.bodyMinWidth
+//                    )
+//                ),
+//                reducer: { HeaderReducer() }
+//            )
+//        )
+//        .border(.pink)
+//
+//        HeaderView(
+//            store: .init(
+//                initialState: HeaderReducer.State(
+//                    object: enumObject,
+//                    topLeadingPoint: CGPoint(x: 0, y: 0),
+//                    bodyWidth: max(
+//                        enumObject.name.systemSize50Width,
+//                        ComponentSizeValues.bodyMinWidth
+//                    )
+//                ),
+//                reducer: { HeaderReducer() }
+//            )
+//        )
+//        .border(.pink)
+//    }
+//    .frame(width: 1000, height: 1600)
+//    .padding()
+// }

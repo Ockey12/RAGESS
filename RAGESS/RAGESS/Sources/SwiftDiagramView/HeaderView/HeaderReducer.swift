@@ -7,8 +7,8 @@
 //
 
 import ComposableArchitecture
+import DeclaredObject
 import Foundation
-import TypeDeclaration
 
 @Reducer
 public struct HeaderReducer {
@@ -16,11 +16,7 @@ public struct HeaderReducer {
 
     @ObservableState
     public struct State: Equatable {
-        public static func == (lhs: HeaderReducer.State, rhs: HeaderReducer.State) -> Bool {
-            lhs.object.id == rhs.object.id
-        }
-
-        var object: any HasHeader
+        var object: DeclaredObject
         var text: TextCellReducer.State
         var topLeadingPoint: CGPoint
         var leadingArrowTerminalPoint: CGPoint {
@@ -50,7 +46,7 @@ public struct HeaderReducer {
         var bodyWidth: CGFloat
 
         public init(
-            object: any HasHeader,
+            object: DeclaredObject,
             topLeadingPoint: CGPoint,
             bodyWidth: CGFloat
         ) {
@@ -70,21 +66,21 @@ public struct HeaderReducer {
         case delegate(Delegate)
 
         public enum Delegate {
-            case clicked(
-                leadingArrowTerminalPoint: CGPoint,
-                trailingArrowTerminalPoint: CGPoint
-            )
+            case showImpactScopeButtonClicked(calleeUSR: [String])
         }
     }
 
     public var body: some ReducerOf<Self> {
-        Reduce { state, action in
+        Scope(state: \.text, action: \.text) {
+            TextCellReducer()
+        }
+        Reduce { _, action in
             switch action {
-            case .text(.clicked):
-                return .send(.delegate(.clicked(
-                    leadingArrowTerminalPoint: state.leadingArrowTerminalPoint,
-                    trailingArrowTerminalPoint: state.trailingArrowTerminalPoint
-                )))
+            case let .text(.delegate(delegateAction)):
+                switch delegateAction {
+                case let .showImpactScopeButtonClicked(calleeUSR: calleeUSR):
+                    return .send(.delegate(.showImpactScopeButtonClicked(calleeUSR: calleeUSR)))
+                }
 
             case .text:
                 return .none

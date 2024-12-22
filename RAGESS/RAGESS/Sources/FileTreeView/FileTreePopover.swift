@@ -7,8 +7,8 @@
 //
 
 import ComposableArchitecture
+import DeclaredObject
 import SwiftUI
-import TypeDeclaration
 
 @Reducer
 public struct FileTreePopoverReducer {
@@ -17,19 +17,20 @@ public struct FileTreePopoverReducer {
         let content: Content
         var cells: IdentifiedArrayOf<FileTreePopoverCellReducer.State>
 
-        public init(content: Content, declarationObjects: [any DeclarationObject]) {
+        public init(content: Content) {
             self.content = content
 
-            var objects: [any DeclarationObject] = []
             switch content {
-            case let .directory(directory):
-                break
+            case .directory:
+                cells = []
             case let .sourceFile(sourceFile):
-                objects = declarationObjects.filter { sourceFile.path == $0.fullPath }
+                let objects = sourceFile.declaredObjects
+                    .flatMap { $0.withNestingTypes }
+                    .sorted(by: { $0.rangeInXcode.lowerBound < $1.rangeInXcode.lowerBound })
+                cells = .init(uniqueElements: objects.map {
+                    FileTreePopoverCellReducer.State(declaredObject: $0)
+                })
             }
-            cells = .init(uniqueElements: objects.map {
-                FileTreePopoverCellReducer.State(declarationObject: $0)
-            })
         }
     }
 
@@ -38,7 +39,7 @@ public struct FileTreePopoverReducer {
         case delegate(Delegate)
 
         public enum Delegate {
-            case cellClicked(objectID: UUID)
+            case cellClicked(firstUSR: String)
         }
     }
 
@@ -47,8 +48,8 @@ public struct FileTreePopoverReducer {
             switch action {
             case let .cells(.element(id: _, action: .delegate(delegateAction))):
                 switch delegateAction {
-                case let .clicked(objectID: objectID):
-                    return .send(.delegate(.cellClicked(objectID: objectID)))
+                case let .clicked(firstUSR: firstUSR):
+                    return .send(.delegate(.cellClicked(firstUSR: firstUSR)))
                 }
 
             case .cells:
@@ -64,7 +65,7 @@ public struct FileTreePopoverReducer {
     }
 }
 
-public struct FileTreePopoverContent: View {
+public struct FileTreePopoverContentView: View {
     let store: StoreOf<FileTreePopoverReducer>
 
     public init(store: StoreOf<FileTreePopoverReducer>) {
@@ -72,10 +73,9 @@ public struct FileTreePopoverContent: View {
     }
 
     public var body: some View {
-        List {
+        VStack(alignment: .leading, spacing: 5) {
             ForEach(store.scope(state: \.cells, action: \.cells)) { cellStore in
                 FileTreePopoverCell(store: cellStore)
-                    .listRowSeparator(.hidden)
             }
         }
     }

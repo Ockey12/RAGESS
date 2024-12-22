@@ -8,7 +8,6 @@
 
 import ComposableArchitecture
 import SwiftUI
-import TypeDeclaration
 
 struct DetailView: View {
     let store: StoreOf<DetailReducer>
@@ -19,17 +18,19 @@ struct DetailView: View {
                 frameWidth: store.frameWidth,
                 numberOfItems: store.texts.count
             )
-            .foregroundStyle(.white)
+            .foregroundStyle(Color("Component", bundle: .module))
 
             DetailFrameShape(
                 frameWidth: store.frameWidth,
                 numberOfItems: store.texts.count
             )
             .stroke(lineWidth: ComponentSizeValues.borderWidth)
-            .fill(.black)
+            .fill(Color("ComponentBorder", bundle: .module))
 
             Text(store.kind.text)
                 .font(.system(size: ComponentSizeValues.fontSize))
+                .bold()
+                .foregroundStyle(Color("ComponentKindFont", bundle: .module))
                 .frame(
                     width: store.frameWidth + ComponentSizeValues.arrowTerminalWidth * 2,
                     height: ComponentSizeValues.itemHeight
@@ -52,45 +53,45 @@ struct DetailView: View {
     }
 }
 
-#Preview {
-    let functionObjects = [
-        FunctionObject(
-            name: "Function1",
-            nameOffset: 0,
-            fullPath: "",
-            positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
-            offsetRange: 0 ... 1
-        ),
-        FunctionObject(
-            name: "Function2",
-            nameOffset: 0,
-            fullPath: "",
-            positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
-            offsetRange: 0 ... 1
-        ),
-        FunctionObject(
-            name: "Function3",
-            nameOffset: 0,
-            fullPath: "",
-            positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
-            offsetRange: 0 ... 1
-        )
-    ]
-
-    return VStack {
-        DetailView(
-            store: .init(
-                initialState: DetailReducer.State(
-                    objects: functionObjects,
-                    kind: .functions,
-                    topLeadingPoint: CGPoint(x: 0, y: 0),
-                    frameWidth: 800
-                ),
-                reducer: { DetailReducer() }
-            )
-        )
-        .border(.pink)
-        .padding()
-    }
-    .frame(width: 900, height: 800)
-}
+// #Preview {
+//    let functionObjects = [
+//        FunctionObject(
+//            name: "Function1",
+//            nameOffset: 0,
+//            fullPath: "",
+//            positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
+//            offsetRange: 0 ... 1
+//        ),
+//        FunctionObject(
+//            name: "Function2",
+//            nameOffset: 0,
+//            fullPath: "",
+//            positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
+//            offsetRange: 0 ... 1
+//        ),
+//        FunctionObject(
+//            name: "Function3",
+//            nameOffset: 0,
+//            fullPath: "",
+//            positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
+//            offsetRange: 0 ... 1
+//        )
+//    ]
+//
+//    return VStack {
+//        DetailView(
+//            store: .init(
+//                initialState: DetailReducer.State(
+//                    objects: functionObjects,
+//                    kind: .functions,
+//                    topLeadingPoint: CGPoint(x: 0, y: 0),
+//                    frameWidth: 800
+//                ),
+//                reducer: { DetailReducer() }
+//            )
+//        )
+//        .border(.pink)
+//        .padding()
+//    }
+//    .frame(width: 900, height: 800)
+// }

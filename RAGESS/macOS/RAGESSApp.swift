@@ -14,7 +14,7 @@ struct RAGESSApp: App {
         WindowGroup {
             RAGESSView(
                 store: .init(
-                    initialState: .init(projectRootDirectoryPath: ""),
+                    initialState: .init(),
                     reducer: {
                         RAGESSReducer()
                     }

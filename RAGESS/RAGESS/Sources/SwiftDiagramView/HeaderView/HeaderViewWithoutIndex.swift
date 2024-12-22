@@ -8,7 +8,6 @@
 
 import ComposableArchitecture
 import SwiftUI
-import TypeDeclaration
 
 struct HeaderViewWithoutIndex: View {
     let store: StoreOf<HeaderReducer>
@@ -22,46 +21,48 @@ struct HeaderViewWithoutIndex: View {
     var body: some View {
         ZStack(alignment: .topLeading) {
             HeaderFrameWithoutIndex(frameWidth: store.bodyWidth)
-                .foregroundStyle(.white)
+                .foregroundStyle(Color("Component", bundle: .module))
 
             HeaderFrameWithoutIndex(frameWidth: store.bodyWidth)
                 .stroke(lineWidth: borderWidth)
-                .fill(.black)
+                .fill(Color("ComponentBorder", bundle: .module))
 
             TextCellView(store: store.scope(state: \.text, action: \.text))
         } // ZStack
         .frame(
             width: store.bodyWidth + ComponentSizeValues.arrowTerminalWidth * 2,
-            height: 210
+            height: ComponentSizeValues.itemHeight
+                + ComponentSizeValues.bottomPaddingForLastText
+                + ComponentSizeValues.connectionHeight
         )
     }
 }
 
-#Preview {
-    let protocolObject = ProtocolObject(
-        name: "SampleProtocol",
-        nameOffset: 0,
-        fullPath: "",
-        sourceCode: "",
-        positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
-        offsetRange: 0 ... 1
-    )
-
-    return Group {
-        HeaderViewWithoutIndex(
-            store: .init(
-                initialState: HeaderReducer.State(
-                    object: protocolObject,
-                    topLeadingPoint: CGPoint(x: 0, y: 0),
-                    bodyWidth: max(
-                        protocolObject.name.systemSize50Width,
-                        ComponentSizeValues.bodyMinWidth
-                    )
-                ),
-                reducer: { HeaderReducer() }
-            )
-        )
-    }
-    .frame(width: 1000)
-    .padding()
-}
+// #Preview {
+//    let protocolObject = ProtocolObject(
+//        name: "SampleProtocol",
+//        nameOffset: 0,
+//        fullPath: "",
+//        sourceCode: "",
+//        positionRange: SourcePosition(line: 0, utf8index: 0) ... SourcePosition(line: 1, utf8index: 1),
+//        offsetRange: 0 ... 1
+//    )
+//
+//    return Group {
+//        HeaderViewWithoutIndex(
+//            store: .init(
+//                initialState: HeaderReducer.State(
+//                    object: protocolObject,
+//                    topLeadingPoint: CGPoint(x: 0, y: 0),
+//                    bodyWidth: max(
+//                        protocolObject.name.systemSize50Width,
+//                        ComponentSizeValues.bodyMinWidth
+//                    )
+//                ),
+//                reducer: { HeaderReducer() }
+//            )
+//        )
+//    }
+//    .frame(width: 1000)
+//    .padding()
+// }

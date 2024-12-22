@@ -8,17 +8,19 @@
 
 import BuildSettingsClient
 import ComposableArchitecture
+import DebugView
 import DeclarationExtractor
-import DeclarationObjectsClient
+import DeclaredObject
 import Dependencies
-import DependenciesClient
+import DependenciesExtractor
+import DependencyObject
 import DumpPackageClient
 import FileTreeView
 import Foundation
 import MonitorClient
 import SourceFileClient
 import SwiftDiagramView
-import TypeDeclaration
+import SwiftIndexStoreObject
 import XcodeObject
 
 @Reducer
@@ -27,11 +29,30 @@ public struct RAGESSReducer {
 
     @ObservableState
     public struct State {
-        var projectRootDirectoryPath: String
-        var rootDirectory: Directory?
-        var buildSettings: [String: String] = [:]
-        var packages: [PackageObject] = []
-        var declarationObjects: [any DeclarationObject] = []
+        struct ExtractedData: Equatable {
+            var projectRootDirectoryPath: String = ""
+            var derivedDataPath: String = ""
+            var rootDirectory: Directory?
+            var buildSettings: [String: String] = [:]
+            var packages: [PackageObject] = []
+            var usrTable: [String: WritableKeyPath<Directory, DeclaredObject>] = [:]
+            var sourceFileTable: [String: WritableKeyPath<Directory, SourceFile>] = [:]
+            var indexStoreObjects: [IndexStoreObject] = []
+            var dependencyObjects: [DependencyObject] = []
+
+            mutating func reset() {
+                rootDirectory = nil
+                buildSettings = [:]
+                packages = []
+                usrTable = [:]
+                sourceFileTable = [:]
+                indexStoreObjects = []
+            }
+        }
+
+        var showStopButton = false
+        var extractedData: ExtractedData = .init()
+        var rootDirectoryWithoutUSRs: Directory?
         let ignoredDirectories = [
             "build",
             ".build",
@@ -41,296 +62,287 @@ public struct RAGESSReducer {
             ".swiftpm"
         ]
         var fileTree: FileTreeViewReducer.State = .init()
-        var loadingTaskKindBuffer: [LoadingTaskKind] = []
-        var swiftDiagramTree: SwiftDiagramTreeViewReducer.State = .init(allDeclarationObjects: [])
-        var swiftDiagramScale: CGFloat = 0.5
+        var showProgressView = false
+        var swiftDiagramTree: SwiftDiagramTreeViewReducer.State = .init(
+            rootObjectKeyPath: nil,
+            rootDirectory: nil,
+            usrTable: [:],
+            dependencyObjects: []
+        )
         var processStartTime = CFAbsoluteTimeGetCurrent()
+        var debugView = DebugReducer.State()
 
-        public init(projectRootDirectoryPath: String) {
-            self.projectRootDirectoryPath = projectRootDirectoryPath
+        var lastBuildStartTimeString = ""
+        var lastBuildSuccessTimeString = ""
+        let dateFormatter: DateFormatter
+        let monitor = BuildMonitor()
+        var isMonitoring = false
+
+        var lastSelectedObjectUSR: String?
+
+        public init() {
+            dateFormatter = DateFormatter()
+            dateFormatter.timeStyle = .medium
+            dateFormatter.dateStyle = .short
+            dateFormatter.locale = .current
         }
     }
 
     public enum Action: BindableAction {
+        case task
+
         case projectDirectorySelectorResponse(Result<[URL], Error>)
+        case derivedDataSelectorResponse(Result<[URL], Error>)
+        case monitorButtonTapped
         case extractSourceFiles
         case sourceFileResponse(Result<Directory, Error>)
-        case sourceFileSelected(SourceFile)
-        case buildSettingsResponse(Result<[String: String], Error>)
-        case dumpPackageResponse(Result<PackageObject, Error>)
-        case dumpPackageCompleted
-        case extractDeclarationsCompleted([any DeclarationObject])
-        case extractDependenciesResponse(Result<[any DeclarationObject], Error>)
-        case startMonitoring
-        case detectedDirectoryChange
+        case declarationExtractorResponse(Result<DeclarationExtractor.Response, Error>)
+        case dependenciesExtractorCompleted([DependencyObject])
+        case swiftDiagramTreeStateResponse(SwiftDiagramTreeViewReducer.State)
+
+        case detectedBuildStart(Date)
+        case detectedBuildSuccess(Date)
+
         case fileTree(FileTreeViewReducer.Action)
         case swiftDiagramTree(SwiftDiagramTreeViewReducer.Action)
         case minusMagnifyingglassTapped
         case plusMagnifyingglassTapped
+        case debugView(DebugReducer.Action)
         case binding(BindingAction<State>)
     }
 
     @Dependency(MonitorClient.self) var monitorClient
     @Dependency(SourceFileClient.self) var sourceFileClient
-    @Dependency(BuildSettingsClient.self) var buildSettingsClient
-    @Dependency(DumpPackageClient.self) var dumpPackageClient
-    @Dependency(DeclarationObjectsClient.self) var declarationObjectsClient
-    @Dependency(DependenciesClient.self) var dependenciesClient
-    @Dependency(\.mainQueue) var mainQueue
-
-    enum CancelID {
-        case detectedBuildSucceeded
-    }
+    @Dependency(\.swiftIndexStoreClient) private var indexStoreClient
 
     public var body: some ReducerOf<Self> {
+        BindingReducer()
         Scope(state: \.fileTree, action: \.fileTree) {
             FileTreeViewReducer()
         }
         Scope(state: \.swiftDiagramTree, action: \.swiftDiagramTree) {
             SwiftDiagramTreeViewReducer()
         }
+        #if DEBUG
+            Scope(state: \.debugView, action: \.debugView) {
+                DebugReducer()
+            }
+        #endif
         Reduce { state, action in
             switch action {
-            case let .projectDirectorySelectorResponse(.success(urls)):
-                guard let url = urls.first else {
-                    print("ERROR in \(#file) - \(#line): Cannot find `urls.first`")
+            case .task:
+                return .run { send in
+                    for await event in BuildMonitor().monitorBuildEvents() {
+                        switch event {
+                        case let .buildStart(date):
+                            await send(.detectedBuildStart(date))
+                        case let .buildSuccess(date):
+                            await send(.detectedBuildSuccess(date))
+                        }
+                    }
+                }
+
+            case let .projectDirectorySelectorResponse(result):
+                switch result {
+                case let .success(urls):
+                    guard let url = urls.first else {
+                        assertionFailure()
+                        return .none
+                    }
+
+                    state.extractedData.projectRootDirectoryPath = url.path()
+
+                    return .none
+
+                case let .failure(error):
+                    print(error)
+                    assertionFailure()
                     return .none
                 }
 
-                #if DEBUG
-                    print("Successfully get project root directory path.")
-                    print("╰─\(url.path())")
-                #endif
+            case let .derivedDataSelectorResponse(result):
+                switch result {
+                case let .success(urls):
+                    guard let url = urls.first else {
+                        assertionFailure()
+                        return .none
+                    }
 
-                state.projectRootDirectoryPath = url.path()
+                    state.extractedData.derivedDataPath = url.path()
 
-                return .send(.extractSourceFiles)
+                    return .none
 
-            case let .projectDirectorySelectorResponse(.failure(error)):
-                print(error)
+                case let .failure(error):
+                    print(error)
+                    assertionFailure()
+                    return .none
+                }
+
+            case .monitorButtonTapped:
+                if state.isMonitoring {
+                    // stop monitoring
+                    state.isMonitoring = false
+                    state.rootDirectoryWithoutUSRs = nil
+                } else {
+                    // start monitoring
+                    guard state.extractedData.projectRootDirectoryPath != "",
+                          state.extractedData.derivedDataPath != "" else {
+                        return .none
+                    }
+
+                    state.isMonitoring = true
+                }
                 return .none
 
             case .extractSourceFiles:
                 state.processStartTime = CFAbsoluteTimeGetCurrent()
-                state.loadingTaskKindBuffer.append(.sourceFiles)
 
                 return .run { [
-                    projectRootDirectoryPath = state.projectRootDirectoryPath,
+                    projectRootDirectoryPath = state.extractedData.projectRootDirectoryPath,
                     ignoredDirectories = state.ignoredDirectories
                 ] send in
                     await send(.sourceFileResponse(Result {
-                        try await sourceFileClient.getXcodeObjects(
+                        try sourceFileClient.getRootDirectory(
                             rootDirectoryPath: projectRootDirectoryPath,
                             ignoredDirectories: ignoredDirectories
                         )
                     }))
                 }
 
-            case let .sourceFileResponse(.success(rootDirectory)):
-                state.loadingTaskKindBuffer.removeFirst()
+            case let .sourceFileResponse(result):
+                switch result {
+                case let .success(rootDirectory):
+                    state.rootDirectoryWithoutUSRs = rootDirectory
+                    return .none
 
-                #if DEBUG
-                    print(".sourceFileResponse(.success(rootDirectory))")
-                    print("state.loadingTaskKindBuffer.removeFirst(): \(state.loadingTaskKindBuffer)")
-                    dump(rootDirectory)
-                #endif
-
-                state.rootDirectory = rootDirectory
-                state.fileTree.rootDirectory = rootDirectory
-
-                guard !rootDirectory.allXcodeprojPathsUnderDirectory.isEmpty else {
-                    print("ERROR in \(#file) - \(#line): Cannot find `**.xcodeproj`")
+                case let .failure(error):
+                    print(error)
+                    assertionFailure()
                     return .none
                 }
 
-                state.loadingTaskKindBuffer.append(.buildSettings)
-                state.loadingTaskKindBuffer.append(
-                    contentsOf: Array(
-                        repeating: .dumpPackage,
-                        count: rootDirectory.allPackageSwiftPath.count
-                    )
-                )
+            case let .declarationExtractorResponse(result):
+                switch result {
+                case let .success(response):
+                    state.extractedData.rootDirectory = response.rootDirectory
+                    state.extractedData.usrTable = response.usrTable
+                    state.extractedData.sourceFileTable = response.sourceFileTable
+                    state.extractedData.indexStoreObjects = response.indexStoreObjects
+                    state.fileTree.rootDirectory = response.rootDirectory
 
-                return .run { send in
-                    await send(.buildSettingsResponse(Result {
-                        try await buildSettingsClient.getSettings(
-                            xcodeprojPath: rootDirectory.allXcodeprojPathsUnderDirectory[0]
+                    return .send(.dependenciesExtractorCompleted(
+                        DependenciesExtractor.extract(
+                            indexStoreObjects: response.indexStoreObjects,
+                            usrTable: response.usrTable,
+                            sourceFileTable: response.sourceFileTable,
+                            rootDirectory: response.rootDirectory
                         )
-                    }))
+                    ))
 
-                    for packageSwiftPath in rootDirectory.allPackageSwiftPath {
-                        let packageDirectoryPath = NSString(string: packageSwiftPath)
-                            .deletingLastPathComponent
-                        await send(.dumpPackageResponse(Result {
-                            try await dumpPackageClient.dumpPackage(currentDirectory: packageDirectoryPath)
-                        }))
-                    }
-
-                    await send(.dumpPackageCompleted)
-                }
-
-            case let .sourceFileResponse(.failure(error)):
-                print(error)
-                return .none
-
-            case let .sourceFileSelected(sourceFile):
-                return .none
-
-            case let .buildSettingsResponse(.success(buildSettings)):
-                state.buildSettings = buildSettings
-                state.loadingTaskKindBuffer.removeFirst()
-
-                #if DEBUG
-                    print("Successfully get buildsettings.")
-                    print("state.loadingTaskKindBuffer.removeFirst(): \(state.loadingTaskKindBuffer)")
-                    dump(buildSettings)
-                #endif
-                return .none
-
-            case let .buildSettingsResponse(.failure(error)):
-                print(error)
-                return .none
-
-            case let .dumpPackageResponse(.success(packageObject)):
-                state.packages.append(packageObject)
-                state.loadingTaskKindBuffer.removeFirst()
-
-                #if DEBUG
-                    print("Successfully dump `PackageObject`.")
-                    print("state.loadingTaskKindBuffer.removeFirst(): \(state.loadingTaskKindBuffer)")
-                    dump(packageObject)
-                #endif
-
-                return .none
-
-            case let .dumpPackageResponse(.failure(error)):
-                print(error)
-                return .none
-
-            case .dumpPackageCompleted:
-                state.loadingTaskKindBuffer.removeAll(where: { $0 == .dumpPackage })
-
-                #if DEBUG
-                    print("Successfully dump all `PackageObject`.")
-                    print("state.loadingTaskKindBuffer.removeFirst(): \(state.loadingTaskKindBuffer)")
-                #endif
-
-                guard let rootDirectory = state.rootDirectory else {
-                    print("ERROR in \(#file) - \(#line): Cannot find `State.rootDirectory`")
+                case let .failure(error):
+                    state.showProgressView = false
+                    print(error)
+                    assertionFailure()
                     return .none
                 }
-                let allSourceFiles = getAllSourceFiles(in: rootDirectory)
 
-                state.loadingTaskKindBuffer.append(.extractDeclarations)
+            case let .dependenciesExtractorCompleted(dependencyObjects):
+                print("EXTRACT COMPLETED: \(CFAbsoluteTimeGetCurrent() - state.processStartTime) S")
+                state.extractedData.dependencyObjects = dependencyObjects
+                state.showProgressView = false
 
-                return .run {
-                    [
-                        buildSettings = state.buildSettings,
-                        packages = state.packages
-                    ] send in
-
-                    let declarationObjects = await extractDeclarations(
-                        allSourceFiles: allSourceFiles,
-                        buildSettings: buildSettings,
-                        packages: packages
+                if let usr = state.lastSelectedObjectUSR,
+                   let objectKeyPath = state.extractedData.usrTable[usr],
+                   let rootDirectory = state.extractedData.rootDirectory {
+                    let startTime = CFAbsoluteTimeGetCurrent()
+                    state.swiftDiagramTree = .init(
+                        rootObjectKeyPath: objectKeyPath,
+                        rootDirectory: rootDirectory,
+                        usrTable: state.extractedData.usrTable,
+                        dependencyObjects: state.extractedData.dependencyObjects
                     )
-
-                    await send(.extractDeclarationsCompleted(declarationObjects))
+                    print("Node States Generated: \(CFAbsoluteTimeGetCurrent() - startTime) S")
+                } else {
+                    state.swiftDiagramTree.reset()
                 }
-
-            case let .extractDeclarationsCompleted(declarationObjects):
-                state.loadingTaskKindBuffer.removeFirst()
-
-                #if DEBUG
-                    print("Successfully extract declaration objects.")
-                    print("state.loadingTaskKindBuffer.removeFirst(): \(state.loadingTaskKindBuffer)")
-                #endif
-
-                guard let rootDirectory = state.rootDirectory else {
-                    print("ERROR in \(#file) - \(#line): Cannot find `State.rootDirectory`")
-                    return .none
-                }
-                let allSourceFiles = getAllSourceFiles(in: rootDirectory)
-
-                state.loadingTaskKindBuffer.append(.extractDependencies)
-
-                return .run {
-                    [
-                        buildSettings = state.buildSettings,
-                        packages = state.packages
-                    ] send in
-
-                    await declarationObjectsClient.set(declarationObjects)
-
-                    await send(.extractDependenciesResponse(Result {
-                        try await dependenciesClient.extractDependencies(
-                            declarationObjects: declarationObjects,
-                            allSourceFiles: allSourceFiles,
-                            buildSettings: buildSettings,
-                            packages: packages
-                        )
-                    }))
-                }
-
-            case let .extractDependenciesResponse(.success(hasDependenciesObjects)):
-                state.loadingTaskKindBuffer.removeFirst()
-
-                #if DEBUG
-                    print("Successfully extract dependencies.")
-                    print("state.loadingTaskKindBuffer.removeFirst(): \(state.loadingTaskKindBuffer)")
-                #endif
-
-                state.declarationObjects = hasDependenciesObjects
-
-                print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
-                print("COMPLETE ALL PROCESSES")
-                print("TIME ELAPSED: \(CFAbsoluteTimeGetCurrent() - state.processStartTime)")
-                print("NUMBER OF DECLARATION OBJECTS: \(state.declarationObjects.count)")
-                print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=")
-
-                return .send(.startMonitoring)
-
-            case let .extractDependenciesResponse(.failure(error)):
-                print(error)
                 return .none
 
-            case .startMonitoring:
-                guard let buildDirectoryPath = state.buildSettings["BUILD_DIR"] else {
-                    print("ERROR in \(#file) - \(#line): Cannot find \"BUILD_DIR\" key.")
-                    return .none
-                }
-                let appPaths = findAppPaths(in: buildDirectoryPath)
-
-                guard !appPaths.isEmpty else {
-                    print("ERROR in \(#file) - \(#line): Cannot find \".app\" directory.")
+            case let .detectedBuildStart(date):
+                guard state.isMonitoring else {
                     return .none
                 }
 
-                return .run { send in
-                    // FIXME: Monitoring multiple `.app` directories.
-                    // FIXME: Reset monitoring if project root directory changes.
-                    for await _ in monitorClient.start(directoryPath: appPaths[0]) {
-                        await send(.detectedDirectoryChange)
-                    }
-                }
-
-            case .detectedDirectoryChange:
+                let dateString = state.dateFormatter.string(from: date)
+                print("Build Start: \(dateString)")
+                state.lastBuildStartTimeString = dateString
                 return .send(.extractSourceFiles)
-                    .debounce(
-                        id: CancelID.detectedBuildSucceeded,
-                        for: 1.0,
-                        scheduler: self.mainQueue
-                    )
+
+            case let .detectedBuildSuccess(date):
+                guard state.isMonitoring else {
+                    return .none
+                }
+
+                let dateString = state.dateFormatter.string(from: date)
+                print("Build Success: \(dateString)")
+                state.lastBuildSuccessTimeString = dateString
+
+                guard let rootDirectory = state.rootDirectoryWithoutUSRs else {
+                    print("state.rootDirectoryWithoutUSRs == nil")
+                    return .run { send in
+                        try await Task.sleep(for: .seconds(1))
+                        await send(.detectedBuildSuccess(date))
+                    }
+                }
+                state.rootDirectoryWithoutUSRs = nil
+                guard !rootDirectory.allXcodeprojPathsUnderDirectory.isEmpty,
+                      let derivedDataURL = URL(string: state.extractedData.derivedDataPath)
+                else {
+                    assertionFailure()
+                    return .none
+                }
+
+                let indexStoreURL = derivedDataURL
+                    .appendingPathComponent("Index.noindex")
+                    .appendingPathComponent("DataStore")
+
+                state.showProgressView = true
+                return .run { send in
+                    await send(.declarationExtractorResponse(Result {
+                        try DeclarationExtractor.extractDeclarations(rootDirectory: rootDirectory, indexStoreURL: indexStoreURL)
+                    }))
+                }
+
+            case let .swiftDiagramTreeStateResponse(treeState):
+                state.showProgressView = false
+                state.swiftDiagramTree = treeState
+                return .none
+
+            // MARK: Children Actions
 
             case let .fileTree(.delegate(delegateAction)):
                 switch delegateAction {
-                case let .popoverCellClicked(objectID: objectID):
-                    guard let clickedObject = state.declarationObjects.first(where: { $0.id == objectID }) else {
+                case let .popoverCellClicked(firstUSR: firstUSR):
+                    guard let objectKeyPath = state.extractedData.usrTable[firstUSR],
+                          let rootDirectory = state.extractedData.rootDirectory
+                    else {
+                        assertionFailure()
                         return .none
                     }
-                    print(clickedObject.name)
-                    state.swiftDiagramTree = .init(rootObject: clickedObject, allDeclarationObjects: state.declarationObjects)
-                    return .none
+                    let selectedObject = rootDirectory[keyPath: objectKeyPath]
+                    state.lastSelectedObjectUSR = firstUSR
+                    state.showProgressView = true
+                    print("Selected: \(selectedObject.name)")
+
+                    return .run { [usrTable = state.extractedData.usrTable, dependencyObjects = state.extractedData.dependencyObjects] send in
+                        await send(.swiftDiagramTreeStateResponse(
+                            SwiftDiagramTreeViewReducer.State(
+                                rootObjectKeyPath: objectKeyPath,
+                                rootDirectory: rootDirectory,
+                                usrTable: usrTable,
+                                dependencyObjects: dependencyObjects
+                            )
+                        ))
+                    }
                 }
 
             case .fileTree:
@@ -340,76 +352,19 @@ public struct RAGESSReducer {
                 return .none
 
             case .minusMagnifyingglassTapped:
-                state.swiftDiagramScale = max(state.swiftDiagramScale - 0.05, 0.05)
+                state.swiftDiagramTree.swiftDiagramScale = max(round((state.swiftDiagramTree.swiftDiagramScale - 0.1) * 10) / 10, 0.1)
                 return .none
 
             case .plusMagnifyingglassTapped:
-                state.swiftDiagramScale = min(state.swiftDiagramScale + 0.05, 1)
+                state.swiftDiagramTree.swiftDiagramScale = min(round((state.swiftDiagramTree.swiftDiagramScale + 0.1) * 10) / 10, 2)
+                return .none
+
+            case .debugView:
                 return .none
 
             case .binding:
                 return .none
             }
         }
-    }
-}
-
-extension RAGESSReducer {
-    func getAllSourceFiles(in directory: Directory) -> [SourceFile] {
-        var files = directory.files
-        for subDirectory in directory.subDirectories {
-            files.append(contentsOf: getAllSourceFiles(in: subDirectory))
-        }
-        return files
-    }
-
-    func getAllSwiftFilePaths(in directory: Directory) -> [String] {
-        var swiftFilePaths: [String] = directory.files.map { $0.path }
-        for subDirectory in directory.subDirectories {
-            swiftFilePaths.append(contentsOf: getAllSwiftFilePaths(in: subDirectory))
-        }
-        return swiftFilePaths
-    }
-
-    func extractDeclarations(
-        allSourceFiles: [SourceFile],
-        buildSettings: [String: String],
-        packages: [PackageObject]
-    ) async -> [any DeclarationObject] {
-        var declarationObjects: [any DeclarationObject] = []
-        let allSourceFilePaths = allSourceFiles.map { $0.path }
-        let extractor = DeclarationExtractor()
-
-        for sourceFile in allSourceFiles {
-            let declarations = await extractor.extractDeclarations(
-                from: sourceFile,
-                buildSettings: buildSettings,
-                sourceFilePaths: allSourceFilePaths,
-                packages: packages
-            )
-
-            declarationObjects.append(contentsOf: declarations)
-        }
-
-        return declarationObjects
-    }
-
-    func findAppPaths(in directoryPath: String) -> [String] {
-        let fileManager = FileManager.default
-        let directoryURL = URL(filePath: directoryPath)
-
-        guard let enumerator = fileManager.enumerator(at: directoryURL, includingPropertiesForKeys: nil) else {
-            return []
-        }
-
-        var appPaths: [String] = []
-
-        while let url = enumerator.nextObject() as? URL {
-            if url.pathExtension == "app" {
-                appPaths.append(url.path())
-            }
-        }
-
-        return appPaths
     }
 }

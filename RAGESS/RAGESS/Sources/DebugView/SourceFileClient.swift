@@ -59,7 +59,7 @@ public struct SourceFileClientDebugger {
                 state.selectedFile = nil
                 return .run { [rootPath = state.rootPath] send in
                     await send(.sourceFileResponse(Result {
-                        try await sourceFileClient.getXcodeObjects(
+                        try sourceFileClient.getRootDirectory(
                             rootDirectoryPath: rootPath,
                             ignoredDirectories: [".build", "DerivedData", ".git"]
                         )
@@ -149,12 +149,12 @@ public struct SourceFileClientDebugView: View {
                     if let file = store.selectedFile {
                         VStack {
                             HStack {
-                                Text(file.path)
+                                Text(file.fullPath)
                                 Spacer()
                             }
                             ScrollView {
                                 HStack {
-                                    Text(file.content)
+                                    Text(file.sourceCode)
                                         .foregroundStyle(.white)
                                     Spacer()
                                 }

@@ -7,18 +7,19 @@
 
 import Foundation
 
-public struct Directory: Identifiable {
+public struct Directory: Identifiable, Equatable {
     public var id: String {
-        path
+        fullPath
     }
 
-    public let path: String
+    public let fullPath: String
+    public let keyPathFromRootDirectory: WritableKeyPath<Self, Self>
     public var name: String {
-        NSString(string: path).lastPathComponent
+        NSString(string: fullPath).lastPathComponent
     }
 
-    public let subDirectories: [Self]
-    public let files: [SourceFile]
+    public var subDirectories: [Self]
+    public var files: [SourceFile]
     public let xcodeprojPaths: [String]
     public var allXcodeprojPathsUnderDirectory: [String] {
         var allPaths = subDirectories.map { $0.allXcodeprojPathsUnderDirectory }.flatMap { $0 }
@@ -38,13 +39,15 @@ public struct Directory: Identifiable {
     public var descriptionJSONString: String?
 
     public init(
-        path: String,
+        fullPath: String,
+        keyPathFromRootDirectory: WritableKeyPath<Self, Self>,
         subDirectories: [Self],
         files: [SourceFile],
         xcodeprojPaths: [String] = [],
         packageSwiftPath: String? = nil
     ) {
-        self.path = path
+        self.fullPath = fullPath
+        self.keyPathFromRootDirectory = keyPathFromRootDirectory
         self.subDirectories = subDirectories
         self.files = files
         self.xcodeprojPaths = xcodeprojPaths

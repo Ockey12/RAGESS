@@ -7,10 +7,10 @@
 //
 
 import ComposableArchitecture
-import DeclarationObjectsClient
-import Dependencies
+import DeclaredObject
+import DependencyObject
 import Foundation
-import TypeDeclaration
+import XcodeObject
 
 @Reducer
 public struct SwiftDiagramTreeViewReducer {
@@ -18,54 +18,57 @@ public struct SwiftDiagramTreeViewReducer {
 
     @ObservableState
     public struct State {
-        let rootObject: (any DeclarationObject)?
         var nodes: IdentifiedArrayOf<NodeReducer.State>
         var arrows: IdentifiedArrayOf<ArrowViewReducer.State>
-        let allDeclarationObjects: [any DeclarationObject]
-        public let frameWidth: CGFloat
-        public let frameHeight: CGFloat
+        public var frameWidth: CGFloat
+        public var frameHeight: CGFloat
+        public var swiftDiagramScale: CGFloat = 1
 
-        public init(rootObject: (any DeclarationObject)? = nil, allDeclarationObjects: [any DeclarationObject]) {
-            self.rootObject = rootObject
-            self.allDeclarationObjects = allDeclarationObjects
-
-            guard let rootObject else {
+        public init(
+            rootObjectKeyPath: KeyPath<Directory, DeclaredObject>?,
+            rootDirectory: Directory?,
+            usrTable: [String: KeyPath<Directory, DeclaredObject>],
+            dependencyObjects: [DependencyObject]
+        ) {
+            guard let rootObjectKeyPath,
+                  let rootDirectory,
+                  let rootNode = TreeGenerator.generate(
+                      rootDirectory: rootDirectory,
+                      rootObjectKeyPath: rootObjectKeyPath,
+                      usrTable: usrTable,
+                      dependencyObjects: dependencyObjects
+                  )
+            else {
                 nodes = []
                 arrows = []
                 frameWidth = 0
                 frameHeight = 0
                 return
             }
-
-            let rootNode = TreeGenerator.generateTree(rootObject: rootObject, allDeclarationObjects: allDeclarationObjects)
-
-            guard let rootNode else {
-                nodes = []
-                arrows = []
-                frameWidth = 0
-                frameHeight = 0
-                return
-            }
-            #if DEBUG
-                print("printTree(parentNode: rootNode)")
-                TreeGenerator.printTree(parentNode: rootNode)
-            #endif
 
             frameHeight = rootNode.subtreeHeight
-            let nodesState = TreeGenerator.generateNodesState(rootNode: rootNode, allDeclarationObjects: allDeclarationObjects)
-            frameWidth = nodesState.map { $0.topLeadingPoint.x + $0.frameWidth }.max() ?? 0
-            nodes = .init(uniqueElements: nodesState)
-            let arrowsState = ArrowsStateGenerator.generate(nodes: nodesState)
+            let nodeStates = TreeGenerator.generateNodeStates(
+                rootNode: rootNode,
+                rootDirectory: rootDirectory,
+                usrTable: usrTable,
+                dependencyObjects: dependencyObjects
+            )
+            frameWidth = nodeStates.map { $0.topLeadingPoint.x + $0.frameWidth }.max() ?? 0
+            nodes = .init(uniqueElements: nodeStates)
+            let arrowsState = ArrowsStateGenerator.generate(
+                nodes: nodeStates,
+                rootDirectory: rootDirectory,
+                usrTable: usrTable,
+                dependencyObjects: dependencyObjects
+            )
             arrows = .init(uniqueElements: arrowsState)
-            #if DEBUG
-                for node in nodes {
-                    print(node.object.name)
-                    print("  topLeadingPoint: \(node.topLeadingPoint)")
-                    print("  W: \(node.frameWidth), H: \(node.frameWidth)")
-                }
-                print("frameWidth: \(frameWidth)")
-                print("frameHeight: \(frameHeight)")
-            #endif
+        }
+
+        public mutating func reset() {
+            nodes = []
+            arrows = []
+            frameWidth = 10
+            frameHeight = 10
         }
     }
 
@@ -74,11 +77,24 @@ public struct SwiftDiagramTreeViewReducer {
         case arrows(IdentifiedActionOf<ArrowViewReducer>)
     }
 
-    @Dependency(DeclarationObjectsClient.self) var declarationObjectsClient
-
     public var body: some ReducerOf<Self> {
-        Reduce { _, action in
+        Reduce { state, action in
             switch action {
+            case let .nodes(.element(id: _, action: .delegate(delegateAction))):
+                switch delegateAction {
+                case let .showImpactScopeButtonClicked(calleeUSR: calleeUSR):
+                    state.arrows = .init(uniqueElements: state.arrows.map {
+                        var arrowState = $0
+                        if calleeUSR.contains($0.dependency.calleeUSR) {
+                            arrowState.isShow = true
+                        } else {
+                            arrowState.isShow = false
+                        }
+                        return arrowState
+                    })
+                    return .none
+                }
+
             case .nodes:
                 return .none
 
@@ -95,79 +111,130 @@ public struct SwiftDiagramTreeViewReducer {
     }
 }
 
-let verticalPadding: CGFloat = 500
+extension Directory {
+    func findRootTypeObject(
+        targetKeyPath: KeyPath<Directory, DeclaredObject>,
+        usrTable: [String: KeyPath<Directory, DeclaredObject>]
+    ) -> DeclaredObject? {
+        var object = self[keyPath: targetKeyPath]
+
+        while true {
+            switch object.kind {
+            case .struct, .class, .enum, .protocol, .actor, .extension:
+                return object
+            case .initializer, .variable, .function, .case, .attribute:
+                guard let parentUSR = object.parentUSRs.first,
+                      let parentKeyPath = usrTable[parentUSR]
+                else {
+                    return nil
+                }
+                let parent = self[keyPath: parentKeyPath]
+                guard object != parent else {
+                    return object
+                }
+                object = self[keyPath: parentKeyPath]
+            }
+        }
+    }
+}
 
 private enum TreeGenerator {
-    /// Return  a root node.
-    static func generateTree(
-        rootObject: any DeclarationObject,
-        allDeclarationObjects: [any DeclarationObject]
-    ) -> NodeModel? {
-        let genericTypeObject: GenericTypeObject
-        switch rootObject {
-        case let structObject as StructObject:
-            genericTypeObject = .struct(structObject)
-        case let classObject as ClassObject:
-            genericTypeObject = .class(classObject)
-        case let enumObject as EnumObject:
-            genericTypeObject = .enum(enumObject)
-        case let protocolObject as ProtocolObject:
-            genericTypeObject = .protocol(protocolObject)
-        case let actorObject as ActorObject:
-            genericTypeObject = .actor(actorObject)
-        default:
-            #if DEBUG
-                print("ERROR: \(#file) - \(#function): Cannot cast \(rootObject.name) to Type.")
-            #endif
-            return nil
+    private static func convertToNodeModel(
+        from declaredObject: DeclaredObject,
+        rootDirectory: Directory,
+        usrTable: [String: KeyPath<Directory, DeclaredObject>],
+        dependencyObjects: [DependencyObject],
+        parentID: UUID?
+    ) -> NodeModel {
+        let callerDependencies = dependencyObjects.filteringWhereCaller(declaredObject)
+        let baseOfs = callerDependencies.filter { $0.roles.contains(.baseOf) }
+
+        let baseObjects: [DeclaredObject] = baseOfs.compactMap { dependency in
+            guard let calleeUSRKeyPath = usrTable[dependency.calleeUSR] else {
+                return nil
+            }
+            return rootDirectory[keyPath: calleeUSRKeyPath]
         }
 
-        let rootNode = NodeModel(
-            object: genericTypeObject,
-            parentID: nil,
-            allDeclarationObjects: allDeclarationObjects
+        let hasSuperClass: Bool = baseObjects.contains(where: { $0.kind == .class })
+
+        let numberOfParentProtocols: Int = {
+            if declaredObject.kind == .protocol {
+                return baseObjects.filter { $0.kind == .protocol }.count
+            } else {
+                return 0
+            }
+        }()
+
+        let numberOfConformances: Int = {
+            if declaredObject.kind == .protocol {
+                return 0
+            } else {
+                return baseObjects.filter { $0.kind == .protocol }.count
+            }
+        }()
+
+        return NodeModel(
+            object: declaredObject,
+            parentID: parentID,
+            hasSuperClass: hasSuperClass,
+            numberOfParentProtocols: numberOfParentProtocols,
+            numberOfConformances: numberOfConformances
         )
+    }
+
+    /// Return  a root node.
+    static func generate(
+        rootDirectory: Directory,
+        rootObjectKeyPath: KeyPath<Directory, DeclaredObject>,
+        usrTable: [String: KeyPath<Directory, DeclaredObject>],
+        dependencyObjects: [DependencyObject]
+    ) -> NodeModel? {
+        let rootObject = rootDirectory[keyPath: rootObjectKeyPath]
+
+        let rootNode = Self.convertToNodeModel(
+            from: rootObject,
+            rootDirectory: rootDirectory,
+            usrTable: usrTable,
+            dependencyObjects: dependencyObjects,
+            parentID: nil
+        )
+
         var queue: [NodeModel] = [rootNode]
         var allNodes: [NodeModel] = [rootNode]
         var didVisitObjectsID: Set<UUID> = [rootNode.object.id]
 
         while !queue.isEmpty {
             let node = queue.removeFirst()
-            let dependencies = node.object.objectsThatCallThisObject
+            let dependencies = dependencyObjects.filteringWhereCallee(node.object)
             didVisitObjectsID.insert(node.object.id)
 
             for dependency in dependencies {
-                guard let callerObject = allDeclarationObjects.first(where: { $0.id == dependency.callerObject.rootObjectID }) else {
-                    continue
-                }
-                guard node.object.id != callerObject.id else {
-                    continue
-                }
-                guard !didVisitObjectsID.contains(callerObject.id) else {
-                    continue
-                }
-                didVisitObjectsID.insert(callerObject.id)
-
-                let genericTypeObject: GenericTypeObject
-                switch callerObject {
-                case let structObject as StructObject:
-                    genericTypeObject = .struct(structObject)
-                case let classObject as ClassObject:
-                    genericTypeObject = .class(classObject)
-                case let enumObject as EnumObject:
-                    genericTypeObject = .enum(enumObject)
-                case let protocolObject as ProtocolObject:
-                    genericTypeObject = .protocol(protocolObject)
-                case let actorObject as ActorObject:
-                    genericTypeObject = .actor(actorObject)
-                default:
+                guard let callerUSR = dependency.callerUSRs.first,
+                      let callerKeyPath = usrTable[callerUSR]
+                else {
                     continue
                 }
 
-                let child = NodeModel(
-                    object: genericTypeObject,
-                    parentID: node.object.id,
-                    allDeclarationObjects: allDeclarationObjects
+                let callerRootObject = rootDirectory.findRootTypeObject(
+                    targetKeyPath: callerKeyPath,
+                    usrTable: usrTable
+                )
+                guard let callerRootObject,
+                      node.object.id != callerRootObject.id,
+                      !didVisitObjectsID.contains(callerRootObject.id)
+                else {
+                    continue
+                }
+
+                didVisitObjectsID.insert(callerRootObject.id)
+
+                let child = Self.convertToNodeModel(
+                    from: callerRootObject,
+                    rootDirectory: rootDirectory,
+                    usrTable: usrTable,
+                    dependencyObjects: dependencyObjects,
+                    parentID: node.object.id
                 )
                 queue.append(child)
                 allNodes.append(child)
@@ -193,7 +260,7 @@ private enum TreeGenerator {
     #if DEBUG
         static func printTree(parentNode: NodeModel, level: Int = 0) {
             let indent = String(repeating: "  ", count: level)
-            print("\(indent)\(parentNode.object.name), id: \(parentNode.id), parentID: \(parentNode.parentID)")
+            print("\(indent)\(parentNode.object.name), id: \(parentNode.id), parentID: \(parentNode.parentID?.uuidString ?? "nil")")
 
             for child in parentNode.children {
                 printTree(parentNode: child, level: level + 1)
@@ -201,13 +268,15 @@ private enum TreeGenerator {
         }
     #endif
 
-    static func generateNodesState(
+    static func generateNodeStates(
         rootNode: NodeModel,
-        allDeclarationObjects: [any DeclarationObject]
+        rootDirectory: Directory,
+        usrTable: [String: KeyPath<Directory, DeclaredObject>],
+        dependencyObjects: [DependencyObject]
     ) -> [NodeReducer.State] {
         var queue: [NodeModel] = [rootNode]
         var allNodes: [NodeModel] = [rootNode]
-        let horizontalPadding: CGFloat = 1000
+        let horizontalPadding = ComponentSizeValues.horizontalPaddingBetweenCombinedDiagrams
 
         while !queue.isEmpty {
             let node = queue.removeFirst()
@@ -220,14 +289,16 @@ private enum TreeGenerator {
             x: 0,
             y: 0
         )
-        var nodesState: [NodeReducer.State] = []
+        var nodeStates: [NodeReducer.State] = []
         for node in allNodes {
             if node.id == rootNode.id {
                 // root node
-                nodesState.append(
-                    NodeReducer.State(
+                nodeStates.append(
+                    .init(
                         object: node.object,
-                        allDeclarationObjects: allDeclarationObjects,
+                        rootDirectory: rootDirectory,
+                        usrTable: usrTable,
+                        dependencyObjects: dependencyObjects,
                         topLeadingPoint: CGPoint(
                             x: 0,
                             y: node.subtreeHeight / 2 - node.frameHeight / 2
@@ -235,25 +306,13 @@ private enum TreeGenerator {
                         subtreeTopLeadingPoint: CGPoint(x: 0, y: 0)
                     )
                 )
-
                 currentSubtreeTopLeadingPoint.x += node.frameWidth + horizontalPadding
-                #if DEBUG
-                    print("\nRoot Node")
-                    print(node.object.name)
-                    print("  topLeadingPoint: \(nodesState.last!.topLeadingPoint)")
-                    print("  W: \(node.frameWidth), H: \(node.frameHeight)")
-                    print("  State W: \(nodesState.last!.frameWidth), H: \(nodesState.last!.frameHeight)")
-                    print("  subtreeHeight: \(node.subtreeHeight)\n")
-                #endif
                 continue
-            } // if
+            }
 
             if currentParentID != node.parentID,
                let parentID = node.parentID {
-                guard let parent = nodesState.first(where: { $0.id == parentID }) else {
-                    #if DEBUG
-                        print("ERROR: \(#file) - \(#function): Couldn't find parent node.")
-                    #endif
+                guard let parent = nodeStates.first(where: { $0.id == parentID }) else {
                     break
                 }
                 currentParentID = parentID
@@ -261,14 +320,14 @@ private enum TreeGenerator {
                     x: parent.topLeadingPoint.x + parent.frameWidth + horizontalPadding,
                     y: parent.subtreeTopLeadingPoint.y
                 )
-                print("parentID changed: \(parentID)")
-                print("new currentBottomPoint: \(currentSubtreeTopLeadingPoint)\n")
             }
 
-            nodesState.append(
-                NodeReducer.State(
+            nodeStates.append(
+                .init(
                     object: node.object,
-                    allDeclarationObjects: allDeclarationObjects,
+                    rootDirectory: rootDirectory,
+                    usrTable: usrTable,
+                    dependencyObjects: dependencyObjects,
                     topLeadingPoint: CGPoint(
                         x: currentSubtreeTopLeadingPoint.x,
                         y: currentSubtreeTopLeadingPoint.y + node.subtreeHeight / 2 - node.frameHeight / 2
@@ -277,108 +336,96 @@ private enum TreeGenerator {
                 )
             )
 
-            #if DEBUG
-                print(node.object.name)
-                print("  topLeadingPoint: \(nodesState.last!.topLeadingPoint)")
-                print("  W: \(node.frameWidth), H: \(node.frameHeight)")
-                print("  State W: \(nodesState.last!.frameWidth), H: \(nodesState.last!.frameHeight)")
-                print("  subtreeHeight: \(node.subtreeHeight)\n")
-            #endif
-
-            currentSubtreeTopLeadingPoint.y += node.subtreeHeight + verticalPadding
-            print("increment currentBottomPoint.y: \(currentSubtreeTopLeadingPoint)\n")
+            currentSubtreeTopLeadingPoint.y += node.subtreeHeight + ComponentSizeValues.verticalPaddingBetweenCombinedDiagrams
         }
 
-        print("end \(#function)\n")
-        return nodesState
+        return nodeStates
     }
 }
 
 private enum ArrowsStateGenerator {
-    static func generate(nodes: [NodeReducer.State]) -> [ArrowViewReducer.State] {
-        var arrowsState: [ArrowViewReducer.State] = []
+    static func generate(
+        nodes: [NodeReducer.State],
+        rootDirectory: Directory,
+        usrTable: [String: KeyPath<Directory, DeclaredObject>],
+        dependencyObjects: [DependencyObject]
+    ) -> [ArrowViewReducer.State] {
+        var arrowStates: [ArrowViewReducer.State] = []
 
         for node in nodes {
-            for dependency in node.object.objectsThatCallThisObject {
-                if dependency.definitionObject.rootObjectID == dependency.callerObject.rootObjectID {
+            let calleeDependencies = dependencyObjects.filteringWhereCallee(node.object)
+            for dependency in calleeDependencies {
+                guard let calleeKeyPath = usrTable[dependency.calleeUSR] else {
                     continue
                 }
-                let callerID: UUID
+                let callee = rootDirectory[keyPath: calleeKeyPath]
+                // Do not show dependencies where a function references its own arguments.
+                if dependency.callerUSRs.contains(dependency.calleeUSR),
+                   dependency.callerUSRs.first != dependency.calleeUSR,
+                   callee.kind == .function || callee.kind == .initializer {
+                    continue
+                }
+
+                // set start point coordinate
                 var leadingStartPoint: CGPoint = .zero
                 var trailingStartPoint: CGPoint = .zero
-
-                switch dependency.kind {
-                case .protocolInheritance, .classInheritance, .protocolConformance:
-                    callerID = dependency.callerObject.rootObjectID
+                if node.object.usrs.contains(dependency.calleeUSR) {
+                    // This object itself is referenced, so the header becomes the starting point of the arrow.
                     leadingStartPoint = node.header.leadingArrowTerminalPoint
                     trailingStartPoint = node.header.trailingArrowTerminalPoint
-
-                case .declarationReference, .identifierType:
-                    callerID = dependency.callerObject.leafObjectID
-
-                    if node.id == dependency.definitionObject.leafObjectID {
-                        leadingStartPoint = node.header.leadingArrowTerminalPoint
-                        trailingStartPoint = node.header.trailingArrowTerminalPoint
-                    } else {
-                        for definitionDetail in node.details {
-                            for text in definitionDetail.texts {
-                                if text.id == dependency.definitionObject.leafObjectID {
-                                    leadingStartPoint = text.leadingArrowTerminalPoint
-                                    trailingStartPoint = text.trailingArrowTerminalPoint
-                                }
-                            }
-                        }
-                    }
-                    if trailingStartPoint == .zero {
-                        #if DEBUG
-                            print("ERROR: \(#file) - \(#function): Couldn't find definition of \(dependency.definitionObject.keyPath).")
-                        #endif
-                        continue
-                    }
-                }
-
-                var leadingEndPoint: CGPoint = .zero
-                var trailingEndPoint: CGPoint = .zero
-                var isFoundCaller = false
-                for caller in nodes {
-                    for detail in caller.details {
+                } else {
+                    details: for detail in node.details {
                         for text in detail.texts {
-                            if text.id == callerID {
-                                leadingEndPoint = text.leadingArrowTerminalPoint
-                                trailingEndPoint = text.trailingArrowTerminalPoint
-                                isFoundCaller = true
-                                break
+                            if text.object.usrs.contains(dependency.calleeUSR) {
+                                leadingStartPoint = text.leadingArrowTerminalPoint
+                                trailingStartPoint = text.trailingArrowTerminalPoint
+                                break details
                             }
                         }
-                        if isFoundCaller {
-                            break
-                        }
-                    }
-                    if isFoundCaller {
-                        break
                     }
                 }
-
-                if !isFoundCaller {
-                    #if DEBUG
-                        print("ERROR: \(#file) - \(#function): Couldn't find caller of \(dependency.definitionObject.keyPath).")
-                    #endif
+                guard leadingStartPoint != .zero,
+                      trailingStartPoint != .zero else {
                     continue
                 }
 
-                arrowsState.append(
-                    .init(
-                        startPointRootObjectID: dependency.definitionObject.rootObjectID,
-                        endPointRootObjectID: dependency.callerObject.rootObjectID,
-                        leadingStartPoint: leadingStartPoint,
-                        trailingStartPoint: trailingStartPoint,
-                        leadingEndPoint: leadingEndPoint,
-                        trailingEndPoint: trailingEndPoint
-                    )
+                // set end point coordinate
+                var leadingEndPoint: CGPoint = .zero
+                var trailingEndPoint: CGPoint = .zero
+                guard let caller = nodes.first(where: { $0.object.descendantsUSRs.contains(dependency.callerUSRs) }) else {
+                    continue
+                }
+                details: for detail in caller.details {
+                    for text in detail.texts {
+                        if text.object.descendantsUSRs.contains(dependency.callerUSRs) {
+                            leadingEndPoint = text.leadingArrowTerminalPoint
+                            trailingEndPoint = text.trailingArrowTerminalPoint
+                            break details
+                        }
+                    }
+                }
+                guard leadingEndPoint != .zero,
+                      trailingEndPoint != .zero else {
+                    continue
+                }
+
+                let arrowState = ArrowViewReducer.State(
+                    dependency: dependency,
+                    leadingStartPoint: leadingStartPoint,
+                    trailingStartPoint: trailingStartPoint,
+                    leadingEndPoint: leadingEndPoint,
+                    trailingEndPoint: trailingEndPoint
                 )
+
+                // Arrows with the same start and end points should be combined into one.
+                guard !arrowStates.contains(where: { $0.startPoint == arrowState.startPoint && $0.endPoint == arrowState.endPoint }) else {
+                    continue
+                }
+
+                arrowStates.append(arrowState)
             } // for dependency
         } // for node
 
-        return arrowsState
+        return arrowStates
     }
 }

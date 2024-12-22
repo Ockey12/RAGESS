@@ -5,13 +5,13 @@
 //  Created by ockey12 on 2024/05/05.
 //
 
+import DeclaredObject
 import SwiftSyntax
-import TypeDeclaration
 
 final class DeclarationVisitor: SyntaxVisitor {
     let fullPath: String
-    private(set) var extractedDeclarations: [any DeclarationObject] = []
-    private var buffer: [any DeclarationObject] = []
+    private(set) var extractedDeclarations: [DeclaredObject] = []
+    private var buffer: [DeclaredObject] = []
 
     private let locationConverter: SourceLocationConverter
 
@@ -24,26 +24,20 @@ final class DeclarationVisitor: SyntaxVisitor {
     // MARK: ProtocolDeclSyntax
 
     override func visit(_ node: ProtocolDeclSyntax) -> SyntaxVisitorContinueKind {
-        #if DEBUG
-            print("\nvisit(ProtocolDeclSyntax(\(node.name.text)))")
-        #endif
-        let positionRange = node.sourceRange(converter: locationConverter)
+        let locationRange = node.sourceRange(converter: locationConverter)
+        let rangeInXcode = LocationInXcode(line: locationRange.start.line, column: locationRange.start.column)
+            ... LocationInXcode(line: locationRange.end.line, column: locationRange.end.column)
         let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
-        let currentProtocol = ProtocolObject(
+        let currentProtocol = DeclaredObject(
             name: node.name.text,
             nameOffset: node.name.trimmedByteRange.offset,
             fullPath: fullPath,
             sourceCode: trimSourceCode(node.description),
-            positionRange: SourcePosition(
-                line: positionRange.start.line,
-                utf8index: positionRange.start.column
-            )
-                ... SourcePosition(
-                    line: positionRange.end.line,
-                    utf8index: positionRange.end.column
-                ),
-            offsetRange: offsetRange
+            rangeInXcode: rangeInXcode,
+            offsetRange: offsetRange,
+            kind: .protocol,
+            declModifiers: node.modifiers.map { $0.trimmed.description }
         )
 
         appendToBuffer(currentProtocol)
@@ -52,74 +46,45 @@ final class DeclarationVisitor: SyntaxVisitor {
     }
 
     override func visitPost(_ node: ProtocolDeclSyntax) {
-        #if DEBUG
-            print("\nvisitPost(ProtocolDeclSyntax(\(node.name.text)))")
-        #endif
-
         guard !buffer.isEmpty else {
             fatalError("The buffer is empty.")
         }
-
-        #if DEBUG
-            print("buffer.popLast()")
-            print("- \(buffer.map { $0.name })")
-        #endif
-
-        guard let lastItem = buffer.popLast(),
-              let currentProtocol = lastItem as? ProtocolObject else {
-            fatalError("The type of the last element of buffer is not a \(ProtocolObject.self).")
+        guard var currentProtocol = buffer.popLast(),
+              currentProtocol.kind == .protocol
+        else {
+            fatalError("The type of the last element of buffer is not a protocol.")
         }
-
-        #if DEBUG
-            print("+ \(buffer.map { $0.name })")
-        #endif
 
         if buffer.count >= 1 {
             // If there is an element in the buffer, the last element in the buffer is the parent of this.
-            guard let lastItem = buffer.popLast(),
-                  var protocolOwner = lastItem as? any TypeNestable else {
-                fatalError("The type of the last element of buffer does not conform to TypeNestable.")
+            guard var protocolOwner = buffer.popLast() else {
+                fatalError("The buffer is empty.")
             }
-            #if DEBUG
-                print("buffer[\(buffer.count)].nestingProtocols.append(\(currentProtocol.name))")
-            #endif
+            currentProtocol.addOuterEnclosingTypeName(protocolOwner.name)
             protocolOwner.nestingProtocols.append(currentProtocol)
             buffer.append(protocolOwner)
         } else {
-            #if DEBUG
-                print("extractedDeclarations.append(\(currentProtocol.name))")
-                print("- \(extractedDeclarations.map { $0.name })")
-            #endif
             extractedDeclarations.append(currentProtocol)
-            #if DEBUG
-                print("+ \(extractedDeclarations.map { $0.name })")
-            #endif
         }
     }
 
     // MARK: StructDeclSyntax
 
     override func visit(_ node: StructDeclSyntax) -> SyntaxVisitorContinueKind {
-        #if DEBUG
-            print("\nvisit(StructDeclSyntax(\(node.name.text)))")
-        #endif
-        let positionRange = node.sourceRange(converter: locationConverter)
+        let locationRange = node.sourceRange(converter: locationConverter)
+        let rangeInXcode = LocationInXcode(line: locationRange.start.line, column: locationRange.start.column)
+            ... LocationInXcode(line: locationRange.end.line, column: locationRange.end.column)
         let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
-        let currentStruct = StructObject(
+        let currentStruct = DeclaredObject(
             name: node.name.text,
             nameOffset: node.name.trimmedByteRange.offset,
             fullPath: fullPath,
             sourceCode: trimSourceCode(node.description),
-            positionRange: SourcePosition(
-                line: positionRange.start.line,
-                utf8index: positionRange.start.column
-            )
-                ... SourcePosition(
-                    line: positionRange.end.line,
-                    utf8index: positionRange.end.column
-                ),
-            offsetRange: offsetRange
+            rangeInXcode: rangeInXcode,
+            offsetRange: offsetRange,
+            kind: .struct,
+            declModifiers: node.modifiers.map { $0.trimmed.description }
         )
 
         appendToBuffer(currentStruct)
@@ -128,74 +93,45 @@ final class DeclarationVisitor: SyntaxVisitor {
     }
 
     override func visitPost(_ node: StructDeclSyntax) {
-        #if DEBUG
-            print("\nvisitPost(StructDeclSyntax(\(node.name.text)))")
-        #endif
-
         guard !buffer.isEmpty else {
             fatalError("The buffer is empty.")
         }
-
-        #if DEBUG
-            print("buffer.popLast()")
-            print("- \(buffer.map { $0.name })")
-        #endif
-
-        guard let lastItem = buffer.popLast(),
-              let currentStruct = lastItem as? StructObject else {
-            fatalError("The type of the last element of buffer is not a \(StructObject.self).")
+        guard var currentStruct = buffer.popLast(),
+              currentStruct.kind == .struct
+        else {
+            fatalError("The type of the last element of buffer is not a struct.")
         }
-
-        #if DEBUG
-            print("+ \(buffer.map { $0.name })")
-        #endif
 
         if buffer.count >= 1 {
             // If there is an element in the buffer, the last element in the buffer is the parent of this.
-            guard let owner = buffer.popLast(),
-                  var ownerTypeObject = owner as? any TypeNestable else {
-                fatalError("The type of the last element of buffer does not conform to TypeNestable.")
+            guard var structOwner = buffer.popLast() else {
+                fatalError("The buffer is empty.")
             }
-            #if DEBUG
-                print("buffer[\(buffer.count)].nestingStructs.append(\(currentStruct.name))")
-            #endif
-            ownerTypeObject.nestingStructs.append(currentStruct)
-            buffer.append(ownerTypeObject)
+            currentStruct.addOuterEnclosingTypeName(structOwner.name)
+            structOwner.nestingStructs.append(currentStruct)
+            buffer.append(structOwner)
         } else {
-            #if DEBUG
-                print("extractedDeclarations.append(\(currentStruct.name))")
-                print("- \(extractedDeclarations.map { $0.name })")
-            #endif
             extractedDeclarations.append(currentStruct)
-            #if DEBUG
-                print("+ \(extractedDeclarations.map { $0.name })")
-            #endif
         }
     }
 
     // MARK: ClassDeclSyntax
 
     override func visit(_ node: ClassDeclSyntax) -> SyntaxVisitorContinueKind {
-        #if DEBUG
-            print("\nvisit(ClassDeclSyntax(\(node.name.text)))")
-        #endif
-        let positionRange = node.sourceRange(converter: locationConverter)
+        let locationRange = node.sourceRange(converter: locationConverter)
+        let rangeInXcode = LocationInXcode(line: locationRange.start.line, column: locationRange.start.column)
+            ... LocationInXcode(line: locationRange.end.line, column: locationRange.end.column)
         let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
-        let currentClass = ClassObject(
+        let currentClass = DeclaredObject(
             name: node.name.text,
             nameOffset: node.name.trimmedByteRange.offset,
             fullPath: fullPath,
             sourceCode: trimSourceCode(node.description),
-            positionRange: SourcePosition(
-                line: positionRange.start.line,
-                utf8index: positionRange.start.column
-            )
-                ... SourcePosition(
-                    line: positionRange.end.line,
-                    utf8index: positionRange.end.column
-                ),
-            offsetRange: offsetRange
+            rangeInXcode: rangeInXcode,
+            offsetRange: offsetRange,
+            kind: .class,
+            declModifiers: node.modifiers.map { $0.trimmed.description }
         )
 
         appendToBuffer(currentClass)
@@ -204,74 +140,43 @@ final class DeclarationVisitor: SyntaxVisitor {
     }
 
     override func visitPost(_ node: ClassDeclSyntax) {
-        #if DEBUG
-            print("\nvisitPost(ClassDeclSyntax(\(node.name.text)))")
-        #endif
-
         guard !buffer.isEmpty else {
             fatalError("The buffer is empty.")
         }
-
-        #if DEBUG
-            print("buffer.popLast()")
-            print("- \(buffer.map { $0.name })")
-        #endif
-
-        guard let lastItem = buffer.popLast(),
-              let currentClass = lastItem as? ClassObject else {
-            fatalError("The type of the last element of buffer is not a \(ClassObject.self).")
+        guard var currentClass = buffer.popLast() else {
+            fatalError("The type of the last element of buffer is not a class.")
         }
-
-        #if DEBUG
-            print("+ \(buffer.map { $0.name })")
-        #endif
 
         if buffer.count >= 1 {
             // If there is an element in the buffer, the last element in the buffer is the parent of this.
-            guard let owner = buffer.popLast(),
-                  var ownerTypeObject = owner as? any TypeNestable else {
-                fatalError("The type of the last element of buffer does not conform to TypeNestable.")
+            guard var classOwner = buffer.popLast() else {
+                fatalError("The buffer is empty.")
             }
-            #if DEBUG
-                print("buffer[\(buffer.count)].nestingClasses.append(\(currentClass.name))")
-            #endif
-            ownerTypeObject.nestingClasses.append(currentClass)
-            buffer.append(ownerTypeObject)
+            currentClass.addOuterEnclosingTypeName(classOwner.name)
+            classOwner.nestingClasses.append(currentClass)
+            buffer.append(classOwner)
         } else {
-            #if DEBUG
-                print("extractedDeclarations.append(\(currentClass.name))")
-                print("- \(extractedDeclarations.map { $0.name })")
-            #endif
             extractedDeclarations.append(currentClass)
-            #if DEBUG
-                print("+ \(extractedDeclarations.map { $0.name })")
-            #endif
         }
     }
 
     // MARK: EnumDeclSyntax
 
     override func visit(_ node: EnumDeclSyntax) -> SyntaxVisitorContinueKind {
-        #if DEBUG
-            print("\nvisit(EnumDeclSyntax(\(node.name.text)))")
-        #endif
-        let positionRange = node.sourceRange(converter: locationConverter)
+        let locationRange = node.sourceRange(converter: locationConverter)
+        let rangeInXcode = LocationInXcode(line: locationRange.start.line, column: locationRange.start.column)
+            ... LocationInXcode(line: locationRange.end.line, column: locationRange.end.column)
         let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
-        let currentEnum = EnumObject(
+        let currentEnum = DeclaredObject(
             name: node.name.text,
             nameOffset: node.name.trimmedByteRange.offset,
             fullPath: fullPath,
             sourceCode: trimSourceCode(node.description),
-            positionRange: SourcePosition(
-                line: positionRange.start.line,
-                utf8index: positionRange.start.column
-            )
-                ... SourcePosition(
-                    line: positionRange.end.line,
-                    utf8index: positionRange.end.column
-                ),
-            offsetRange: offsetRange
+            rangeInXcode: rangeInXcode,
+            offsetRange: offsetRange,
+            kind: .enum,
+            declModifiers: node.modifiers.map { $0.trimmed.description }
         )
 
         appendToBuffer(currentEnum)
@@ -279,73 +184,45 @@ final class DeclarationVisitor: SyntaxVisitor {
     }
 
     override func visitPost(_ node: EnumDeclSyntax) {
-        #if DEBUG
-            print("\nvisitPost(EnumDeclSyntax(\(node.name.text)))")
-        #endif
-
         guard !buffer.isEmpty else {
             fatalError("The buffer is empty.")
         }
-
-        #if DEBUG
-            print("buffer.popLast()")
-            print("- \(buffer.map { $0.name })")
-        #endif
-
-        guard let lastItem = buffer.popLast(),
-              let currentEnum = lastItem as? EnumObject else {
-            fatalError("The type of the last element of buffer is not a \(EnumObject.self).")
+        guard var currentEnum = buffer.popLast(),
+              currentEnum.kind == .enum
+        else {
+            fatalError("The type of the last element of buffer is not a enum.")
         }
-
-        #if DEBUG
-            print("+ \(buffer.map { $0.name })")
-        #endif
 
         if buffer.count >= 1 {
             // If there is an element in the buffer, the last element in the buffer is the parent of this.
-            guard let owner = buffer.popLast(),
-                  var ownerTypeObject = owner as? any TypeNestable else {
-                fatalError("The type of the last element of buffer does not conform to TypeNestable.")
+            guard var enumOwner = buffer.popLast() else {
+                fatalError("The buffer is empty.")
             }
-            #if DEBUG
-                print("buffer[\(buffer.count)].nestingEnums.append(\(currentEnum.name))")
-            #endif
-            ownerTypeObject.nestingEnums.append(currentEnum)
-            buffer.append(ownerTypeObject)
+            currentEnum.addOuterEnclosingTypeName(enumOwner.name)
+            enumOwner.nestingEnums.append(currentEnum)
+            buffer.append(enumOwner)
         } else {
-            #if DEBUG
-                print("extractedDeclarations.append(\(currentEnum.name))")
-                print("- \(extractedDeclarations.map { $0.name })")
-            #endif
             extractedDeclarations.append(currentEnum)
-            #if DEBUG
-                print("+ \(extractedDeclarations.map { $0.name })")
-            #endif
         }
     }
 
     // MARK: ActorDeclSyntax
 
     override func visit(_ node: ActorDeclSyntax) -> SyntaxVisitorContinueKind {
-        #if DEBUG
-            print("\nvisit(ActorDeclSyntax(\(node.name.text))")
-        #endif
-        let positionRange = node.sourceRange(converter: locationConverter)
+        let locationRange = node.sourceRange(converter: locationConverter)
+        let rangeInXcode = LocationInXcode(line: locationRange.start.line, column: locationRange.start.column)
+            ... LocationInXcode(line: locationRange.end.line, column: locationRange.end.column)
         let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
-        let currentActor = ActorObject(
+        let currentActor = DeclaredObject(
             name: node.name.text,
             nameOffset: node.name.trimmedByteRange.offset,
             fullPath: fullPath,
-            positionRange: SourcePosition(
-                line: positionRange.start.line,
-                utf8index: positionRange.start.column
-            )
-                ... SourcePosition(
-                    line: positionRange.end.line,
-                    utf8index: positionRange.end.column
-                ),
-            offsetRange: offsetRange
+            sourceCode: trimSourceCode(node.description),
+            rangeInXcode: rangeInXcode,
+            offsetRange: offsetRange,
+            kind: .actor,
+            declModifiers: node.modifiers.map { $0.trimmed.description }
         )
 
         appendToBuffer(currentActor)
@@ -353,74 +230,91 @@ final class DeclarationVisitor: SyntaxVisitor {
     }
 
     override func visitPost(_ node: ActorDeclSyntax) {
-        #if DEBUG
-            print("\nvisitPost(ActorDeclSyntax(\(node.name.text))")
-        #endif
-
         guard !buffer.isEmpty else {
             fatalError("The buffer is empty.")
         }
-
-        #if DEBUG
-            print("buffer.popLast()")
-            print("- \(buffer.map { $0.name })")
-        #endif
-
-        guard let lastItem = buffer.popLast(),
-              let currentActor = lastItem as? ActorObject else {
-            fatalError("The type of the last element of buffer is not a \(ActorObject.self).")
+        guard var currentActor = buffer.popLast(),
+              currentActor.kind == .actor
+        else {
+            fatalError("The type of the last element of buffer is not a actor.")
         }
-
-        #if DEBUG
-            print("+ \(buffer.map { $0.name })")
-        #endif
 
         if buffer.count >= 1 {
             // If there is an element in the buffer, the last element in the buffer is the parent of this.
-            guard let owner = buffer.popLast(),
-                  var ownerTypeObject = owner as? any TypeNestable else {
-                fatalError("The type of the last element of buffer does not conform to TypeNestable.")
+            guard var actorOwner = buffer.popLast() else {
+                fatalError("The buffer is empty.")
             }
-            #if DEBUG
-                print("buffer[\(buffer.count)].nestingActors.append(\(currentActor.name)")
-            #endif
-            ownerTypeObject.nestingActors.append(currentActor)
-            buffer.append(ownerTypeObject)
+            currentActor.addOuterEnclosingTypeName(actorOwner.name)
+            actorOwner.nestingActors.append(currentActor)
+            buffer.append(actorOwner)
         } else {
-            #if DEBUG
-                print("extractedDeclarations.append(\(currentActor.name))")
-                print("- \(extractedDeclarations.map { $0.name })")
-            #endif
             extractedDeclarations.append(currentActor)
-            #if DEBUG
-                print("+ \(extractedDeclarations.map { $0.name })")
-            #endif
         }
+    }
+
+    // MARK: ExtensionDeclSyntax
+
+    override func visit(_ node: ExtensionDeclSyntax) -> SyntaxVisitorContinueKind {
+        let locationRange = node.sourceRange(converter: locationConverter)
+        let rangeInXcode = LocationInXcode(line: locationRange.start.line, column: locationRange.start.column)
+            ... LocationInXcode(line: locationRange.end.line, column: locationRange.end.column)
+        let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
+
+        appendToBuffer(
+            .init(
+                name: "\(node.trimmed.extendedType) \(node.trimmed.genericWhereClause?.description ?? "")",
+                nameOffset: node.trimmed.extendedType.trimmedByteRange.offset,
+                fullPath: fullPath,
+                sourceCode: trimSourceCode(node.description),
+                rangeInXcode: rangeInXcode,
+                offsetRange: offsetRange,
+                kind: .extension
+            )
+        )
+
+        return .visitChildren
+    }
+
+    override func visitPost(_ node: ExtensionDeclSyntax) {
+        guard !buffer.isEmpty else {
+            fatalError("The buffer is empty.")
+        }
+        guard let currentExtension = buffer.popLast(),
+              currentExtension.kind == .extension
+        else {
+            fatalError("The type of the last element of buffer is not a extension.")
+        }
+
+        extractedDeclarations.append(currentExtension)
     }
 
     // MARK: InitializerDeclSyntax
 
     override func visit(_ node: InitializerDeclSyntax) -> SyntaxVisitorContinueKind {
-        #if DEBUG
-            print("\nvisit(InitializerDeclSyntax(\(node.description)))")
-        #endif
-        let positionRange = node.sourceRange(converter: locationConverter)
+        let locationRange = node.sourceRange(converter: locationConverter)
+
+        let rangeInXcode = LocationInXcode(line: locationRange.start.line, column: locationRange.start.column)
+            ... LocationInXcode(line: locationRange.end.line, column: locationRange.end.column)
         let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
-        let currentInitializer = InitializerObject(
-            name: "init",
+        var name = "init"
+        if let _ = node.optionalMark {
+            name += "?"
+        }
+        let singleSpacedSignature = node.signature.trimmed.description.replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression)
+        name += singleSpacedSignature
+            .replacingOccurrences(of: "\\(\\s*", with: "(", options: .regularExpression)
+            .replacingOccurrences(of: "\\s*\\)", with: ")", options: .regularExpression)
+
+        let currentInitializer = DeclaredObject(
+            name: name,
             nameOffset: node.initKeyword.trimmedByteRange.offset,
             fullPath: fullPath,
             sourceCode: trimSourceCode(node.description),
-            positionRange: SourcePosition(
-                line: positionRange.start.line,
-                utf8index: positionRange.start.column
-            )
-                ... SourcePosition(
-                    line: positionRange.end.line,
-                    utf8index: positionRange.end.column
-                ),
-            offsetRange: offsetRange
+            rangeInXcode: rangeInXcode,
+            offsetRange: offsetRange,
+            kind: .initializer,
+            declModifiers: node.modifiers.map { $0.trimmed.description }
         )
 
         appendToBuffer(currentInitializer)
@@ -429,39 +323,22 @@ final class DeclarationVisitor: SyntaxVisitor {
     }
 
     override func visitPost(_ node: InitializerDeclSyntax) {
-        #if DEBUG
-            print("\nvisitPost(InitializerDeclSyntax(\(node.description)))")
-        #endif
-
         guard !buffer.isEmpty else {
             fatalError("The buffer is empty.")
         }
-
-        #if DEBUG
-            print("buffer.popLast()")
-            print("- \(buffer.map { $0.name })")
-        #endif
-
-        guard let lastItem = buffer.popLast(),
-              let currentInitializer = lastItem as? InitializerObject else {
-            fatalError("The type of the last element of buffer is not a \(InitializerObject.self).")
+        guard let currentInitializer = buffer.popLast(),
+              currentInitializer.kind == .initializer
+        else {
+            fatalError("The type of the last element of buffer is not a initializer.")
         }
-
-        #if DEBUG
-            print("+ \(buffer.map { $0.name })")
-        #endif
 
         if buffer.count >= 1 {
             // If there is an element in the buffer, the last element in the buffer is the parent of this.
-            guard let lastItem = buffer.popLast(),
-                  var ownerObject = lastItem as? any Initializable else {
-                fatalError("The type of the last element of buffer does not conform to Initializable.")
+            guard var initializerOwner = buffer.popLast() else {
+                fatalError("The buffer is empty.")
             }
-            #if DEBUG
-                print("buffer[\(buffer.count)].functions.append(\(currentInitializer.name))")
-            #endif
-            ownerObject.initializers.append(currentInitializer)
-            buffer.append(ownerObject)
+            initializerOwner.initializers.append(currentInitializer)
+            buffer.append(initializerOwner)
         } else {
             fatalError("Cannot find the holder of the initializer.")
         }
@@ -470,38 +347,66 @@ final class DeclarationVisitor: SyntaxVisitor {
     // MARK: VariableDeclSyntax
 
     override func visit(_ node: VariableDeclSyntax) -> SyntaxVisitorContinueKind {
-        #if DEBUG
-            print("\nvisit(VariableDeclSyntax(\n\(node)\n))")
-        #endif
-
         let array = Array(node.bindings)
         guard !array.isEmpty else {
-            #if DEBUG
-                print("The contents of the variable do not exist.")
-            #endif
             return .visitChildren
         }
 
-        let positionRange = node.sourceRange(converter: locationConverter)
+        var name = array[0].pattern.trimmed.description
+        if let typeAnnotation = array[0].typeAnnotation {
+            name += typeAnnotation.description
+        }
+
+        if let initializer = array[0].initializer {
+            let children = initializer.value.children(viewMode: .sourceAccurate)
+            if let array = initializer.value.as(ArrayExprSyntax.self) {
+                // array
+                let elements = Array(array.elements)
+                if !elements.isEmpty {
+                    if elements[0].description.components(separatedBy: "\n").count > 2 {
+                        name += " = [ ... ]"
+                    } else {
+                        name += " = [\(elements.first!.trimmedDescription) ... ]"
+                    }
+                }
+            } else if initializer.description.contains("\n") {
+                // multiple lines
+                let lines = initializer.description.components(separatedBy: "\n").map { $0.trimmingCharacters(in: .whitespaces) }
+                if let firstLine = lines.first,
+                   let lastLine = lines.last {
+                    if !name.hasSuffix(" ") {
+                        name += " "
+                    }
+                    name += firstLine + " ... " + lastLine
+                }
+            } else {
+                if !name.hasSuffix(" ") {
+                    name += " "
+                }
+                name += initializer.description
+            }
+        }
+
+        let locationRange = node.sourceRange(converter: locationConverter)
+        let rangeInXcode = LocationInXcode(line: locationRange.start.line, column: locationRange.start.column)
+            ... LocationInXcode(line: locationRange.end.line, column: locationRange.end.column)
         let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
-        let currentVariable = VariableObject(
+        var modifiers = node.modifiers.map { $0.trimmed.description }
+        modifiers.append(node.bindingSpecifier.text)
+
+        let currentVariable = DeclaredObject(
             // FIXME: This element does not necessarily represent the name of the variable.
             // For example, in the case of Tuple Decomposition, the tuple would be the name of the variable.
             // When `let (a, b, c) = (0, 1, 2)`, the variable name becomes “(a, b, c)”.
-            name: array[0].pattern.trimmed.description,
+            name: name,
             nameOffset: array[0].pattern.trimmed.trimmedByteRange.offset,
             fullPath: fullPath,
             sourceCode: trimSourceCode(node.description),
-            positionRange: SourcePosition(
-                line: positionRange.start.line,
-                utf8index: positionRange.start.column
-            )
-                ... SourcePosition(
-                    line: positionRange.end.line,
-                    utf8index: positionRange.end.column
-                ),
-            offsetRange: offsetRange
+            rangeInXcode: rangeInXcode,
+            offsetRange: offsetRange,
+            kind: .variable,
+            declModifiers: modifiers
         )
 
         appendToBuffer(currentVariable)
@@ -510,73 +415,49 @@ final class DeclarationVisitor: SyntaxVisitor {
     }
 
     override func visitPost(_ node: VariableDeclSyntax) {
-        #if DEBUG
-            print("\nvisitPost(VariableDeclSyntax(\(node)))")
-        #endif
-
         guard !buffer.isEmpty else {
             fatalError("The buffer is empty.")
         }
-
-        #if DEBUG
-            print("buffer.popLast()")
-            print("- \(buffer.map { $0.name })")
-        #endif
-
-        guard let lastItem = buffer.popLast(),
-              let currentVariable = lastItem as? VariableObject else {
-            fatalError("The type of the last element of buffer is not a \(VariableObject.self).")
+        guard let currentVariable = buffer.popLast(),
+              currentVariable.kind == .variable
+        else {
+            fatalError("The type of the last element of buffer is not a variable.")
         }
-
-        #if DEBUG
-            print("+ \(buffer.map { $0.name })")
-        #endif
 
         if buffer.count >= 1 {
             // If there is an element in the buffer, the last element in the buffer is the parent of this.
-            guard var ownerObject = buffer.popLast() else {
-                fatalError("The type of the last element of buffer does not conform to DeclarationObject.")
+            guard var variableOwner = buffer.popLast() else {
+                fatalError("The buffer is empty.")
             }
-            #if DEBUG
-                print("buffer[\(buffer.count)].variables.append(\(currentVariable.name))")
-            #endif
-            ownerObject.variables.append(currentVariable)
-            buffer.append(ownerObject)
+            variableOwner.variables.append(currentVariable)
+            buffer.append(variableOwner)
         } else {
-            #if DEBUG
-                print("extractedDeclarations.append(\(currentVariable.name))")
-                print("- \(extractedDeclarations.map { $0.name })")
-            #endif
             extractedDeclarations.append(currentVariable)
-            #if DEBUG
-                print("+ \(extractedDeclarations.map { $0.name })")
-            #endif
         }
     }
 
     // MARK: FunctionDeclSyntax
 
     override func visit(_ node: FunctionDeclSyntax) -> SyntaxVisitorContinueKind {
-        #if DEBUG
-            print("\nvisit(FunctionDeclSyntax(\(node.name.text)))")
-        #endif
-        let positionRange = node.sourceRange(converter: locationConverter)
+        let locationRange = node.sourceRange(converter: locationConverter)
+        let rangeInXcode = LocationInXcode(line: locationRange.start.line, column: locationRange.start.column)
+            ... LocationInXcode(line: locationRange.end.line, column: locationRange.end.column)
         let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
-        let currentFunction = FunctionObject(
-            name: node.name.text,
+        let singleSpacedSignature = node.signature.trimmed.description.replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression)
+        let signatureWithoutSpacesAroundParams = singleSpacedSignature
+            .replacingOccurrences(of: "\\(\\s*", with: "(", options: .regularExpression)
+            .replacingOccurrences(of: "\\s*\\)", with: ")", options: .regularExpression)
+
+        let currentFunction = DeclaredObject(
+            name: node.name.text + signatureWithoutSpacesAroundParams,
             nameOffset: node.name.trimmedByteRange.offset,
             fullPath: fullPath,
             sourceCode: trimSourceCode(node.description),
-            positionRange: SourcePosition(
-                line: positionRange.start.line,
-                utf8index: positionRange.start.column
-            )
-                ... SourcePosition(
-                    line: positionRange.end.line,
-                    utf8index: positionRange.end.column
-                ),
-            offsetRange: offsetRange
+            rangeInXcode: rangeInXcode,
+            offsetRange: offsetRange,
+            kind: .function,
+            declModifiers: node.modifiers.map { $0.trimmed.description }
         )
 
         appendToBuffer(currentFunction)
@@ -585,111 +466,91 @@ final class DeclarationVisitor: SyntaxVisitor {
     }
 
     override func visitPost(_ node: FunctionDeclSyntax) {
-        #if DEBUG
-            print("\nvisitPost(FunctionDeclSyntax(\(node.name.text)))")
-        #endif
-
         guard !buffer.isEmpty else {
             fatalError("The buffer is empty.")
         }
-
-        #if DEBUG
-            print("buffer.popLast()")
-            print("- \(buffer.map { $0.name })")
-        #endif
-
-        guard let lastItem = buffer.popLast(),
-              let currentFunction = lastItem as? FunctionObject else {
-            fatalError("The type of the last element of buffer is not a \(FunctionObject.self).")
+        guard let currentFunction = buffer.popLast(),
+              currentFunction.kind == .function
+        else {
+            fatalError("The type of the last element of buffer is not a function.")
         }
-
-        #if DEBUG
-            print("+ \(buffer.map { $0.name })")
-        #endif
 
         if buffer.count >= 1 {
             // If there is an element in the buffer, the last element in the buffer is the parent of this.
-            guard var ownerObject = buffer.popLast() else {
-                fatalError("The type of the last element of buffer does not conform to DeclarationObject.")
+            guard var functionOwner = buffer.popLast() else {
+                fatalError("The buffer is empty.")
             }
-            #if DEBUG
-                print("buffer[\(buffer.count)].functions.append(\(currentFunction.name))")
-            #endif
-            ownerObject.functions.append(currentFunction)
-            buffer.append(ownerObject)
+            functionOwner.functions.append(currentFunction)
+            buffer.append(functionOwner)
         } else {
-            #if DEBUG
-                print("extractedDeclarations.append(\(currentFunction.name))")
-                print("- \(extractedDeclarations.map { $0.name })")
-            #endif
             extractedDeclarations.append(currentFunction)
-            #if DEBUG
-                print("+ \(extractedDeclarations.map { $0.name })")
-            #endif
         }
     }
 
     // MARK: EnumCaseDeclSyntax
 
     override func visit(_ node: EnumCaseDeclSyntax) -> SyntaxVisitorContinueKind {
-        #if DEBUG
-            print("\nvisit(EnumCaseDeclSyntax(\(node.description)))")
-            print("node.elements")
-            print("    \(node.elements)")
-            print("node.elements.trimmedByteRange.offset: \(node.elements.trimmedByteRange.offset)")
-
-        #endif
-
-        let positionRange = node.sourceRange(converter: locationConverter)
+        let locationRange = node.sourceRange(converter: locationConverter)
+        let rangeInXcode = LocationInXcode(line: locationRange.start.line, column: locationRange.start.column)
+            ... LocationInXcode(line: locationRange.end.line, column: locationRange.end.column)
         let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
 
-        let currentCase = EnumObject.CaseObject(
+        let currentCase = DeclaredObject(
+            name: node.trimmed.description,
             nameOffset: node.elements.trimmedByteRange.offset,
             fullPath: fullPath,
             sourceCode: trimSourceCode(node.description),
-            positionRange: SourcePosition(
-                line: positionRange.start.line,
-                utf8index: positionRange.start.column
-            )
-                ... SourcePosition(
-                    line: positionRange.end.line,
-                    utf8index: positionRange.end.column
-                ),
-            offsetRange: offsetRange
+            rangeInXcode: rangeInXcode,
+            offsetRange: offsetRange,
+            kind: .case
         )
 
         guard !buffer.isEmpty else {
             fatalError("The buffer is empty.")
         }
-
-        guard let lastItem = buffer.popLast(),
-              var enumObject = lastItem as? EnumObject else {
-            fatalError("The type of the last element of buffer is not a \(EnumObject.self).")
+        guard var enumObject = buffer.popLast(),
+              enumObject.kind == .enum
+        else {
+            fatalError("The type of the last element of buffer is not a enum.")
         }
 
         enumObject.cases.append(currentCase)
         buffer.append(enumObject)
 
-        #if DEBUG
-            print("buffer[\(buffer.count)].cases.append(currentCase)")
-        #endif
+        return .visitChildren
+    }
+
+    // MARK: Attribute
+
+    override func visit(_ node: AttributeSyntax) -> SyntaxVisitorContinueKind {
+        if !buffer.isEmpty,
+           var owner = buffer.popLast() {
+            let locationRange = node.sourceRange(converter: locationConverter)
+            let rangeInXcode = LocationInXcode(line: locationRange.start.line, column: locationRange.start.column)
+                ... LocationInXcode(line: locationRange.end.line, column: locationRange.end.column)
+            let offsetRange = node.trimmedByteRange.offset ... node.trimmedByteRange.endOffset
+
+            owner.attributes.append(
+                DeclaredObject(
+                    name: node.trimmed.description,
+                    nameOffset: node.trimmedByteRange.offset,
+                    fullPath: fullPath,
+                    sourceCode: trimSourceCode(node.description),
+                    rangeInXcode: rangeInXcode,
+                    offsetRange: offsetRange,
+                    kind: .attribute
+                )
+            )
+            buffer.append(owner)
+        }
 
         return .visitChildren
     }
 }
 
 extension DeclarationVisitor {
-    private func appendToBuffer(_ object: any DeclarationObject) {
-        #if DEBUG
-            print("buffer.append(\(object.name))")
-            print("- \(buffer.map { $0.name })")
-        #endif
-
+    private func appendToBuffer(_ object: DeclaredObject) {
         buffer.append(object)
-
-        #if DEBUG
-            print("+ \(buffer.map { $0.name })")
-        #endif
     }
 
     // FIXME: If a String exists in the source code and “\n” exists in the String, a new line is broken.

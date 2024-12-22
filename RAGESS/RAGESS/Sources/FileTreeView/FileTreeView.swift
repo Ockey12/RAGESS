@@ -27,75 +27,75 @@ public struct FileTreeView: View {
     }
 }
 
-#Preview {
-    FileTreeView(
-        store: .init(
-            initialState: FileTreeViewReducer.State(
-                rootDirectory: Directory(
-                    path: "Project/",
-                    subDirectories: [
-                        Directory(
-                            path: "Project/View",
-                            subDirectories: [],
-                            files: [
-                                SourceFile(
-                                    path: "Project/View/ContentView.swift",
-                                    content: ""
-                                )
-                            ]
-                        ),
-                        Directory(
-                            path: "Project/Model",
-                            subDirectories: [
-                                Directory(
-                                    path: "Project/Model/Data",
-                                    subDirectories: [],
-                                    files: []
-                                ),
-                                Directory(
-                                    path: "Project/Model/API",
-                                    subDirectories: [],
-                                    files: [
-                                        SourceFile(
-                                            path: "Project/Model/API/Post.swift",
-                                            content: ""
-                                        )
-                                    ]
-                                )
-                            ],
-                            files: [
-                                SourceFile(
-                                    path: "Project/Model/DogModel.swift",
-                                    content: ""
-                                ),
-                                SourceFile(
-                                    path: "Project/Model/CatModel.swift",
-                                    content: ""
-                                )
-                            ]
-                        ),
-                        Directory(
-                            path: "Project/ViewModel",
-                            subDirectories: [],
-                            files: [
-                                SourceFile(
-                                    path: "Project/ViewModel/AnimalViewModel.swift",
-                                    content: ""
-                                )
-                            ]
-                        )
-                    ],
-                    files: [
-                        SourceFile(
-                            path: "Project/App.swift",
-                            content: ""
-                        )
-                    ]
-                )
-            ),
-            reducer: {
-                FileTreeViewReducer()
-            }
-        )
-    )
-}
+// #Preview {
+//    FileTreeView(
+//        store: .init(
+//            initialState: FileTreeViewReducer.State(
+//                rootDirectory: Directory(
+//                    path: "Project/",
+//                    subDirectories: [
+//                        Directory(
+//                            path: "Project/View",
+//                            subDirectories: [],
+//                            files: [
+//                                SourceFile(
+//                                    path: "Project/View/ContentView.swift",
+//                                    content: ""
+//                                )
+//                            ]
+//                        ),
+//                        Directory(
+//                            path: "Project/Model",
+//                            subDirectories: [
+//                                Directory(
+//                                    path: "Project/Model/Data",
+//                                    subDirectories: [],
+//                                    files: []
+//                                ),
+//                                Directory(
+//                                    path: "Project/Model/API",
+//                                    subDirectories: [],
+//                                    files: [
+//                                        SourceFile(
+//                                            path: "Project/Model/API/Post.swift",
+//                                            content: ""
+//                                        )
+//                                    ]
+//                                )
+//                            ],
+//                            files: [
+//                                SourceFile(
+//                                    path: "Project/Model/DogModel.swift",
+//                                    content: ""
+//                                ),
+//                                SourceFile(
+//                                    path: "Project/Model/CatModel.swift",
+//                                    content: ""
+//                                )
+//                            ]
+//                        ),
+//                        Directory(
+//                            path: "Project/ViewModel",
+//                            subDirectories: [],
+//                            files: [
+//                                SourceFile(
+//                                    path: "Project/ViewModel/AnimalViewModel.swift",
+//                                    content: ""
+//                                )
+//                            ]
+//                        )
+//                    ],
+//                    files: [
+//                        SourceFile(
+//                            path: "Project/App.swift",
+//                            content: ""
+//                        )
+//                    ]
+//                )
+//            ),
+//            reducer: {
+//                FileTreeViewReducer()
+//            }
+//        )
+//    )
+// }

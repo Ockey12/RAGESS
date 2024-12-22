@@ -61,7 +61,7 @@ public struct DetailReducer {
                     y: textCellTopLeadingPoint.y + ComponentSizeValues.itemHeight
                 )
             }
-            texts = .init(textCells, uniquingIDsWith: { a, b in a})
+            texts = .init(textCells, uniquingIDsWith: { a, _ in a })
             self.kind = kind
             self.topLeadingPoint = topLeadingPoint
             self.frameWidth = frameWidth

@@ -99,6 +99,7 @@ public struct RAGESSReducer {
         case sourceFileResponse(Result<Directory, Error>)
         case declarationExtractorResponse(Result<DeclarationExtractor.Response, Error>)
         case dependenciesExtractorCompleted([DependencyObject])
+        case swiftDiagramTreeStateResponse(SwiftDiagramTreeViewReducer.State)
 
         case detectedBuildStart(Date)
         case detectedBuildSuccess(Date)
@@ -314,6 +315,11 @@ public struct RAGESSReducer {
                     }))
                 }
 
+            case let .swiftDiagramTreeStateResponse(treeState):
+                state.showProgressView = false
+                state.swiftDiagramTree = treeState
+                return .none
+
             // MARK: Children Actions
 
             case let .fileTree(.delegate(delegateAction)):
@@ -327,18 +333,37 @@ public struct RAGESSReducer {
                     }
                     let selectedObject = rootDirectory[keyPath: objectKeyPath]
                     state.lastSelectedObjectUSR = firstUSR
+                    state.showProgressView = true
                     print("Selected: \(selectedObject.name)")
 
                     let startTime = CFAbsoluteTimeGetCurrent()
-                    state.swiftDiagramTree = .init(
-                        rootObjectKeyPath: objectKeyPath,
-                        rootDirectory: rootDirectory,
-                        usrTable: state.extractedData.usrTable,
-                        dependencyObjects: state.extractedData.dependencyObjects
-                    )
+                    // FIXME: Run on a non-main thread.
+//                    state.swiftDiagramTree = .init(
+//                        rootObjectKeyPath: objectKeyPath,
+//                        rootDirectory: rootDirectory,
+//                        usrTable: state.extractedData.usrTable,
+//                        dependencyObjects: state.extractedData.dependencyObjects
+//                    )
                     print("Node States Generated: \(CFAbsoluteTimeGetCurrent() - startTime) S")
 
-                    return .none
+//                    return .send(.swiftDiagramTreeStateResponse(
+//                        SwiftDiagramTreeViewReducer.State(
+//                            rootObjectKeyPath: objectKeyPath,
+//                            rootDirectory: rootDirectory,
+//                            usrTable: state.extractedData.usrTable,
+//                            dependencyObjects: state.extractedData.dependencyObjects
+//                        )
+//                    ))
+                    return .run { [usrTable = state.extractedData.usrTable, dependencyObjects = state.extractedData.dependencyObjects] send in
+                        await send(.swiftDiagramTreeStateResponse(
+                            SwiftDiagramTreeViewReducer.State(
+                                rootObjectKeyPath: objectKeyPath,
+                                rootDirectory: rootDirectory,
+                                usrTable: usrTable,
+                                dependencyObjects: dependencyObjects
+                            )
+                        ))
+                    }
                 }
 
             case .fileTree:

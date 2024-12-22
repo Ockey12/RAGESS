@@ -93,8 +93,6 @@ public struct RAGESSReducer {
 
         case projectDirectorySelectorResponse(Result<[URL], Error>)
         case derivedDataSelectorResponse(Result<[URL], Error>)
-        case startButtonTapped
-        case stopButtonTapped
         case monitorButtonTapped
         case extractSourceFiles
         case sourceFileResponse(Result<Directory, Error>)
@@ -179,24 +177,6 @@ public struct RAGESSReducer {
                     assertionFailure()
                     return .none
                 }
-
-            case .startButtonTapped:
-                guard state.extractedData.projectRootDirectoryPath != "",
-                      state.extractedData.derivedDataPath != "" else {
-                    return .none
-                }
-
-                state.showStopButton = true
-                state.isMonitoring = true
-
-                return .none
-
-            case .stopButtonTapped:
-                state.showStopButton = false
-                state.isMonitoring = false
-                state.rootDirectoryWithoutUSRs = nil
-
-                return .none
 
             case .monitorButtonTapped:
                 if state.isMonitoring {

@@ -128,6 +128,10 @@ extension Directory {
                 else {
                     return nil
                 }
+                let parent = self[keyPath: parentKeyPath]
+                guard object != parent else {
+                    return object
+                }
                 object = self[keyPath: parentKeyPath]
             }
         }

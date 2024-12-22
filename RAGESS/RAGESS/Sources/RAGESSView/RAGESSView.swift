@@ -99,26 +99,12 @@ public struct RAGESSView: View {
                 }
                 .toolbar {
                     ToolbarItemGroup(placement: .navigation) {
-                        if store.showStopButton {
-                            Button(
-                                action: {
-                                    store.send(.stopButtonTapped)
-                                },
-                                label: {
-                                    Image(systemName: "stop.fill")
-                                        .resizable()
-                                        .frame(width: 15, height: 15)
-                                }
-                            )
-                            .disabled(false)
-                        }
-
                         Button(
                             action: {
-                                store.send(.startButtonTapped)
+                                store.send(.monitorButtonTapped)
                             },
                             label: {
-                                Image(systemName: "play.fill")
+                                Image(systemName: store.isMonitoring ? "stop.fill" : "play.fill")
                                     .resizable()
                                     .frame(width: 15, height: 15)
                             }

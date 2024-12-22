@@ -336,24 +336,6 @@ public struct RAGESSReducer {
                     state.showProgressView = true
                     print("Selected: \(selectedObject.name)")
 
-                    let startTime = CFAbsoluteTimeGetCurrent()
-                    // FIXME: Run on a non-main thread.
-//                    state.swiftDiagramTree = .init(
-//                        rootObjectKeyPath: objectKeyPath,
-//                        rootDirectory: rootDirectory,
-//                        usrTable: state.extractedData.usrTable,
-//                        dependencyObjects: state.extractedData.dependencyObjects
-//                    )
-                    print("Node States Generated: \(CFAbsoluteTimeGetCurrent() - startTime) S")
-
-//                    return .send(.swiftDiagramTreeStateResponse(
-//                        SwiftDiagramTreeViewReducer.State(
-//                            rootObjectKeyPath: objectKeyPath,
-//                            rootDirectory: rootDirectory,
-//                            usrTable: state.extractedData.usrTable,
-//                            dependencyObjects: state.extractedData.dependencyObjects
-//                        )
-//                    ))
                     return .run { [usrTable = state.extractedData.usrTable, dependencyObjects = state.extractedData.dependencyObjects] send in
                         await send(.swiftDiagramTreeStateResponse(
                             SwiftDiagramTreeViewReducer.State(

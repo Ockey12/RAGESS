@@ -43,13 +43,13 @@ public struct DetailReducer {
             @Dependency(\.uuid) var uuid
             id = uuid()
 
-            var textCells: [TextCellReducer.State] = []
+            var textCells = Set<TextCellReducer.State>()
             var textCellTopLeadingPoint = CGPoint(
                 x: topLeadingPoint.x,
                 y: topLeadingPoint.y + ComponentSizeValues.connectionHeight
             )
             for object in objects {
-                textCells.append(
+                textCells.insert(
                     .init(
                         object: object,
                         topLeadingPoint: textCellTopLeadingPoint,
@@ -61,7 +61,10 @@ public struct DetailReducer {
                     y: textCellTopLeadingPoint.y + ComponentSizeValues.itemHeight
                 )
             }
-            texts = .init(uniqueElements: textCells)
+            texts = .init(
+                uniqueElements: Array(textCells)
+                    .sorted(by: { $0.object.rangeInXcode.lowerBound < $1.object.rangeInXcode.lowerBound })
+            )
             self.kind = kind
             self.topLeadingPoint = topLeadingPoint
             self.frameWidth = frameWidth

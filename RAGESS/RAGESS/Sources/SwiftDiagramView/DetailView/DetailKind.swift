@@ -30,9 +30,9 @@ public enum DetailKind {
         case .initializers:
             "Initializer"
         case .variables:
-            "Variables"
+            "Property"
         case .functions:
-            "Functions"
+            "Method"
         case .case:
             "Case"
         case .nestType:

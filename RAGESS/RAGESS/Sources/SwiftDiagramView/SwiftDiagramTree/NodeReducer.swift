@@ -68,12 +68,12 @@ public struct NodeReducer {
 
             // set bodyWidth and frameWidth
             var allAnnotatedDecl = [object.declaration]
-            allAnnotatedDecl.append(contentsOf: abstractObjects.map { $0.declaration })
             allAnnotatedDecl.append(contentsOf: object.attributes.map { $0.declaration })
-            allAnnotatedDecl.append(contentsOf: object.initializers.map { $0.declaration })
-            allAnnotatedDecl.append(contentsOf: object.variables.map { $0.declaration })
-            allAnnotatedDecl.append(contentsOf: object.functions.map { $0.declaration })
+            allAnnotatedDecl.append(contentsOf: abstractObjects.map { $0.declaration })
             allAnnotatedDecl.append(contentsOf: object.cases.map { $0.declaration })
+            allAnnotatedDecl.append(contentsOf: object.variables.map { $0.declaration })
+            allAnnotatedDecl.append(contentsOf: object.initializers.map { $0.declaration })
+            allAnnotatedDecl.append(contentsOf: object.functions.map { $0.declaration })
             let bodyWidth = max(
                 calculateMaxTextWidth(allAnnotatedDecl),
                 ComponentSizeValues.bodyMinWidth
@@ -160,24 +160,6 @@ public struct NodeReducer {
                 )
             }
 
-            if !object.initializers.isEmpty {
-                details.append(
-                    .init(
-                        objects: object.initializers,
-                        kind: .initializers,
-                        topLeadingPoint: frameBottomLeadingPoint,
-                        frameWidth: bodyWidth
-                    )
-                )
-                frameBottomLeadingPoint = CGPoint(
-                    x: frameBottomLeadingPoint.x,
-                    y: frameBottomLeadingPoint.y
-                        + connectionHeight
-                        + itemHeight * CGFloat(object.initializers.count)
-                        + bottomPaddingForLastText
-                )
-            }
-
             if !object.cases.isEmpty {
                 details.append(
                     .init(
@@ -211,6 +193,24 @@ public struct NodeReducer {
                         + connectionHeight
                         + itemHeight * CGFloat(object.variables.count)
                         + bottomPaddingForLastText
+                )
+            }
+
+            if !object.initializers.isEmpty {
+                details.append(
+                    .init(
+                        objects: object.initializers,
+                        kind: .initializers,
+                        topLeadingPoint: frameBottomLeadingPoint,
+                        frameWidth: bodyWidth
+                    )
+                )
+                frameBottomLeadingPoint = CGPoint(
+                    x: frameBottomLeadingPoint.x,
+                    y: frameBottomLeadingPoint.y
+                    + connectionHeight
+                    + itemHeight * CGFloat(object.initializers.count)
+                    + bottomPaddingForLastText
                 )
             }
 

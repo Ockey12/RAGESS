@@ -208,9 +208,9 @@ public struct NodeReducer {
                 frameBottomLeadingPoint = CGPoint(
                     x: frameBottomLeadingPoint.x,
                     y: frameBottomLeadingPoint.y
-                    + connectionHeight
-                    + itemHeight * CGFloat(object.initializers.count)
-                    + bottomPaddingForLastText
+                        + connectionHeight
+                        + itemHeight * CGFloat(object.initializers.count)
+                        + bottomPaddingForLastText
                 )
             }
 
